@@ -3,79 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bitcoin Premium Edition #001</title>
+    <title>Moneda Física #001 - Bitcoin Premium Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        .coin {
-            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .coin:hover {
-            transform: rotateY(25deg) rotateX(15deg) scale(1.08);
-        }
-        .glow {
-            box-shadow: 0 0 60px -10px rgb(245 158 11);
-        }
+        body { font-family: system-ui, -apple-system, sans-serif; }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-950 to-black text-slate-100 flex items-center justify-center p-6">
-    <div class="max-w-lg w-full">
-        <div class="bg-zinc-900/90 backdrop-blur-2xl rounded-3xl shadow-2xl border border-amber-500/30 overflow-hidden">
-            <div class="p-10 text-center">
-                <h1 class="text-5xl font-bold mb-2 text-amber-400 tracking-tight">Bitcoin Premium Edition</h1>
-                <p class="text-2xl text-amber-300 mb-10">Moneda Física #001</p>
-                
-                <div class="relative mx-auto mb-12" style="width: 320px; height: 320px;">
-                    <img id="coinImage" src="assets/coin-001.png" 
-                         class="coin mx-auto w-full h-full object-contain rounded-full shadow-2xl border-8 border-amber-500 glow" alt="Moneda Bitcoin Premium">
-                </div>
+<body class="bg-black text-white min-h-screen flex items-center justify-center p-6">
+    <div class="max-w-md w-full text-center">
+        <h1 class="text-4xl font-bold text-amber-400 mb-1">Bitcoin Premium Edition</h1>
+        <p class="text-xl text-amber-300 mb-12">Moneda Física #001</p>
 
-                <div class="bg-zinc-800/80 rounded-3xl p-8 mb-10">
-                    <p class="text-amber-400 text-sm uppercase tracking-widest mb-1">Valor nominal</p>
-                    <p class="text-7xl font-bold text-white mb-2" id="euro">50 €</p>
-                    <p class="text-4xl font-mono text-emerald-400" id="sats">---,--- sats</p>
-                    <p class="text-xs text-slate-500 mt-4">Precio actualizado en tiempo real</p>
-                </div>
-
-                <div id="qrcode" class="mx-auto mb-10 bg-white p-4 rounded-2xl inline-block"></div>
-
-                <button onclick="copyLink()" class="w-full py-6 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-black font-bold text-2xl rounded-3xl transition-all active:scale-95 shadow-xl">
-                    📋 COPIAR ENLACE PARA NFC
-                </button>
-            </div>
+        <div class="bg-zinc-900 rounded-3xl p-8 mb-8">
+            <p class="text-amber-400 text-sm mb-2 tracking-widest">VALOR NOMINAL</p>
+            <div id="nominal" class="text-6xl font-bold text-white mb-3">50 €</div>
+            <div id="sats" class="text-4xl font-mono text-emerald-400">87.173 sats</div>
         </div>
+
+        <div class="bg-zinc-900 rounded-3xl p-6 mb-8">
+            <p class="text-xs text-zinc-400 mb-2">Precio de Bitcoin</p>
+            <div id="btc-price" class="text-2xl font-mono text-amber-300">-- €</div>
+        </div>
+
+        <div id="qrcode" class="mx-auto mb-8 inline-block p-4 bg-white rounded-2xl"></div>
+
+        <button onclick="copyLink()" class="w-full py-6 bg-amber-500 hover:bg-amber-600 text-black font-bold text-xl rounded-3xl transition-all">
+            📋 Copiar enlace para NFC
+        </button>
+
+        <p class="text-xs text-zinc-500 mt-8">Valor nominal actualizado cada 15 segundos según BTC</p>
     </div>
 
     <script>
+        const fixedSats = 87173; // Sats fijos comprados
+
         async function updatePrice() {
             try {
                 const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
                 const data = await res.json();
-                const btcPrice = data.bitcoin.eur;
-                const sats = Math.round((50 / btcPrice) * 100_000_000);
-                document.getElementById('sats').textContent = sats.toLocaleString('es-ES') + ' sats';
-            } catch (e) {
-                console.log('Error fetching price');
+                const btcEur = data.bitcoin.eur;
+
+                // Valor nominal en euros = (sats fijos / 100M) * precio BTC
+                const nominalEur = (fixedSats / 100000000 * btcEur).toFixed(2);
+                
+                document.getElementById('nominal').innerHTML = nominalEur + ' <span class="text-4xl">€</span>';
+                document.getElementById('sats').textContent = fixedSats.toLocaleString('es-ES') + ' sats';
+                document.getElementById('btc-price').textContent = btcEur.toLocaleString('es-ES') + ' €';
+            } catch(e) {
+                console.error('Error al actualizar precio');
             }
         }
 
         function copyLink() {
-            navigator.clipboard.writeText(window.location.href).then(() => {
-                alert('✅ Enlace copiado correctamente! Pégalo en tu chip NFC.');
-            });
+            navigator.clipboard.writeText(window.location.href);
+            alert('✅ Enlace copiado! Pégalo en tu chip NFC.');
         }
 
-        window.onload = function() {
+        window.onload = () => {
             updatePrice();
-            setInterval(updatePrice, 30000);
+            setInterval(updatePrice, 15000); // Cada 15 segundos
 
-            // QR Code
             new QRCode(document.getElementById("qrcode"), {
                 text: window.location.href,
-                width: 260,
-                height: 260,
-                colorDark : "#000000",
-                colorLight : "#ffffff",
+                width: 220,
+                height: 220,
+                colorDark: "#f59e0b",
+                colorLight: "#18181b"
             });
         };
     </script>
