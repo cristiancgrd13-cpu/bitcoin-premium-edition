@@ -3,73 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Moneda Física #001 - Bitcoin Premium Edition</title>
+    <title>Bitcoin Premium Edition #001</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body { font-family: system-ui, -apple-system, sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
     </style>
 </head>
-<body class="bg-black text-white min-h-screen flex items-center justify-center p-6">
+<body class="bg-black text-white min-h-screen flex items-center justify-center p-4">
     <div class="max-w-md w-full text-center">
-        <h1 class="text-4xl font-bold text-amber-400 mb-1">Bitcoin Premium Edition</h1>
-        <p class="text-xl text-amber-300 mb-12">Moneda Física #001</p>
+        <h1 class="text-5xl font-bold text-amber-400 mb-2">Bitcoin Premium Edition</h1>
+        <p class="text-2xl text-amber-300 mb-12">Moneda Física #001</p>
+
+        <div class="bg-zinc-900 rounded-3xl p-10 mb-8 border border-amber-500/30">
+            <p class="text-amber-400 text-lg tracking-widest mb-4">VALOR DEL NFC</p>
+            <div id="nominal" class="text-7xl font-bold text-white mb-4">50.00 €</div>
+            <div id="sats" class="text-5xl font-mono text-emerald-400">87.173 sats</div>
+        </div>
 
         <div class="bg-zinc-900 rounded-3xl p-8 mb-8">
-            <p class="text-amber-400 text-sm mb-2 tracking-widest">VALOR NOMINAL</p>
-            <div id="nominal" class="text-6xl font-bold text-white mb-3">50 €</div>
-            <div id="sats" class="text-4xl font-mono text-emerald-400">87.173 sats</div>
+            <p class="text-zinc-400 text-sm mb-3">PRECIO DE BITCOIN</p>
+            <div id="btc-price" class="text-4xl font-mono text-amber-300">-- €</div>
         </div>
 
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-8">
-            <p class="text-xs text-zinc-400 mb-2">Precio de Bitcoin</p>
-            <div id="btc-price" class="text-2xl font-mono text-amber-300">-- €</div>
-        </div>
+        <div id="qrcode" class="mx-auto mb-10 p-5 bg-white rounded-3xl inline-block"></div>
 
-        <div id="qrcode" class="mx-auto mb-8 inline-block p-4 bg-white rounded-2xl"></div>
-
-        <button onclick="copyLink()" class="w-full py-6 bg-amber-500 hover:bg-amber-600 text-black font-bold text-xl rounded-3xl transition-all">
+        <button onclick="copyLink()" 
+                class="w-full py-6 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-black font-bold text-2xl rounded-3xl transition-all">
             📋 Copiar enlace para NFC
         </button>
 
-        <p class="text-xs text-zinc-500 mt-8">Valor nominal actualizado cada 15 segundos según BTC</p>
+        <p class="text-xs text-zinc-500 mt-10">cada 10 segundos</p>
     </div>
 
     <script>
-        const fixedSats = 87173; // Sats fijos comprados
+        let fixedSats = 87173;
 
         async function updatePrice() {
             try {
                 const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
                 const data = await res.json();
-                const btcEur = data.bitcoin.eur;
-
-                // Valor nominal en euros = (sats fijos / 100M) * precio BTC
+                const btcEur = data.bitcoin.eur || 57000;
                 const nominalEur = (fixedSats / 100000000 * btcEur).toFixed(2);
                 
-                document.getElementById('nominal').innerHTML = nominalEur + ' <span class="text-4xl">€</span>';
+                document.getElementById('nominal').textContent = nominalEur + ' €';
                 document.getElementById('sats').textContent = fixedSats.toLocaleString('es-ES') + ' sats';
                 document.getElementById('btc-price').textContent = btcEur.toLocaleString('es-ES') + ' €';
             } catch(e) {
-                console.error('Error al actualizar precio');
+                console.error("Error fetching price", e);
             }
         }
 
         function copyLink() {
-            navigator.clipboard.writeText(window.location.href);
-            alert('✅ Enlace copiado! Pégalo en tu chip NFC.');
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('✅ Enlace copiado para tu chip NFC!');
+            });
         }
 
         window.onload = () => {
             updatePrice();
-            setInterval(updatePrice, 15000); // Cada 15 segundos
+            setInterval(updatePrice, 10000); // cada 10 segundos
 
             new QRCode(document.getElementById("qrcode"), {
                 text: window.location.href,
-                width: 220,
-                height: 220,
-                colorDark: "#f59e0b",
-                colorLight: "#18181b"
+                width: 260,
+                height: 260,
+                colorDark: "#fbbf24",
+                colorLight: "#111827"
             });
         };
     </script>
