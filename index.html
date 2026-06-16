@@ -7,92 +7,77 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Space+Grotesk:wght@500;600&display=swap');
-        body { font-family: 'Inter', system-ui; }
-        .title { font-family: 'Space Grotesk', sans-serif; }
-        .coin { transition: transform 0.6s; }
-        .coin:hover { transform: rotateY(20deg) rotateX(10deg); }
+        .coin {
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .coin:hover {
+            transform: rotateY(25deg) rotateX(15deg) scale(1.08);
+        }
+        .glow {
+            box-shadow: 0 0 60px -10px rgb(245 158 11);
+        }
     </style>
 </head>
-<body class="bg-zinc-950 text-white min-h-screen">
-    <div class="max-w-2xl mx-auto p-6">
-        <div class="text-center mb-8">
-            <h1 class="title text-5xl font-bold text-amber-400 mb-2">Bitcoin Premium Edition</h1>
-            <p class="text-zinc-400">#001 - Physical Bitcoin</p>
-        </div>
+<body class="min-h-screen bg-gradient-to-br from-slate-950 via-zinc-950 to-black text-slate-100 flex items-center justify-center p-6">
+    <div class="max-w-lg w-full">
+        <div class="bg-zinc-900/90 backdrop-blur-2xl rounded-3xl shadow-2xl border border-amber-500/30 overflow-hidden">
+            <div class="p-10 text-center">
+                <h1 class="text-5xl font-bold mb-2 text-amber-400 tracking-tight">Bitcoin Premium Edition</h1>
+                <p class="text-2xl text-amber-300 mb-10">Moneda Física #001</p>
+                
+                <div class="relative mx-auto mb-12" style="width: 320px; height: 320px;">
+                    <img id="coinImage" src="https://raw.githubusercontent.com/cristiancgrd13-cpu/bitcoin-premium-edition/main/assets/coin-001.png" 
+                         class="coin mx-auto w-full h-full object-contain rounded-full shadow-2xl border-8 border-amber-500 glow" alt="Moneda Bitcoin Premium">
+                </div>
 
-        <div class="bg-zinc-900 rounded-3xl p-8 shadow-2xl border border-zinc-800">
-            <div class="flex justify-center mb-8">
-                <img id="coin-image" src="assets/coin-001.png" alt="Bitcoin Premium Edition #001" class="coin w-80 h-80 object-contain drop-shadow-2xl">
+                <div class="bg-zinc-800/80 rounded-3xl p-8 mb-10">
+                    <p class="text-amber-400 text-sm uppercase tracking-widest mb-1">Valor nominal</p>
+                    <p class="text-7xl font-bold text-white mb-2" id="euro">50 €</p>
+                    <p class="text-4xl font-mono text-emerald-400" id="sats">---,--- sats</p>
+                    <p class="text-xs text-slate-500 mt-4">Precio actualizado en tiempo real</p>
+                </div>
+
+                <div id="qrcode" class="mx-auto mb-10 bg-white p-4 rounded-2xl inline-block"></div>
+
+                <button onclick="copyLink()" class="w-full py-6 bg-gradient-to-r from-amber-400 to-yellow-500 hover:from-amber-500 hover:to-yellow-600 text-black font-bold text-2xl rounded-3xl transition-all active:scale-95 shadow-xl">
+                    📋 COPIAR ENLACE PARA NFC
+                </button>
             </div>
-
-            <div class="space-y-6 text-center">
-                <div>
-                    <p class="text-zinc-400 text-sm">Valor nominal</p>
-                    <p id="euro-value" class="text-6xl font-bold text-emerald-400">50 €</p>
-                </div>
-
-                <div>
-                    <p class="text-zinc-400 text-sm">Valor en Sats (actualizado en vivo)</p>
-                    <p id="sats-value" class="text-5xl font-mono font-bold text-white">87,500 sats</p>
-                    <p id="btc-price" class="text-xs text-zinc-500 mt-1"></p>
-                </div>
-
-                <div class="pt-4">
-                    <div id="qrcode" class="mx-auto"></div>
-                </div>
-
-                <a href="#" id="link-nfc" class="block bg-emerald-600 hover:bg-emerald-500 transition-colors text-white font-medium py-4 rounded-2xl text-lg">
-                    Copiar enlace para NFC
-                </a>
-            </div>
-        </div>
-
-        <div class="mt-8 text-center text-zinc-500 text-sm">
-            Escanea este enlace con tu teléfono o NFC para ver el valor actualizado en tiempo real.
         </div>
     </div>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get('id') || '001';
-        const baseEuros = parseFloat(params.get('euros')) || 50;
-
         async function updatePrice() {
             try {
                 const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
                 const data = await res.json();
-                const btcEur = data.bitcoin.eur;
-                const sats = Math.round(baseEuros * (btcEur / 65000) * 100000); // Aprox 1 BTC = 100M sats
-                document.getElementById('sats-value').textContent = sats.toLocaleString('es-ES') + ' sats';
-                document.getElementById('btc-price').textContent = `1 BTC ≈ ${btcEur.toLocaleString('es-ES')} €`;
-                document.getElementById('euro-value').textContent = baseEuros + ' €';
-            } catch(e) {
+                const btcPrice = data.bitcoin.eur;
+                const sats = Math.round((50 / btcPrice) * 100_000_000);
+                document.getElementById('sats').textContent = sats.toLocaleString('es-ES') + ' sats';
+            } catch (e) {
                 console.log('Error fetching price');
             }
         }
 
-        function generateQR() {
-            const url = window.location.href;
-            document.getElementById('qrcode').innerHTML = '';
-            new QRCode(document.getElementById('qrcode'), {
-                text: url,
-                width: 256,
-                height: 256,
-                colorDark : "#ffffff",
-                colorLight : "#18181b"
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('✅ Enlace copiado correctamente! Pégalo en tu chip NFC.');
             });
         }
 
-        document.getElementById('link-nfc').href = window.location.href;
-        document.getElementById('link-nfc').addEventListener('click', (e) => {
-            e.preventDefault();
-            navigator.clipboard.writeText(window.location.href).then(() => alert('¡Enlace copiado para tu chip NFC!'));
-        });
+        window.onload = function() {
+            updatePrice();
+            setInterval(updatePrice, 30000);
 
-        updatePrice();
-        setInterval(updatePrice, 60000);
-        generateQR();
+            // QR Code
+            new QRCode(document.getElementById("qrcode"), {
+                text: window.location.href,
+                width: 260,
+                height: 260,
+                colorDark : "#000000",
+                colorLight : "#ffffff",
+            });
+        };
     </script>
 </body>
 </html>
