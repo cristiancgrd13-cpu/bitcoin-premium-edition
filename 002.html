@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bitcoin Premium Edition #002</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .bitcoin-logo {
+            width: 180px;
+            height: 180px;
+            filter: drop-shadow(0 0 30px #fbbf24);
+        }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+        <h1 class="text-5xl font-bold text-amber-400 mb-2">Bitcoin Premium Edition</h1>
+        <p class="text-2xl text-amber-300 mb-8">Moneda Física #002</p>
+
+        <!-- Gran logo Bitcoin -->
+        <div class="flex justify-center mb-10">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Bitcoin.svg/1200px-Bitcoin.svg.png" 
+                 alt="Bitcoin Logo" 
+                 class="bitcoin-logo">
+        </div>
+
+        <div class="bg-zinc-900 rounded-3xl p-10 mb-8 border border-amber-500/30">
+            <p class="text-amber-400 text-lg tracking-widest mb-4">VALOR DEL NFC</p>
+            <div id="nominal" class="text-7xl font-bold text-white mb-4">50.00 €</div>
+            <div id="sats" class="text-5xl font-mono text-emerald-400">87.173 sats</div>
+        </div>
+
+        <div class="bg-zinc-900 rounded-3xl p-8 mb-8">
+            <p class="text-zinc-400 text-sm mb-3">PRECIO DE BITCOIN</p>
+            <div id="btc-price" class="text-4xl font-mono text-amber-300">-- €</div>
+        </div>
+
+        <!-- Precio promedio de compra -->
+        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-emerald-500/30">
+            <p class="text-emerald-400 text-sm mb-2">PRECIO PROMEDIO DE COMPRA</p>
+            <div id="avg-buy-price" class="text-4xl font-mono text-white">50.00 €</div>
+            <p id="buy-date" class="text-xs text-zinc-500 mt-3">Fecha de adquisición: 17/06/2026</p>
+        </div>
+
+        <!-- Rendimiento -->
+        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-amber-500/30">
+            <p class="text-zinc-400 text-sm mb-3">RENDIMIENTO</p>
+            <div id="percentage" class="text-5xl font-bold">+0.00%</div>
+        </div>
+
+        <button onclick="copyLink()" 
+                class="w-full py-6 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-black font-bold text-2xl rounded-3xl transition-all mb-8">
+            📋 Copiar enlace para NFC
+        </button>
+
+        <p class="text-xs text-zinc-500">El Valor del NFC se actualiza cada 10 segundos según el precio real de Bitcoin</p>
+    </div>
+
+    <script>
+        let fixedSats = 87173;
+        let initialInvestment = 50.00; // Cambia aquí el valor inicial de compra
+        let acquisitionDate = "17/06/2026";
+
+        async function updatePrice() {
+            try {
+                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
+                const data = await res.json();
+                const btcEur = data.bitcoin.eur || 57000;
+                
+                const nominalEur = (fixedSats / 100000000 * btcEur).toFixed(2);
+                
+                document.getElementById('nominal').textContent = nominalEur + ' €';
+                document.getElementById('sats').textContent = fixedSats.toLocaleString('es-ES') + ' sats';
+                document.getElementById('btc-price').textContent = btcEur.toLocaleString('es-ES') + ' €';
+
+                // Precio promedio (por ahora fijo - luego podemos mejorarlo con múltiples compras)
+                document.getElementById('avg-buy-price').textContent = initialInvestment.toFixed(2) + ' €';
+
+                // Porcentaje rendimiento
+                const percentageChange = ((parseFloat(nominalEur) - initialInvestment) / initialInvestment * 100).toFixed(2);
+                const percElement = document.getElementById('percentage');
+                percElement.textContent = (percentageChange >= 0 ? '+' : '') + percentageChange + '%';
+                
+                if (percentageChange >= 0) {
+                    percElement.classList.add('text-emerald-400');
+                    percElement.classList.remove('text-red-400');
+                } else {
+                    percElement.classList.add('text-red-400');
+                    percElement.classList.remove('text-emerald-400');
+                }
+
+            } catch(e) {
+                console.error("Error fetching price", e);
+            }
+        }
+
+        function copyLink() {
+            navigator.clipboard.writeText(window.location.href).then(() => {
+                alert('✅ Enlace copiado para tu chip NFC!');
+            });
+        }
+
+        window.onload = () => {
+            updatePrice();
+            setInterval(updatePrice, 10000);
+        };
+    </script>
+</body>
+</html>
