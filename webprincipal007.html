@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinLink BTC Edition - Web Principal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    <div class="max-w-6xl mx-auto px-6">
+
+        <!-- Hero -->
+        <div class="text-center py-16 border-b border-amber-500/30">
+            <h1 class="text-6xl font-bold text-amber-400 mb-6">CoinLink BTC Edition</h1>
+            <p class="text-2xl text-amber-300 max-w-3xl mx-auto">
+                La forma más sencilla y tangible de invertir en bitcoin. Liquidez 24/7 respaldado en la blockchain.
+            </p>
+
+            <!-- Active Coins Counter -->
+            <div class="mt-10 inline-flex items-center justify-center bg-zinc-900 rounded-3xl px-10 py-4 border border-amber-500/30">
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-white">12 <span class="text-amber-400">/ 1000</span></div>
+                    <div class="text-sm text-zinc-400 tracking-widest mt-1">MONEDAS ACTIVAS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bitcoin Total Respaldado -->
+        <div class="py-12 text-center">
+            <div class="bg-zinc-900 rounded-3xl p-10 border border-amber-500/30 max-w-2xl mx-auto">
+                <p class="text-emerald-400 text-sm tracking-widest mb-3">BITCOIN TOTAL RESPALDADO</p>
+                <div class="text-4xl md:text-5xl font-mono font-bold text-white tracking-tighter">0.1443326</div>
+                <p class="text-sm text-zinc-400 mt-3">Respaldado 1:1 Físico y Digital</p>
+            </div>
+        </div>
+
+        <!-- Advantages - Compact next to logo style -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 py-10">
+            <div class="bg-zinc-900 rounded-2xl p-6 flex items-center gap-4 border border-amber-500/20">
+                <div class="text-4xl flex-shrink-0">⚡</div>
+                <div>
+                    <div class="font-semibold text-lg">Liquidez 24/7</div>
+                    <div class="text-xs text-zinc-400">Accede y vende cuando necesites</div>
+                </div>
+            </div>
+            <div class="bg-zinc-900 rounded-2xl p-6 flex items-center gap-4 border border-amber-500/20">
+                <div class="text-4xl flex-shrink-0">🔒</div>
+                <div>
+                    <div class="font-semibold text-lg">Respaldo Real</div>
+                    <div class="text-xs text-zinc-400">BTC físico verificable</div>
+                </div>
+            </div>
+            <div class="bg-zinc-900 rounded-2xl p-6 flex items-center gap-4 border border-amber-500/20">
+                <div class="text-4xl flex-shrink-0">📊</div>
+                <div>
+                    <div class="font-semibold text-lg">Transparencia Total</div>
+                    <div class="text-xs text-zinc-400">Todo en blockchain pública</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- New Serious Block: Seguridad y Transparencia Garantizada -->
+        <div class="bg-zinc-900 rounded-3xl p-10 my-12 border border-amber-500/30">
+            <div class="text-center mb-10">
+                <div class="inline-block px-5 py-1 bg-amber-500/10 text-amber-400 text-sm tracking-widest rounded-full mb-4">COMPROMISO REAL</div>
+                <h2 class="text-3xl font-bold">Seguridad y Transparencia Garantizada</h2>
+                <p class="text-zinc-400 mt-2 max-w-md mx-auto">Cada moneda está respaldada físicamente y verificable públicamente en la blockchain.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 text-sm">
+                <div class="bg-black/40 rounded-2xl p-6">
+                    <div class="font-semibold text-amber-400 mb-2">✓ Respaldo Físico</div>
+                    <div class="text-zinc-300">Bitcoin físico custodiado en bóvedas certificadas con auditorías periódicas.</div>
+                </div>
+                <div class="bg-black/40 rounded-2xl p-6">
+                    <div class="font-semibold text-amber-400 mb-2">✓ Verificación Pública</div>
+                    <div class="text-zinc-300">Cada transacción y respaldo es verificable en exploradores públicos de blockchain.</div>
+                </div>
+                <div class="bg-black/40 rounded-2xl p-6">
+                    <div class="font-semibold text-amber-400 mb-2">✓ Actualización en Tiempo Real</div>
+                    <div class="text-zinc-300">Precio y valor de cada moneda actualizado cada pocos segundos desde fuentes confiables.</div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center text-zinc-500 text-sm py-12 border-t border-zinc-800">
+            CoinLink BTC Edition © 2026 • Invertir nunca fue tan fácil
+        </footer>
+    </div>
+
+    <script>
+        async function updateTotalValue() {
+            try {
+                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
+                const data = await res.json();
+                const btcPrice = data.bitcoin.eur;
+                const totalBtc = 0.1443326;
+                const totalEur = (totalBtc * btcPrice).toFixed(2);
+                document.getElementById('total-value').textContent = totalEur + ' €';
+            } catch(e) {}
+        }
+        window.onload = updateTotalValue;
+        setInterval(updateTotalValue, 30000);
+    </script>
+</body>
+</html>
