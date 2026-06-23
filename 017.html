@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinLink BTC Edition #017</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .countdown { font-variant-numeric: tabular-nums; }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full text-center">
+        <h1 class="text-5xl font-bold text-amber-400 mb-1">CoinLink BTC Edition</h1>
+        <p class="text-5xl font-bold text-amber-400 mb-10">#017</p>
+
+        <!-- VALOR DEL NFC -->
+        <div class="bg-zinc-900 rounded-3xl p-8 mb-6 border border-amber-500/30">
+            <p class="text-amber-400 text-lg tracking-widest mb-3">VALOR DEL NFC</p>
+            <div class="flex items-baseline justify-center gap-3">
+                <div id="nominal" class="text-6xl font-bold text-white">100.00</div>
+                <div class="text-5xl font-bold text-amber-400">€</div>
+            </div>
+            <div id="btc-amount" class="text-3xl font-mono text-emerald-400 mt-2">0.001825 BTC</div>
+        </div>
+
+        <!-- EVOLUCIÓN DIARIA DEL VALOR (mismo tamaño que TradingView) -->
+        <div class="bg-zinc-900 rounded-3xl p-4 mb-6 border border-amber-500/30">
+            <p class="text-amber-400 text-sm mb-3 text-center">EVOLUCIÓN DIARIA DEL VALOR</p>
+            <canvas id="evolutionChart" class="w-full" height="280"></canvas>
+        </div>
+
+        <!-- GRÁFICA BITCOIN TRADINGVIEW (320px) -->
+        <div class="bg-zinc-900 rounded-3xl p-4 mb-8 border border-amber-500/30">
+            <p class="text-amber-400 text-sm mb-3 text-center">GRÁFICA BITCOIN (TradingView - EUR)</p>
+            <div class="tradingview-widget-container">
+                <div id="tradingview-chart" style="height: 320px;"></div>
+            </div>
+        </div>
+
+        <!-- PRECIO DE COMPRA + CUENTA ATRÁS -->
+        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-emerald-500/30">
+            <p class="text-emerald-400 text-sm mb-2">PRECIO PROMEDIO DE COMPRA</p>
+            <div class="flex items-baseline justify-center gap-3">
+                <div id="avg-buy-price" class="text-5xl font-mono text-white">100.00</div>
+                <div class="text-4xl font-bold text-amber-400">€</div>
+            </div>
+            <p id="btc-buy-price" class="text-zinc-400 text-sm mt-2">≈ -- €/BTC</p>
+            <p id="buy-date" class="text-xs text-zinc-500 mt-4">Fecha de adquisición: 19/06/2026</p>
+            
+            <!-- Cuenta atrás -->
+            <div class="mt-6 pt-6 border-t border-zinc-700">
+                <p class="text-amber-400 text-sm mb-3">Plazo de Vencimiento (3 AÑOS)</p>
+                <div id="countdown" class="countdown text-3xl font-mono text-white grid grid-cols-4 gap-2 text-center">
+                    <div><span id="years" class="text-4xl">3</span><br><span class="text-xs text-zinc-500">AÑOS</span></div>
+                    <div><span id="days" class="text-4xl">00</span><br><span class="text-xs text-zinc-500">DÍAS</span></div>
+                    <div><span id="hours" class="text-4xl">00</span><br><span class="text-xs text-zinc-500">HRS</span></div>
+                    <div><span id="minutes" class="text-4xl">00</span><br><span class="text-xs text-zinc-500">MIN</span></div>
+                </div>
+                <p class="text-red-400 text-xs mt-4">* Penalización del 30% si se vende antes de los 3 años</p>
+            </div>
+        </div>
+
+        <!-- RENDIMIENTO -->
+        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-amber-500/30">
+            <p class="text-zinc-400 text-sm mb-3">RENDIMIENTO</p>
+            <div id="percentage" class="text-5xl font-bold">+0.00%</div>
+        </div>
+
+        <a href="https://cristiancgrd13-cpu.github.io/bitcoin-premium-edition/webprincipal008.html" id="main-link"
+           class="block w-full py-6 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-black font-bold text-2xl rounded-3xl transition-all mb-8">
+            Acceso a la Web
+        </a>
+
+        <p class="text-amber-400 text-lg font-medium mb-6">"Invertir nunca fue tan fácil"</p>
+
+        <!-- FAQ -->
+        <div class="bg-zinc-900 rounded-3xl p-8 text-left">
+            <p class="text-amber-400 text-xl font-semibold mb-6">FAQ</p>
+            <p class="text-emerald-400 font-medium mb-4">¿Por qué invertir con nosotros?</p>
+            <ul class="space-y-4 text-zinc-300 text-sm">
+                <li class="flex gap-3"><span class="text-emerald-400">•</span> Tu liquidez 24/7 cuando lo necesites.</li>
+                <li class="flex gap-3"><span class="text-emerald-400">•</span> Transparencia, seriedad y confianza.</li>
+                <li class="flex gap-3"><span class="text-emerald-400">•</span> Respaldado con BTC real en la blockchain.</li>
+            </ul>
+        </div>
+
+        <p class="text-xs text-zinc-500 mt-8">El Valor del NFC se actualiza cada 5 segundos según el precio real de Bitcoin</p>
+    </div>
+
+    <script>
+        let fixedSats = 182500;
+        let initialInvestment = 100.00;
+        let acquisitionDate = new Date("2026-06-19T00:00:00");
+        let initialBtcPrice = 54800;
+
+        async function updatePrice() {
+            try {
+                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
+                const data = await res.json();
+                const btcEur = data.bitcoin.eur || initialBtcPrice;
+                
+                const nominalEur = (fixedSats / 100000000 * btcEur).toFixed(2);
+                const btcAmount = (fixedSats / 100000000).toFixed(6);
+                
+                document.getElementById('nominal').textContent = nominalEur;
+                document.getElementById('btc-amount').textContent = btcAmount + ' BTC';
+
+                document.getElementById('avg-buy-price').textContent = initialInvestment.toFixed(2);
+                document.getElementById('btc-buy-price').textContent = `≈ ${initialBtcPrice.toLocaleString('es-ES')} €/BTC`;
+
+                const percentageChange = ((parseFloat(nominalEur) - initialInvestment) / initialInvestment * 100).toFixed(2);
+                const percElement = document.getElementById('percentage');
+                percElement.textContent = (percentageChange >= 0 ? '+' : '') + percentageChange + '%';
+                
+                if (percentageChange >= 0) {
+                    percElement.classList.add('text-emerald-400');
+                    percElement.classList.remove('text-red-400');
+                } else {
+                    percElement.classList.add('text-red-400');
+                    percElement.classList.remove('text-emerald-400');
+                }
+            } catch(e) {
+                console.error("Error fetching price", e);
+            }
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            const maturityDate = new Date(acquisitionDate);
+            maturityDate.setFullYear(maturityDate.getFullYear() + 3);
+
+            let diff = maturityDate - now;
+
+            if (diff <= 0) {
+                document.getElementById('countdown').innerHTML = `<span class="text-emerald-400">¡Madura!</span>`;
+                return;
+            }
+
+            const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+            diff -= years * (1000 * 60 * 60 * 24 * 365.25);
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            diff -= days * (1000 * 60 * 60 * 24);
+            const hours = Math.floor(diff / (1000 * 60 * 60));
+            diff -= hours * (1000 * 60 * 60);
+            const minutes = Math.floor(diff / (1000 * 60));
+
+            document.getElementById('years').textContent = years;
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+        }
+
+        // Daily Evolution Chart - mismo tamaño que TradingView
+        function createEvolutionChart() {
+            const ctx = document.getElementById('evolutionChart');
+            if (!ctx) return;
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['19 Jun', '20 Jun', '21 Jun', '22 Jun', '23 Jun'],
+                    datasets: [{
+                        label: 'Valor NFC (€)',
+                        data: [100.00, 101.50, 103.20, 102.80, 105.75],
+                        borderColor: '#fbbf24',
+                        backgroundColor: 'rgba(251, 191, 36, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4,
+                        pointBackgroundColor: '#fbbf24',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: { 
+                            grid: { color: '#27251f' },
+                            ticks: { color: '#a1a1aa', font: { size: 11 } }
+                        },
+                        y: { 
+                            grid: { color: '#27251f' },
+                            ticks: { color: '#a1a1aa', font: { size: 11 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // TradingView Chart in EUR
+        function loadTradingView() {
+            const script = document.createElement('script');
+            script.src = 'https://s3.tradingview.com/tv.js';
+            script.async = true;
+            script.onload = function() {
+                new TradingView.widget(
+                {
+                    "width": "100%",
+                    "height": "320",
+                    "symbol": "BINANCE:BTCEUR",
+                    "interval": "60",
+                    "timezone": "Etc/UTC",
+                    "theme": "dark",
+                    "style": "1",
+                    "locale": "es",
+                    "toolbar_bg": "#1f2937",
+                    "enable_publishing": false,
+                    "hide_top_toolbar": false,
+                    "hide_legend": true,
+                    "save_image": false,
+                    "container_id": "tradingview-chart"
+                }
+                );
+            };
+            document.head.appendChild(script);
+        }
+
+        window.onload = () => {
+            updatePrice();
+            updateCountdown();
+            createEvolutionChart();
+            loadTradingView();
+            setInterval(updatePrice, 5000);
+            setInterval(updateCountdown, 30000);
+        };
+    </script>
+</body>
+</html>
