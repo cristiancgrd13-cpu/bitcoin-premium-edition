@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoinLink BTC Edition - Web Principal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
+        .star { cursor: pointer; transition: color 0.2s; }
+        .star:hover { color: #fbbf24; }
+        .review-card { transition: all 0.2s; }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    <div class="max-w-6xl mx-auto px-6">
+
+        <!-- Hero -->
+        <div class="text-center py-16 border-b border-amber-500/30">
+            <h1 class="text-6xl font-bold text-amber-400 mb-6">CoinLink BTC Edition</h1>
+            <p class="text-2xl text-amber-300 max-w-3xl mx-auto">
+                La forma más sencilla y tangible de invertir en bitcoin. Liquidez 24/7 respaldado en la blockchain.
+            </p>
+
+            <!-- Active Coins Counter -->
+            <div class="mt-10 inline-flex items-center justify-center bg-zinc-900 rounded-3xl px-10 py-4 border border-amber-500/30">
+                <div class="text-center">
+                    <div class="text-4xl font-bold text-white">1 <span class="text-amber-400">/ 1000</span></div>
+                    <div class="text-sm text-zinc-400 tracking-widest mt-1">MONEDAS ACTIVAS</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bitcoin Total Respaldado -->
+        <div class="py-12 text-center">
+            <div class="bg-zinc-900 rounded-3xl p-10 border border-amber-500/30 max-w-2xl mx-auto">
+                <p class="text-emerald-400 text-sm tracking-widest mb-3">BITCOIN TOTAL RESPALDADO</p>
+                <div class="text-4xl md:text-5xl font-mono font-bold text-white tracking-tighter">0.1443326</div>
+                <p class="text-sm text-zinc-400 mt-3">Respaldado 1:1 Físico y Digital</p>
+            </div>
+
+            <!-- Blockchain Button -->
+            <div class="mt-8">
+                <a href="#" class="inline-flex items-center gap-3 px-8 py-4 bg-zinc-900 hover:bg-zinc-800 border border-amber-500/40 rounded-2xl transition-all text-lg">
+                    <span>Ver respaldo en Blockchain</span>
+                    <span class="text-amber-400">↗</span>
+                </a>
+                <p class="text-xs text-zinc-500 mt-3">Dirección pública • Verificación en tiempo real</p>
+            </div>
+        </div>
+
+        <!-- Advantages -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 py-10">
+            <div class="bg-zinc-900 rounded-2xl p-6 flex items-center gap-4 border border-amber-500/20">
+                <div class="text-4xl flex-shrink-0">⚡</div>
+                <div>
+                    <div class="font-semibold text-lg">Liquidez 24/7</div>
+                    <div class="text-xs text-zinc-400">Accede y vende cuando necesites</div>
+                </div>
+            </div>
+            <div class="bg-zinc-900 rounded-2xl p-6 flex items-center gap-4 border border-amber-500/20">
+                <div class="text-4xl flex-shrink-0">🔒</div>
+                <div>
+                    <div class="font-semibold text-lg">Respaldo Real</div>
+                    <div class="text-xs text-zinc-400">BTC físico verificable</div>
+                </div>
+            </div>
+            <div class="bg-zinc-900 rounded-2xl p-6 flex items-center gap-4 border border-amber-500/20">
+                <div class="text-4xl flex-shrink-0">📊</div>
+                <div>
+                    <div class="font-semibold text-lg">Transparencia Total</div>
+                    <div class="text-xs text-zinc-400">Todo en blockchain pública</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compromiso Real -->
+        <div class="bg-zinc-900 rounded-3xl p-10 my-12 border border-amber-500/30">
+            <div class="text-center mb-8">
+                <div class="inline-block px-5 py-1 bg-amber-500/10 text-amber-400 text-sm tracking-widest rounded-full mb-4">COMPROMISO REAL</div>
+                <h2 class="text-3xl font-bold">Seguridad y Transparencia Garantizada</h2>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 text-sm">
+                <div class="bg-black/40 rounded-2xl p-6">
+                    <div class="font-semibold text-amber-400 mb-2">✓ Respaldo Físico</div>
+                    <div class="text-zinc-300">Bitcoin Fisico custodiado en Hardware Wallets certificadas con auditorias.</div>
+                </div>
+                <div class="bg-black/40 rounded-2xl p-6">
+                    <div class="font-semibold text-amber-400 mb-2">✓ Verificación Pública</div>
+                    <div class="text-zinc-300">Cada transacción y respaldo es verificable en exploradores Blockchain.</div>
+                </div>
+                <div class="bg-black/40 rounded-2xl p-6">
+                    <div class="font-semibold text-amber-400 mb-2">✓ En tiempo Real</div>
+                    <div class="text-zinc-300">Precio y valor actualizado constantemente desde fuentes confiables.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- NUEVO BLOQUE: Opiniones y Reseñas -->
+        <div class="bg-zinc-900 rounded-3xl p-10 my-12 border border-amber-500/30">
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold">Opiniones de nuestros clientes</h2>
+                <p class="text-zinc-400 mt-2">Tu experiencia nos importa. Deja tu opinión y ayuda a otros.</p>
+            </div>
+
+            <!-- Formulario para dejar opinión -->
+            <div class="max-w-2xl mx-auto mb-10 bg-black/40 rounded-2xl p-8">
+                <div class="mb-4">
+                    <label class="block text-sm text-zinc-400 mb-2">Tu opinión</label>
+                    <textarea id="review-text" rows="3" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl p-4 text-white placeholder-zinc-500" placeholder="Cuéntanos tu experiencia..."></textarea>
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-sm text-zinc-400 mb-2">Tu valoración</label>
+                    <div class="flex gap-2 text-3xl" id="star-rating">
+                        <span class="star text-zinc-600" data-value="1">★</span>
+                        <span class="star text-zinc-600" data-value="2">★</span>
+                        <span class="star text-zinc-600" data-value="3">★</span>
+                        <span class="star text-zinc-600" data-value="4">★</span>
+                        <span class="star text-zinc-600" data-value="5">★</span>
+                    </div>
+                    <input type="hidden" id="selected-stars" value="0">
+                </div>
+
+                <button onclick="submitReview()" 
+                        class="w-full py-4 bg-amber-500 hover:bg-amber-600 text-black font-bold rounded-2xl transition-all">
+                    Enviar mi opinión
+                </button>
+            </div>
+
+            <!-- Filtros por estrellas -->
+            <div class="flex flex-wrap justify-center gap-2 mb-6">
+                <button onclick="filterReviews(0)" class="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-sm active-filter" id="filter-0">Todas</button>
+                <button onclick="filterReviews(5)" class="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-sm" id="filter-5">★★★★★</button>
+                <button onclick="filterReviews(4)" class="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-sm" id="filter-4">★★★★☆</button>
+                <button onclick="filterReviews(3)" class="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-sm" id="filter-3">★★★☆☆</button>
+                <button onclick="filterReviews(2)" class="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-sm" id="filter-2">★★☆☆☆</button>
+                <button onclick="filterReviews(1)" class="px-5 py-2 bg-zinc-800 hover:bg-zinc-700 rounded-full text-sm" id="filter-1">★☆☆☆☆</button>
+            </div>
+
+            <!-- Lista de reseñas (scrollable) -->
+            <div id="reviews-list" class="max-h-[420px] overflow-y-auto pr-2 space-y-4">
+                <!-- Las reseñas se cargan aquí dinámicamente -->
+            </div>
+        </div>
+
+        <footer class="text-center text-zinc-500 text-sm py-12 border-t border-zinc-800">
+            CoinLink BTC Edition © 2026
+        </footer>
+    </div>
+
+    <script>
+        let reviews = JSON.parse(localStorage.getItem('coinlink_reviews')) || [];
+        let currentFilter = 0;
+        let selectedRating = 0;
+
+        // Estrellas interactivas
+        function setupStarRating() {
+            const stars = document.querySelectorAll('#star-rating .star');
+            const hiddenInput = document.getElementById('selected-stars');
+
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    selectedRating = parseInt(star.dataset.value);
+                    hiddenInput.value = selectedRating;
+                    updateStarDisplay(stars, selectedRating);
+                });
+
+                star.addEventListener('mouseover', () => {
+                    updateStarDisplay(stars, parseInt(star.dataset.value));
+                });
+
+                star.addEventListener('mouseout', () => {
+                    updateStarDisplay(stars, selectedRating);
+                });
+            });
+        }
+
+        function updateStarDisplay(stars, rating) {
+            stars.forEach(star => {
+                const value = parseInt(star.dataset.value);
+                if (value <= rating) {
+                    star.classList.add('text-yellow-400');
+                    star.classList.remove('text-zinc-600');
+                } else {
+                    star.classList.remove('text-yellow-400');
+                    star.classList.add('text-zinc-600');
+                }
+            });
+        }
+
+        // Enviar reseña
+        function submitReview() {
+            const text = document.getElementById('review-text').value.trim();
+            const stars = parseInt(document.getElementById('selected-stars').value);
+
+            if (!text || stars === 0) {
+                alert('Por favor escribe una opinión y selecciona estrellas.');
+                return;
+            }
+
+            const newReview = {
+                id: Date.now(),
+                text: text,
+                stars: stars,
+                date: new Date().toLocaleDateString('es-ES')
+            };
+
+            reviews.unshift(newReview);
+            localStorage.setItem('coinlink_reviews', JSON.stringify(reviews));
+
+            // Limpiar formulario
+            document.getElementById('review-text').value = '';
+            document.getElementById('selected-stars').value = '0';
+            selectedRating = 0;
+            updateStarDisplay(document.querySelectorAll('#star-rating .star'), 0);
+
+            renderReviews(currentFilter);
+        }
+
+        // Renderizar reseñas
+        function renderReviews(filterStars = 0) {
+            const container = document.getElementById('reviews-list');
+            container.innerHTML = '';
+
+            let filteredReviews = reviews;
+            if (filterStars > 0) {
+                filteredReviews = reviews.filter(r => r.stars === filterStars);
+            }
+
+            if (filteredReviews.length === 0) {
+                container.innerHTML = `<p class="text-center text-zinc-500 py-8">No hay reseñas todavía con esta valoración.</p>`;
+                return;
+            }
+
+            filteredReviews.forEach(review => {
+                const div = document.createElement('div');
+                div.className = 'review-card bg-black/40 rounded-2xl p-6 border border-zinc-800';
+                
+                let starsHTML = '';
+                for (let i = 1; i <= 5; i++) {
+                    starsHTML += `<span class="${i <= review.stars ? 'text-yellow-400' : 'text-zinc-600'}">★</span>`;
+                }
+
+                div.innerHTML = `
+                    <div class="flex justify-between items-start mb-3">
+                        <div class="flex gap-1 text-xl">${starsHTML}</div>
+                        <div class="text-xs text-zinc-500">${review.date}</div>
+                    </div>
+                    <p class="text-zinc-200">"${review.text}"</p>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Filtrar reseñas
+        function filterReviews(stars) {
+            currentFilter = stars;
+
+            // Actualizar botones activos
+            document.querySelectorAll('[id^="filter-"]').forEach(btn => {
+                btn.classList.remove('bg-amber-500', 'text-black');
+                btn.classList.add('bg-zinc-800');
+            });
+            
+            const activeBtn = document.getElementById(`filter-${stars}`);
+            if (activeBtn) {
+                activeBtn.classList.add('bg-amber-500', 'text-black');
+                activeBtn.classList.remove('bg-zinc-800');
+            }
+
+            renderReviews(stars);
+        }
+
+        // Inicializar
+        function initReviews() {
+            // Si no hay reseñas, añadir algunas de ejemplo
+            if (reviews.length === 0) {
+                reviews = [
+                    { id: 1, text: "Excelente servicio. Muy transparentes y fácil de usar.", stars: 5, date: "20/06/2026" },
+                    { id: 2, text: "Me gusta mucho la idea de tener Bitcoin físico. Muy recomendable.", stars: 5, date: "18/06/2026" },
+                    { id: 3, text: "Buen servicio, aunque el proceso inicial fue un poco lento.", stars: 4, date: "15/06/2026" }
+                ];
+                localStorage.setItem('coinlink_reviews', JSON.stringify(reviews));
+            }
+
+            renderReviews(0);
+            setupStarRating();
+        }
+
+        window.onload = () => {
+            initReviews();
+        };
+    </script>
+</body>
+</html>
