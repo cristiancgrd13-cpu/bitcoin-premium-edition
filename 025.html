@@ -30,7 +30,7 @@
             <p class="text-amber-400 text-sm mb-3 text-center">EVOLUCIÓN DIARIA DEL VALOR</p>
             <div id="evolution-container" class="overflow-x-auto pb-2">
                 <div id="evolution-days" class="flex gap-4 min-w-max">
-                    <!-- Generado dinámicamente -->
+                    <div class="text-zinc-500 text-sm py-4">Cargando datos reales...</div>
                 </div>
             </div>
             <p class="text-xs text-zinc-500 text-center mt-2">Desliza → para ver más días</p>
@@ -42,12 +42,11 @@
             <div id="percentage" class="text-5xl font-bold">+0.00%</div>
         </div>
 
-        <!-- 4. RECOMPENSA POR FIDELIDAD (actualizado) -->
+        <!-- 4. RECOMPENSA POR FIDELIDAD -->
         <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-emerald-500/30">
             <p class="text-emerald-400 text-sm mb-4">RECOMPENSA POR FIDELIDAD</p>
             
             <div class="space-y-3 text-left">
-                <!-- Antes de 3 años -->
                 <div class="bg-black/40 rounded-2xl p-4">
                     <div class="flex justify-between items-center">
                         <div>
@@ -61,7 +60,6 @@
                     </div>
                 </div>
 
-                <!-- 3 años -->
                 <div class="bg-black/40 rounded-2xl p-4">
                     <div class="flex justify-between items-center">
                         <div>
@@ -74,7 +72,6 @@
                     </div>
                 </div>
 
-                <!-- 5 años -->
                 <div class="bg-black/40 rounded-2xl p-4">
                     <div class="flex justify-between items-center">
                         <div>
@@ -87,7 +84,6 @@
                     </div>
                 </div>
 
-                <!-- 10 años -->
                 <div class="bg-black/40 rounded-2xl p-4 border border-emerald-500/40">
                     <div class="flex justify-between items-center">
                         <div>
@@ -121,7 +117,7 @@
 
         <p class="text-amber-400 text-lg font-medium mb-6">"Invertir nunca fue tan fácil"</p>
 
-        <!-- FAQ (con nuevo punto) -->
+        <!-- FAQ -->
         <div class="bg-zinc-900 rounded-3xl p-8 text-left">
             <p class="text-amber-400 text-xl font-semibold mb-6">FAQ</p>
             <p class="text-emerald-400 font-medium mb-4">¿Por qué invertir con nosotros?</p>
@@ -137,82 +133,95 @@
     </div>
 
     <script>
-        let fixedSats = 182500;
-        let initialInvestment = 100.00;
-        let acquisitionDate = new Date("2026-06-19T00:00:00");
-        let initialBtcPrice = 54800;
+        const fixedSats = 182500;
+        const initialInvestment = 100.00;
 
-        function generateDailyEvolution() {
-            const container = document.getElementById('evolution-days');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const today = new Date();
-            let currentValue = 100.00;
-
-            for (let i = 4; i >= 0; i--) {
-                const date = new Date(today);
-                date.setDate(date.getDate() - i - 1);
-
-                const day = date.getDate();
-                const month = date.toLocaleString('es-ES', { month: 'short' });
-
-                const change = (Math.random() * 2.5) + 0.3;
-                currentValue = currentValue * (1 + change / 100);
-
-                const isPositive = change >= 0;
-
-                const div = document.createElement('div');
-                div.className = 'bg-black/40 rounded-2xl px-5 py-4 text-center min-w-[110px] flex-shrink-0';
-                div.innerHTML = `
-                    <div class="text-xs text-zinc-400">${day} ${month}</div>
-                    <div class="font-mono text-lg mt-1">${currentValue.toFixed(2)} €</div>
-                    <div class="text-xs ${isPositive ? 'text-emerald-400' : 'text-red-400'}">
-                        ${isPositive ? '+' : ''}${change.toFixed(2)}%
-                    </div>
-                `;
-                container.appendChild(div);
-            }
+        // ─── Precio actual ───────────────────────────────────────────────────────
+        async function fetchCurrentPrice() {
+            const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
+            const data = await res.json();
+            return data.bitcoin.eur;
         }
 
         async function updatePrice() {
             try {
-                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
-                const data = await res.json();
-                const btcEur = data.bitcoin.eur || initialBtcPrice;
-                
-                const nominalEur = (fixedSats / 100000000 * btcEur).toFixed(2);
+                const btcEur = await fetchCurrentPrice();
+                const nominalEur = (fixedSats / 100000000 * btcEur);
                 const btcAmount = (fixedSats / 100000000).toFixed(6);
-                
-                document.getElementById('nominal').textContent = nominalEur;
+
+                document.getElementById('nominal').textContent = nominalEur.toFixed(2);
                 document.getElementById('btc-amount').textContent = btcAmount + ' BTC';
 
-                document.getElementById('avg-buy-price').textContent = initialInvestment.toFixed(2);
-                document.getElementById('btc-buy-price').textContent = `≈ ${initialBtcPrice.toLocaleString('es-ES')} €/BTC`;
-
-                const percentageChange = ((parseFloat(nominalEur) - initialInvestment) / initialInvestment * 100).toFixed(2);
+                // Rendimiento correcto: vs inversión inicial de 100 €
+                const percentageChange = ((nominalEur - initialInvestment) / initialInvestment * 100).toFixed(2);
                 const percElement = document.getElementById('percentage');
                 percElement.textContent = (percentageChange >= 0 ? '+' : '') + percentageChange + '%';
-                
+
                 if (percentageChange >= 0) {
-                    percElement.classList.add('text-emerald-400');
-                    percElement.classList.remove('text-red-400');
+                    percElement.className = 'text-5xl font-bold text-emerald-400';
                 } else {
-                    percElement.classList.add('text-red-400');
-                    percElement.classList.remove('text-emerald-400');
+                    percElement.className = 'text-5xl font-bold text-red-400';
                 }
             } catch(e) {
                 console.error("Error fetching price", e);
             }
         }
 
+        // ─── Evolución diaria con datos REALES de CoinGecko ─────────────────────
+        async function generateDailyEvolution() {
+            const container = document.getElementById('evolution-days');
+            if (!container) return;
+
+            try {
+                // Pedimos 7 días de histórico para tener margen (devuelve precios diarios)
+                const res = await fetch(
+                    'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=daily'
+                );
+                const data = await res.json();
+
+                // data.prices = [[timestamp, price], ...]
+                // Cogemos los últimos 6 puntos para calcular 5 cambios día a día
+                const prices = data.prices.slice(-6);
+
+                container.innerHTML = '';
+
+                for (let i = 1; i < prices.length; i++) {
+                    const [ts, price] = prices[i];
+                    const prevPrice = prices[i - 1][1];
+
+                    const date = new Date(ts);
+                    const day = date.getDate();
+                    const month = date.toLocaleString('es-ES', { month: 'short' });
+
+                    // Valor del NFC ese día
+                    const valueEur = (fixedSats / 100000000 * price).toFixed(2);
+                    const change = ((price - prevPrice) / prevPrice * 100).toFixed(2);
+                    const isPositive = parseFloat(change) >= 0;
+
+                    const div = document.createElement('div');
+                    div.className = 'bg-black/40 rounded-2xl px-5 py-4 text-center min-w-[110px] flex-shrink-0';
+                    div.innerHTML = `
+                        <div class="text-xs text-zinc-400">${day} ${month}</div>
+                        <div class="font-mono text-lg mt-1">${valueEur} €</div>
+                        <div class="text-xs ${isPositive ? 'text-emerald-400' : 'text-red-400'}">
+                            ${isPositive ? '+' : ''}${change}%
+                        </div>
+                    `;
+                    container.appendChild(div);
+                }
+            } catch(e) {
+                container.innerHTML = '<div class="text-zinc-500 text-sm py-4">No se pudieron cargar los datos</div>';
+                console.error("Error fetching historical prices", e);
+            }
+        }
+
+        // ─── TradingView ─────────────────────────────────────────────────────────
         function loadTradingView() {
             const script = document.createElement('script');
             script.src = 'https://s3.tradingview.com/tv.js';
             script.async = true;
             script.onload = function() {
-                new TradingView.widget(
-                {
+                new TradingView.widget({
                     "width": "100%",
                     "height": "320",
                     "symbol": "BINANCE:BTCEUR",
@@ -227,17 +236,17 @@
                     "hide_legend": true,
                     "save_image": false,
                     "container_id": "tradingview-chart"
-                }
-                );
+                });
             };
             document.head.appendChild(script);
         }
 
+        // ─── Init ────────────────────────────────────────────────────────────────
         window.onload = () => {
             updatePrice();
-            generateDailyEvolution();
+            generateDailyEvolution();   // Solo se llama una vez — datos estables
             loadTradingView();
-            setInterval(updatePrice, 5000);
+            setInterval(updatePrice, 5000);  // Solo el precio actual se refresca
         };
     </script>
 </body>
