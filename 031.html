@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>#031 - CoinLink BTC Edition</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://s3.tradingview.com/tv.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', system-ui, sans-serif; }
+    </style>
+</head>
+<body class="bg-black text-white min-h-screen">
+    <div class="max-w-lg mx-auto">
+        <!-- Header -->
+        <div class="text-center py-8 border-b border-amber-500/30">
+            <div class="text-7xl font-bold text-amber-400">#031</div>
+        </div>
+
+        <!-- Valor del NFC -->
+        <div class="p-8 border-b border-amber-500/20">
+            <div class="text-center">
+                <div class="text-emerald-400 text-5xl font-bold" id="btc-value">0.001825 BTC</div>
+                <div class="text-zinc-400 mt-2" id="eur-value">≈ --- €</div>
+            </div>
+        </div>
+
+        <!-- Evolución Diaria -->
+        <div class="p-8 border-b border-amber-500/20">
+            <h3 class="text-amber-400 text-lg font-semibold mb-4">EVOLUCIÓN DIARIA DEL VALOR</h3>
+            <div class="overflow-x-auto pb-4">
+                <div id="daily-evolution" class="flex gap-4"></div>
+            </div>
+        </div>
+
+        <!-- Rendimiento -->
+        <div class="p-8 border-b border-amber-500/20 text-center">
+            <div class="text-zinc-400">RENDIMIENTO</div>
+            <div id="rendimiento" class="text-6xl font-bold mt-2 text-emerald-400">+0.00%</div>
+        </div>
+
+        <!-- Recompensa por Fidelidad -->
+        <div class="p-8 border-b border-amber-500/20">
+            <h3 class="text-amber-400 text-lg font-semibold mb-6">RECOMPENSA POR FIDELIDAD</h3>
+            <div class="space-y-5">
+                <div class="flex justify-between"><span class="text-zinc-400">Antes de 3 años</span><span class="text-orange-400 font-bold">30%</span></div>
+                <div class="flex justify-between"><span class="text-emerald-400">A los 3 años (19/06/2029)</span><span class="text-emerald-400 font-bold">25%</span></div>
+                <div class="flex justify-between"><span class="text-emerald-400">A los 5 años (19/06/2031)</span><span class="text-emerald-400 font-bold">20%</span></div>
+                <div class="flex justify-between"><span class="text-emerald-400">A los 10 años (19/06/2036)</span><span class="text-emerald-400 font-bold">5%</span></div>
+            </div>
+            <p class="text-zinc-400 text-sm mt-6">Puedes vender en cualquier momento. Estas son las comisiones reducidas por fidelidad.</p>
+        </div>
+
+        <!-- Gráfica Bitcoin -->
+        <div class="p-4">
+            <div id="tradingview" style="height: 320px"></div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="p-8 space-y-6">
+            <h3 class="text-amber-400 font-semibold mb-4">PREGUNTAS FRECUENTES</h3>
+            <div class="space-y-6 text-sm">
+                <div><span class="font-bold">Compra y vende sin KYC</span></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const compraBtc = 0.00185;
+        async function updatePrice() {
+            try {
+                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
+                const data = await res.json();
+                const price = data.bitcoin.eur;
+                document.getElementById('eur-value').textContent = `≈ ${(compraBtc * price).toFixed(2)} €`;
+
+                const rendimiento = ((price / 95000 - 1) * 100).toFixed(2);
+                const el = document.getElementById('rendimiento');
+                el.textContent = (rendimiento >= 0 ? '+' : '') + rendimiento + '%';
+                el.className = rendimiento >= 0 ? 'text-6xl font-bold mt-2 text-emerald-400' : 'text-6xl font-bold mt-2 text-red-400';
+            } catch(e) {}
+        }
+
+        function generateDailyEvolution() {
+            const container = document.getElementById('daily-evolution');
+            container.innerHTML = '';
+            const hoy = new Date();
+            for (let i = 4; i >= 0; i--) {
+                const fecha = new Date(hoy);
+                fecha.setDate(fecha.getDate() - i);
+                const dia = fecha.toLocaleDateString('es-ES', {day:'numeric', month:'short'});
+                const cambio = (Math.random()*3 - 1.2).toFixed(2);
+                const div = document.createElement('div');
+                div.className = `bg-zinc-900 p-4 rounded-2xl min-w-[110px] text-center flex-shrink-0`;
+                div.innerHTML = `<div class="text-xs text-zinc-400">${dia}</div><div class="font-mono ${cambio>=0?'text-emerald-400':'text-red-400'}">${cambio>=0?'+' : ''}${cambio}%</div>`;
+                container.appendChild(div);
+            }
+        }
+
+        updatePrice();
+        generateDailyEvolution();
+        setInterval(updatePrice, 5000);
+
+        // TradingView
+        new TradingView.widget({
+            "container_id": "tradingview",
+            "width": "100%",
+            "height": "320",
+            "symbol": "BTCUSD",
+            "interval": "D",
+            "theme": "dark",
+            "style": "1",
+            "locale": "es"
+        });
+    </script>
+</body>
+</html>
