@@ -173,15 +173,24 @@
             if (!container) return;
 
             try {
-                // Pedimos 7 días de histórico para tener margen (devuelve precios diarios)
                 const res = await fetch(
                     'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=daily'
                 );
                 const data = await res.json();
 
-                // data.prices = [[timestamp, price], ...]
-                // Cogemos los últimos 6 puntos para calcular 5 cambios día a día
-                const prices = data.prices.slice(-6);
+                // Deduplicar por fecha (YYYY-MM-DD) — CoinGecko a veces repite el día actual
+                const seen = new Set();
+                const unique = [];
+                for (const [ts, price] of data.prices) {
+                    const dateKey = new Date(ts).toISOString().slice(0, 10);
+                    if (!seen.has(dateKey)) {
+                        seen.add(dateKey);
+                        unique.push([ts, price]);
+                    }
+                }
+
+                // Últimos 6 puntos únicos → 5 cambios día a día
+                const prices = unique.slice(-6);
 
                 container.innerHTML = '';
 
