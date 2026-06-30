@@ -26,8 +26,38 @@
             <!-- Active Coins Counter -->
             <div class="mt-10 inline-flex items-center justify-center bg-zinc-900 rounded-3xl px-10 py-4 border border-amber-500/30">
                 <div class="text-center">
-                    <div class="text-4xl font-bold text-white">1 <span class="text-amber-400">/ 1000</span></div>
+                    <div class="text-4xl font-bold text-white">20 <span class="text-amber-400">/ 1000</span></div>
                     <div class="text-sm text-zinc-400 tracking-widest mt-1">MONEDAS ACTIVAS</div>
+                </div>
+            </div>
+
+            <!-- Cómo Funciona la Compra -->
+            <div class="mt-8 max-w-3xl mx-auto bg-zinc-900 rounded-3xl p-8 border border-amber-500/30 text-left">
+                <div class="text-center mb-6">
+                    <div class="inline-block px-5 py-1 bg-emerald-500/10 text-emerald-400 text-sm tracking-widest rounded-full">ANTES DE COMPRAR</div>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex gap-4 items-start bg-black/40 rounded-2xl p-5">
+                        <span class="text-2xl flex-shrink-0">💰</span>
+                        <div>
+                            <div class="font-semibold text-amber-400 mb-1">Invierte lo que quieras</div>
+                            <div class="text-zinc-300 text-sm">Puedes adquirir el valor que quieras, aunque para la mejor rentabilidad inicial se recomienda empezar con 100 €.</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 items-start bg-black/40 rounded-2xl p-5">
+                        <span class="text-2xl flex-shrink-0">🔄</span>
+                        <div>
+                            <div class="font-semibold text-amber-400 mb-1">Recargas mensuales</div>
+                            <div class="text-zinc-300 text-sm">Puedes hacer compras mensuales para ir mejorando tu precio promedio de compra, con un coste de recarga de solo 5 €.</div>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 items-start bg-black/40 rounded-2xl p-5">
+                        <span class="text-2xl flex-shrink-0">🧾</span>
+                        <div>
+                            <div class="font-semibold text-amber-400 mb-1">Coste de la compra inicial</div>
+                            <div class="text-zinc-300 text-sm">La compra inicial está sujeta a un coste de 10 € + 2 € de gastos de gestión.</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -280,8 +310,7 @@
             if (reviews.length === 0) {
                 reviews = [
                     { id: 1, text: "Excelente servicio. Muy transparentes y fácil de usar.", stars: 5, date: "20/06/2026" },
-                    { id: 2, text: "Me gusta mucho la idea de tener Bitcoin físico. Muy recomendable.", stars: 5, date: "18/06/2026" },
-                    { id: 3, text: "Buen servicio, aunque el proceso inicial fue un poco lento.", stars: 4, date: "15/06/2026" }
+                    { id: 2, text: "Me gusta mucho la idea de tener Bitcoin físico. Muy recomendable.", stars: 5, date: "18/06/2026" }
                 ];
                 localStorage.setItem('coinlink_reviews', JSON.stringify(reviews));
             }
