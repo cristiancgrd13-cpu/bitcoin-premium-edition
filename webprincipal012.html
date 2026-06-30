@@ -40,7 +40,7 @@
                     <div class="flex gap-4 items-start bg-black/40 rounded-2xl p-5">
                         <span class="text-2xl flex-shrink-0">💰</span>
                         <div>
-                            <div class="font-semibold text-amber-400 mb-1">Invierte Facilmente</div>
+                            <div class="font-semibold text-amber-400 mb-1">Invierte lo que quieras</div>
                             <div class="text-zinc-300 text-sm">Puedes adquirir el valor que quieras, aunque para la mejor rentabilidad inicial se recomienda empezar con 100 €.</div>
                         </div>
                     </div>
@@ -54,8 +54,8 @@
                     <div class="flex gap-4 items-start bg-black/40 rounded-2xl p-5">
                         <span class="text-2xl flex-shrink-0">🧾</span>
                         <div>
-                            <div class="font-semibold text-amber-400 mb-1">Compra inicial</div>
-                            <div class="text-zinc-300 text-sm">Está sujeta a un coste de 10 € + 2 € de gastos de gestión.</div>
+                            <div class="font-semibold text-amber-400 mb-1">Coste de la compra inicial</div>
+                            <div class="text-zinc-300 text-sm">La compra inicial está sujeta a un coste de 10 € + 2 € de gastos de gestión.</div>
                         </div>
                     </div>
                 </div>
@@ -306,15 +306,6 @@
 
         // Inicializar
         function initReviews() {
-            // Si no hay reseñas, añadir algunas de ejemplo
-            if (reviews.length === 0) {
-                reviews = [
-                    { id: 1, text: "Excelente servicio. Muy transparentes y fácil de usar.", stars: 5, date: "20/06/2026" },
-                    { id: 2, text: "Me gusta mucho la idea de tener Bitcoin físico. Muy recomendable.", stars: 5, date: "18/06/2026" }
-                ];
-                localStorage.setItem('coinlink_reviews', JSON.stringify(reviews));
-            }
-
             renderReviews(0);
             setupStarRating();
         }
@@ -325,3 +316,4 @@
     </script>
 </body>
 </html>
+
