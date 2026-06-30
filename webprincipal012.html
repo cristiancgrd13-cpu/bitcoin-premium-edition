@@ -182,6 +182,12 @@
     </div>
 
     <script>
+        // Reseteo único: borra reseñas de ejemplo guardadas previamente en navegadores
+        if (!localStorage.getItem('coinlink_reviews_reset_v1')) {
+            localStorage.removeItem('coinlink_reviews');
+            localStorage.setItem('coinlink_reviews_reset_v1', 'true');
+        }
+
         let reviews = JSON.parse(localStorage.getItem('coinlink_reviews')) || [];
         let currentFilter = 0;
         let selectedRating = 0;
@@ -316,4 +322,5 @@
     </script>
 </body>
 </html>
+
 
