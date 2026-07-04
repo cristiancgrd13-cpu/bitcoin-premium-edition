@@ -22,7 +22,7 @@
                 <div id="nominal" class="text-6xl font-bold text-white">10649.00</div>
                 <div class="text-5xl font-bold text-amber-400">€</div>
             </div>
-            <div id="btc-amount" class="text-3xl font-mono text-emerald-400 mt-2">0.1443326 BTC</div>
+            <div id="btc-amount" class="text-3xl font-mono text-emerald-400 mt-2">0.1573571 BTC</div>
         </div>
 
         <!-- 2. EVOLUCIÓN DIARIA (scrollable) -->
@@ -62,7 +62,7 @@
                 <div class="bg-black/40 rounded-2xl p-4">
                     <div class="flex justify-between items-center">
                         <div>
-                            <div class="font-semibold text-emerald-400">A los 3 años (01/01/2029)</div>
+                            <div class="font-semibold text-emerald-400">A los 3 años (17/08/2028)</div>
                         </div>
                         <div class="text-right">
                             <div class="text-lg font-bold text-emerald-400">25%</div>
@@ -74,7 +74,7 @@
                 <div class="bg-black/40 rounded-2xl p-4">
                     <div class="flex justify-between items-center">
                         <div>
-                            <div class="font-semibold text-emerald-400">A los 5 años (01/01/2031)</div>
+                            <div class="font-semibold text-emerald-400">A los 5 años (17/08/2030)</div>
                         </div>
                         <div class="text-right">
                             <div class="text-lg font-bold text-emerald-400">20%</div>
@@ -86,7 +86,7 @@
                 <div class="bg-black/40 rounded-2xl p-4 border border-emerald-500/40">
                     <div class="flex justify-between items-center">
                         <div>
-                            <div class="font-semibold text-emerald-400">A los 10 años (01/01/2036)</div>
+                            <div class="font-semibold text-emerald-400">A los 10 años (17/08/2035)</div>
                         </div>
                         <div class="text-right">
                             <div class="text-lg font-bold text-emerald-400">5%</div>
@@ -108,21 +108,21 @@
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div>
                         <div class="text-xs text-zinc-400 mb-1">Inversión inicial</div>
-                        <div class="text-2xl font-bold text-white">10.649,00 €</div>
+                        <div class="text-2xl font-bold text-white">8.228,96 €</div>
                     </div>
                     <span class="text-3xl text-amber-400">💶</span>
                 </div>
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div>
                         <div class="text-xs text-zinc-400 mb-1">Precio medio de compra</div>
-                        <div class="text-2xl font-bold text-white">76.448,00 €<span class="text-sm text-zinc-400 font-normal">/BTC</span></div>
+                        <div class="text-2xl font-bold text-white">72.972,09 €<span class="text-sm text-zinc-400 font-normal">/BTC</span></div>
                     </div>
                     <span class="text-3xl text-amber-400">₿</span>
                 </div>
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div>
                         <div class="text-xs text-zinc-400 mb-1">Bitcoin obtenido</div>
-                        <div class="text-lg font-bold text-emerald-400 whitespace-nowrap">0.1443326 BTC</div>
+                        <div class="text-lg font-bold text-emerald-400 whitespace-nowrap">0.1573571 BTC</div>
                     </div>
                     <span class="text-3xl text-emerald-400">🔐</span>
                 </div>
@@ -161,9 +161,9 @@
 
     <script>
         // ── Configuración de la moneda #001 ──────────────────────────────────────
-        const fixedSats = 14433260;         // 0.1443326 BTC
-        const initialInvestment = 10649.00; // Inversión inicial en €
-        const btcPriceAtBuy = 76448;        // Precio medio de compra €/BTC el 01/01/2026
+        const fixedSats = 15735710;         // 0.1573571 BTC
+        const initialInvestment = 8228.96; // Inversión inicial en €
+        const btcPriceAtBuy = 72972.09;        // Precio medio de compra €/BTC el 17/08/2025
 
         // ── Precio actual ─────────────────────────────────────────────────────────
         async function fetchCurrentPrice() {
@@ -181,7 +181,7 @@
                 document.getElementById('nominal').textContent = nominalEur.toFixed(2);
                 document.getElementById('btc-amount').textContent = btcAmount + ' BTC';
 
-                // Rendimiento: valor actual vs inversión inicial de 10.649 €
+                // Rendimiento: valor actual vs inversión inicial de 8.228,96 €
                 const percentageChange = ((nominalEur - initialInvestment) / initialInvestment * 100).toFixed(2);
                 const percElement = document.getElementById('percentage');
                 percElement.textContent = (percentageChange >= 0 ? '+' : '') + percentageChange + '%';
@@ -231,7 +231,7 @@
                     const day = date.getDate();
                     const month = date.toLocaleString('es-ES', { month: 'short' });
 
-                    // Valor de los 0.1443326 BTC ese día
+                    // Valor de los 0.1573571 BTC ese día
                     const valueEur = (fixedSats / 100000000 * price).toFixed(2);
                     const change = ((price - prevPrice) / prevPrice * 100).toFixed(2);
                     const isPositive = parseFloat(change) >= 0;
@@ -289,6 +289,7 @@
     </script>
 </body>
 </html>
+
 
 
 
