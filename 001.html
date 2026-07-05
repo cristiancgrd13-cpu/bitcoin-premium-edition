@@ -108,7 +108,7 @@
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div>
                         <div class="text-xs text-zinc-400 mb-1">Inversión inicial</div>
-                        <div class="text-2xl font-bold text-white">8.228,96 €</div>
+                        <div class="text-2xl font-bold text-white">10.999,50 €</div>
                     </div>
                     <span class="text-3xl text-amber-400">💶</span>
                 </div>
@@ -162,7 +162,7 @@
     <script>
         // ── Configuración de la moneda #001 ──────────────────────────────────────
         const fixedSats = 15735710;         // 0.1573571 BTC
-        const initialInvestment = 8228.96; // Inversión inicial en €
+        const initialInvestment = 10999.50; // Inversión inicial en €
         const btcPriceAtBuy = 72972.09;        // Precio medio de compra €/BTC el 17/08/2025
 
         // ── Precio actual ─────────────────────────────────────────────────────────
@@ -181,7 +181,7 @@
                 document.getElementById('nominal').textContent = nominalEur.toFixed(2);
                 document.getElementById('btc-amount').textContent = btcAmount + ' BTC';
 
-                // Rendimiento: valor actual vs inversión inicial de 8.228,96 €
+                // Rendimiento: valor actual vs inversión inicial de 10.999,50 €
                 const percentageChange = ((nominalEur - initialInvestment) / initialInvestment * 100).toFixed(2);
                 const percElement = document.getElementById('percentage');
                 percElement.textContent = (percentageChange >= 0 ? '+' : '') + percentageChange + '%';
@@ -289,6 +289,7 @@
     </script>
 </body>
 </html>
+
 
 
 
