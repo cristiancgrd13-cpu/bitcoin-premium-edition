@@ -37,7 +37,7 @@
                         <span class="text-2xl">₿</span>
                         <div class="text-left">
                             <div class="font-semibold text-amber-400">Bitcoin</div>
-                            <div class="text-xs text-zinc-400">0.1573571 BTC</div>
+                            <div class="text-xs text-zinc-400">0.1507357 BTC</div>
                         </div>
                     </div>
                     <div class="text-right">
@@ -52,12 +52,12 @@
                         <span class="text-2xl">Ξ</span>
                         <div class="text-left">
                             <div class="font-semibold text-indigo-400">Ethereum</div>
-                            <div class="text-xs text-zinc-400">1.2 ETH</div>
+                            <div class="text-xs text-zinc-400">1.14237 ETH</div>
                         </div>
                     </div>
                     <div class="text-right">
                         <div id="eth-value" class="font-bold text-white">— €</div>
-                        <div id="eth-perf" class="text-xs text-zinc-500">Precio compra pendiente</div>
+                        <div id="eth-perf" class="text-xs">—</div>
                     </div>
                 </div>
 
@@ -67,12 +67,12 @@
                         <span class="text-2xl">◎</span>
                         <div class="text-left">
                             <div class="font-semibold text-purple-400">Solana</div>
-                            <div class="text-xs text-zinc-400">7.06 SOL</div>
+                            <div class="text-xs text-zinc-400">5.89 SOL</div>
                         </div>
                     </div>
                     <div class="text-right">
                         <div id="sol-value" class="font-bold text-white">— €</div>
-                        <div id="sol-perf" class="text-xs text-zinc-500">Precio compra pendiente</div>
+                        <div id="sol-perf" class="text-xs">—</div>
                     </div>
                 </div>
 
@@ -83,23 +83,18 @@
         <div class="bg-zinc-900 rounded-3xl p-8 mb-6 border border-amber-500/30">
             <p class="text-zinc-400 text-sm mb-3">RENDIMIENTO TOTAL</p>
             <div id="percentage" class="text-5xl font-bold">—</div>
-            <p class="text-xs text-zinc-500 mt-2">Sobre inversión inicial de 2.000 €</p>
+            <p class="text-xs text-zinc-500 mt-2">Sobre inversión total de 14.540,76 €</p>
         </div>
 
-        <!-- 4. GRÁFICA QUESO - DISTRIBUCIÓN -->
+        <!-- 4. GRÁFICA QUESO -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">DISTRIBUCIÓN DEL PORTAFOLIO</p>
             <div class="flex justify-center">
                 <canvas id="pie-chart" width="220" height="220"></canvas>
             </div>
-            <div id="pie-legend" class="flex justify-center gap-6 mt-4 text-xs text-zinc-400">
-                <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-amber-400"></span> BTC</span>
-                <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-indigo-400"></span> ETH</span>
-                <span class="flex items-center gap-1"><span class="inline-block w-3 h-3 rounded-full bg-purple-400"></span> SOL</span>
-            </div>
         </div>
 
-        <!-- 5. EVOLUCIÓN DIARIA BTC -->
+        <!-- 5. EVOLUCIÓN DIARIA -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-3 text-center">EVOLUCIÓN DIARIA DEL PORTAFOLIO</p>
             <div id="evolution-container" class="overflow-x-auto pb-2">
@@ -110,63 +105,21 @@
             <p class="text-xs text-zinc-500 text-center mt-2">Desliza → para ver más días</p>
         </div>
 
-        <!-- 6. RECOMPENSA POR FIDELIDAD -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-emerald-500/30">
-            <p class="text-emerald-400 text-sm mb-4">RECOMPENSA POR FIDELIDAD</p>
-            <div class="space-y-3 text-left">
-                <div class="bg-black/40 rounded-2xl p-4">
-                    <div class="flex justify-between items-center">
-                        <div><div class="font-semibold">Antes de los 3 años</div></div>
-                        <div class="text-right">
-                            <div class="text-lg font-bold text-orange-400">30%</div>
-                            <div class="text-xs text-zinc-500">comisión</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-black/40 rounded-2xl p-4">
-                    <div class="flex justify-between items-center">
-                        <div><div class="font-semibold text-emerald-400">A los 3 años (17/08/2028)</div></div>
-                        <div class="text-right">
-                            <div class="text-lg font-bold text-emerald-400">25%</div>
-                            <div class="text-xs text-zinc-500">comisión</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-black/40 rounded-2xl p-4">
-                    <div class="flex justify-between items-center">
-                        <div><div class="font-semibold text-emerald-400">A los 5 años (17/08/2030)</div></div>
-                        <div class="text-right">
-                            <div class="text-lg font-bold text-emerald-400">20%</div>
-                            <div class="text-xs text-zinc-500">comisión</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-black/40 rounded-2xl p-4 border border-emerald-500/40">
-                    <div class="flex justify-between items-center">
-                        <div><div class="font-semibold text-emerald-400">A los 10 años (17/08/2035)</div></div>
-                        <div class="text-right">
-                            <div class="text-lg font-bold text-emerald-400">5%</div>
-                            <div class="text-xs text-zinc-500">comisión</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <p class="text-xs text-zinc-400 mt-5 text-center">
-                Puedes vender en cualquier momento. Esta es la reducción de comisiones por fidelidad. Las ganancias derivadas de la venta están sujetas a un 19% de impuestos de Hacienda.
-            </p>
-        </div>
-
-        <!-- 7. PROMEDIO DE COMPRA -->
+        <!-- 6. PROMEDIO DE COMPRA -->
         <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-5 text-center tracking-widest">PROMEDIO DE COMPRA</p>
             <div class="space-y-4">
+
+                <!-- Inversión total -->
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div>
-                        <div class="text-xs text-zinc-400 mb-1">Inversión inicial</div>
-                        <div class="text-2xl font-bold text-white">2.000,00 €</div>
+                        <div class="text-xs text-zinc-400 mb-1">Inversión total</div>
+                        <div class="text-2xl font-bold text-white">14.540,76 €</div>
                     </div>
                     <span class="text-3xl text-amber-400">💶</span>
                 </div>
+
+                <!-- DCA -->
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div>
                         <div class="text-xs text-zinc-400 mb-1">DCA mensual</div>
@@ -174,17 +127,53 @@
                     </div>
                     <span class="text-3xl text-amber-400">📅</span>
                 </div>
-                <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
-                    <div>
-                        <div class="text-xs text-zinc-400 mb-1">Precio medio BTC</div>
-                        <div class="text-2xl font-bold text-white">72.972,09 €<span class="text-sm text-zinc-400 font-normal">/BTC</span></div>
+
+                <!-- BTC -->
+                <div class="bg-black/40 rounded-2xl p-4">
+                    <div class="flex justify-between items-center">
+                        <div class="text-left">
+                            <div class="text-xs text-zinc-400 mb-1">Bitcoin</div>
+                            <div class="font-bold text-amber-400">0.1507357 BTC</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-zinc-400 mb-1">Precio medio</div>
+                            <div class="font-bold text-white">72.972,09 €</div>
+                        </div>
                     </div>
-                    <span class="text-3xl text-amber-400">₿</span>
                 </div>
+
+                <!-- ETH -->
+                <div class="bg-black/40 rounded-2xl p-4">
+                    <div class="flex justify-between items-center">
+                        <div class="text-left">
+                            <div class="text-xs text-zinc-400 mb-1">Ethereum</div>
+                            <div class="font-bold text-indigo-400">1.14237 ETH</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-zinc-400 mb-1">Precio medio</div>
+                            <div class="font-bold text-white">2.555,01 €</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SOL -->
+                <div class="bg-black/40 rounded-2xl p-4">
+                    <div class="flex justify-between items-center">
+                        <div class="text-left">
+                            <div class="text-xs text-zinc-400 mb-1">Solana</div>
+                            <div class="font-bold text-purple-400">5.89 SOL</div>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-xs text-zinc-400 mb-1">Precio medio</div>
+                            <div class="font-bold text-white">105,69 €</div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
 
-        <!-- 8. GRÁFICA TRADINGVIEW -->
+        <!-- 7. GRÁFICA TRADINGVIEW -->
         <div class="bg-zinc-900 rounded-3xl p-4 mb-8 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-3 text-center">GRÁFICA BITCOIN (TradingView - EUR)</p>
             <div class="tradingview-widget-container">
@@ -192,32 +181,16 @@
             </div>
         </div>
 
-        <p class="text-amber-400 text-lg font-medium mb-6">"Invertir nunca fue tan fácil"</p>
-
-        <!-- FAQ -->
-        <div class="bg-zinc-900 rounded-3xl p-8 text-left">
-            <p class="text-amber-400 text-xl font-semibold mb-6">FAQ</p>
-            <p class="text-emerald-400 font-medium mb-4">¿Por qué invertir con nosotros?</p>
-            <ul class="space-y-4 text-zinc-300 text-sm">
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> <strong>Tu liquidez 24/7 cuando lo necesites.</strong></li>
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> <strong>Transparencia, seriedad y confianza.</strong></li>
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> <strong>Respaldado con BTC real en la blockchain.</strong></li>
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> <strong>Compra y vende sin KYC</strong></li>
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> <strong>Autocustodia tu NFT</strong></li>
-            </ul>
-        </div>
-
-        <p class="text-xs text-zinc-500 mt-8">El valor del portafolio se actualiza cada 5 segundos según precios reales</p>
     </div>
 
     <script>
         // ── Configuración del portafolio ──────────────────────────────────────────
         const portfolio = {
-            btc: { amount: 0.1573571, buyPrice: 72972.09 },
-            eth: { amount: 1.2,       buyPrice: null },   // pendiente de confirmar
-            sol: { amount: 7.06,      buyPrice: null }    // pendiente de confirmar
+            btc: { amount: 0.15073571, buyPrice: 72972.09 },
+            eth: { amount: 1.14237,    buyPrice: 2555.01  },
+            sol: { amount: 5.89,       buyPrice: 105.69   }
         };
-        const initialInvestment = 2000;
+        const totalInvested = 14540.76;
         let pieChart = null;
 
         // ── Fetch precios actuales ────────────────────────────────────────────────
@@ -226,11 +199,7 @@
                 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=eur'
             );
             const data = await res.json();
-            return {
-                btc: data.bitcoin.eur,
-                eth: data.ethereum.eur,
-                sol: data.solana.eur
-            };
+            return { btc: data.bitcoin.eur, eth: data.ethereum.eur, sol: data.solana.eur };
         }
 
         // ── Actualizar todo ───────────────────────────────────────────────────────
@@ -243,28 +212,32 @@
                 const solVal = portfolio.sol.amount * prices.sol;
                 const total  = btcVal + ethVal + solVal;
 
-                // Bloque 1 — valor total
+                // Bloque 1
                 document.getElementById('total-value').textContent = total.toFixed(2);
 
-                // Bloque 2 — desglose
-                document.getElementById('btc-value').textContent = btcVal.toFixed(2) + ' €';
-                document.getElementById('eth-value').textContent = ethVal.toFixed(2) + ' €';
-                document.getElementById('sol-value').textContent = solVal.toFixed(2) + ' €';
+                // Bloque 2 — valores y rendimientos individuales
+                const assets = [
+                    { id: 'btc', val: btcVal, price: prices.btc },
+                    { id: 'eth', val: ethVal, price: prices.eth },
+                    { id: 'sol', val: solVal, price: prices.sol }
+                ];
 
-                // Rendimiento BTC (precio de compra conocido)
-                const btcPerf = ((prices.btc - portfolio.btc.buyPrice) / portfolio.btc.buyPrice * 100).toFixed(2);
-                const btcPerfEl = document.getElementById('btc-perf');
-                btcPerfEl.textContent = (btcPerf >= 0 ? '+' : '') + btcPerf + '%';
-                btcPerfEl.className = 'text-xs ' + (btcPerf >= 0 ? 'text-emerald-400' : 'text-red-400');
+                assets.forEach(({ id, val, price }) => {
+                    document.getElementById(`${id}-value`).textContent = val.toFixed(2) + ' €';
+                    const perf = ((price - portfolio[id].buyPrice) / portfolio[id].buyPrice * 100).toFixed(2);
+                    const el = document.getElementById(`${id}-perf`);
+                    el.textContent = (perf >= 0 ? '+' : '') + perf + '%';
+                    el.className = 'text-xs ' + (perf >= 0 ? 'text-emerald-400' : 'text-red-400');
+                });
 
-                // Rendimiento total vs inversión inicial
-                const totalPerf = ((total - initialInvestment) / initialInvestment * 100).toFixed(2);
+                // Bloque 3 — rendimiento total
+                const totalPerf = ((total - totalInvested) / totalInvested * 100).toFixed(2);
                 const percEl = document.getElementById('percentage');
                 percEl.textContent = (totalPerf >= 0 ? '+' : '') + totalPerf + '%';
                 percEl.className = 'text-5xl font-bold ' + (totalPerf >= 0 ? 'text-emerald-400' : 'text-red-400');
 
                 // Gráfica queso
-                updatePieChart(btcVal, ethVal, solVal);
+                updatePieChart(btcVal, ethVal, solVal, total);
 
             } catch(e) {
                 console.error('Error fetching prices', e);
@@ -272,14 +245,12 @@
         }
 
         // ── Gráfica queso ─────────────────────────────────────────────────────────
-        function updatePieChart(btcVal, ethVal, solVal) {
-            const total = btcVal + ethVal + solVal;
+        function updatePieChart(btcVal, ethVal, solVal, total) {
             const btcPct = (btcVal / total * 100).toFixed(1);
             const ethPct = (ethVal / total * 100).toFixed(1);
             const solPct = (solVal / total * 100).toFixed(1);
 
             const ctx = document.getElementById('pie-chart').getContext('2d');
-
             if (pieChart) {
                 pieChart.data.datasets[0].data = [btcVal, ethVal, solVal];
                 pieChart.data.labels = [`BTC ${btcPct}%`, `ETH ${ethPct}%`, `SOL ${solPct}%`];
@@ -291,7 +262,7 @@
                         labels: [`BTC ${btcPct}%`, `ETH ${ethPct}%`, `SOL ${solPct}%`],
                         datasets: [{
                             data: [btcVal, ethVal, solVal],
-                            backgroundColor: ['#fbbf24', '#818cf8', '#a855f7'],
+                            backgroundColor: ['#f97316', '#818cf8', '#a855f7'],
                             borderColor: '#18181b',
                             borderWidth: 3
                         }]
@@ -302,11 +273,7 @@
                             legend: {
                                 display: true,
                                 position: 'bottom',
-                                labels: {
-                                    color: '#a1a1aa',
-                                    font: { size: 12 },
-                                    padding: 16
-                                }
+                                labels: { color: '#a1a1aa', font: { size: 12 }, padding: 16 }
                             },
                             tooltip: {
                                 callbacks: {
@@ -319,7 +286,7 @@
             }
         }
 
-        // ── Evolución diaria (basada en BTC como activo principal) ────────────────
+        // ── Evolución diaria ──────────────────────────────────────────────────────
         async function generateDailyEvolution() {
             const container = document.getElementById('evolution-days');
             if (!container) return;
@@ -333,10 +300,7 @@
                 const unique = [];
                 for (const [ts, price] of data.prices) {
                     const dateKey = new Date(ts).toISOString().slice(0, 10);
-                    if (!seen.has(dateKey)) {
-                        seen.add(dateKey);
-                        unique.push([ts, price]);
-                    }
+                    if (!seen.has(dateKey)) { seen.add(dateKey); unique.push([ts, price]); }
                 }
 
                 const prices = unique.slice(-6, -1);
@@ -345,11 +309,9 @@
                 for (let i = 1; i < prices.length; i++) {
                     const [ts, price] = prices[i];
                     const prevPrice = prices[i - 1][1];
-
                     const date = new Date(ts);
                     const day = date.getDate();
                     const month = date.toLocaleString('es-ES', { month: 'short' });
-
                     const btcValue = (portfolio.btc.amount * price).toFixed(2);
                     const change = ((price - prevPrice) / prevPrice * 100).toFixed(2);
                     const isPositive = parseFloat(change) >= 0;
@@ -399,3 +361,4 @@
     </script>
 </body>
 </html>
+
