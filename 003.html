@@ -9,6 +9,43 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body { font-family: 'Inter', system-ui, sans-serif; }
+
+        /* Gauge */
+        .gauge-wrap { position: relative; width: 180px; height: 100px; margin: 0 auto; }
+        .gauge-bg {
+            width: 180px; height: 90px;
+            border-radius: 90px 90px 0 0;
+            background: conic-gradient(
+                #ef4444 0deg 54deg,
+                #f97316 54deg 90deg,
+                #eab308 90deg 126deg,
+                #84cc16 126deg 162deg,
+                #22c55e 162deg 180deg
+            );
+            overflow: hidden;
+        }
+        .gauge-center {
+            position: absolute; bottom: 0; left: 50%;
+            transform: translateX(-50%);
+            width: 130px; height: 65px;
+            background: #18181b;
+            border-radius: 65px 65px 0 0;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .gauge-needle {
+            position: absolute; bottom: 0; left: 50%;
+            width: 3px; height: 72px;
+            background: white;
+            transform-origin: bottom center;
+            border-radius: 3px 3px 0 0;
+            transition: transform 1s ease;
+        }
+        .gauge-dot {
+            position: absolute; bottom: -5px; left: 50%;
+            transform: translateX(-50%);
+            width: 12px; height: 12px;
+            background: white; border-radius: 50%;
+        }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen flex items-center justify-center p-4">
@@ -30,8 +67,6 @@
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MIS CRIPTOMONEDAS</p>
             <div class="space-y-3">
-
-                <!-- BTC -->
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">₿</span>
@@ -45,8 +80,6 @@
                         <div id="btc-perf" class="text-xs">—</div>
                     </div>
                 </div>
-
-                <!-- ETH -->
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">Ξ</span>
@@ -60,8 +93,6 @@
                         <div id="eth-perf" class="text-xs">—</div>
                     </div>
                 </div>
-
-                <!-- SOL -->
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">◎</span>
@@ -75,7 +106,6 @@
                         <div id="sol-perf" class="text-xs">—</div>
                     </div>
                 </div>
-
             </div>
         </div>
 
@@ -94,7 +124,37 @@
             </div>
         </div>
 
-        <!-- 5. EVOLUCIÓN DIARIA -->
+        <!-- 5. ÍNDICE DE SENTIMIENTO -->
+        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
+            <p class="text-amber-400 text-sm mb-5 text-center tracking-widest">ÍNDICE DE SENTIMIENTO</p>
+            <div class="gauge-wrap mb-2">
+                <div class="gauge-bg"></div>
+                <div class="gauge-center">
+                    <div>
+                        <div id="fear-value" class="text-3xl font-bold text-white">—</div>
+                    </div>
+                </div>
+                <div id="gauge-needle" class="gauge-needle"></div>
+                <div class="gauge-dot"></div>
+            </div>
+            <div id="fear-label" class="text-xl font-bold mt-3">—</div>
+            <p class="text-xs text-zinc-500 mt-1">Fear & Greed Index · Actualizado diariamente</p>
+        </div>
+
+        <!-- 6. TOP 100 MERCADO -->
+        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
+            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MERCADO — TOP 100</p>
+            <div class="mb-3">
+                <input id="market-search" type="text" placeholder="Buscar cripto..."
+                    class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-sm text-white placeholder-zinc-500 outline-none">
+            </div>
+            <div id="market-list" class="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+                <div class="text-zinc-500 text-sm py-4">Cargando mercado...</div>
+            </div>
+            <p class="text-xs text-zinc-500 text-center mt-3">Actualización cada 60 segundos · Fuente: CoinGecko</p>
+        </div>
+
+        <!-- 7. EVOLUCIÓN DIARIA -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-3 text-center">EVOLUCIÓN DIARIA DEL PORTAFOLIO</p>
             <div id="evolution-container" class="overflow-x-auto pb-2">
@@ -105,12 +165,10 @@
             <p class="text-xs text-zinc-500 text-center mt-2">Desliza → para ver más días</p>
         </div>
 
-        <!-- 6. PROMEDIO DE COMPRA -->
+        <!-- 8. PROMEDIO DE COMPRA -->
         <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-5 text-center tracking-widest">PROMEDIO DE COMPRA</p>
             <div class="space-y-4">
-
-                <!-- Inversión total -->
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div>
                         <div class="text-xs text-zinc-400 mb-1">Inversión total</div>
@@ -118,8 +176,6 @@
                     </div>
                     <span class="text-3xl text-amber-400">💶</span>
                 </div>
-
-                <!-- DCA -->
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div>
                         <div class="text-xs text-zinc-400 mb-1">DCA mensual</div>
@@ -127,8 +183,6 @@
                     </div>
                     <span class="text-3xl text-amber-400">📅</span>
                 </div>
-
-                <!-- BTC -->
                 <div class="bg-black/40 rounded-2xl p-4">
                     <div class="flex justify-between items-center">
                         <div class="text-left">
@@ -141,8 +195,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- ETH -->
                 <div class="bg-black/40 rounded-2xl p-4">
                     <div class="flex justify-between items-center">
                         <div class="text-left">
@@ -155,8 +207,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- SOL -->
                 <div class="bg-black/40 rounded-2xl p-4">
                     <div class="flex justify-between items-center">
                         <div class="text-left">
@@ -169,11 +219,10 @@
                         </div>
                     </div>
                 </div>
-
             </div>
         </div>
 
-        <!-- 7. GRÁFICA TRADINGVIEW -->
+        <!-- 9. GRÁFICA TRADINGVIEW -->
         <div class="bg-zinc-900 rounded-3xl p-4 mb-8 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-3 text-center">GRÁFICA BITCOIN (TradingView - EUR)</p>
             <div class="tradingview-widget-container">
@@ -184,7 +233,7 @@
     </div>
 
     <script>
-        // ── Configuración del portafolio ──────────────────────────────────────────
+        // ── Portafolio ────────────────────────────────────────────────────────────
         const portfolio = {
             btc: { amount: 0.15073571, buyPrice: 72972.09 },
             eth: { amount: 1.14237,    buyPrice: 2555.01  },
@@ -192,8 +241,9 @@
         };
         const totalInvested = 14540.76;
         let pieChart = null;
+        let allMarketData = [];
 
-        // ── Fetch precios actuales ────────────────────────────────────────────────
+        // ── Fetch precios portafolio ──────────────────────────────────────────────
         async function fetchPrices() {
             const res = await fetch(
                 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=eur'
@@ -202,27 +252,17 @@
             return { btc: data.bitcoin.eur, eth: data.ethereum.eur, sol: data.solana.eur };
         }
 
-        // ── Actualizar todo ───────────────────────────────────────────────────────
         async function updateAll() {
             try {
                 const prices = await fetchPrices();
-
                 const btcVal = portfolio.btc.amount * prices.btc;
                 const ethVal = portfolio.eth.amount * prices.eth;
                 const solVal = portfolio.sol.amount * prices.sol;
                 const total  = btcVal + ethVal + solVal;
 
-                // Bloque 1
                 document.getElementById('total-value').textContent = total.toFixed(2);
 
-                // Bloque 2 — valores y rendimientos individuales
-                const assets = [
-                    { id: 'btc', val: btcVal, price: prices.btc },
-                    { id: 'eth', val: ethVal, price: prices.eth },
-                    { id: 'sol', val: solVal, price: prices.sol }
-                ];
-
-                assets.forEach(({ id, val, price }) => {
+                [['btc', btcVal, prices.btc], ['eth', ethVal, prices.eth], ['sol', solVal, prices.sol]].forEach(([id, val, price]) => {
                     document.getElementById(`${id}-value`).textContent = val.toFixed(2) + ' €';
                     const perf = ((price - portfolio[id].buyPrice) / portfolio[id].buyPrice * 100).toFixed(2);
                     const el = document.getElementById(`${id}-perf`);
@@ -230,15 +270,12 @@
                     el.className = 'text-xs ' + (perf >= 0 ? 'text-emerald-400' : 'text-red-400');
                 });
 
-                // Bloque 3 — rendimiento total
                 const totalPerf = ((total - totalInvested) / totalInvested * 100).toFixed(2);
                 const percEl = document.getElementById('percentage');
                 percEl.textContent = (totalPerf >= 0 ? '+' : '') + totalPerf + '%';
                 percEl.className = 'text-5xl font-bold ' + (totalPerf >= 0 ? 'text-emerald-400' : 'text-red-400');
 
-                // Gráfica queso
                 updatePieChart(btcVal, ethVal, solVal, total);
-
             } catch(e) {
                 console.error('Error fetching prices', e);
             }
@@ -249,7 +286,6 @@
             const btcPct = (btcVal / total * 100).toFixed(1);
             const ethPct = (ethVal / total * 100).toFixed(1);
             const solPct = (solVal / total * 100).toFixed(1);
-
             const ctx = document.getElementById('pie-chart').getContext('2d');
             if (pieChart) {
                 pieChart.data.datasets[0].data = [btcVal, ethVal, solVal];
@@ -270,42 +306,121 @@
                     options: {
                         cutout: '60%',
                         plugins: {
-                            legend: {
-                                display: true,
-                                position: 'bottom',
-                                labels: { color: '#a1a1aa', font: { size: 12 }, padding: 16 }
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: (ctx) => ` ${ctx.parsed.toFixed(2)} €`
-                                }
-                            }
+                            legend: { display: true, position: 'bottom', labels: { color: '#a1a1aa', font: { size: 12 }, padding: 16 } },
+                            tooltip: { callbacks: { label: (ctx) => ` ${ctx.parsed.toFixed(2)} €` } }
                         }
                     }
                 });
             }
         }
 
+        // ── Fear & Greed Index ────────────────────────────────────────────────────
+        async function updateFearGreed() {
+            try {
+                const res = await fetch('https://api.alternative.me/fng/?limit=1');
+                const data = await res.json();
+                const value = parseInt(data.data[0].value);
+                const label = data.data[0].value_classification;
+
+                document.getElementById('fear-value').textContent = value;
+
+                const labelEl = document.getElementById('fear-label');
+                const labelMap = {
+                    'Extreme Fear': 'Miedo Extremo',
+                    'Fear': 'Miedo',
+                    'Neutral': 'Neutral',
+                    'Greed': 'Codicia',
+                    'Extreme Greed': 'Codicia Extrema'
+                };
+                const colorMap = {
+                    'Extreme Fear': 'text-red-500',
+                    'Fear': 'text-orange-400',
+                    'Neutral': 'text-yellow-400',
+                    'Greed': 'text-lime-400',
+                    'Extreme Greed': 'text-emerald-400'
+                };
+                labelEl.textContent = labelMap[label] || label;
+                labelEl.className = 'text-xl font-bold mt-3 ' + (colorMap[label] || 'text-white');
+
+                // Aguja: 0→-90deg (extremo miedo), 100→+90deg (extremo codicia)
+                const deg = (value / 100) * 180 - 90;
+                document.getElementById('gauge-needle').style.transform = `translateX(-50%) rotate(${deg}deg)`;
+            } catch(e) {
+                console.error('Error fetching Fear & Greed', e);
+            }
+        }
+
+        // ── Top 100 Mercado ───────────────────────────────────────────────────────
+        async function updateMarket() {
+            try {
+                const res = await fetch(
+                    'https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=100&page=1&price_change_percentage=24h'
+                );
+                allMarketData = await res.json();
+                renderMarket(allMarketData);
+            } catch(e) {
+                console.error('Error fetching market', e);
+            }
+        }
+
+        function renderMarket(coins) {
+            const container = document.getElementById('market-list');
+            container.innerHTML = '';
+            coins.forEach((coin, i) => {
+                const change = coin.price_change_percentage_24h?.toFixed(2) ?? '—';
+                const isPos = parseFloat(change) >= 0;
+                const price = coin.current_price >= 1
+                    ? coin.current_price.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                    : coin.current_price.toFixed(6);
+
+                const div = document.createElement('div');
+                div.className = 'bg-black/40 rounded-2xl px-4 py-3 flex justify-between items-center';
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="text-xs text-zinc-500 w-5 text-right">${i + 1}</span>
+                        <img src="${coin.image}" class="w-7 h-7 rounded-full" loading="lazy">
+                        <div class="text-left">
+                            <div class="text-sm font-semibold">${coin.name}</div>
+                            <div class="text-xs text-zinc-500 uppercase">${coin.symbol}</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="text-sm font-bold">${price} €</div>
+                        <div class="text-xs ${isPos ? 'text-emerald-400' : 'text-red-400'}">
+                            ${isPos ? '▲' : '▼'} ${Math.abs(change)}%
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        // Búsqueda en tiempo real
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('market-search').addEventListener('input', (e) => {
+                const q = e.target.value.toLowerCase();
+                const filtered = allMarketData.filter(c =>
+                    c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)
+                );
+                renderMarket(filtered);
+            });
+        });
+
         // ── Evolución diaria ──────────────────────────────────────────────────────
         async function generateDailyEvolution() {
             const container = document.getElementById('evolution-days');
             if (!container) return;
             try {
-                const res = await fetch(
-                    'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=daily'
-                );
+                const res = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=daily');
                 const data = await res.json();
-
                 const seen = new Set();
                 const unique = [];
                 for (const [ts, price] of data.prices) {
                     const dateKey = new Date(ts).toISOString().slice(0, 10);
                     if (!seen.has(dateKey)) { seen.add(dateKey); unique.push([ts, price]); }
                 }
-
                 const prices = unique.slice(-6, -1);
                 container.innerHTML = '';
-
                 for (let i = 1; i < prices.length; i++) {
                     const [ts, price] = prices[i];
                     const prevPrice = prices[i - 1][1];
@@ -315,15 +430,12 @@
                     const btcValue = (portfolio.btc.amount * price).toFixed(2);
                     const change = ((price - prevPrice) / prevPrice * 100).toFixed(2);
                     const isPositive = parseFloat(change) >= 0;
-
                     const div = document.createElement('div');
                     div.className = 'bg-black/40 rounded-2xl px-5 py-4 text-center min-w-[110px] flex-shrink-0';
                     div.innerHTML = `
                         <div class="text-xs text-zinc-400">${day} ${month}</div>
                         <div class="font-mono text-base mt-1">${btcValue} €</div>
-                        <div class="text-xs ${isPositive ? 'text-emerald-400' : 'text-red-400'}">
-                            ${isPositive ? '+' : ''}${change}%
-                        </div>
+                        <div class="text-xs ${isPositive ? 'text-emerald-400' : 'text-red-400'}">${isPositive ? '+' : ''}${change}%</div>
                     `;
                     container.appendChild(div);
                 }
@@ -339,12 +451,10 @@
             script.async = true;
             script.onload = function() {
                 new TradingView.widget({
-                    "width": "100%", "height": "320",
-                    "symbol": "BINANCE:BTCEUR", "interval": "60",
-                    "timezone": "Etc/UTC", "theme": "dark", "style": "1",
-                    "locale": "es", "toolbar_bg": "#1f2937",
-                    "enable_publishing": false, "hide_top_toolbar": false,
-                    "hide_legend": true, "save_image": false,
+                    "width": "100%", "height": "320", "symbol": "BINANCE:BTCEUR",
+                    "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1",
+                    "locale": "es", "toolbar_bg": "#1f2937", "enable_publishing": false,
+                    "hide_top_toolbar": false, "hide_legend": true, "save_image": false,
                     "container_id": "tradingview-chart"
                 });
             };
@@ -354,12 +464,18 @@
         // ── Init ──────────────────────────────────────────────────────────────────
         window.onload = () => {
             updateAll();
+            updateFearGreed();
+            updateMarket();
             generateDailyEvolution();
             loadTradingView();
-            setInterval(updateAll, 5000);
+
+            setInterval(updateAll, 5000);          // portafolio cada 5s
+            setInterval(updateMarket, 60000);      // mercado cada 60s
+            setInterval(updateFearGreed, 3600000); // sentimiento cada hora
         };
     </script>
 </body>
 </html>
+
 
 
