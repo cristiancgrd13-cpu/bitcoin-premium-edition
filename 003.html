@@ -46,15 +46,6 @@
             width: 12px; height: 12px;
             background: white; border-radius: 50%;
         }
-        /* ---- Modo claro (overrides simples sobre las clases de Tailwind) ---- */
-        body.light-mode { background: #f4f4f5; color: #18181b; }
-        body.light-mode [class*="bg-black"]:not(.gauge-center) { background: #ffffff !important; }
-        body.light-mode [class*="bg-zinc-900"] { background: #ffffff !important; border-color: rgba(217,119,6,.35) !important; }
-        body.light-mode [class*="text-white"] { color: #18181b !important; }
-        body.light-mode [class*="text-zinc-400"] { color: #52525b !important; }
-        body.light-mode [class*="text-zinc-500"] { color: #71717a !important; }
-        body.light-mode input { background: #f4f4f5 !important; color: #18181b !important; border-color: #d4d4d8 !important; }
-        body.light-mode .modal-box { background: #ffffff !important; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
         .modal-box { max-height: 85vh; overflow-y: auto; }
         .news-scroll::-webkit-scrollbar { width: 6px; }
@@ -64,13 +55,7 @@
 <body class="bg-black text-white min-h-screen p-4">
     <div class="max-w-md w-full mx-auto text-center">
 
-        <div class="flex items-center justify-between mb-6">
-            <div class="text-left">
-                <h1 class="text-3xl font-bold text-amber-400">Portafolio Personal</h1>
-                <p class="text-xs text-zinc-500">#001</p>
-            </div>
-            <button id="theme-toggle" onclick="toggleTheme()" class="w-11 h-11 rounded-full bg-zinc-900 border border-amber-500/30 text-xl flex items-center justify-center">☀️</button>
-        </div>
+        <h1 class="text-3xl font-bold text-amber-400 mb-6">Portafolio Personal</h1>
 
         <!-- 1. VALOR TOTAL -->
         <div class="bg-zinc-900 rounded-3xl p-8 mb-6 border border-amber-500/30">
@@ -105,28 +90,30 @@
             </div>
         </div>
 
-        <!-- 5. COMPARATIVA VS OTROS ACTIVOS -->
+        <!-- 6. DOMINANCIA BTC VS RESTO -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">COMPARATIVA VS OTROS ACTIVOS</p>
-            <p class="text-xs text-zinc-500 mb-4">Si tu inversión total la hubieras puesto entera en un solo activo</p>
-            <div id="comparativa-list" class="space-y-2 text-left">
-                <div class="text-zinc-500 text-sm py-2">Calculando...</div>
-            </div>
-        </div>
-
-        <!-- 6. DOMINANCIA BTC -->
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">DOMINANCIA DE MERCADO</p>
-            <div class="flex justify-around">
+            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">BITCOIN VS. RESTO DE ACTIVOS</p>
+            <div class="flex justify-around mb-4">
                 <div>
                     <div id="btc-dominance" class="text-3xl font-bold text-amber-400">—</div>
                     <div class="text-xs text-zinc-500 mt-1">Bitcoin</div>
                 </div>
                 <div>
-                    <div id="eth-dominance" class="text-3xl font-bold text-indigo-400">—</div>
-                    <div class="text-xs text-zinc-500 mt-1">Ethereum</div>
+                    <div id="rest-dominance" class="text-3xl font-bold text-zinc-300">—</div>
+                    <div class="text-xs text-zinc-500 mt-1">Resto de activos</div>
                 </div>
             </div>
+            <div class="space-y-2">
+                <div class="bg-black/40 rounded-xl px-4 py-3 flex justify-between items-center">
+                    <span class="text-xs text-zinc-400">Capitalización Bitcoin</span>
+                    <span id="btc-marketcap" class="font-bold text-amber-400">—</span>
+                </div>
+                <div class="bg-black/40 rounded-xl px-4 py-3 flex justify-between items-center">
+                    <span class="text-xs text-zinc-400">Capitalización resto de activos</span>
+                    <span id="rest-marketcap" class="font-bold text-zinc-300">—</span>
+                </div>
+            </div>
+            <p class="text-xs text-zinc-500 text-center mt-3">Actualizado cada 5 segundos</p>
         </div>
 
         <!-- 7. ÍNDICE DE SENTIMIENTO -->
@@ -161,7 +148,7 @@
             <div id="news-list" class="news-scroll space-y-2 text-left max-h-80 overflow-y-auto pr-1">
                 <div class="text-zinc-500 text-sm py-4">Cargando noticias...</div>
             </div>
-            <p class="text-xs text-zinc-500 text-center mt-3">Actualización cada 60 segundos · Cointelegraph & CoinDesk</p>
+            <p class="text-xs text-zinc-500 text-center mt-3">Actualización cada 60 segundos · Cointelegraph ES & CriptoNoticias</p>
         </div>
 
         <!-- 10. PROMEDIO DE COMPRA -->
@@ -239,6 +226,13 @@
                 <option value="etf_nasdaq">ETF Nasdaq</option>
                 <option value="etf_sp500">ETF S&P 500</option>
                 <option value="rental">Inmobiliario (Rental)</option>
+                <option value="usdc_sol">USDC-SOL</option>
+                <option value="spacex">SpaceX</option>
+                <option value="bittensor">Bittensor (TAO)</option>
+                <option value="hyperliquid">Hyperliquid (HYPE)</option>
+                <option value="etf_acwi">ETF ACWI</option>
+                <option value="etf_msci_world">ETF MSCI World</option>
+                <option value="aave">Aave (AAVE)</option>
             </select>
             <label class="text-xs text-zinc-500">Cantidad (monedas / participaciones / unidades)</label>
             <input id="add-qty" type="number" step="any" placeholder="Ej. 0.005 / 2 / 1" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-3 outline-none">
@@ -251,10 +245,17 @@
     <script>
         // ── Estado y persistencia ────────────────────────────────────────────────
         const ASSET_TYPE_META = {
-            etf_gold:   { name: 'ETF Oro Físico', icon: '🥇', color: '#eab308' },
-            etf_nasdaq: { name: 'ETF Nasdaq',      icon: '📈', color: '#38bdf8' },
-            etf_sp500:  { name: 'ETF S&P 500',     icon: '📊', color: '#4ade80' },
-            rental:     { name: 'Inmobiliario (Rental)', icon: '🏠', color: '#f472b6' }
+            etf_gold:       { type: 'manual', name: 'ETF Oro Físico',       icon: '🥇', color: '#eab308' },
+            etf_nasdaq:     { type: 'manual', name: 'ETF Nasdaq',           icon: '📈', color: '#38bdf8' },
+            etf_sp500:      { type: 'manual', name: 'ETF S&P 500',         icon: '📊', color: '#4ade80' },
+            rental:         { type: 'manual', name: 'Inmobiliario (Rental)', icon: '🏠', color: '#f472b6' },
+            spacex:         { type: 'manual', name: 'SpaceX',               icon: '🚀', color: '#94a3b8' },
+            etf_acwi:       { type: 'manual', name: 'ETF ACWI',             icon: '🌍', color: '#60a5fa' },
+            etf_msci_world: { type: 'manual', name: 'ETF MSCI World',       icon: '🌐', color: '#34d399' },
+            usdc_sol:       { type: 'crypto', name: 'USDC-SOL', symbol: 'USDC', coingeckoId: 'usd-coin',   icon: '💵', color: '#2775ca' },
+            bittensor:      { type: 'crypto', name: 'Bittensor', symbol: 'TAO', coingeckoId: 'bittensor',   icon: '🧠', color: '#facc15' },
+            hyperliquid:    { type: 'crypto', name: 'Hyperliquid', symbol: 'HYPE', coingeckoId: 'hyperliquid', icon: '⚡', color: '#22d3ee' },
+            aave:           { type: 'crypto', name: 'Aave', symbol: 'AAVE', coingeckoId: 'aave',           icon: '👻', color: '#b6509e' }
         };
 
         function loadAssets() {
@@ -279,18 +280,6 @@
             const a = assets[key];
             if (a.type === 'crypto') return a.amount * (livePrices[a.coingeckoId] || 0);
             return (a.currentValue != null ? a.currentValue : a.invested);
-        }
-
-        // ── Tema claro/oscuro ────────────────────────────────────────────────────
-        function applyTheme() {
-            const theme = localStorage.getItem('theme') || 'dark';
-            document.body.classList.toggle('light-mode', theme === 'light');
-            document.getElementById('theme-toggle').textContent = theme === 'light' ? '🌙' : '☀️';
-        }
-        function toggleTheme() {
-            const current = localStorage.getItem('theme') || 'dark';
-            localStorage.setItem('theme', current === 'dark' ? 'light' : 'dark');
-            applyTheme();
         }
 
         // ── Animación de entrada (contador) ─────────────────────────────────────
@@ -410,30 +399,6 @@
             }
         }
 
-        // ── Comparativa vs otros activos ─────────────────────────────────────────
-        function updateComparativa(totalInvertido, totalActual) {
-            const container = document.getElementById('comparativa-list');
-            container.innerHTML = '';
-
-            const realRow = document.createElement('div');
-            realRow.className = 'flex justify-between items-center bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3';
-            realRow.innerHTML = `<span class="text-sm font-semibold text-amber-400">Tu portafolio real</span><span class="font-bold text-white">${fmtEUR(totalActual)}</span>`;
-            container.appendChild(realRow);
-
-            Object.keys(assets).forEach(key => {
-                const a = assets[key];
-                if (a.type !== 'crypto') return;
-                const avgPrice = a.invested / a.amount;
-                const livePrice = livePrices[a.coingeckoId];
-                if (!livePrice) return;
-                const hipotetico = totalInvertido * (livePrice / avgPrice);
-                const row = document.createElement('div');
-                row.className = 'flex justify-between items-center bg-black/40 rounded-xl px-4 py-3';
-                row.innerHTML = `<span class="text-sm text-zinc-300">Todo en ${a.name}</span><span class="font-bold text-white">${fmtEUR(hipotetico)}</span>`;
-                container.appendChild(row);
-            });
-        }
-
         // ── Ciclo principal de actualización ─────────────────────────────────────
         async function updateAll() {
             try {
@@ -454,7 +419,6 @@
                 percEl.className = 'text-5xl font-bold ' + (totalPerf >= 0 ? 'text-emerald-400' : 'text-red-400');
 
                 updatePieChart();
-                updateComparativa(totalInvertido, total);
             } catch (e) {
                 console.error('Error updateAll', e);
             }
@@ -478,20 +442,31 @@
             } catch(e) { console.error('Fear & Greed error', e); }
         }
 
-        // ── Dominancia de mercado ────────────────────────────────────────────────
+        // ── Dominancia de mercado: Bitcoin vs. resto de activos ──────────────────
+        function fmtCompactEUR(n) {
+            return new Intl.NumberFormat('es-ES', { notation: 'compact', maximumFractionDigits: 2 }).format(n) + ' €';
+        }
         async function updateDominance() {
             try {
                 const res = await fetch('https://api.coingecko.com/api/v3/global');
                 const data = await res.json();
-                document.getElementById('btc-dominance').textContent = data.data.market_cap_percentage.btc.toFixed(1) + '%';
-                document.getElementById('eth-dominance').textContent = data.data.market_cap_percentage.eth.toFixed(1) + '%';
+                const btcPct = data.data.market_cap_percentage.btc;
+                const restPct = 100 - btcPct;
+                const totalCap = data.data.total_market_cap.eur;
+                const btcCap = totalCap * (btcPct / 100);
+                const restCap = totalCap - btcCap;
+
+                document.getElementById('btc-dominance').textContent = btcPct.toFixed(1) + '%';
+                document.getElementById('rest-dominance').textContent = restPct.toFixed(1) + '%';
+                document.getElementById('btc-marketcap').textContent = fmtCompactEUR(btcCap);
+                document.getElementById('rest-marketcap').textContent = fmtCompactEUR(restCap);
             } catch(e) { console.error('Dominance error', e); }
         }
 
         // ── Noticias ──────────────────────────────────────────────────────────────
         const RSS_FEEDS = [
-            'https://cointelegraph.com/rss',
-            'https://www.coindesk.com/arc/outboundfeeds/rss/'
+            'https://es.cointelegraph.com/rss',
+            'https://www.criptonoticias.com/feed/'
         ];
         async function updateNews() {
             try {
@@ -686,11 +661,15 @@
                 assets[key].amount += qty;
                 assets[key].invested += inv;
                 if (assets[key].type !== 'crypto') {
-                    assets[key].currentValue = (assets[key].currentValue ?? assets[key].invested - inv) + inv;
+                    assets[key].currentValue = (assets[key].currentValue ?? (assets[key].invested - inv)) + inv;
                 }
             } else {
                 const meta = ASSET_TYPE_META[key];
-                assets[key] = { type: 'manual', name: meta.name, icon: meta.icon, color: meta.color, amount: qty, invested: inv, currentValue: inv };
+                if (meta.type === 'crypto') {
+                    assets[key] = { type: 'crypto', coingeckoId: meta.coingeckoId, name: meta.name, symbol: meta.symbol, icon: meta.icon, color: meta.color, amount: qty, invested: inv };
+                } else {
+                    assets[key] = { type: 'manual', name: meta.name, icon: meta.icon, color: meta.color, amount: qty, invested: inv, currentValue: inv };
+                }
             }
             saveAssets();
             closeAddAssetModal();
@@ -708,7 +687,6 @@
 
         // ── Init ──────────────────────────────────────────────────────────────────
         window.onload = () => {
-            applyTheme();
             renderAssetsList();
             renderPromedioCompra();
             updateAll();
@@ -719,13 +697,12 @@
             generateDailyEvolution();
             setInterval(updateAll, 5000);
             setInterval(updateMarket, 60000);
-            setInterval(updateFearGreed, 3600000);
-            setInterval(updateDominance, 300000);
+            setInterval(updateFearGreed, 5000);
+            setInterval(updateDominance, 5000);
             setInterval(updateNews, 60000);
         };
     </script>
 </body>
 </html>
-
 
 
