@@ -90,7 +90,7 @@
             </div>
         </div>
 
-        <!-- 5. DOMINANCIA BTC VS RESTO -->
+        <!-- 6. DOMINANCIA BTC VS RESTO -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">BITCOIN VS. RESTO DE ACTIVOS</p>
             <div class="flex justify-around mb-4">
@@ -116,7 +116,7 @@
             <p class="text-xs text-zinc-500 text-center mt-3">Actualizado cada 5 segundos</p>
         </div>
 
-        <!-- 6. ÍNDICE DE SENTIMIENTO -->
+        <!-- 7. ÍNDICE DE SENTIMIENTO -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-5 text-center tracking-widest">ÍNDICE DE SENTIMIENTO</p>
             <div class="gauge-wrap mb-2">
@@ -131,7 +131,7 @@
             <p class="text-xs text-zinc-500 mt-1">Fear & Greed Index · Actualizado diariamente</p>
         </div>
 
-        <!-- 7. EVOLUCIÓN DIARIA -->
+        <!-- 8. EVOLUCIÓN DIARIA -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-3 text-center">EVOLUCIÓN DIARIA DEL PORTAFOLIO</p>
             <div id="evolution-container" class="overflow-x-auto pb-2">
@@ -142,7 +142,7 @@
             <p class="text-xs text-zinc-500 text-center mt-2">Desliza → para ver más días</p>
         </div>
 
-        <!-- 8. NOTICIAS -->
+        <!-- 9. NOTICIAS -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">NOTICIAS CRIPTO Y MERCADOS</p>
             <div id="news-list" class="news-scroll space-y-2 text-left max-h-80 overflow-y-auto pr-1">
@@ -151,7 +151,7 @@
             <p class="text-xs text-zinc-500 text-center mt-3">Actualización cada 60 segundos · CoinTelegraph · Decrypt · CoinDesk</p>
         </div>
 
-        <!-- 9. PROMEDIO DE COMPRA -->
+        <!-- 10. PROMEDIO DE COMPRA -->
         <div class="bg-zinc-900 rounded-3xl p-8 mb-6 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-5 text-center tracking-widest">PROMEDIO DE COMPRA</p>
             <div class="space-y-4">
@@ -169,11 +169,12 @@
                     </div>
                     <span class="text-3xl text-amber-400">📅</span>
                 </div>
-                <div id="promedio-list" class="space-y-4"></div>
+                <div id="promedio-list" class="space-y-4">
+                </div>
             </div>
         </div>
 
-        <!-- 10. MERCADO TOP 100 (último) -->
+        <!-- 11. MERCADO TOP 100 (último) -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-8 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MERCADO — TOP 100</p>
             <div class="mb-3">
@@ -242,18 +243,19 @@
     </div>
 
     <script>
+        // ── Estado y persistencia ────────────────────────────────────────────────
         const ASSET_TYPE_META = {
-            etf_gold:       { type: 'manual', name: 'ETF Oro Físico',        icon: '🥇', color: '#eab308' },
-            etf_nasdaq:     { type: 'manual', name: 'ETF Nasdaq',            icon: '📈', color: '#38bdf8' },
-            etf_sp500:      { type: 'manual', name: 'ETF S&P 500',          icon: '📊', color: '#4ade80' },
+            etf_gold:       { type: 'manual', name: 'ETF Oro Físico',       icon: '🥇', color: '#eab308' },
+            etf_nasdaq:     { type: 'manual', name: 'ETF Nasdaq',           icon: '📈', color: '#38bdf8' },
+            etf_sp500:      { type: 'manual', name: 'ETF S&P 500',         icon: '📊', color: '#4ade80' },
             rental:         { type: 'manual', name: 'Inmobiliario (Rental)', icon: '🏠', color: '#f472b6' },
-            spacex:         { type: 'manual', name: 'SpaceX',                icon: '🚀', color: '#94a3b8' },
-            etf_acwi:       { type: 'manual', name: 'ETF ACWI',              icon: '🌍', color: '#60a5fa' },
-            etf_msci_world: { type: 'manual', name: 'ETF MSCI World',        icon: '🌐', color: '#34d399' },
-            usdc_sol:       { type: 'crypto', name: 'USDC-SOL',    symbol: 'USDC', coingeckoId: 'usd-coin',    icon: '💵', color: '#2775ca' },
-            bittensor:      { type: 'crypto', name: 'Bittensor',   symbol: 'TAO',  coingeckoId: 'bittensor',   icon: '🧠', color: '#facc15' },
+            spacex:         { type: 'manual', name: 'SpaceX',               icon: '🚀', color: '#94a3b8' },
+            etf_acwi:       { type: 'manual', name: 'ETF ACWI',             icon: '🌍', color: '#60a5fa' },
+            etf_msci_world: { type: 'manual', name: 'ETF MSCI World',       icon: '🌐', color: '#34d399' },
+            usdc_sol:       { type: 'crypto', name: 'USDC-SOL', symbol: 'USDC', coingeckoId: 'usd-coin',   icon: '💵', color: '#2775ca' },
+            bittensor:      { type: 'crypto', name: 'Bittensor', symbol: 'TAO', coingeckoId: 'bittensor',   icon: '🧠', color: '#facc15' },
             hyperliquid:    { type: 'crypto', name: 'Hyperliquid', symbol: 'HYPE', coingeckoId: 'hyperliquid', icon: '⚡', color: '#22d3ee' },
-            aave:           { type: 'crypto', name: 'Aave',        symbol: 'AAVE', coingeckoId: 'aave',        icon: '👻', color: '#b6509e' }
+            aave:           { type: 'crypto', name: 'Aave', symbol: 'AAVE', coingeckoId: 'aave',           icon: '👻', color: '#b6509e' }
         };
 
         function loadAssets() {
@@ -273,6 +275,7 @@
         let allMarketData = [];
 
         function fmtEUR(n) { return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+
         function getAssetValue(key) {
             const a = assets[key];
             if (a.type === 'crypto') return a.amount * (livePrices[a.coingeckoId] || 0);
@@ -286,7 +289,8 @@
             function step(now) {
                 const p = Math.min((now - startTime) / duration, 1);
                 const eased = 1 - Math.pow(1 - p, 3);
-                el.textContent = (start + (target - start) * eased).toFixed(2);
+                const val = start + (target - start) * eased;
+                el.textContent = val.toFixed(2);
                 if (p < 1) requestAnimationFrame(step); else el.dataset.val = target;
             }
             requestAnimationFrame(step);
@@ -356,14 +360,18 @@
         }
 
         function updatePieChart() {
-            const labels = [], data = [], colors = [];
+            const labels = [];
+            const data = [];
+            const colors = [];
             let total = 0;
-            Object.keys(assets).forEach(k => { total += getAssetValue(k); });
-            Object.keys(assets).forEach(k => {
-                const a = assets[k]; const val = getAssetValue(k);
+            Object.keys(assets).forEach(key => { total += getAssetValue(key); });
+            Object.keys(assets).forEach(key => {
+                const a = assets[key];
+                const val = getAssetValue(key);
                 const pct = total ? (val / total * 100).toFixed(1) : '0.0';
                 labels.push(`${a.symbol || a.name} ${pct}%`);
-                data.push(val); colors.push(a.color);
+                data.push(val);
+                colors.push(a.color);
             });
             const ctx = document.getElementById('pie-chart').getContext('2d');
             if (pieChart) {
@@ -375,7 +383,13 @@
                 pieChart = new Chart(ctx, {
                     type: 'doughnut',
                     data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#18181b', borderWidth: 3 }] },
-                    options: { cutout: '60%', plugins: { legend: { display: true, position: 'bottom', labels: { color: '#a1a1aa', font: { size: 11 }, padding: 12 } }, tooltip: { callbacks: { label: (ctx) => ` ${ctx.parsed.toFixed(2)} €` } } } }
+                    options: {
+                        cutout: '60%',
+                        plugins: {
+                            legend: { display: true, position: 'bottom', labels: { color: '#a1a1aa', font: { size: 11 }, padding: 12 } },
+                            tooltip: { callbacks: { label: (ctx) => ` ${ctx.parsed.toFixed(2)} €` } }
+                        }
+                    }
                 });
             }
         }
@@ -385,17 +399,23 @@
                 await fetchCryptoPrices();
                 renderAssetsList();
                 renderPromedioCompra();
+
                 const totalInvertido = Object.values(assets).reduce((s, a) => s + a.invested, 0);
                 const total = Object.keys(assets).reduce((s, k) => s + getAssetValue(k), 0);
+
                 animateNumber(document.getElementById('total-value'), total);
                 document.getElementById('inv-total-subtitle').textContent = `Sobre inversión total de ${fmtEUR(totalInvertido)}`;
                 document.getElementById('promedio-total-invertido').textContent = fmtEUR(totalInvertido);
+
                 const totalPerf = ((total - totalInvertido) / totalInvertido * 100).toFixed(2);
                 const percEl = document.getElementById('percentage');
                 percEl.textContent = (totalPerf >= 0 ? '+' : '') + totalPerf + '%';
                 percEl.className = 'text-5xl font-bold ' + (totalPerf >= 0 ? 'text-emerald-400' : 'text-red-400');
+
                 updatePieChart();
-            } catch(e) { console.error('Error updateAll', e); }
+            } catch (e) {
+                console.error('Error updateAll', e);
+            }
         }
 
         async function updateFearGreed() {
@@ -427,6 +447,7 @@
                 const totalCap = data.data.total_market_cap.eur;
                 const btcCap = totalCap * (btcPct / 100);
                 const restCap = totalCap - btcCap;
+
                 document.getElementById('btc-dominance').textContent = btcPct.toFixed(1) + '%';
                 document.getElementById('rest-dominance').textContent = restPct.toFixed(1) + '%';
                 document.getElementById('btc-marketcap').textContent = fmtCompactEUR(btcCap);
@@ -434,7 +455,7 @@
             } catch(e) { console.error('Dominance error', e); }
         }
 
-        // ── NOTICIAS — feeds fiables con CORS permitido ───────────────────────────
+        // ── NOTICIAS — único cambio respecto al original ──────────────────────────
         const RSS_FEEDS = [
             'https://cointelegraph.com/rss',
             'https://decrypt.co/feed',
@@ -451,10 +472,7 @@
                 items = items.slice(0, 20);
                 const container = document.getElementById('news-list');
                 container.innerHTML = '';
-                if (!items.length) {
-                    container.innerHTML = '<div class="text-zinc-500 text-sm py-4">Sin noticias disponibles ahora mismo</div>';
-                    return;
-                }
+                if (!items.length) { container.innerHTML = '<div class="text-zinc-500 text-sm py-4">Sin noticias disponibles ahora mismo</div>'; return; }
                 items.forEach(it => {
                     const div = document.createElement('a');
                     div.href = it.link; div.target = '_blank'; div.rel = 'noopener';
@@ -475,6 +493,7 @@
             try {
                 const cryptoKeys = Object.keys(assets).filter(k => assets[k].type === 'crypto');
                 const manualTotal = Object.keys(assets).filter(k => assets[k].type !== 'crypto').reduce((s, k) => s + getAssetValue(k), 0);
+
                 function dedup(prices) {
                     const seen = new Set(); const u = [];
                     for (const [ts, p] of prices) {
@@ -483,15 +502,18 @@
                     }
                     return u;
                 }
+
                 const histories = await Promise.all(cryptoKeys.map(k =>
                     fetch(`https://api.coingecko.com/api/v3/coins/${assets[k].coingeckoId}/market_chart?vs_currency=eur&days=7&interval=daily`).then(r => r.json())
                 ));
                 const seriesPerAsset = histories.map(h => dedup(h.prices).slice(-5));
                 const len = Math.min(...seriesPerAsset.map(s => s.length), 5);
+
                 await fetchCryptoPrices();
                 seriesPerAsset.forEach((s, i) => {
                     if (s.length) s[s.length - 1][1] = livePrices[assets[cryptoKeys[i]].coingeckoId] ?? s[s.length - 1][1];
                 });
+
                 container.innerHTML = '';
                 for (let i = 1; i < len; i++) {
                     let prevTotal = manualTotal, curTotal = manualTotal;
@@ -506,6 +528,7 @@
                     const month = date.toLocaleString('es-ES', { month: 'short' });
                     const change = ((curTotal - prevTotal) / prevTotal * 100).toFixed(2);
                     const isPos = parseFloat(change) >= 0;
+
                     const div = document.createElement('div');
                     div.className = 'bg-black/40 rounded-2xl px-5 py-4 text-center min-w-[110px] flex-shrink-0' + (isToday ? ' ring-1 ring-amber-400/50' : '');
                     div.innerHTML = `
@@ -522,7 +545,9 @@
 
         async function updateMarket() {
             try {
-                const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=100&page=1&price_change_percentage=24h');
+                const res = await fetch(
+                    'https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=100&page=1&price_change_percentage=24h'
+                );
                 allMarketData = await res.json();
                 renderMarket(allMarketData);
             } catch(e) { console.error('Market error', e); }
@@ -565,10 +590,12 @@
             const chartWrap = document.getElementById('detail-chart-wrap');
             const manualWrap = document.getElementById('detail-manual-wrap');
             if (a.type === 'crypto') {
-                chartWrap.classList.remove('hidden'); manualWrap.classList.add('hidden');
+                chartWrap.classList.remove('hidden');
+                manualWrap.classList.add('hidden');
                 await loadAssetChart(a.coingeckoId);
             } else {
-                chartWrap.classList.add('hidden'); manualWrap.classList.remove('hidden');
+                chartWrap.classList.add('hidden');
+                manualWrap.classList.remove('hidden');
                 document.getElementById('manual-current-value-input').value = a.currentValue ?? a.invested;
                 document.getElementById('manual-asset-key').value = key;
             }
@@ -586,7 +613,13 @@
                 detailChart = new Chart(ctx, {
                     type: 'line',
                     data: { labels, datasets: [{ data: values, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,.12)', fill: true, tension: .3, pointRadius: 0 }] },
-                    options: { plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#a1a1aa', maxTicksLimit: 6 }, grid: { display: false } }, y: { ticks: { color: '#a1a1aa' }, grid: { color: '#27272a' } } } }
+                    options: {
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { ticks: { color: '#a1a1aa', maxTicksLimit: 6 }, grid: { display: false } },
+                            y: { ticks: { color: '#a1a1aa' }, grid: { color: '#27272a' } }
+                        }
+                    }
                 });
             } catch(e) { console.error('Chart error', e); }
         }
@@ -594,7 +627,12 @@
         function saveManualValue() {
             const key = document.getElementById('manual-asset-key').value;
             const val = parseFloat(document.getElementById('manual-current-value-input').value);
-            if (!isNaN(val) && val >= 0) { assets[key].currentValue = val; saveAssets(); closeAssetDetail(); updateAll(); }
+            if (!isNaN(val) && val >= 0) {
+                assets[key].currentValue = val;
+                saveAssets();
+                closeAssetDetail();
+                updateAll();
+            }
         }
 
         function openAddAssetModal() { document.getElementById('add-asset-modal').classList.remove('hidden'); }
@@ -608,9 +646,13 @@
             const qty = parseFloat(document.getElementById('add-qty').value);
             const inv = parseFloat(document.getElementById('add-invested').value);
             if (isNaN(qty) || isNaN(inv) || qty <= 0 || inv <= 0) { alert('Introduce una cantidad y un importe válidos.'); return; }
+
             if (assets[key]) {
-                assets[key].amount += qty; assets[key].invested += inv;
-                if (assets[key].type !== 'crypto') assets[key].currentValue = (assets[key].currentValue ?? (assets[key].invested - inv)) + inv;
+                assets[key].amount += qty;
+                assets[key].invested += inv;
+                if (assets[key].type !== 'crypto') {
+                    assets[key].currentValue = (assets[key].currentValue ?? (assets[key].invested - inv)) + inv;
+                }
             } else {
                 const meta = ASSET_TYPE_META[key];
                 if (meta.type === 'crypto') {
@@ -619,7 +661,10 @@
                     assets[key] = { type: 'manual', name: meta.name, icon: meta.icon, color: meta.color, amount: qty, invested: inv, currentValue: inv };
                 }
             }
-            saveAssets(); closeAddAssetModal(); updateAll(); generateDailyEvolution();
+            saveAssets();
+            closeAddAssetModal();
+            updateAll();
+            generateDailyEvolution();
         }
 
         document.addEventListener('DOMContentLoaded', () => {
@@ -647,6 +692,7 @@
     </script>
 </body>
 </html>
+
 
 
 
