@@ -3,14 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoinLink BTC Edition #001</title>
+    <title>Portafolio Personal</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
         body { font-family: 'Inter', system-ui, sans-serif; }
-
-        /* Gauge */
         .gauge-wrap { position: relative; width: 180px; height: 100px; margin: 0 auto; }
         .gauge-bg {
             width: 180px; height: 90px;
@@ -22,7 +20,6 @@
                 #84cc16 126deg 162deg,
                 #22c55e 162deg 180deg
             );
-            overflow: hidden;
         }
         .gauge-center {
             position: absolute; bottom: 0; left: 50%;
@@ -50,12 +47,12 @@
 </head>
 <body class="bg-black text-white min-h-screen flex items-center justify-center p-4">
     <div class="max-w-md w-full text-center">
-        <h1 class="text-5xl font-bold text-amber-400 mb-1">CoinLink BTC Edition</h1>
+
+        <h1 class="text-5xl font-bold text-amber-400 mb-1">Portafolio Personal</h1>
         <p class="text-5xl font-bold text-amber-400 mb-10">#001</p>
 
-        <!-- 1. VALOR TOTAL DEL PORTAFOLIO -->
+        <!-- 1. VALOR TOTAL -->
         <div class="bg-zinc-900 rounded-3xl p-8 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-lg tracking-widest mb-3">VALOR DEL NFC/NFT</p>
             <div class="flex items-baseline justify-center gap-3">
                 <div id="total-value" class="text-6xl font-bold text-white">—</div>
                 <div class="text-5xl font-bold text-amber-400">€</div>
@@ -63,9 +60,9 @@
             <p class="text-xs text-zinc-500 mt-2">Valor total del portafolio en tiempo real</p>
         </div>
 
-        <!-- 2. DESGLOSE DE CRIPTOS -->
+        <!-- 2. MIS ACTIVOS -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MIS CRIPTOMONEDAS</p>
+            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MIS ACTIVOS</p>
             <div class="space-y-3">
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div class="flex items-center gap-3">
@@ -113,7 +110,7 @@
         <div class="bg-zinc-900 rounded-3xl p-8 mb-6 border border-amber-500/30">
             <p class="text-zinc-400 text-sm mb-3">RENDIMIENTO TOTAL</p>
             <div id="percentage" class="text-5xl font-bold">—</div>
-            <p class="text-xs text-zinc-500 mt-2">Sobre inversión total de 14.540,76 €</p>
+            <p class="text-xs text-zinc-500 mt-2">Sobre inversión total de 14.490,76 €</p>
         </div>
 
         <!-- 4. GRÁFICA QUESO -->
@@ -130,9 +127,7 @@
             <div class="gauge-wrap mb-2">
                 <div class="gauge-bg"></div>
                 <div class="gauge-center">
-                    <div>
-                        <div id="fear-value" class="text-3xl font-bold text-white">—</div>
-                    </div>
+                    <div id="fear-value" class="text-3xl font-bold text-white">—</div>
                 </div>
                 <div id="gauge-needle" class="gauge-needle"></div>
                 <div class="gauge-dot"></div>
@@ -141,20 +136,7 @@
             <p class="text-xs text-zinc-500 mt-1">Fear & Greed Index · Actualizado diariamente</p>
         </div>
 
-        <!-- 6. TOP 100 MERCADO -->
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MERCADO — TOP 100</p>
-            <div class="mb-3">
-                <input id="market-search" type="text" placeholder="Buscar cripto..."
-                    class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-sm text-white placeholder-zinc-500 outline-none">
-            </div>
-            <div id="market-list" class="space-y-2 max-h-[480px] overflow-y-auto pr-1">
-                <div class="text-zinc-500 text-sm py-4">Cargando mercado...</div>
-            </div>
-            <p class="text-xs text-zinc-500 text-center mt-3">Actualización cada 60 segundos · Fuente: CoinGecko</p>
-        </div>
-
-        <!-- 7. EVOLUCIÓN DIARIA -->
+        <!-- 6. EVOLUCIÓN DIARIA -->
         <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-3 text-center">EVOLUCIÓN DIARIA DEL PORTAFOLIO</p>
             <div id="evolution-container" class="overflow-x-auto pb-2">
@@ -165,14 +147,14 @@
             <p class="text-xs text-zinc-500 text-center mt-2">Desliza → para ver más días</p>
         </div>
 
-        <!-- 8. PROMEDIO DE COMPRA -->
+        <!-- 7. PROMEDIO DE COMPRA -->
         <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-amber-500/30">
             <p class="text-amber-400 text-sm mb-5 text-center tracking-widest">PROMEDIO DE COMPRA</p>
             <div class="space-y-4">
                 <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
                     <div>
                         <div class="text-xs text-zinc-400 mb-1">Inversión total</div>
-                        <div class="text-2xl font-bold text-white">14.540,76 €</div>
+                        <div class="text-2xl font-bold text-white">14.490,76 €</div>
                     </div>
                     <span class="text-3xl text-amber-400">💶</span>
                 </div>
@@ -203,7 +185,7 @@
                         </div>
                         <div class="text-right">
                             <div class="text-xs text-zinc-400 mb-1">Precio medio</div>
-                            <div class="font-bold text-white">2.555,01 €</div>
+                            <div class="font-bold text-white">2.511,24 €</div>
                         </div>
                     </div>
                 </div>
@@ -222,28 +204,32 @@
             </div>
         </div>
 
-        <!-- 9. GRÁFICA TRADINGVIEW -->
-        <div class="bg-zinc-900 rounded-3xl p-4 mb-8 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-3 text-center">GRÁFICA BITCOIN (TradingView - EUR)</p>
-            <div class="tradingview-widget-container">
-                <div id="tradingview-chart" style="height: 320px;"></div>
+        <!-- 8. MERCADO TOP 100 (último) -->
+        <div class="bg-zinc-900 rounded-3xl p-6 mb-8 border border-amber-500/30">
+            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MERCADO — TOP 100</p>
+            <div class="mb-3">
+                <input id="market-search" type="text" placeholder="Buscar cripto..."
+                    class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-sm text-white placeholder-zinc-500 outline-none">
             </div>
+            <div id="market-list" class="space-y-2 max-h-[480px] overflow-y-auto pr-1">
+                <div class="text-zinc-500 text-sm py-4">Cargando mercado...</div>
+            </div>
+            <p class="text-xs text-zinc-500 text-center mt-3">Actualización cada 60 segundos · Fuente: CoinGecko</p>
         </div>
 
     </div>
 
     <script>
-        // ── Portafolio ────────────────────────────────────────────────────────────
         const portfolio = {
             btc: { amount: 0.15073571, buyPrice: 72972.09 },
-            eth: { amount: 1.14237,    buyPrice: 2555.01  },
+            eth: { amount: 1.14237,    buyPrice: 2511.24  },
             sol: { amount: 5.89,       buyPrice: 105.69   }
         };
-        const totalInvested = 14540.76;
+        const totalInvested = 14490.76;
         let pieChart = null;
         let allMarketData = [];
 
-        // ── Fetch precios portafolio ──────────────────────────────────────────────
+        // ── Precios portafolio ────────────────────────────────────────────────────
         async function fetchPrices() {
             const res = await fetch(
                 'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=eur'
@@ -281,7 +267,7 @@
             }
         }
 
-        // ── Gráfica queso ─────────────────────────────────────────────────────────
+        // ── Queso ─────────────────────────────────────────────────────────────────
         function updatePieChart(btcVal, ethVal, solVal, total) {
             const btcPct = (btcVal / total * 100).toFixed(1);
             const ethPct = (ethVal / total * 100).toFixed(1);
@@ -299,8 +285,7 @@
                         datasets: [{
                             data: [btcVal, ethVal, solVal],
                             backgroundColor: ['#f97316', '#818cf8', '#a855f7'],
-                            borderColor: '#18181b',
-                            borderWidth: 3
+                            borderColor: '#18181b', borderWidth: 3
                         }]
                     },
                     options: {
@@ -314,39 +299,94 @@
             }
         }
 
-        // ── Fear & Greed Index ────────────────────────────────────────────────────
+        // ── Fear & Greed ──────────────────────────────────────────────────────────
         async function updateFearGreed() {
             try {
                 const res = await fetch('https://api.alternative.me/fng/?limit=1');
                 const data = await res.json();
                 const value = parseInt(data.data[0].value);
                 const label = data.data[0].value_classification;
-
                 document.getElementById('fear-value').textContent = value;
-
+                const labelMap = { 'Extreme Fear': 'Miedo Extremo', 'Fear': 'Miedo', 'Neutral': 'Neutral', 'Greed': 'Codicia', 'Extreme Greed': 'Codicia Extrema' };
+                const colorMap = { 'Extreme Fear': 'text-red-500', 'Fear': 'text-orange-400', 'Neutral': 'text-yellow-400', 'Greed': 'text-lime-400', 'Extreme Greed': 'text-emerald-400' };
                 const labelEl = document.getElementById('fear-label');
-                const labelMap = {
-                    'Extreme Fear': 'Miedo Extremo',
-                    'Fear': 'Miedo',
-                    'Neutral': 'Neutral',
-                    'Greed': 'Codicia',
-                    'Extreme Greed': 'Codicia Extrema'
-                };
-                const colorMap = {
-                    'Extreme Fear': 'text-red-500',
-                    'Fear': 'text-orange-400',
-                    'Neutral': 'text-yellow-400',
-                    'Greed': 'text-lime-400',
-                    'Extreme Greed': 'text-emerald-400'
-                };
                 labelEl.textContent = labelMap[label] || label;
                 labelEl.className = 'text-xl font-bold mt-3 ' + (colorMap[label] || 'text-white');
-
-                // Aguja: 0→-90deg (extremo miedo), 100→+90deg (extremo codicia)
                 const deg = (value / 100) * 180 - 90;
                 document.getElementById('gauge-needle').style.transform = `translateX(-50%) rotate(${deg}deg)`;
+            } catch(e) { console.error('Fear & Greed error', e); }
+        }
+
+        // ── Evolución diaria del portafolio completo ──────────────────────────────
+        async function generateDailyEvolution() {
+            const container = document.getElementById('evolution-days');
+            if (!container) return;
+            try {
+                // Fetch histórico de BTC, ETH y SOL simultáneamente
+                const [resBtc, resEth, resSol] = await Promise.all([
+                    fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=daily'),
+                    fetch('https://api.coingecko.com/api/v3/coins/ethereum/market_chart?vs_currency=eur&days=7&interval=daily'),
+                    fetch('https://api.coingecko.com/api/v3/coins/solana/market_chart?vs_currency=eur&days=7&interval=daily')
+                ]);
+                const [dataBtc, dataEth, dataSol] = await Promise.all([resBtc.json(), resEth.json(), resSol.json()]);
+
+                // Deduplicar y alinear por fecha
+                function dedup(prices) {
+                    const seen = new Set(); const u = [];
+                    for (const [ts, p] of prices) {
+                        const k = new Date(ts).toISOString().slice(0, 10);
+                        if (!seen.has(k)) { seen.add(k); u.push([k, p]); }
+                    }
+                    return u;
+                }
+
+                // Incluimos el día de hoy (últimos 5 puntos) para que el último
+                // día mostrado coincida con el valor real y actual del portafolio.
+                const btcPrices = dedup(dataBtc.prices).slice(-5);
+                const ethPrices = dedup(dataEth.prices).slice(-5);
+                const solPrices = dedup(dataSol.prices).slice(-5);
+
+                // Sobrescribimos el precio de "hoy" con el precio en vivo actual
+                // (el último punto de CoinGecko puede tener unas horas de retraso).
+                try {
+                    const livePrices = await fetchPrices();
+                    if (btcPrices.length) btcPrices[btcPrices.length - 1][1] = livePrices.btc;
+                    if (ethPrices.length) ethPrices[ethPrices.length - 1][1] = livePrices.eth;
+                    if (solPrices.length) solPrices[solPrices.length - 1][1] = livePrices.sol;
+                } catch (e) { /* si falla, se usa el último precio histórico */ }
+
+                container.innerHTML = '';
+                const len = Math.min(btcPrices.length, ethPrices.length, solPrices.length);
+
+                for (let i = 1; i < len; i++) {
+                    const [dateKey, btcP] = btcPrices[i];
+                    const ethP = ethPrices[i][1];
+                    const solP = solPrices[i][1];
+                    const prevTotal = portfolio.btc.amount * btcPrices[i-1][1]
+                                    + portfolio.eth.amount * ethPrices[i-1][1]
+                                    + portfolio.sol.amount * solPrices[i-1][1];
+                    const curTotal  = portfolio.btc.amount * btcP
+                                    + portfolio.eth.amount * ethP
+                                    + portfolio.sol.amount * solP;
+
+                    const isToday = i === len - 1;
+                    const date = isToday ? new Date() : new Date(dateKey);
+                    const day = date.getDate();
+                    const month = date.toLocaleString('es-ES', { month: 'short' });
+                    const change = ((curTotal - prevTotal) / prevTotal * 100).toFixed(2);
+                    const isPos = parseFloat(change) >= 0;
+
+                    const div = document.createElement('div');
+                    div.className = 'bg-black/40 rounded-2xl px-5 py-4 text-center min-w-[110px] flex-shrink-0' + (isToday ? ' ring-1 ring-amber-400/50' : '');
+                    div.innerHTML = `
+                        <div class="text-xs text-zinc-400">${isToday ? 'Hoy' : day + ' ' + month}</div>
+                        <div class="font-mono text-base mt-1">${curTotal.toFixed(2)} €</div>
+                        <div class="text-xs ${isPos ? 'text-emerald-400' : 'text-red-400'}">${isPos ? '+' : ''}${change}%</div>
+                    `;
+                    container.appendChild(div);
+                }
             } catch(e) {
-                console.error('Error fetching Fear & Greed', e);
+                container.innerHTML = '<div class="text-zinc-500 text-sm py-4">No se pudieron cargar los datos</div>';
             }
         }
 
@@ -358,9 +398,7 @@
                 );
                 allMarketData = await res.json();
                 renderMarket(allMarketData);
-            } catch(e) {
-                console.error('Error fetching market', e);
-            }
+            } catch(e) { console.error('Market error', e); }
         }
 
         function renderMarket(coins) {
@@ -372,7 +410,6 @@
                 const price = coin.current_price >= 1
                     ? coin.current_price.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                     : coin.current_price.toFixed(6);
-
                 const div = document.createElement('div');
                 div.className = 'bg-black/40 rounded-2xl px-4 py-3 flex justify-between items-center';
                 div.innerHTML = `
@@ -386,80 +423,19 @@
                     </div>
                     <div class="text-right">
                         <div class="text-sm font-bold">${price} €</div>
-                        <div class="text-xs ${isPos ? 'text-emerald-400' : 'text-red-400'}">
-                            ${isPos ? '▲' : '▼'} ${Math.abs(change)}%
-                        </div>
+                        <div class="text-xs ${isPos ? 'text-emerald-400' : 'text-red-400'}">${isPos ? '▲' : '▼'} ${Math.abs(change)}%</div>
                     </div>
                 `;
                 container.appendChild(div);
             });
         }
 
-        // Búsqueda en tiempo real
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('market-search').addEventListener('input', (e) => {
                 const q = e.target.value.toLowerCase();
-                const filtered = allMarketData.filter(c =>
-                    c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)
-                );
-                renderMarket(filtered);
+                renderMarket(allMarketData.filter(c => c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)));
             });
         });
-
-        // ── Evolución diaria ──────────────────────────────────────────────────────
-        async function generateDailyEvolution() {
-            const container = document.getElementById('evolution-days');
-            if (!container) return;
-            try {
-                const res = await fetch('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=eur&days=7&interval=daily');
-                const data = await res.json();
-                const seen = new Set();
-                const unique = [];
-                for (const [ts, price] of data.prices) {
-                    const dateKey = new Date(ts).toISOString().slice(0, 10);
-                    if (!seen.has(dateKey)) { seen.add(dateKey); unique.push([ts, price]); }
-                }
-                const prices = unique.slice(-6, -1);
-                container.innerHTML = '';
-                for (let i = 1; i < prices.length; i++) {
-                    const [ts, price] = prices[i];
-                    const prevPrice = prices[i - 1][1];
-                    const date = new Date(ts);
-                    const day = date.getDate();
-                    const month = date.toLocaleString('es-ES', { month: 'short' });
-                    const btcValue = (portfolio.btc.amount * price).toFixed(2);
-                    const change = ((price - prevPrice) / prevPrice * 100).toFixed(2);
-                    const isPositive = parseFloat(change) >= 0;
-                    const div = document.createElement('div');
-                    div.className = 'bg-black/40 rounded-2xl px-5 py-4 text-center min-w-[110px] flex-shrink-0';
-                    div.innerHTML = `
-                        <div class="text-xs text-zinc-400">${day} ${month}</div>
-                        <div class="font-mono text-base mt-1">${btcValue} €</div>
-                        <div class="text-xs ${isPositive ? 'text-emerald-400' : 'text-red-400'}">${isPositive ? '+' : ''}${change}%</div>
-                    `;
-                    container.appendChild(div);
-                }
-            } catch(e) {
-                container.innerHTML = '<div class="text-zinc-500 text-sm py-4">No se pudieron cargar los datos</div>';
-            }
-        }
-
-        // ── TradingView ───────────────────────────────────────────────────────────
-        function loadTradingView() {
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/tv.js';
-            script.async = true;
-            script.onload = function() {
-                new TradingView.widget({
-                    "width": "100%", "height": "320", "symbol": "BINANCE:BTCEUR",
-                    "interval": "60", "timezone": "Etc/UTC", "theme": "dark", "style": "1",
-                    "locale": "es", "toolbar_bg": "#1f2937", "enable_publishing": false,
-                    "hide_top_toolbar": false, "hide_legend": true, "save_image": false,
-                    "container_id": "tradingview-chart"
-                });
-            };
-            document.head.appendChild(script);
-        }
 
         // ── Init ──────────────────────────────────────────────────────────────────
         window.onload = () => {
@@ -467,11 +443,9 @@
             updateFearGreed();
             updateMarket();
             generateDailyEvolution();
-            loadTradingView();
-
-            setInterval(updateAll, 5000);          // portafolio cada 5s
-            setInterval(updateMarket, 60000);      // mercado cada 60s
-            setInterval(updateFearGreed, 3600000); // sentimiento cada hora
+            setInterval(updateAll, 5000);
+            setInterval(updateMarket, 60000);
+            setInterval(updateFearGreed, 3600000);
         };
     </script>
 </body>
