@@ -17,8 +17,6 @@
         .gauge-dot { position: absolute; bottom: -5px; left: 50%; transform: translateX(-50%); width: 12px; height: 12px; background: white; border-radius: 50%; }
         .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
         .modal-box { max-height: 85vh; overflow-y: auto; }
-        .news-scroll::-webkit-scrollbar { width: 6px; }
-        .news-scroll::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
     </style>
 </head>
 <body class="bg-black text-white min-h-screen p-4">
@@ -38,12 +36,10 @@
     <!-- 2. MIS ACTIVOS -->
     <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
         <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MIS ACTIVOS</p>
-        <div id="assets-list" class="space-y-3">
-            <div class="text-zinc-500 text-sm py-4">Cargando activos...</div>
-        </div>
+        <div id="assets-list" class="space-y-3"></div>
         <div class="flex gap-3 mt-4">
             <button onclick="openAddAssetModal()" class="flex-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-400 font-semibold rounded-2xl py-3 transition">+ Añadir activo</button>
-            <button onclick="openEditAssetModal()" class="flex-1 bg-red-500/10 hover:bg-red-500/20 border border-red-500/40 text-red-400 font-semibold rounded-2xl py-3 transition">✕ Eliminar activo</button>
+            <button onclick="openEditAssetModal()" class="flex-1 bg-zinc-700/40 hover:bg-zinc-700/60 border border-zinc-600 text-zinc-300 font-semibold rounded-2xl py-3 transition">✎ Modificar activo</button>
         </div>
     </div>
 
@@ -104,28 +100,19 @@
     <!-- 7. RENDIMIENTO ANUAL EN BARRAS -->
     <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
         <p class="text-amber-400 text-sm mb-1 text-center tracking-widest">RENDIMIENTO ANUAL</p>
-        <div class="flex justify-between items-center mb-4 px-1">
+        <div class="flex justify-between items-center mb-3 px-1">
             <div id="annual-date" class="text-xs text-zinc-400">—</div>
             <div class="text-right">
                 <span class="text-xs text-zinc-500">Anualizado: </span>
                 <span id="annualized-perf" class="text-xs font-bold">—</span>
             </div>
         </div>
-        <div style="height:220px;">
+        <div style="height:260px;">
             <canvas id="annual-chart"></canvas>
         </div>
     </div>
 
-    <!-- 8. NOTICIAS -->
-    <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-        <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">NOTICIAS CRIPTO Y MERCADOS</p>
-        <div id="news-list" class="news-scroll space-y-2 text-left max-h-80 overflow-y-auto pr-1">
-            <div class="text-zinc-500 text-sm py-4">Cargando noticias...</div>
-        </div>
-        <p class="text-xs text-zinc-500 text-center mt-3">Actualización cada 60 segundos · CoinTelegraph · Decrypt · CoinDesk</p>
-    </div>
-
-    <!-- 9. PROMEDIO DE COMPRA -->
+    <!-- 8. PROMEDIO DE COMPRA -->
     <div class="bg-zinc-900 rounded-3xl p-8 mb-6 border border-amber-500/30">
         <p class="text-amber-400 text-sm mb-5 text-center tracking-widest">PROMEDIO DE COMPRA</p>
         <div class="space-y-4">
@@ -147,7 +134,7 @@
         </div>
     </div>
 
-    <!-- 10. MERCADO TOP 100 -->
+    <!-- 9. MERCADO TOP 100 -->
     <div class="bg-zinc-900 rounded-3xl p-6 mb-8 border border-amber-500/30">
         <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MERCADO — TOP 100</p>
         <div class="mb-3">
@@ -214,15 +201,44 @@
     </div>
 </div>
 
-<!-- MODAL: ELIMINAR ACTIVO -->
+<!-- MODAL: MODIFICAR ACTIVO (venta parcial o total + eliminar) -->
 <div id="edit-asset-modal" class="modal-overlay hidden">
-    <div class="modal-box bg-zinc-900 border border-red-500/30 rounded-3xl p-6 max-w-sm w-full text-left">
+    <div class="modal-box bg-zinc-900 border border-zinc-600 rounded-3xl p-6 max-w-sm w-full text-left">
         <div class="flex justify-between items-center mb-4">
-            <p class="text-lg font-bold text-red-400">Eliminar activo</p>
+            <p class="text-lg font-bold text-zinc-200">Modificar activo</p>
             <button onclick="closeEditAssetModal()" class="text-zinc-400 text-2xl leading-none">&times;</button>
         </div>
-        <p class="text-xs text-zinc-400 mb-4">Selecciona el activo que quieres eliminar del portafolio.</p>
-        <div id="delete-asset-list" class="space-y-2"></div>
+        <p class="text-xs text-zinc-400 mb-4">Selecciona el activo para editarlo, registrar una venta parcial o eliminarlo.</p>
+        <div id="edit-asset-list" class="space-y-3"></div>
+    </div>
+</div>
+
+<!-- MODAL: DETALLE MODIFICACIÓN -->
+<div id="modify-detail-modal" class="modal-overlay hidden">
+    <div class="modal-box bg-zinc-900 border border-zinc-600 rounded-3xl p-6 max-w-sm w-full text-left">
+        <div class="flex justify-between items-center mb-2">
+            <p id="modify-title" class="text-lg font-bold text-amber-400">—</p>
+            <button onclick="closeModifyDetail()" class="text-zinc-400 text-2xl leading-none">&times;</button>
+        </div>
+        <div id="modify-current-info" class="text-xs text-zinc-400 mb-4"></div>
+        <input type="hidden" id="modify-asset-key">
+
+        <!-- Venta parcial -->
+        <div class="bg-black/40 rounded-2xl p-4 mb-3">
+            <p class="text-sm font-semibold text-zinc-200 mb-3">Venta parcial</p>
+            <label class="text-xs text-zinc-500">Cantidad vendida</label>
+            <input id="sell-qty" type="number" step="any" placeholder="Ej. 0.5" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-2 outline-none">
+            <label class="text-xs text-zinc-500">€ recibidos por la venta</label>
+            <input id="sell-received" type="number" step="0.01" placeholder="Ej. 500" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-3 outline-none">
+            <button onclick="submitPartialSell()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl py-2 transition text-sm">Registrar venta parcial</button>
+        </div>
+
+        <!-- Eliminar total -->
+        <div class="bg-black/40 rounded-2xl p-4">
+            <p class="text-sm font-semibold text-zinc-200 mb-2">Eliminar activo completo</p>
+            <p class="text-xs text-zinc-500 mb-3">Elimina el activo del portafolio. Usa esto si has vendido todo.</p>
+            <button onclick="submitDeleteAsset()" class="w-full bg-red-600/80 hover:bg-red-600 text-white font-semibold rounded-xl py-2 transition text-sm">Eliminar del portafolio</button>
+        </div>
     </div>
 </div>
 
@@ -258,7 +274,6 @@ let pieChart = null;
 let annualChart = null;
 let allMarketData = [];
 
-// Fecha de inicio del portafolio
 const PORTFOLIO_START = new Date('2026-01-01');
 
 function fmtEUR(n) { return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
@@ -267,13 +282,11 @@ function getAssetValue(key) {
     if (a.type === 'crypto') return a.amount * (livePrices[a.coingeckoId] || 0);
     return (a.currentValue != null ? a.currentValue : a.invested);
 }
-
 function animateNumber(el, target) {
     const start = parseFloat(el.dataset.val || '0') || 0;
     const startTime = performance.now();
-    const duration = 800;
     function step(now) {
-        const p = Math.min((now - startTime) / duration, 1);
+        const p = Math.min((now - startTime) / 800, 1);
         const eased = 1 - Math.pow(1 - p, 3);
         el.textContent = (start + (target - start) * eased).toFixed(2);
         if (p < 1) requestAnimationFrame(step); else el.dataset.val = target;
@@ -289,7 +302,6 @@ async function fetchCryptoPrices() {
     ids.forEach(id => { if (data[id]) livePrices[id] = data[id].eur; });
 }
 
-// ── RENDER: MIS ACTIVOS ───────────────────────────────────────────────────────
 function renderAssetsList() {
     const container = document.getElementById('assets-list');
     container.innerHTML = '';
@@ -313,13 +325,11 @@ function renderAssetsList() {
             <div class="text-right">
                 <div class="font-bold text-white">${fmtEUR(val)}</div>
                 <div class="text-xs ${isPos ? 'text-emerald-400' : 'text-red-400'}">${isPos ? '+' : ''}${perf}%</div>
-            </div>
-        `;
+            </div>`;
         container.appendChild(row);
     });
 }
 
-// ── RENDER: PROMEDIO DE COMPRA (con inversión individual) ─────────────────────
 function renderPromedioCompra() {
     const container = document.getElementById('promedio-list');
     container.innerHTML = '';
@@ -341,21 +351,18 @@ function renderPromedioCompra() {
                     <div class="text-xs text-zinc-400 mb-1">${label}</div>
                     <div class="font-bold text-white">${value}</div>
                 </div>
-            </div>
-        `;
+            </div>`;
         container.appendChild(div);
     });
 }
 
-// ── GRÁFICA QUESO ─────────────────────────────────────────────────────────────
 function updatePieChart() {
     const labels = [], data = [], colors = [];
     let total = 0;
     Object.keys(assets).forEach(k => { total += getAssetValue(k); });
     Object.keys(assets).forEach(k => {
         const a = assets[k]; const val = getAssetValue(k);
-        const pct = total ? (val / total * 100).toFixed(1) : '0.0';
-        labels.push(`${a.symbol || a.name} ${pct}%`);
+        labels.push(`${a.symbol || a.name} ${total ? (val/total*100).toFixed(1) : 0}%`);
         data.push(val); colors.push(a.color);
     });
     const ctx = document.getElementById('pie-chart').getContext('2d');
@@ -373,34 +380,28 @@ function updatePieChart() {
     }
 }
 
-// ── GRÁFICA RENDIMIENTO ANUAL EN BARRAS ───────────────────────────────────────
+// ── RENDIMIENTO ANUAL ─────────────────────────────────────────────────────────
 function updateAnnualChart() {
     const now = new Date();
     const totalInvertido = Object.values(assets).reduce((s, a) => s + a.invested, 0);
     const totalActual = Object.keys(assets).reduce((s, k) => s + getAssetValue(k), 0);
 
-    // Años desde inicio hasta año actual
     const startYear = PORTFOLIO_START.getFullYear();
     const currentYear = now.getFullYear();
     const years = [];
     for (let y = startYear; y <= currentYear; y++) years.push(y);
 
-    // Rendimiento acumulado real solo para el año en curso (los anteriores en 0 por ahora)
-    const perfData = years.map(y => {
-        if (y === currentYear) {
-            return parseFloat(((totalActual - totalInvertido) / totalInvertido * 100).toFixed(2));
-        }
-        return 0; // años futuros o pasados sin datos reales aún
-    });
+    const currentPerf = parseFloat(((totalActual - totalInvertido) / totalInvertido * 100).toFixed(2));
+    const perfData = years.map(y => y === currentYear ? currentPerf : 0);
 
-    const bgColors = perfData.map(v => v >= 0 ? 'rgba(34,197,94,0.7)' : 'rgba(239,68,68,0.7)');
+    const bgColors = perfData.map(v => v >= 0 ? 'rgba(34,197,94,0.75)' : 'rgba(239,68,68,0.75)');
     const borderColors = perfData.map(v => v >= 0 ? '#22c55e' : '#ef4444');
 
-    // Fecha y hora en tiempo real
+    // Fecha/hora en tiempo real
     const dateStr = now.toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
     document.getElementById('annual-date').textContent = dateStr;
 
-    // Rendimiento anualizado (CAGR simplificado)
+    // CAGR — corregido: usa el mismo rendimiento total como base
     const daysSinceStart = Math.max(1, (now - PORTFOLIO_START) / (1000 * 60 * 60 * 24));
     const yearsFraction = daysSinceStart / 365.25;
     const cagr = (Math.pow(totalActual / totalInvertido, 1 / yearsFraction) - 1) * 100;
@@ -426,7 +427,10 @@ function updateAnnualChart() {
                     backgroundColor: bgColors,
                     borderColor: borderColors,
                     borderWidth: 2,
-                    borderRadius: 8
+                    borderRadius: 6,
+                    // barras estrechas fijas independientemente del número de años
+                    barPercentage: 0.35,
+                    categoryPercentage: 0.5
                 }]
             },
             options: {
@@ -434,22 +438,25 @@ function updateAnnualChart() {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: (ctx) => ` ${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(2)}%`
-                        }
-                    },
-                    datalabels: { display: false }
+                    tooltip: { callbacks: { label: (ctx) => ` ${ctx.parsed.y >= 0 ? '+' : ''}${ctx.parsed.y.toFixed(2)}%` } }
                 },
                 scales: {
-                    x: { ticks: { color: '#a1a1aa' }, grid: { color: '#27272a' } },
+                    x: {
+                        ticks: { color: '#a1a1aa', font: { size: 12 } },
+                        grid: { color: '#27272a' }
+                    },
                     y: {
+                        min: -100,
+                        max: 100,
                         ticks: {
                             color: '#a1a1aa',
-                            callback: v => (v >= 0 ? '+' : '') + v.toFixed(2) + '%'
+                            stepSize: 25,
+                            callback: v => (v > 0 ? '+' : '') + v + '%'
                         },
-                        grid: { color: '#27272a' },
-                        zero: true
+                        grid: {
+                            color: ctx => ctx.tick.value === 0 ? '#6b7280' : '#27272a',
+                            lineWidth: ctx => ctx.tick.value === 0 ? 2 : 1
+                        }
                     }
                 }
             }
@@ -457,7 +464,6 @@ function updateAnnualChart() {
     }
 }
 
-// ── CICLO PRINCIPAL ───────────────────────────────────────────────────────────
 async function updateAll() {
     try {
         await fetchCryptoPrices();
@@ -477,7 +483,6 @@ async function updateAll() {
     } catch(e) { console.error('Error updateAll', e); }
 }
 
-// ── FEAR & GREED ──────────────────────────────────────────────────────────────
 async function updateFearGreed() {
     try {
         const res = await fetch('https://api.alternative.me/fng/?limit=1');
@@ -490,14 +495,11 @@ async function updateFearGreed() {
         const labelEl = document.getElementById('fear-label');
         labelEl.textContent = labelMap[label] || label;
         labelEl.className = 'text-xl font-bold mt-3 ' + (colorMap[label] || 'text-white');
-        const deg = (value / 100) * 180 - 90;
-        document.getElementById('gauge-needle').style.transform = `translateX(-50%) rotate(${deg}deg)`;
+        document.getElementById('gauge-needle').style.transform = `translateX(-50%) rotate(${(value / 100) * 180 - 90}deg)`;
     } catch(e) { console.error('Fear & Greed error', e); }
 }
 
-// ── DOMINANCIA ────────────────────────────────────────────────────────────────
 function fmtCompactEUR(n) {
-    // 4 decimales en la parte compacta
     const abs = Math.abs(n);
     if (abs >= 1e12) return (n / 1e12).toFixed(4) + ' Bill. €';
     if (abs >= 1e9)  return (n / 1e9).toFixed(4) + ' MM €';
@@ -509,47 +511,14 @@ async function updateDominance() {
         const res = await fetch('https://api.coingecko.com/api/v3/global');
         const data = await res.json();
         const btcPct = data.data.market_cap_percentage.btc;
-        const restPct = 100 - btcPct;
         const totalCap = data.data.total_market_cap.eur;
         document.getElementById('btc-dominance').textContent = btcPct.toFixed(1) + '%';
-        document.getElementById('rest-dominance').textContent = restPct.toFixed(1) + '%';
+        document.getElementById('rest-dominance').textContent = (100 - btcPct).toFixed(1) + '%';
         document.getElementById('btc-marketcap').textContent = fmtCompactEUR(totalCap * btcPct / 100);
         document.getElementById('rest-marketcap').textContent = fmtCompactEUR(totalCap * (1 - btcPct / 100));
     } catch(e) { console.error('Dominance error', e); }
 }
 
-// ── NOTICIAS ──────────────────────────────────────────────────────────────────
-const RSS_FEEDS = [
-    'https://cointelegraph.com/rss',
-    'https://decrypt.co/feed',
-    'https://www.coindesk.com/arc/outboundfeeds/rss/'
-];
-async function updateNews() {
-    try {
-        const results = await Promise.all(RSS_FEEDS.map(url =>
-            fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}&count=10`)
-                .then(r => r.json()).catch(() => ({ status: 'error', items: [] }))
-        ));
-        let items = results.flatMap(r => (r.status === 'ok' ? r.items : []) || []);
-        items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-        items = items.slice(0, 20);
-        const container = document.getElementById('news-list');
-        container.innerHTML = '';
-        if (!items.length) { container.innerHTML = '<div class="text-zinc-500 text-sm py-4">Sin noticias disponibles ahora mismo</div>'; return; }
-        items.forEach(it => {
-            const div = document.createElement('a');
-            div.href = it.link; div.target = '_blank'; div.rel = 'noopener';
-            div.className = 'block bg-black/40 rounded-xl p-3 hover:bg-black/60 transition';
-            const date = new Date(it.pubDate).toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-            div.innerHTML = `<div class="text-xs text-zinc-500 mb-1">${date}</div><div class="text-sm font-medium text-white">${(it.title||'').replace(/</g,'&lt;')}</div>`;
-            container.appendChild(div);
-        });
-    } catch(e) {
-        document.getElementById('news-list').innerHTML = '<div class="text-zinc-500 text-sm py-4">No se pudieron cargar las noticias</div>';
-    }
-}
-
-// ── MERCADO TOP 100 ───────────────────────────────────────────────────────────
 async function updateMarket() {
     try {
         const res = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=100&page=1&price_change_percentage=24h');
@@ -580,25 +549,24 @@ function renderMarket(coins) {
             <div class="text-right">
                 <div class="text-sm font-bold">${price} €</div>
                 <div class="text-xs ${isPos ? 'text-emerald-400' : 'text-red-400'}">${isPos ? '▲' : '▼'} ${Math.abs(change)}%</div>
-            </div>
-        `;
+            </div>`;
         container.appendChild(div);
     });
 }
 
-// ── MODAL: DETALLE ACTIVO ─────────────────────────────────────────────────────
+// ── MODAL DETALLE ACTIVO ──────────────────────────────────────────────────────
 let detailChart = null;
 async function openAssetDetail(key) {
     const a = assets[key];
     document.getElementById('detail-modal-title').textContent = a.name;
     document.getElementById('asset-detail-modal').classList.remove('hidden');
-    const chartWrap = document.getElementById('detail-chart-wrap');
-    const manualWrap = document.getElementById('detail-manual-wrap');
     if (a.type === 'crypto') {
-        chartWrap.classList.remove('hidden'); manualWrap.classList.add('hidden');
+        document.getElementById('detail-chart-wrap').classList.remove('hidden');
+        document.getElementById('detail-manual-wrap').classList.add('hidden');
         await loadAssetChart(a.coingeckoId);
     } else {
-        chartWrap.classList.add('hidden'); manualWrap.classList.remove('hidden');
+        document.getElementById('detail-chart-wrap').classList.add('hidden');
+        document.getElementById('detail-manual-wrap').classList.remove('hidden');
         document.getElementById('manual-current-value-input').value = a.currentValue ?? a.invested;
         document.getElementById('manual-asset-key').value = key;
     }
@@ -625,7 +593,7 @@ function saveManualValue() {
     if (!isNaN(val) && val >= 0) { assets[key].currentValue = val; saveAssets(); closeAssetDetail(); updateAll(); }
 }
 
-// ── MODAL: AÑADIR ACTIVO ──────────────────────────────────────────────────────
+// ── MODAL AÑADIR ──────────────────────────────────────────────────────────────
 function openAddAssetModal() { document.getElementById('add-asset-modal').classList.remove('hidden'); }
 function closeAddAssetModal() {
     document.getElementById('add-asset-modal').classList.add('hidden');
@@ -651,40 +619,71 @@ function submitAddAsset() {
     saveAssets(); closeAddAssetModal(); updateAll();
 }
 
-// ── MODAL: ELIMINAR ACTIVO ────────────────────────────────────────────────────
+// ── MODAL MODIFICAR (venta parcial + eliminar) ────────────────────────────────
 function openEditAssetModal() {
-    const container = document.getElementById('delete-asset-list');
+    const container = document.getElementById('edit-asset-list');
     container.innerHTML = '';
     Object.keys(assets).forEach(key => {
         const a = assets[key];
+        const val = getAssetValue(key);
         const row = document.createElement('div');
-        row.className = 'flex justify-between items-center bg-black/40 rounded-2xl p-4';
+        row.className = 'flex justify-between items-center bg-black/40 rounded-2xl p-4 cursor-pointer hover:bg-black/60 transition';
+        row.onclick = () => openModifyDetail(key);
         row.innerHTML = `
             <div class="flex items-center gap-3">
                 <span class="text-xl">${a.icon}</span>
                 <div class="text-left">
                     <div class="font-semibold text-sm" style="color:${a.color}">${a.name}</div>
-                    <div class="text-xs text-zinc-400">${fmtEUR(a.invested)} invertidos</div>
+                    <div class="text-xs text-zinc-400">${a.type === 'crypto' ? a.amount + ' ' + a.symbol : a.amount + ' ud.'} · ${fmtEUR(val)}</div>
                 </div>
             </div>
-            <button onclick="deleteAsset('${key}')" class="bg-red-500/20 hover:bg-red-500/40 border border-red-500/40 text-red-400 text-xs font-semibold rounded-xl px-3 py-2 transition">Eliminar</button>
+            <span class="text-zinc-400 text-lg">›</span>
         `;
         container.appendChild(row);
     });
     document.getElementById('edit-asset-modal').classList.remove('hidden');
 }
 function closeEditAssetModal() { document.getElementById('edit-asset-modal').classList.add('hidden'); }
-function deleteAsset(key) {
-    if (!confirm(`¿Eliminar ${assets[key].name} del portafolio?`)) return;
-    delete assets[key];
-    saveAssets();
-    closeEditAssetModal();
-    updateAll();
+
+function openModifyDetail(key) {
+    const a = assets[key];
+    document.getElementById('modify-asset-key').value = key;
+    document.getElementById('modify-title').textContent = a.name;
+    document.getElementById('modify-current-info').textContent =
+        a.type === 'crypto'
+            ? `Tienes ${a.amount} ${a.symbol} · Invertido: ${fmtEUR(a.invested)}`
+            : `${a.amount} ud. · Invertido: ${fmtEUR(a.invested)}`;
+    document.getElementById('sell-qty').value = '';
+    document.getElementById('sell-received').value = '';
+    document.getElementById('modify-detail-modal').classList.remove('hidden');
+}
+function closeModifyDetail() { document.getElementById('modify-detail-modal').classList.add('hidden'); }
+
+function submitPartialSell() {
+    const key = document.getElementById('modify-asset-key').value;
+    const qty = parseFloat(document.getElementById('sell-qty').value);
+    const received = parseFloat(document.getElementById('sell-received').value);
+    const a = assets[key];
+    if (isNaN(qty) || isNaN(received) || qty <= 0 || received < 0) { alert('Introduce una cantidad y un importe válidos.'); return; }
+    if (qty >= a.amount) { alert('La cantidad vendida no puede ser mayor o igual al total. Usa "Eliminar" si vendes todo.'); return; }
+    // Ajustar inversión proporcional
+    const ratio = qty / a.amount;
+    a.invested = a.invested * (1 - ratio);
+    a.amount = parseFloat((a.amount - qty).toFixed(8));
+    saveAssets(); closeModifyDetail(); closeEditAssetModal(); updateAll();
+    alert(`Venta parcial registrada. Quedan ${a.amount} ${a.symbol || 'ud.'}`);
 }
 
-// ── BUSCADOR MERCADO ──────────────────────────────────────────────────────────
+function submitDeleteAsset() {
+    const key = document.getElementById('modify-asset-key').value;
+    if (!confirm(`¿Eliminar ${assets[key].name} completamente del portafolio?`)) return;
+    delete assets[key];
+    saveAssets(); closeModifyDetail(); closeEditAssetModal(); updateAll();
+}
+
+// ── BUSCADOR ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('market-search').addEventListener('input', (e) => {
+    document.getElementById('market-search').addEventListener('input', e => {
         const q = e.target.value.toLowerCase();
         renderMarket(allMarketData.filter(c => c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)));
     });
@@ -698,17 +697,16 @@ window.onload = () => {
     updateFearGreed();
     updateMarket();
     updateDominance();
-    updateNews();
     setInterval(updateAll, 5000);
-    setInterval(updateAnnualChart, 1000);   // fecha y barra activa cada segundo
+    setInterval(updateAnnualChart, 1000);
     setInterval(updateMarket, 60000);
     setInterval(updateFearGreed, 5000);
     setInterval(updateDominance, 5000);
-    setInterval(updateNews, 60000);
 };
 </script>
 </body>
 </html>
+
 
 
 
