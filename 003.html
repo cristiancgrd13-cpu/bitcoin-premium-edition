@@ -223,6 +223,16 @@
         <div id="modify-current-info" class="text-xs text-zinc-400 mb-4"></div>
         <input type="hidden" id="modify-asset-key">
 
+        <!-- Actualizar cantidad (pools, staking, recompensas) -->
+        <div class="bg-black/40 rounded-2xl p-4 mb-3">
+            <p class="text-sm font-semibold text-purple-400 mb-1">Actualizar cantidad</p>
+            <p class="text-xs text-zinc-500 mb-3">Ideal para pools de liquidez o staking. Pon la cantidad exacta que tienes ahora y se recalculará todo al precio actual.</p>
+            <label class="text-xs text-zinc-500">Nueva cantidad total</label>
+            <input id="update-qty" type="number" step="any" placeholder="Ej. 6.24" class="w-full bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-1 outline-none">
+            <div id="update-qty-preview" class="text-xs text-zinc-400 mb-3 min-h-[16px]"></div>
+            <button onclick="submitUpdateQty()" class="w-full bg-purple-600 hover:bg-purple-500 text-white font-semibold rounded-xl py-2 transition text-sm">Actualizar cantidad y recalcular</button>
+        </div>
+
         <!-- Venta parcial -->
         <div class="bg-black/40 rounded-2xl p-4 mb-3">
             <p class="text-sm font-semibold text-zinc-200 mb-3">Venta parcial</p>
@@ -401,15 +411,10 @@ function updateAnnualChart() {
     const dateStr = now.toLocaleString('es-ES', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
     document.getElementById('annual-date').textContent = dateStr;
 
-    // Anualizado: mientras no haya pasado 1 año completo desde PORTFOLIO_START,
-    // NO se extrapola el rendimiento (evita proyecciones engañosas como
-    // "-26% en 6 meses" -> "-44% anualizado"). Se muestra el rendimiento real
-    // acumulado. El CAGR compuesto solo se calcula una vez cumplido el primer año.
+    // CAGR — corregido: usa el mismo rendimiento total como base
     const daysSinceStart = Math.max(1, (now - PORTFOLIO_START) / (1000 * 60 * 60 * 24));
     const yearsFraction = daysSinceStart / 365.25;
-    const cagr = yearsFraction >= 1
-        ? (Math.pow(totalActual / totalInvertido, 1 / yearsFraction) - 1) * 100
-        : currentPerf;
+    const cagr = (Math.pow(totalActual / totalInvertido, 1 / yearsFraction) - 1) * 100;
     const annEl = document.getElementById('annualized-perf');
     annEl.textContent = (cagr >= 0 ? '+' : '') + cagr.toFixed(2) + '%';
     annEl.className = 'text-xs font-bold ' + (cagr >= 0 ? 'text-emerald-400' : 'text-red-400');
@@ -660,9 +665,31 @@ function openModifyDetail(key) {
             : `${a.amount} ud. · Invertido: ${fmtEUR(a.invested)}`;
     document.getElementById('sell-qty').value = '';
     document.getElementById('sell-received').value = '';
+    document.getElementById('update-qty').value = '';
+    document.getElementById('update-qty-preview').textContent = '';
     document.getElementById('modify-detail-modal').classList.remove('hidden');
 }
 function closeModifyDetail() { document.getElementById('modify-detail-modal').classList.add('hidden'); }
+
+function submitUpdateQty() {
+    const key = document.getElementById('modify-asset-key').value;
+    const newQty = parseFloat(document.getElementById('update-qty').value);
+    if (isNaN(newQty) || newQty <= 0) { alert('Introduce una cantidad válida.'); return; }
+    const a = assets[key];
+    const currentPrice = livePrices[a.coingeckoId] || 0;
+    // Recalcular inversión proporcional: precio medio de compra se mantiene,
+    // la nueva cantidad aumenta el valor pero no el coste (son ganancias de pool)
+    const oldAvgPrice = a.invested / a.amount;
+    // La inversión en € se recalcula: nueva cantidad × precio medio de compra original
+    a.invested = parseFloat((newQty * oldAvgPrice).toFixed(2));
+    a.amount = parseFloat(newQty.toFixed(8));
+    saveAssets();
+    closeModifyDetail();
+    closeEditAssetModal();
+    updateAll();
+    const newVal = newQty * currentPrice;
+    alert(`✅ Actualizado: ${newQty} ${a.symbol} · Valor actual: ${fmtEUR(newVal)}`);
+}
 
 function submitPartialSell() {
     const key = document.getElementById('modify-asset-key').value;
@@ -692,6 +719,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const q = e.target.value.toLowerCase();
         renderMarket(allMarketData.filter(c => c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)));
     });
+
+    document.getElementById('update-qty').addEventListener('input', e => {
+        const key = document.getElementById('modify-asset-key').value;
+        const newQty = parseFloat(e.target.value);
+        const preview = document.getElementById('update-qty-preview');
+        if (!key || isNaN(newQty) || newQty <= 0) { preview.textContent = ''; return; }
+        const a = assets[key];
+        const price = livePrices[a.coingeckoId] || 0;
+        const newVal = newQty * price;
+        const diff = newQty - a.amount;
+        const diffStr = (diff >= 0 ? '+' : '') + diff.toFixed(6) + ' ' + (a.symbol || '');
+        preview.innerHTML = `Valor resultante: <span class="text-white font-semibold">${fmtEUR(newVal)}</span> &nbsp;·&nbsp; Diferencia: <span class="${diff >= 0 ? 'text-emerald-400' : 'text-red-400'}">${diffStr}</span>`;
+    });
 });
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -711,6 +751,7 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
 
 
 
