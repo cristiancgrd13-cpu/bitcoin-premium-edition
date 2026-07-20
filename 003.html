@@ -677,18 +677,16 @@ function submitUpdateQty() {
     if (isNaN(newQty) || newQty <= 0) { alert('Introduce una cantidad válida.'); return; }
     const a = assets[key];
     const currentPrice = livePrices[a.coingeckoId] || 0;
-    // Recalcular inversión proporcional: precio medio de compra se mantiene,
-    // la nueva cantidad aumenta el valor pero no el coste (son ganancias de pool)
-    const oldAvgPrice = a.invested / a.amount;
-    // La inversión en € se recalcula: nueva cantidad × precio medio de compra original
-    a.invested = parseFloat((newQty * oldAvgPrice).toFixed(2));
+    // Solo actualiza la cantidad — la inversión en € NO cambia
+    // El precio medio se recalcula automáticamente: invested / newAmount
     a.amount = parseFloat(newQty.toFixed(8));
     saveAssets();
     closeModifyDetail();
     closeEditAssetModal();
     updateAll();
     const newVal = newQty * currentPrice;
-    alert(`✅ Actualizado: ${newQty} ${a.symbol} · Valor actual: ${fmtEUR(newVal)}`);
+    const newAvg = a.invested / newQty;
+    alert(`✅ Actualizado: ${newQty} ${a.symbol}\nValor actual: ${fmtEUR(newVal)}\nNuevo precio medio: ${fmtEUR(newAvg)}\nInversión: ${fmtEUR(a.invested)} (sin cambios)`);
 }
 
 function submitPartialSell() {
@@ -751,6 +749,7 @@ window.onload = () => {
 </script>
 </body>
 </html>
+
 
 
 
