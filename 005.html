@@ -5,220 +5,215 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Plan Dietético · Cristian Campos</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg:#0f1419;--card:#1a2332;--card-hover:#243044;
-      --accent:#00b4d8;--accent-soft:rgba(0,180,216,0.15);
-      --green:#2dd4bf;--green-soft:rgba(45,212,191,0.2);
-      --text:#e8eef4;--text-muted:#8b9cb3;--border:#2a3648;
-      --entreno:#f59e0b;--entreno-soft:rgba(245,158,11,0.15);
-      --padel:#a78bfa;--padel-soft:rgba(167,139,250,0.18);
-      --cardio:#34d399;--cardio-soft:rgba(52,211,153,0.15);
-      --kcal:#f472b6;--purple:#c084fc;
+      --bg: #0f1419; --card: #1a2332; --card-hover: #243044;
+      --accent: #00b4d8; --accent-soft: rgba(0,180,216,0.15);
+      --green: #2dd4bf; --green-soft: rgba(45,212,191,0.2);
+      --text: #e8eef4; --text-muted: #8b9cb3; --border: #2a3648;
+      --entreno: #f59e0b; --entreno-soft: rgba(245,158,11,0.15);
+      --padel: #a78bfa; --padel-soft: rgba(167,139,250,0.18);
+      --cardio: #34d399; --cardio-soft: rgba(52,211,153,0.15);
+      --kcal: #f472b6;
     }
-    *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
-    .header{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,#0f1419 80%,transparent);padding:1.25rem 1.5rem 1rem;border-bottom:1px solid var(--border);backdrop-filter:blur(12px)}
-    .header-inner{max-width:1400px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
-    .brand h1{font-size:1.35rem;font-weight:700;letter-spacing:-0.02em}
-    .brand span{font-size:0.8rem;color:var(--text-muted);font-weight:500}
-    .clock-box{display:flex;flex-direction:column;align-items:flex-end;gap:0.2rem}
-    .clock-date{font-size:0.95rem;font-weight:600;color:var(--accent);text-transform:capitalize}
-    .clock-time{font-size:1.75rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:0.05em}
-    .clock-time span{color:var(--accent)}
-    .main{max-width:1400px;margin:0 auto;padding:1.5rem}
-    .section-title{font-size:1.1rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
-    .section-title::before{content:'';width:4px;height:1.1em;background:var(--accent);border-radius:2px}
-
-    /* STATS SCROLL */
-    .stats-scroll-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem;margin-bottom:1.5rem}
-    .stats-tabs{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem}
-    .stat-tab{font-size:0.72rem;font-weight:600;padding:0.3rem 0.7rem;border-radius:8px;border:1px solid var(--border);cursor:pointer;color:var(--text-muted);background:transparent;transition:all 0.15s}
-    .stat-tab.active{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
-    .stat-chart-area{display:none}
-    .stat-chart-area.active{display:block}
-    .stat-timeline{display:flex;gap:0.75rem;overflow-x:auto;padding-bottom:0.5rem}
-    .stat-entry{min-width:90px;background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:10px;padding:0.6rem 0.75rem;text-align:center;flex-shrink:0}
-    .stat-entry.latest{border-color:var(--accent)}
-    .stat-entry-date{font-size:0.62rem;color:var(--text-muted);margin-bottom:0.25rem}
-    .stat-entry-val{font-size:1.2rem;font-weight:700;color:var(--accent)}
-    .stat-entry-delta{font-size:0.65rem;font-weight:600;margin-top:0.15rem}
-    .delta-up{color:#ef4444}
-    .delta-down{color:var(--green)}
-    .delta-ok{color:var(--text-muted)}
-    .stat-add-btn{margin-top:0.75rem;background:transparent;border:1px dashed var(--border);color:var(--text-muted);font-size:0.78rem;padding:0.4rem 0.9rem;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.15s;width:100%}
-    .stat-add-btn:hover{border-color:var(--accent);color:var(--accent)}
-    .stat-legend{font-size:0.7rem;color:var(--text-muted);margin-top:0.5rem;text-align:center}
-
-    /* SEMANA */
-    .legend{display:flex;flex-wrap:wrap;gap:0.75rem 1.25rem;margin-bottom:1.25rem;font-size:0.78rem;color:var(--text-muted)}
-    .legend-item{display:flex;align-items:center;gap:0.4rem}
-    .legend-dot{width:10px;height:10px;border-radius:3px}
-    .legend-dot.entreno{background:var(--entreno)}
-    .legend-dot.padel{background:var(--padel)}
-    .legend-dot.cardio{background:var(--cardio)}
-    .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0.75rem;overflow-x:auto;padding-bottom:0.5rem}
-    @media(max-width:1100px){.week-grid{grid-template-columns:repeat(4,minmax(200px,1fr))}}
-    @media(max-width:700px){.week-grid{grid-template-columns:repeat(2,minmax(180px,1fr))}}
-    @media(max-width:420px){.week-grid{grid-template-columns:1fr}}
-    .day-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color 0.2s;min-width:0;display:flex;flex-direction:column}
-    .day-card:hover{border-color:var(--accent)}
-    .day-card.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-soft)}
-    .day-header{padding:0.7rem 0.85rem;background:rgba(0,0,0,0.25);display:flex;flex-direction:column;gap:0.25rem;border-bottom:1px solid var(--border)}
-    .day-header.entreno-opt{background:var(--entreno-soft)}
-    .day-header.padel{background:var(--padel-soft)}
-    .day-name{font-weight:700;font-size:0.95rem;display:flex;align-items:center;flex-wrap:wrap;gap:0.35rem}
-    .badge{font-size:0.62rem;font-weight:600;padding:0.12rem 0.38rem;border-radius:4px;text-transform:uppercase;letter-spacing:0.03em}
-    .badge-entreno{background:var(--entreno);color:#111}
-    .badge-padel{background:var(--padel);color:#111}
-    .day-label{font-size:0.7rem;color:var(--text-muted);font-weight:500}
-    .day-kcal{font-size:0.78rem;font-weight:700;color:var(--kcal);margin-top:0.15rem}
-    .activity-row{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.25rem}
-    .activity-chip{font-size:0.65rem;font-weight:600;padding:0.2rem 0.45rem;border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:all 0.15s;user-select:none;color:var(--text-muted);background:transparent}
-    .activity-chip.done{background:var(--green-soft);border-color:var(--green);color:var(--green)}
-    .activity-chip.cardio.done{background:var(--cardio-soft);border-color:var(--cardio);color:var(--cardio)}
-    .meals{padding:0.5rem;display:flex;flex-direction:column;gap:0.35rem;flex:1}
-    .meal{display:flex;align-items:flex-start;gap:0.45rem;padding:0.45rem 0.5rem;border-radius:8px;transition:background 0.15s;user-select:none}
-    .meal:hover{background:var(--card-hover)}
-    .meal.done{background:var(--green-soft)}
-    .meal.done .meal-name{text-decoration:line-through;color:var(--text-muted)}
-    .meal-check{flex-shrink:0;width:18px;height:18px;border:2px solid var(--border);border-radius:5px;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;cursor:pointer}
-    .meal.done .meal-check{background:var(--green);border-color:var(--green)}
-    .meal.done .meal-check::after{content:'✓';color:#0f1419;font-size:12px;font-weight:700}
-    .meal-info{flex:1;min-width:0}
-    .meal-slot{font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--accent);margin-bottom:0.08rem;display:flex;align-items:center;justify-content:space-between;gap:0.3rem}
-    .meal-time{font-size:0.6rem;color:var(--purple);font-weight:600;text-transform:none;letter-spacing:0}
-    .meal-kcal-tag{font-size:0.6rem;color:var(--kcal);font-weight:600;text-transform:none;letter-spacing:0}
-    .meal-name{font-size:0.76rem;font-weight:500;line-height:1.3}
-    .meal-btns{display:flex;flex-direction:column;gap:0.25rem;flex-shrink:0;margin-top:1px}
-    .btn-similar,.btn-recipe{background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:0.58rem;font-weight:600;padding:0.15rem 0.38rem;border-radius:5px;cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap}
-    .btn-similar:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-    .btn-recipe:hover{border-color:var(--purple);color:var(--purple);background:rgba(192,132,252,0.1)}
-
-    /* MODALES */
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
-    .modal-overlay.open{display:flex}
-    .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:440px;width:100%;max-height:88vh;overflow-y:auto;padding:1.25rem}
-    .modal-header{display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;margin-bottom:1rem}
-    .modal-header h3{font-size:1rem;font-weight:700}
-    .modal-header p{font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem}
-    .modal-close{background:transparent;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;line-height:1;padding:0.1rem 0.3rem}
-    .modal-close:hover{color:var(--text)}
-    .alt-list{display:flex;flex-direction:column;gap:0.5rem}
-    .alt-item{background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:10px;padding:0.75rem 0.9rem;cursor:pointer;transition:border-color 0.15s,background 0.15s}
-    .alt-item:hover{border-color:var(--accent);background:var(--accent-soft)}
-    .alt-item.active{border-color:var(--green);background:var(--green-soft)}
-    .alt-name{font-size:0.88rem;font-weight:600;margin-bottom:0.15rem}
-    .alt-meta{font-size:0.72rem;color:var(--text-muted);display:flex;gap:0.6rem;flex-wrap:wrap}
-    .alt-kcal{color:var(--kcal);font-weight:600}
-
-    /* RECETA */
-    .recipe-modal{max-width:480px}
-    .recipe-section{margin-bottom:1rem}
-    .recipe-section h4{font-size:0.85rem;font-weight:700;color:var(--accent);margin-bottom:0.5rem;display:flex;align-items:center;gap:0.35rem}
-    .recipe-ingredients{display:flex;flex-direction:column;gap:0.3rem}
-    .recipe-ing{display:flex;justify-content:space-between;align-items:center;background:rgba(0,0,0,0.25);border-radius:8px;padding:0.4rem 0.7rem;font-size:0.8rem}
-    .recipe-ing-qty{color:var(--kcal);font-weight:600;font-size:0.78rem}
-    .recipe-steps{display:flex;flex-direction:column;gap:0.5rem}
-    .recipe-step{display:flex;gap:0.6rem;align-items:flex-start}
-    .step-num{flex-shrink:0;width:22px;height:22px;background:var(--accent-soft);border:1px solid var(--accent);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:var(--accent)}
-    .step-text{font-size:0.8rem;color:var(--text-muted);padding-top:0.15rem;line-height:1.4}
-    .recipe-macros{display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.5rem}
-    .macro-chip{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:0.3rem 0.6rem;font-size:0.72rem}
-    .macro-chip span{color:var(--accent);font-weight:700}
-
-    /* STATS ADD MODAL */
-    .stats-form{display:flex;flex-direction:column;gap:0.75rem}
-    .stats-form label{font-size:0.75rem;color:var(--text-muted);display:flex;flex-direction:column;gap:0.25rem}
-    .stats-form input{background:rgba(0,0,0,0.3);border:1px solid var(--border);border-radius:8px;padding:0.5rem 0.75rem;color:var(--text);font-family:inherit;font-size:0.85rem;outline:none}
-    .stats-form input:focus{border-color:var(--accent)}
-    .btn-save{background:var(--accent);color:#111;font-weight:700;font-size:0.85rem;border:none;border-radius:10px;padding:0.6rem 1.2rem;cursor:pointer;font-family:inherit;transition:opacity 0.15s;width:100%}
-    .btn-save:hover{opacity:0.85}
-
-    .info-box{margin-top:1rem;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
-    .info-box h3{font-size:0.95rem;font-weight:600;margin-bottom:0.5rem;display:flex;align-items:center;gap:0.4rem}
-    .info-box .tag{font-size:0.65rem;padding:0.1rem 0.4rem;border-radius:4px;font-weight:700}
-    .tag-green{background:var(--cardio);color:#111}
-    .tag-blue{background:var(--accent);color:#111}
-    .info-box p,.info-box li{font-size:0.82rem;color:var(--text-muted)}
-    .info-box ul{margin:0.4rem 0 0 1.1rem}
-    .info-box li{margin-bottom:0.25rem}
-    .progress-bar-wrap{margin-top:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
-    .progress-label{display:flex;justify-content:space-between;font-size:0.85rem;font-weight:500;margin-bottom:0.5rem}
-    .progress-label span:last-child{color:var(--accent);font-weight:600}
-    .progress-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
-    .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:4px;transition:width 0.3s ease;width:0%}
-    .reset-btn{margin-top:1rem;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;padding:0.45rem 0.9rem;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.15s}
-    .reset-btn:hover{border-color:#ef4444;color:#ef4444}
-    .footer-note{margin-top:1.5rem;text-align:center;font-size:0.75rem;color:var(--text-muted)}
-    .note-kcal{margin-top:0.75rem;font-size:0.72rem;color:var(--text-muted);text-align:center}
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; line-height: 1.5; }
+    .header { position: sticky; top: 0; z-index: 100; background: linear-gradient(180deg,#0f1419 80%,transparent); padding: 1.25rem 1.5rem 1rem; border-bottom: 1px solid var(--border); backdrop-filter: blur(12px); }
+    .header-inner { max-width: 1400px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; }
+    .brand { display: flex; flex-direction: column; gap: 0.15rem; }
+    .brand h1 { font-size: 1.35rem; font-weight: 700; letter-spacing: -0.02em; }
+    .brand span { font-size: 0.8rem; color: var(--text-muted); font-weight: 500; }
+    .clock-box { display: flex; flex-direction: column; align-items: flex-end; gap: 0.2rem; }
+    .clock-date { font-size: 0.95rem; font-weight: 600; color: var(--accent); text-transform: capitalize; }
+    .clock-time { font-size: 1.75rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 0.05em; }
+    .clock-time span { color: var(--accent); }
+    .main { max-width: 1400px; margin: 0 auto; padding: 1.5rem; }
+    .section-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+    .section-title::before { content: ''; width: 4px; height: 1.1em; background: var(--accent); border-radius: 2px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 0.75rem 1.25rem; margin-bottom: 1.25rem; font-size: 0.78rem; color: var(--text-muted); }
+    .legend-item { display: flex; align-items: center; gap: 0.4rem; }
+    .legend-dot { width: 10px; height: 10px; border-radius: 3px; }
+    .legend-dot.entreno { background: var(--entreno); }
+    .legend-dot.padel { background: var(--padel); }
+    .legend-dot.cardio { background: var(--cardio); }
+    .week-grid { display: grid; grid-template-columns: repeat(7,1fr); gap: 0.75rem; overflow-x: auto; padding-bottom: 0.5rem; }
+    @media (max-width:1100px) { .week-grid { grid-template-columns: repeat(4,minmax(200px,1fr)); } }
+    @media (max-width:700px) { .week-grid { grid-template-columns: repeat(2,minmax(180px,1fr)); } }
+    @media (max-width:420px) { .week-grid { grid-template-columns: 1fr; } }
+    .day-card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; transition: border-color 0.2s; min-width: 0; display: flex; flex-direction: column; }
+    .day-card:hover { border-color: var(--accent); }
+    .day-card.today { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-soft); }
+    .day-header { padding: 0.7rem 0.85rem; background: rgba(0,0,0,0.25); display: flex; flex-direction: column; gap: 0.25rem; border-bottom: 1px solid var(--border); }
+    .day-header.entreno-opt { background: var(--entreno-soft); }
+    .day-header.padel { background: var(--padel-soft); }
+    .day-name { font-weight: 700; font-size: 0.95rem; display: flex; align-items: center; flex-wrap: wrap; gap: 0.35rem; }
+    .badge { font-size: 0.62rem; font-weight: 600; padding: 0.12rem 0.38rem; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .badge-entreno { background: var(--entreno); color: #111; }
+    .badge-padel { background: var(--padel); color: #111; }
+    .day-label { font-size: 0.7rem; color: var(--text-muted); font-weight: 500; }
+    .day-kcal { font-size: 0.78rem; font-weight: 700; color: var(--kcal); margin-top: 0.15rem; }
+    .activity-row { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.25rem; }
+    .activity-chip { font-size: 0.65rem; font-weight: 600; padding: 0.2rem 0.45rem; border-radius: 6px; border: 1px solid var(--border); cursor: pointer; transition: all 0.15s; user-select: none; color: var(--text-muted); background: transparent; }
+    .activity-chip:hover { border-color: var(--text-muted); }
+    .activity-chip.done { background: var(--green-soft); border-color: var(--green); color: var(--green); }
+    .activity-chip.cardio.done { background: var(--cardio-soft); border-color: var(--cardio); color: var(--cardio); }
+    .meals { padding: 0.5rem; display: flex; flex-direction: column; gap: 0.35rem; flex: 1; }
+    .meal { display: flex; align-items: flex-start; gap: 0.45rem; padding: 0.45rem 0.5rem; border-radius: 8px; transition: background 0.15s; user-select: none; }
+    .meal:hover { background: var(--card-hover); }
+    .meal.done { background: var(--green-soft); }
+    .meal.done .meal-name { text-decoration: line-through; color: var(--text-muted); }
+    .meal-check { flex-shrink: 0; width: 18px; height: 18px; border: 2px solid var(--border); border-radius: 5px; margin-top: 2px; display: flex; align-items: center; justify-content: center; transition: all 0.15s; cursor: pointer; }
+    .meal.done .meal-check { background: var(--green); border-color: var(--green); }
+    .meal.done .meal-check::after { content: '✓'; color: #0f1419; font-size: 12px; font-weight: 700; }
+    .meal-info { flex: 1; min-width: 0; }
+    .meal-slot { font-size: 0.62rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--accent); margin-bottom: 0.08rem; display: flex; align-items: center; justify-content: space-between; gap: 0.3rem; }
+    .meal-kcal-tag { font-size: 0.6rem; color: var(--kcal); font-weight: 600; text-transform: none; letter-spacing: 0; }
+    .meal-name { font-size: 0.76rem; font-weight: 500; line-height: 1.3; }
+    .btn-similar { flex-shrink: 0; margin-top: 1px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.6rem; font-weight: 600; padding: 0.18rem 0.4rem; border-radius: 5px; cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+    .btn-similar:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .meal-btns { display: flex; flex-direction: column; gap: 0.25rem; flex-shrink: 0; margin-top: 1px; }
+    .btn-recipe { background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.58rem; font-weight: 600; padding: 0.15rem 0.38rem; border-radius: 5px; cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
+    .btn-recipe:hover { border-color: var(--purple, #c084fc); color: var(--purple, #c084fc); background: rgba(192,132,252,0.1); }
+    :root { --purple: #c084fc; }
+    .recipe-modal { max-width: 480px; }
+    .recipe-section { margin-bottom: 1rem; }
+    .recipe-section h4 { font-size: 0.85rem; font-weight: 700; color: var(--accent); margin-bottom: 0.5rem; }
+    .recipe-ingredients { display: flex; flex-direction: column; gap: 0.3rem; }
+    .recipe-ing { display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.25); border-radius: 8px; padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+    .recipe-ing-qty { color: var(--kcal); font-weight: 600; font-size: 0.78rem; }
+    .recipe-steps { display: flex; flex-direction: column; gap: 0.5rem; }
+    .recipe-step { display: flex; gap: 0.6rem; align-items: flex-start; }
+    .step-num { flex-shrink: 0; width: 22px; height: 22px; background: var(--accent-soft); border: 1px solid var(--accent); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.65rem; font-weight: 700; color: var(--accent); }
+    .step-text { font-size: 0.8rem; color: var(--text-muted); padding-top: 0.15rem; line-height: 1.4; }
+    .recipe-macros { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+    .macro-chip { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 8px; padding: 0.3rem 0.6rem; font-size: 0.72rem; }
+    .macro-chip span { color: var(--accent); font-weight: 700; }
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 200; align-items: center; justify-content: center; padding: 1rem; backdrop-filter: blur(4px); }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--card); border: 1px solid var(--border); border-radius: 16px; max-width: 440px; width: 100%; max-height: 88vh; overflow-y: auto; padding: 1.25rem; }
+    .modal-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 1rem; }
+    .modal-header h3 { font-size: 1rem; font-weight: 700; }
+    .modal-header p { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
+    .modal-close { background: transparent; border: none; color: var(--text-muted); font-size: 1.4rem; cursor: pointer; line-height: 1; padding: 0.1rem 0.3rem; }
+    .modal-close:hover { color: var(--text); }
+    .alt-list { display: flex; flex-direction: column; gap: 0.5rem; }
+    .alt-item { background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 10px; padding: 0.75rem 0.9rem; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+    .alt-item:hover { border-color: var(--accent); background: var(--accent-soft); }
+    .alt-item.active { border-color: var(--green); background: var(--green-soft); }
+    .alt-name { font-size: 0.88rem; font-weight: 600; margin-bottom: 0.15rem; }
+    .alt-meta { font-size: 0.72rem; color: var(--text-muted); display: flex; gap: 0.6rem; flex-wrap: wrap; }
+    .alt-kcal { color: var(--kcal); font-weight: 600; }
+    .info-box { margin-top: 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; }
+    .info-box h3 { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.4rem; }
+    .info-box h3 .tag { font-size: 0.65rem; padding: 0.1rem 0.4rem; border-radius: 4px; font-weight: 700; }
+    .tag-green { background: var(--cardio); color: #111; }
+    .tag-blue { background: var(--accent); color: #111; }
+    .info-box p { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.4rem; }
+    .info-box ul { margin: 0.4rem 0 0 1.1rem; font-size: 0.82rem; color: var(--text-muted); }
+    .info-box li { margin-bottom: 0.25rem; }
+    .progress-bar-wrap { margin-top: 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 1rem 1.25rem; }
+    .progress-label { display: flex; justify-content: space-between; font-size: 0.85rem; font-weight: 500; margin-bottom: 0.5rem; }
+    .progress-label span:last-child { color: var(--accent); font-weight: 600; }
+    .progress-track { height: 8px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg,var(--accent),var(--green)); border-radius: 4px; transition: width 0.3s ease; width: 0%; }
+    .reset-btn { margin-top: 1rem; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.8rem; padding: 0.45rem 0.9rem; border-radius: 8px; cursor: pointer; font-family: inherit; transition: all 0.15s; }
+    .reset-btn:hover { border-color: #ef4444; color: #ef4444; }
+    .footer-note { margin-top: 1.5rem; text-align: center; font-size: 0.75rem; color: var(--text-muted); }
+    .note-kcal { margin-top: 0.75rem; font-size: 0.72rem; color: var(--text-muted); text-align: center; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 0.75rem 1rem; }
+    .stat-label { font-size: 0.68rem; color: var(--text-muted); font-weight: 500; margin-bottom: 0.2rem; }
+    .stat-value { font-size: 1.1rem; font-weight: 700; color: var(--accent); }
+    .stat-status { font-size: 0.65rem; color: var(--green); margin-top: 0.1rem; }
+    .stat-status.warn { color: var(--kcal); }
   </style>
 </head>
 <body>
-<header class="header">
-  <div class="header-inner">
-    <div class="brand">
-      <h1>Plan Dietético + Entreno</h1>
-      <span>Cristian Campos · Seguimiento semanal</span>
+  <header class="header">
+    <div class="header-inner">
+      <div class="brand">
+        <h1>Plan Dietético + Entreno</h1>
+        <span>Cristian Campos · Seguimiento semanal</span>
+      </div>
+      <div class="clock-box">
+        <div class="clock-date" id="clock-date">—</div>
+        <div class="clock-time" id="clock-time">00:00:<span>00</span></div>
+      </div>
     </div>
-    <div class="clock-box">
-      <div class="clock-date" id="clock-date">—</div>
-      <div class="clock-time" id="clock-time">00:00:<span>00</span></div>
+  </header>
+
+  <main class="main">
+
+    <!-- STATS CORPORALES -->
+    <h2 class="section-title">Mis datos corporales</h2>
+    <div class="stats-grid">
+      <div class="stat-card"><div class="stat-label">Peso actual</div><div class="stat-value">63.9 kg</div><div class="stat-status">En forma</div></div>
+      <div class="stat-card"><div class="stat-label">IMC</div><div class="stat-value">22.6</div><div class="stat-status">En forma</div></div>
+      <div class="stat-card"><div class="stat-label">Grasa corporal</div><div class="stat-value">21.5%</div><div class="stat-status">En forma</div></div>
+      <div class="stat-card"><div class="stat-label">Grasa subcutánea</div><div class="stat-value">19.3%</div><div class="stat-status warn">Alta → objetivo</div></div>
+      <div class="stat-card"><div class="stat-label">Músculo</div><div class="stat-value">45.6%</div><div class="stat-status">En forma</div></div>
+      <div class="stat-card"><div class="stat-label">Peso muscular</div><div class="stat-value">29.1 kg</div><div class="stat-status">En forma</div></div>
+      <div class="stat-card"><div class="stat-label">BMR</div><div class="stat-value">1353 kcal</div><div class="stat-status warn">Bajo → más músculo</div></div>
+      <div class="stat-card"><div class="stat-label">Grasa visceral</div><div class="stat-value">8</div><div class="stat-status">En forma</div></div>
+    </div>
+
+    <h2 class="section-title">Calendario semanal</h2>
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot entreno"></span> Entreno (elige 1 de Lun/Mar + 1 de Jue/Vie)</div>
+      <div class="legend-item"><span class="legend-dot padel"></span> Pádel (Miércoles fijo)</div>
+      <div class="legend-item"><span class="legend-dot cardio"></span> Cardio (recomendado en días de gym)</div>
+    </div>
+    <div class="week-grid" id="week-grid"></div>
+
+    <p class="note-kcal">~1.750–1.850 kcal/día · Déficit moderado para perder grasa sin perder músculo · Pulsa ≈ para ver 10 opciones</p>
+
+    <!-- CARDIO / ENTRENO -->
+    <div class="info-box" style="margin-top:1.5rem">
+      <h3>Cardio y entreno <span class="tag tag-green">RECOMENDACIÓN</span></h3>
+      <p>Con tu composición (grasa subcutánea 19.3% → objetivo bajarla) y tu nivel de actividad:</p>
+      <ul>
+        <li><strong>Gym:</strong> prioriza trabajo de fuerza compuesto (sentadilla, press, peso muerto, remo). Más músculo = más BMR = más grasa quemada en reposo.</li>
+        <li><strong>Pádel:</strong> ya es cardio de alta intensidad, perfecto para quemar grasa.</li>
+        <li><strong>Ruta de montaña:</strong> cardio zona 2, ideal para oxidar grasa. Mantener hidratación y subir un tentempié energético.</li>
+        <li><strong>Días gym:</strong> añade 10-15 min cardio suave al final (bici, elíptica).</li>
+        <li><strong>BMR bajo (1353 kcal):</strong> señal de que necesitas más masa muscular. La dieta proteica + gym lo irá subiendo.</li>
+      </ul>
+    </div>
+
+    <!-- CONSEJOS DIETA -->
+    <div class="info-box" style="margin-top:1rem">
+      <h3>Estrategia dietética <span class="tag tag-blue">GRASA → MÚSCULO</span></h3>
+      <p>Objetivo: déficit calórico moderado (~300 kcal/día bajo mantenimiento) con alta proteína para preservar músculo:</p>
+      <ul>
+        <li><strong>Proteína objetivo:</strong> ~120–130g/día (1.8–2g × kg de peso). Fuentes: pollo, pavo, huevos, atún, merluza, queso fresco, yogur griego.</li>
+        <li><strong>Carbohidratos:</strong> concentrarlos antes del entreno (pasta, arroz, avena). La pasta integral es excelente — saciante, energía sostenida y versátil.</li>
+        <li><strong>Grasa subcutánea abdominal:</strong> se reduce con el déficit calórico sostenido + actividad. No hay magia local, pero el gym + cardio aceleran el proceso.</li>
+        <li><strong>Días de ruta:</strong> aumenta un tentempié extra (barrita avena, plátano + frutos secos) para mantener energía sin sobrepasar calorías.</li>
+        <li><strong>Hidratación:</strong> mínimo 2.5L/día. Ayuda a reducir retención de líquidos que puede confundirse con grasa abdominal.</li>
+      </ul>
+    </div>
+
+    <div class="progress-bar-wrap">
+      <div class="progress-label"><span>Comidas + actividades completadas</span><span id="progress-text">0 / 0</span></div>
+      <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+      <button class="reset-btn" id="reset-btn">Reiniciar marcas</button>
+    </div>
+
+    <p class="footer-note">Plan ajustado a composición corporal · Julio 2025 · Sin aceitunas, sardinas, aguacate, espárragos, rúcula, pepino, canónigos, espinacas, champiñones, alcaparras, salmón, gambas, ajo, perejil, mejillones, albahaca, eneldo, brócoli, lubina, bacalao, lenguado, dorada, pez espada, sepia, puerro, tzatziki, pesto, judías verdes, tofu</p>
+  </main>
+
+  <div class="modal-overlay" id="modal">
+    <div class="modal">
+      <div class="modal-header">
+        <div><h3 id="modal-title">Opciones similares</h3><p id="modal-subtitle">Elige la que más te apetezca</p></div>
+        <button class="modal-close" id="modal-close" aria-label="Cerrar">×</button>
+      </div>
+      <div class="alt-list" id="alt-list"></div>
     </div>
   </div>
-</header>
 
-<main class="main">
-
-  <!-- DATOS CORPORALES CON HISTORIAL -->
-  <h2 class="section-title">📊 Evolución corporal</h2>
-  <div class="stats-scroll-wrap">
-    <div class="stats-tabs" id="stats-tabs"></div>
-    <div id="stats-charts"></div>
-    <button class="stat-add-btn" id="btn-add-stat">+ Añadir medición semanal</button>
-    <p class="stat-legend">⬅ Desliza para ver historial · 🟢 Bajó · 🔴 Subió · Última medición marcada en azul</p>
-  </div>
-
-  <!-- SEMANA -->
-  <h2 class="section-title">Calendario semanal</h2>
-  <div class="legend">
-    <div class="legend-item"><span class="legend-dot entreno"></span> Gym (Lun/Mar + Jue/Vie)</div>
-    <div class="legend-item"><span class="legend-dot padel"></span> Pádel (Miércoles)</div>
-    <div class="legend-item"><span class="legend-dot cardio"></span> Cardio</div>
-  </div>
-  <div class="week-grid" id="week-grid"></div>
-
-  <p class="note-kcal">~1.750–1.850 kcal/día · Déficit moderado · Pulsa ≈ para 10 opciones · Pulsa 📋 para ver receta con cantidades</p>
-
-  <div class="info-box">
-    <h3>Estrategia <span class="tag tag-blue">GRASA → MÚSCULO</span></h3>
-    <ul>
-      <li><strong>Proteína objetivo:</strong> 120–130g/día. Fuentes: pollo, pavo, huevos, atún, queso fresco, yogur griego.</li>
-      <li><strong>Pasta/arroz:</strong> concentrarlos en comida de las 12–14h. Pre-entreno ideal.</li>
-      <li><strong>Hidratación:</strong> mínimo 2.5L/día. Reduce retención abdominal.</li>
-      <li><strong>Grasa subcutánea (19.3%):</strong> déficit + gym + pádel la reducirán progresivamente.</li>
-    </ul>
-  </div>
-
-  <div class="progress-bar-wrap">
-    <div class="progress-label"><span>Comidas + actividades completadas</span><span id="progress-text">0 / 0</span></div>
-    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
-    <button class="reset-btn" id="reset-btn">Reiniciar marcas</button>
-  </div>
-  <p class="footer-note">Plan v4 · Agosto 2025 · Sin: aceitunas, sardinas, aguacate, espárragos, rúcula, pepino, canónigos, espinacas, champiñones, alcaparras, salmón, gambas, ajo, perejil, mejillones, albahaca, eneldo, brócoli, lubina, bacalao, lenguado, dorada, pez espada, sepia, puerro, tzatziki, pesto, judías verdes, tofu</p>
-</main>
-
-<!-- MODAL OPCIONES SIMILARES -->
-<div class="modal-overlay" id="modal-similar">
-  <div class="modal">
-    <div class="modal-header">
-      <div><h3 id="modal-title">Opciones similares</h3><p id="modal-subtitle">Elige la que más te apetezca</p></div>
-      <button class="modal-close" id="modal-close-similar">×</button>
-    </div>
-    <div class="alt-list" id="alt-list"></div>
-  </div>
-</div>
 
 <!-- MODAL RECETA -->
 <div class="modal-overlay" id="modal-recipe">
@@ -231,895 +226,495 @@
   </div>
 </div>
 
-<!-- MODAL AÑADIR MEDICIÓN -->
-<div class="modal-overlay" id="modal-stat">
-  <div class="modal">
-    <div class="modal-header">
-      <div><h3>Nueva medición</h3><p>Añade los datos de la báscula de esta semana</p></div>
-      <button class="modal-close" id="modal-close-stat">×</button>
-    </div>
-    <div class="stats-form">
-      <label>Fecha<input type="date" id="stat-date"></label>
-      <label>Peso (kg)<input type="number" step="0.1" id="stat-peso" placeholder="63.9"></label>
-      <label>% Grasa corporal<input type="number" step="0.1" id="stat-grasa" placeholder="21.5"></label>
-      <label>% Grasa subcutánea<input type="number" step="0.1" id="stat-subcutanea" placeholder="19.3"></label>
-      <label>% Músculo<input type="number" step="0.1" id="stat-musculo" placeholder="45.6"></label>
-      <label>Peso muscular (kg)<input type="number" step="0.1" id="stat-musculo-kg" placeholder="29.1"></label>
-      <label>BMR (kcal)<input type="number" step="1" id="stat-bmr" placeholder="1353"></label>
-      <button class="btn-save" id="btn-save-stat">Guardar medición</button>
-    </div>
-  </div>
-</div>
+  <script>
+    // ── ALTERNATIVAS (sin: aceitunas, sardinas, aguacate, espárragos, rúcula, pepino, canónigos, espinacas, champiñones, tomate mínimo) ──
+    const alternatives = {
+      'desayuno-porridge': [
+        { name: 'Porridge leche sin lactosa + manzana + canela', kcal: 310, note: '⭐ Original del plan' },
+        { name: 'Overnight oats + leche vegetal + arándanos + miel', kcal: 308, note: 'Preparar la noche anterior' },
+        { name: 'Tostadas pan integral + huevo cocido + queso fresco', kcal: 305, note: 'Alta proteína' },
+        { name: 'Yogur griego 0% + avena + plátano + canela', kcal: 300, note: 'Muy saciante' },
+        { name: 'Batido avena + proteína whey + fresas + leche', kcal: 295, note: 'Ideal post-entreno' },
+        { name: 'Muesli sin azúcar + leche sin lactosa + kiwi', kcal: 305, note: 'Más fibra' },
+        { name: 'Skyr + granola + arándanos + nueces', kcal: 310, note: 'Alto en proteína' },
+        { name: 'Pan integral + mantequilla de cacahuete + manzana', kcal: 312, note: 'Energía sostenida' },
+        { name: 'Tortitas avena (2) + miel + plátano troceado', kcal: 315, note: 'Más apetecible' },
+        { name: 'Bol açaí + avena + coco rallado + kiwi + miel', kcal: 318, note: 'Antioxidante y sabroso' }
+      ],
+      'desayuno-batido': [
+        { name: 'Batido yogur desnatado + pera + melón', kcal: 260, note: '⭐ Original del plan' },
+        { name: 'Yogur natural + kiwi + 10g miel', kcal: 255, note: 'Vitamina C' },
+        { name: 'Tostada integral + queso fresco + pavo', kcal: 252, note: 'Salado proteico' },
+        { name: 'Batido proteico + leche vegetal + plátano', kcal: 265, note: 'Post-entreno ideal' },
+        { name: 'Smoothie manzana + yogur 0% + avena', kcal: 258, note: 'Energizante' },
+        { name: 'Queso cottage + fruta de temporada + avena', kcal: 260, note: 'Alta proteína' },
+        { name: 'Tostada de maíz + pavo + pimiento rojo asado', kcal: 250, note: 'Sin gluten' },
+        { name: 'Porridge avena + leche sin lactosa + pera', kcal: 262, note: 'Versión caliente' },
+        { name: 'Clara de huevo revuelta + tostada integral + queso', kcal: 248, note: 'Muy alta proteína' },
+        { name: 'Pan centeno + jamón york + kiwi', kcal: 255, note: 'Rápido y completo' }
+      ],
+      'desayuno-yogur-avena': [
+        { name: 'Yogur desnatado + avena + nueces + arándanos', kcal: 320, note: '⭐ Original del plan' },
+        { name: 'Porridge avena + leche sin lactosa + frutos rojos', kcal: 310, note: 'Misma base, caliente' },
+        { name: 'Skyr 0% + granola casera + manzana troceada', kcal: 315, note: 'Más proteína' },
+        { name: 'Tortitas avena (2) + miel + plátano', kcal: 325, note: 'Día especial' },
+        { name: 'Muesli + leche vegetal + fresas + almendras', kcal: 318, note: 'Más fibra' },
+        { name: 'Overnight oats + chía + arándanos + miel', kcal: 322, note: 'Rico en omega-3' },
+        { name: 'Pan integral + mantequilla almendra + plátano', kcal: 316, note: 'Energía sostenida' },
+        { name: 'Batido avena + yogur griego + frambuesas', kcal: 312, note: 'Frío y refrescante' },
+        { name: 'Huevos revueltos (2) + tostada integral + queso', kcal: 320, note: 'Salado proteico' },
+        { name: 'Bowl yogur + granola + mango + coco rallado', kcal: 325, note: 'Tropical sabroso' }
+      ],
+      'tentempie-atun': [
+        { name: 'Bocadillo atún + lechuga + maíz', kcal: 268, note: '⭐ Sin aceitunas ni tomate' },
+        { name: 'Tostada integral + atún + maíz + queso fresco', kcal: 265, note: 'Con queso' },
+        { name: 'Wrap integral + pollo desmenuzado + lechuga', kcal: 272, note: 'Wrap proteico' },
+        { name: 'Pan de molde integral + atún + pimiento asado', kcal: 268, note: 'Pimiento vs tomate' },
+        { name: 'Arroz integral (bol pequeño) + atún + maíz', kcal: 275, note: 'Sin pan' },
+        { name: 'Cracker integral + atún + queso fresco', kcal: 260, note: 'Crujiente' },
+        { name: 'Pita integral + atún + lechuga + maíz', kcal: 270, note: 'Pita proteica' },
+        { name: 'Tostada centeno + caballa al natural + lechuga', kcal: 265, note: 'Omega-3' },
+        { name: 'Bocadillo pechuga pollo + lechuga + queso', kcal: 272, note: 'Pollo en vez de atún' },
+        { name: 'Tortilla de trigo + pavo + lechuga + maíz', kcal: 265, note: 'Wrap de pavo' }
+      ],
+      'tentempie-pavo': [
+        { name: 'Bocadillo pavo + lechuga + queso fresco', kcal: 240, note: '⭐ Sin tomate' },
+        { name: 'Tostada + pechuga pollo + lechuga', kcal: 235, note: 'Pollo vs pavo' },
+        { name: 'Yogur griego 0% + 20g nueces', kcal: 245, note: 'Sin pan' },
+        { name: 'Huevo cocido + 1 fruta + 10g almendras', kcal: 230, note: 'Simple y proteico' },
+        { name: 'Cracker integral + pavo + mostaza + lechuga', kcal: 238, note: 'Crujiente' },
+        { name: 'Pita mini + jamón york + lechuga', kcal: 242, note: 'Diferente' },
+        { name: 'Tostada maíz + jamón york + pimiento asado', kcal: 235, note: 'Sin gluten' },
+        { name: 'Wrap lechuga grande + pavo + maíz + mostaza', kcal: 228, note: 'Low carb' },
+        { name: 'Queso fresco batido + manzana + nueces', kcal: 245, note: 'Dulce-salado' },
+        { name: 'Tortita arroz + pollo desmenuzado + queso', kcal: 240, note: 'Ligero' }
+      ],
+      'tentempie-jamon': [
+        { name: 'Bocadillo jamón serrano + lechuga', kcal: 220, note: '⭐ Sin rúcula' },
+        { name: 'Tostada + pavo + pimiento asado', kcal: 215, note: 'Menos sal' },
+        { name: 'Queso fresco + manzana + nueces (5)', kcal: 225, note: 'Sin pan' },
+        { name: 'Batido proteico + 1 fruta', kcal: 210, note: 'Rápido' },
+        { name: 'Cracker + jamón curado + lechuga', kcal: 218, note: 'Crujiente' },
+        { name: 'Pan centeno + lomo ibérico + lechuga', kcal: 222, note: 'Más sabor' },
+        { name: 'Tostada integral + mozzarella light + pimiento', kcal: 215, note: 'Sin tomate' },
+        { name: 'Wrap mini + jamón york + lechuga + maíz', kcal: 220, note: 'Variado' },
+        { name: 'Pera + 2 lonchas jamón serrano + almendras', kcal: 225, note: 'Dulce-salado' },
+        { name: 'Edamame (100g) + tostada integral', kcal: 220, note: 'Proteína vegetal' }
+      ],
+      'tentempie-hummus': [
+        { name: 'Bocadillo hummus + pimiento asado', kcal: 230, note: '⭐ Sin tomate ni pepino' },
+        { name: 'Cracker + hummus + zanahoria baby', kcal: 225, note: 'Vegetal crujiente' },
+        { name: 'Pita mini + hummus + lechuga', kcal: 232, note: 'Árabe' },
+        { name: 'Yogur + avena + canela + miel', kcal: 225, note: 'Dulce saciante' },
+        { name: 'Cracker + guacamole sin cebolla + zanahoria', kcal: 228, note: 'Tex-mex sin tomate' },
+        { name: 'Tostada centeno + queso ricotta + pimiento asado', kcal: 225, note: 'Italiana' },
+        { name: 'Edamame (100g) + tostada integral', kcal: 232, note: 'Asiático proteico' },
+        { name: 'Wrap mini + hummus + lechuga + maíz', kcal: 230, note: 'Verde' },
+        { name: 'Tortita arroz + aguacate light + pimiento', kcal: 228, note: 'Sin gluten' },
+        { name: 'Falafel (2) + pita mini + lechuga', kcal: 235, note: 'Vegetal sabroso' }
+      ],
+      'tentempie-platano': [
+        { name: 'Plátano + nueces (3-4)', kcal: 250, note: '⭐ Original del plan' },
+        { name: 'Manzana + almendras (15g)', kcal: 240, note: 'Similar y saciante' },
+        { name: 'Pera + yogur 0% + nueces', kcal: 245, note: 'Más volumen' },
+        { name: 'Dátiles (3) + almendras + yogur griego', kcal: 252, note: 'Energía rápida' },
+        { name: 'Smoothie plátano + leche vegetal + avena', kcal: 255, note: 'Batido saciante' },
+        { name: 'Naranja + pistachos (15g)', kcal: 242, note: 'Vitamina C' },
+        { name: 'Mango (100g) + coco rallado + yogur', kcal: 250, note: 'Tropical' },
+        { name: 'Kiwi + nueces + cuajada 0%', kcal: 245, note: 'Digestivo' },
+        { name: 'Barrita avena casera + fruta fresca', kcal: 248, note: 'Práctica' },
+        { name: 'Uvas (120g) + queso fresco + almendras', kcal: 250, note: 'Mediterráneo' }
+      ],
+      'tentempie-melocoton': [
+        { name: 'Melocotón + almendras', kcal: 190, note: '⭐ Original del plan' },
+        { name: 'Nectarina + nueces (10g)', kcal: 185, note: 'Similar' },
+        { name: 'Yogur 0% + arándanos + canela', kcal: 180, note: 'Sin frutos secos' },
+        { name: 'Manzana + 8 almendras', kcal: 195, note: 'Clásico' },
+        { name: 'Ciruela + pistachos (10g)', kcal: 188, note: 'Variado' },
+        { name: 'Mandarina + avellanas (10g)', kcal: 182, note: 'Ligero' },
+        { name: 'Sandía (200g) + semillas girasol', kcal: 185, note: 'Refrescante verano' },
+        { name: 'Frambuesas + yogur griego 0%', kcal: 180, note: 'Antioxidante' },
+        { name: 'Piña (150g) + coco rallado (5g)', kcal: 190, note: 'Tropical' },
+        { name: 'Cerezas (100g) + almendras (8g)', kcal: 185, note: 'Temporada' }
+      ],
+      'tentempie-pera': [
+        { name: 'Pera + avellanas', kcal: 185, note: '⭐ Original del plan' },
+        { name: 'Manzana + nueces (10g)', kcal: 190, note: 'Similar' },
+        { name: 'Kiwi + yogur 0%', kcal: 175, note: 'Vitamina C' },
+        { name: 'Fresas (150g) + almendras (12g)', kcal: 180, note: 'Ligero y fresco' },
+        { name: 'Uvas (100g) + queso fresco light', kcal: 188, note: 'Mediterráneo' },
+        { name: 'Ciruela + avellanas (10g)', kcal: 183, note: 'Variado' },
+        { name: 'Melocotón + yogur 0% + canela', kcal: 178, note: 'Dulce natural' },
+        { name: 'Papaya (150g) + semillas chía', kcal: 182, note: 'Exótico digestivo' },
+        { name: 'Mango (100g) + pistachos (8g)', kcal: 187, note: 'Tropical' },
+        { name: 'Naranja + almendras (8g)', kcal: 180, note: 'Vitamina C + grasa sana' }
+      ],
+      'comida-patata-bonito': [
+        { name: 'Ensalada patata + bonito + maíz + pimiento rojo', kcal: 478, note: '⭐ Sin piquillos ni aceitunas' },
+        { name: 'Pasta integral + atún + maíz + guisantes', kcal: 480, note: 'Con pasta — tu favorita' },
+        { name: 'Patata asada + pechuga pollo + lechuga + maíz', kcal: 475, note: 'Más magra' },
+        { name: 'Arroz integral + atún + pimiento + maíz', kcal: 470, note: 'Sin patata' },
+        { name: 'Boniato asado + salmón + lechuga', kcal: 478, note: 'Omega-3' },
+        { name: 'Quinoa + garbanzos + pimiento + zanahoria', kcal: 485, note: 'Vegetariana proteica' },
+        { name: 'Lentejas + patata + zanahoria + aceite oliva', kcal: 482, note: 'Legumbre caliente' },
+        { name: 'Pasta espiral + bonito + pimiento asado + maíz', kcal: 480, note: 'Pasta mediterránea' },
+        { name: 'Cuscús + pollo + zanahoria + maíz', kcal: 472, note: 'Oriental ligero' },
+        { name: 'Arroz basmati + merluza + guisantes + zanahoria', kcal: 468, note: 'Pescado blanco' }
+      ],
+      'comida-pasta-atun': [
+        { name: 'Pasta + atún + maíz + guisantes + aceite oliva', kcal: 518, note: '⭐ Sin tomate — versión adaptada' },
+        { name: 'Pasta integral + pollo + pimiento + maíz', kcal: 510, note: 'Con pollo' },
+        { name: 'Espaguetis + atún + pimiento asado + maíz', kcal: 515, note: 'Mediterráneo' },
+        { name: 'Pasta + salmón + nata ligera + guisantes', kcal: 525, note: 'Cremosa omega-3' },
+        { name: 'Pasta + pechuga pollo + cebolla + pimiento', kcal: 518, note: 'Con pollo y verduras' },
+        { name: 'Pasta + carne magra ternera + pimiento + zanahoria', kcal: 530, note: 'Boloñesa adaptada' },
+        { name: 'Pasta + huevo + jamón york (carbonara ligera)', kcal: 522, note: 'Carbonara sana' },
+        { name: 'Pasta + pechuga + nata vegetal + ajo', kcal: 518, note: 'Cremosa' },
+        { name: 'Pasta + atún + maíz + cebolla', kcal: 512, note: 'Con atún y maíz' },
+        { name: 'Pasta + caballa + pimiento asado + aceite', kcal: 515, note: 'Omega-3 alternativa' }
+      ],
+      'comida-espaguetis': [
+        { name: 'Espaguetis boloñesa ternera + zanahoria + cebolla', kcal: 548, note: '⭐ Sin espinacas' },
+        { name: 'Pasta + carne magra + pimiento + cebolla + ajo', kcal: 545, note: 'Boloñesa mejorada' },
+        { name: 'Espaguetis + pollo + tomate frito casero + orégano', kcal: 535, note: 'Con pollo' },
+        { name: 'Pasta + pollo + cebolla + zanahoria salteada', kcal: 538, note: 'Con pollo y verduras' },
+        { name: 'Pasta + atún + nata ligera + cebolla', kcal: 545, note: 'Cremosa de atún' },
+        { name: 'Espaguetis + huevos + jamón york + queso (carbonara)', kcal: 545, note: 'Carbonara clásica sana' },
+        { name: 'Tallarines + pechuga + pimiento + ajo + aceite', kcal: 538, note: 'Italiana simple' },
+        { name: 'Pasta + lentejas + zanahoria + cebolla + ajo', kcal: 532, note: 'Proteína vegetal' },
+        { name: 'Pasta + atún + maíz + pimiento asado', kcal: 520, note: 'Más ligera' },
+        { name: 'Macarrones al queso ligeros + pollo desmenuzado', kcal: 542, note: 'Comfort food proteico' }
+      ],
+      'comida-arroz': [
+        { name: 'Arroz + pimiento + cebolla + calabacín + aceite', kcal: 420, note: '⭐ Sin espinacas' },
+        { name: 'Arroz integral + pollo + pimiento + zanahoria', kcal: 450, note: 'Más proteína' },
+        { name: 'Arroz + pollo + zanahoria + cebolla', kcal: 435, note: 'Con pollo y verduras' },
+        { name: 'Arroz basmati + pollo + zanahoria + salsa soja', kcal: 420, note: 'Asiático con pollo' },
+        { name: 'Arroz + ternera picada + pimiento + cebolla', kcal: 425, note: 'Con ternera' },
+        { name: 'Arroz + huevo frito + pimiento + maíz', kcal: 438, note: 'Rápido y sabroso' },
+        { name: 'Quinoa + verduras salteadas + huevo + aceite', kcal: 430, note: 'Sin arroz' },
+        { name: 'Arroz + pechuga + guisantes + zanahoria', kcal: 445, note: 'Completo' },
+        { name: 'Bulgur + verduras asadas + queso feta light', kcal: 428, note: 'Mediterráneo' },
+        { name: 'Pasta integral + verduras salteadas + queso parmesano', kcal: 432, note: 'Pasta en vez de arroz' }
+      ],
+      'comida-macarrones': [
+        { name: 'Macarrones al queso ligero', kcal: 478, note: '⭐ Original del plan' },
+        { name: 'Pasta + pollo + queso parmesano + orégano', kcal: 472, note: 'Italiana clásica' },
+        { name: 'Macarrones + carne ternera + tomate frito + queso', kcal: 480, note: 'Al horno' },
+        { name: 'Pasta + atún + crema queso light + cebolla', kcal: 472, note: 'Cremosa de atún' },
+        { name: 'Penne + verduras asadas + queso + orégano', kcal: 465, note: 'Vegetariano sabroso' },
+        { name: 'Fusilli + atún + pimiento asado + maíz', kcal: 470, note: 'Mediterráneo' },
+        { name: 'Pasta + jamón serrano + queso + ajo + aceite', kcal: 475, note: 'Española' },
+        { name: 'Espirales + pollo + cebolla + pimiento + aceite', kcal: 468, note: 'Con pollo salteado' },
+        { name: 'Tallarines + pollo + nata vegetal + ajo', kcal: 470, note: 'Cremosa' },
+        { name: 'Pasta + huevos revueltos + jamón york + queso', kcal: 478, note: 'Carbonara express' }
+      ],
+      'merienda-fruta': [
+        { name: 'Manzana / Cerezas / Albaricoques', kcal: 70, note: '⭐ Original según día' },
+        { name: 'Pera o naranja', kcal: 65, note: 'Misma idea' },
+        { name: 'Yogur 0% natural', kcal: 60, note: 'Más proteína' },
+        { name: 'Fresas (150g)', kcal: 48, note: 'Muy baja en calorías' },
+        { name: 'Sandía (200g)', kcal: 60, note: 'Refrescante verano' },
+        { name: 'Kiwi (2 unidades)', kcal: 84, note: 'Vitamina C' },
+        { name: 'Melocotón o nectarina', kcal: 58, note: 'Temporada' },
+        { name: 'Mandarinas (2 pequeñas)', kcal: 62, note: 'Fácil de comer' },
+        { name: 'Uvas (100g)', kcal: 68, note: 'Dulces naturales' },
+        { name: 'Mango (100g)', kcal: 65, note: 'Tropical energizante' }
+      ],
+      'cena-tortilla': [
+        { name: 'Ensalada lechuga + maíz + tortilla francesa + cuajada', kcal: 418, note: '⭐ Sin tomate ni rúcula' },
+        { name: 'Ensalada + huevos revueltos + queso fresco + yogur', kcal: 410, note: 'Revuelto proteico' },
+        { name: 'Ensalada + pechuga plancha + cuajada miel', kcal: 400, note: 'Más magra' },
+        { name: 'Ensalada + tortilla de claras + queso fresco', kcal: 390, note: 'Alta proteína baja grasa' },
+        { name: 'Crema calabaza + tortilla francesa + gelatina', kcal: 415, note: 'Caliente reconfortante' },
+        { name: 'Ensalada + revuelto de pimiento + huevo + requesón', kcal: 408, note: 'Diferente' },
+        { name: 'Sopa de pollo ligera + tortilla + fruta', kcal: 412, note: 'Reconfortante' },
+        { name: 'Ensalada + tortilla de maíz + cuajada', kcal: 418, note: 'Con maíz' },
+        { name: 'Gazpacho (sin pepino) + tortilla francesa + yogur', kcal: 405, note: 'Verano' },
+        { name: 'Ensalada + revuelto pavo + maíz + queso + gelatina', kcal: 418, note: 'Con pavo' }
+      ],
+      'cena-merluza': [
+        { name: 'Ensalada lechuga + merluza plancha + zanahoria + gelatina', kcal: 378, note: '⭐ Original adaptado' },
+        { name: 'Ensalada + pollo plancha + zanahoria + gelatina', kcal: 372, note: 'Con pollo' },
+        { name: 'Ensalada + pollo plancha + calabacín + gelatina', kcal: 375, note: 'Carne blanca' },
+        { name: 'Ensalada + merluza al horno + guisantes + gelatina', kcal: 375, note: 'Merluza al horno' },
+        { name: 'Crema verduras + merluza al horno + gelatina', kcal: 378, note: 'Con crema caliente' },
+        { name: 'Ensalada + pechuga pavo plancha + zanahoria + gelatina', kcal: 368, note: 'Con pavo' },
+        { name: 'Ensalada + atún fresco plancha + guisantes + gelatina', kcal: 368, note: 'Atún fresco' },
+        { name: 'Ensalada + solomillo pollo + guisantes + gelatina', kcal: 375, note: 'Con pollo' },
+        { name: 'Ensalada + ternera plancha + zanahoria + gelatina', kcal: 380, note: 'Con ternera' },
+        { name: 'Ensalada + lomo cerdo plancha + guisantes + gelatina', kcal: 365, note: 'Con cerdo' }
+      ],
+      'cena-pollo': [
+        { name: 'Ensalada lechuga + maíz + solomillo pollo + cuajada', kcal: 428, note: '⭐ Sin tomate ni rúcula' },
+        { name: 'Ensalada + pechuga + pimiento asado + yogur', kcal: 420, note: 'Con pimiento' },
+        { name: 'Ensalada + pavo plancha + calabacín + cuajada', kcal: 410, note: 'Más magra' },
+        { name: 'Ensalada + pollo al curry suave + arroz pequeño', kcal: 432, note: 'Especiado sabroso' },
+        { name: 'Crema calabaza + pechuga plancha + gelatina', kcal: 428, note: 'Caliente' },
+        { name: 'Ensalada + pollo asado + pimiento + maíz', kcal: 435, note: 'Al horno' },
+        { name: 'Ensalada + hamburguesa pollo casera + cuajada', kcal: 430, note: 'Diferente' },
+        { name: 'Ensalada + brocheta pollo + salsa yogur + maíz', kcal: 425, note: 'Brocheta con salsa yogur' },
+        { name: 'Ensalada + pollo en salsa de zanahoria + yogur', kcal: 428, note: 'Con salsa' },
+        { name: 'Sopa pollo ligera + ensalada + cuajada', kcal: 422, note: 'Reconfortante' }
+      ],
+      'cena-ternera': [
+        { name: 'Ensalada lechuga + solomillo ternera + guisantes + gelatina', kcal: 448, note: '⭐ Sin habas ni tomate' },
+        { name: 'Ensalada + filete ternera + zanahoria plancha', kcal: 440, note: 'Con zanahoria' },
+        { name: 'Ensalada + solomillo pollo + guisantes + cuajada', kcal: 420, note: 'Más ligera' },
+        { name: 'Ensalada + entrecot ternera + pimiento asado', kcal: 455, note: 'Más sabor' },
+        { name: 'Crema calabacín + ternera plancha + gelatina', kcal: 448, note: 'Caliente' },
+        { name: 'Ensalada + hamburguesa ternera (100g) + maíz', kcal: 445, note: 'Hamburguesa sana' },
+        { name: 'Ensalada + lomo bajo ternera + guisantes + gelatina', kcal: 442, note: 'Otro corte' },
+        { name: 'Ensalada + ternera en salsa zanahoria + arroz pequeño', kcal: 452, note: 'Con salsa' },
+        { name: 'Ensalada + albóndigas ternera (3) + guisantes', kcal: 448, note: 'Albóndigas' },
+        { name: 'Sopa caldo ternera + filete plancha + ensalada', kcal: 445, note: 'Reconfortante' }
+      ],
+      'cena-pavo-sesamo': [
+        { name: 'Ensalada lechuga + tortilla pavo y sésamo + cuajada', kcal: 408, note: '⭐ Sin canónigos' },
+        { name: 'Ensalada + tortilla francesa + pavo + queso', kcal: 400, note: 'Con queso' },
+        { name: 'Ensalada + pechuga + huevo cocido + yogur', kcal: 405, note: 'Proteína doble' },
+        { name: 'Ensalada + tortilla de claras + queso + pavo', kcal: 395, note: 'Alta proteína' },
+        { name: 'Ensalada + revuelto de pavo + pimiento + cuajada', kcal: 412, note: 'Revuelto' },
+        { name: 'Crema de zanahoria + tortilla + gelatina', kcal: 408, note: 'Caliente' },
+        { name: 'Ensalada + tortilla de verduras + requesón', kcal: 405, note: 'Vegetariana' },
+        { name: 'Ensalada + tortilla de atún + maíz + yogur', kcal: 415, note: 'Con atún' },
+        { name: 'Ensalada + huevos poché + salmón + cuajada', kcal: 418, note: 'Salmón proteico' },
+        { name: 'Ensalada + tortilla jamón york + queso fresco', kcal: 412, note: 'Con jamón york' }
+      ],
+      'cena-cerdo': [
+        { name: 'Ensalada lechuga + lomo cerdo + zanahoria + gelatina', kcal: 458, note: '⭐ Sin champiñones' },
+        { name: 'Ensalada + solomillo cerdo + pimiento asado', kcal: 450, note: 'Con pimiento' },
+        { name: 'Ensalada + pollo + zanahoria + cuajada', kcal: 420, note: 'Más magra con pollo' },
+        { name: 'Ensalada + secreto ibérico plancha + guisantes', kcal: 465, note: 'Ibérico sabroso' },
+        { name: 'Ensalada + chuleta cerdo magra + pimiento + maíz', kcal: 458, note: 'Chuleta' },
+        { name: 'Crema calabaza + lomo cerdo + gelatina', kcal: 462, note: 'Caliente dulce' },
+        { name: 'Ensalada + filete cerdo + manzana asada', kcal: 455, note: 'Dulce-salado' },
+        { name: 'Ensalada + cinta lomo + guisantes + gelatina', kcal: 448, note: 'Ligero' },
+        { name: 'Ensalada + cerdo al ajo + pimiento asado', kcal: 460, note: 'Al ajillo' },
+        { name: 'Ensalada + ternera + guisantes + gelatina', kcal: 445, note: 'Cambio a ternera' }
+      ],
+      'cena-salteado': [
+        { name: 'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada', kcal: 428, note: '⭐ Sin champiñones' },
+        { name: 'Ensalada + pollo wok + zanahoria + salsa soja', kcal: 420, note: 'Asiático' },
+        { name: 'Ensalada + pavo salteado + calabacín + cuajada', kcal: 410, note: 'Más ligera' },
+        { name: 'Ensalada + huevos revueltos + pimiento + maíz', kcal: 400, note: 'Sin carne' },
+        { name: 'Ensalada + salteado ternera + zanahoria + salsa soja', kcal: 435, note: 'Asiático ternera' },
+        { name: 'Ensalada + salteado pavo + pimiento + cebolla', kcal: 422, note: 'Con pavo salteado' },
+        { name: 'Ensalada + salteado huevo + pimiento + maíz', kcal: 415, note: 'Vegetariano con huevo' },
+        { name: 'Ensalada + salteado pavo + guisantes + yogur', kcal: 418, note: 'Ligero proteico' },
+        { name: 'Crema verduras + salteado pollo + gelatina', kcal: 428, note: 'Caliente' },
+        { name: 'Ensalada + salteado cerdo + pimiento + cuajada', kcal: 432, note: 'Con cerdo' }
+      ]
+    };
 
-<script>
-// ═══════════════════════════════════════════════════════
-// DATOS CORPORALES CON HISTORIAL
-// ═══════════════════════════════════════════════════════
-const STATS_KEY = 'plan-stats-v1';
-const STAT_DEFS = [
-  { key:'peso',    label:'Peso (kg)',          unit:'kg',  lower:true  },
-  { key:'grasa',   label:'Grasa corporal (%)', unit:'%',   lower:true  },
-  { key:'subcutanea', label:'Grasa subcutánea (%)', unit:'%', lower:true },
-  { key:'musculo', label:'Músculo (%)',         unit:'%',   lower:false },
-  { key:'musculo_kg', label:'Peso muscular (kg)', unit:'kg', lower:false },
-  { key:'bmr',     label:'BMR (kcal)',          unit:'kcal',lower:false },
-];
-
-function loadStats() {
-  try { return JSON.parse(localStorage.getItem(STATS_KEY)) || []; } catch { return []; }
-}
-function saveStats(d) { localStorage.setItem(STATS_KEY, JSON.stringify(d)); }
-
-function initStats() {
-  let stats = loadStats();
-  // Añadir medición inicial si está vacío
-  if (!stats.length) {
-    stats = [{
-      date: '2025-07-18', // Aprox hace 2 semanas
-      peso:63.9, grasa:21.5, subcutanea:19.3, musculo:45.6, musculo_kg:29.1, bmr:1353
-    }];
-    saveStats(stats);
-  }
-  renderStats(stats);
-}
-
-function renderStats(stats) {
-  const tabsEl = document.getElementById('stats-tabs');
-  const chartsEl = document.getElementById('stats-charts');
-  tabsEl.innerHTML = '';
-  chartsEl.innerHTML = '';
-
-  STAT_DEFS.forEach((def, di) => {
-    // Tab
-    const tab = document.createElement('button');
-    tab.className = 'stat-tab' + (di === 0 ? ' active' : '');
-    tab.textContent = def.label;
-    tab.dataset.key = def.key;
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.stat-tab').forEach(t => t.classList.remove('active'));
-      document.querySelectorAll('.stat-chart-area').forEach(a => a.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById('chart-' + def.key).classList.add('active');
-    });
-    tabsEl.appendChild(tab);
-
-    // Área de gráfica/timeline
-    const area = document.createElement('div');
-    area.className = 'stat-chart-area' + (di === 0 ? ' active' : '');
-    area.id = 'chart-' + def.key;
-
-    const timeline = document.createElement('div');
-    timeline.className = 'stat-timeline';
-
-    stats.forEach((entry, i) => {
-      const val = entry[def.key];
-      if (val == null) return;
-      const prev = i > 0 ? stats[i-1][def.key] : null;
-      let deltaHtml = '';
-      if (prev != null) {
-        const diff = (val - prev).toFixed(1);
-        const isGood = def.lower ? diff < 0 : diff > 0;
-        const cls = diff == 0 ? 'delta-ok' : isGood ? 'delta-down' : 'delta-up';
-        const sign = diff > 0 ? '+' : '';
-        deltaHtml = `<div class="stat-entry-delta ${cls}">${sign}${diff}${def.unit}</div>`;
+    const plan = [
+      { id:1, name:'Día 1', label:'Lunes', type:'entreno-opt',
+        activities:[{id:'gym',label:'Gym (opción 1)'},{id:'cardio',label:'Cardio'}],
+        meals:[
+          {slot:'Desayuno',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
+          {slot:'Tentempié 1',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
+          {slot:'Tentempié 2',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
+          {slot:'Comida',name:'Pasta integral + atún + maíz + guisantes + aceite',kcal:518,altKey:'comida-pasta-atun'},
+          {slot:'Merienda',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena',name:'Ensalada lechuga + maíz + tortilla francesa + cuajada miel',kcal:418,altKey:'cena-tortilla'}
+        ]
+      },
+      { id:2, name:'Día 2', label:'Martes', type:'entreno-opt',
+        activities:[{id:'gym',label:'Gym (opción 1)'},{id:'cardio',label:'Cardio'}],
+        meals:[
+          {slot:'Desayuno',name:'Batido yogur desnatado + pera + melón',kcal:260,altKey:'desayuno-batido'},
+          {slot:'Tentempié 1',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
+          {slot:'Tentempié 2',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
+          {slot:'Comida',name:'Espaguetis boloñesa ternera + zanahoria + cebolla',kcal:548,altKey:'comida-espaguetis'},
+          {slot:'Merienda',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena',name:'Ensalada lechuga + merluza plancha + zanahoria + gelatina',kcal:378,altKey:'cena-merluza'}
+        ]
+      },
+      { id:3, name:'Día 3', label:'Miércoles', type:'padel',
+        activities:[{id:'padel',label:'Pádel'}],
+        meals:[
+          {slot:'Desayuno',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,altKey:'desayuno-yogur-avena'},
+          {slot:'Tentempié 1',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
+          {slot:'Tentempié 2',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
+          {slot:'Comida',name:'Pasta + pollo + cebolla + pimiento salteado',kcal:518,altKey:'comida-pasta-atun'},
+          {slot:'Merienda',name:'Albaricoques',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena',name:'Ensalada lechuga + maíz + solomillo pollo + cuajada',kcal:428,altKey:'cena-pollo'}
+        ]
+      },
+      { id:4, name:'Día 4', label:'Jueves', type:'entreno-opt',
+        activities:[{id:'gym',label:'Gym (opción 2)'},{id:'cardio',label:'Cardio'}],
+        meals:[
+          {slot:'Desayuno',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
+          {slot:'Tentempié 1',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
+          {slot:'Tentempié 2',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
+          {slot:'Comida',name:'Arroz + pollo + pimiento + zanahoria',kcal:450,altKey:'comida-arroz'},
+          {slot:'Merienda',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena',name:'Ensalada lechuga + solomillo ternera + guisantes + gelatina',kcal:448,altKey:'cena-ternera'}
+        ]
+      },
+      { id:5, name:'Día 5', label:'Viernes', type:'entreno-opt',
+        activities:[{id:'gym',label:'Gym (opción 2)'},{id:'cardio',label:'Cardio'}],
+        meals:[
+          {slot:'Desayuno',name:'Batido yogur desnatado + pera + melón',kcal:260,altKey:'desayuno-batido'},
+          {slot:'Tentempié 1',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
+          {slot:'Tentempié 2',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
+          {slot:'Comida',name:'Macarrones al queso ligero + pollo desmenuzado',kcal:478,altKey:'comida-macarrones'},
+          {slot:'Merienda',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena',name:'Ensalada lechuga + tortilla pavo y sésamo + cuajada',kcal:408,altKey:'cena-pavo-sesamo'}
+        ]
+      },
+      { id:6, name:'Día 6', label:'Sábado', type:'rest',
+        activities:[],
+        meals:[
+          {slot:'Desayuno',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,altKey:'desayuno-yogur-avena'},
+          {slot:'Tentempié 1',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
+          {slot:'Tentempié 2',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
+          {slot:'Comida',name:'Pasta + pollo + pimiento asado + queso parmesano',kcal:472,altKey:'comida-macarrones'},
+          {slot:'Merienda',name:'Albaricoques',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena',name:'Ensalada lechuga + lomo cerdo + zanahoria + gelatina',kcal:458,altKey:'cena-cerdo'}
+        ]
+      },
+      { id:7, name:'Día 7', label:'Domingo', type:'rest',
+        activities:[],
+        meals:[
+          {slot:'Desayuno',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
+          {slot:'Tentempié 1',name:'Bocadillo hummus + pimiento asado',kcal:230,altKey:'tentempie-hummus'},
+          {slot:'Tentempié 2',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
+          {slot:'Comida',name:'Espaguetis + huevos + jamón york (carbonara ligera)',kcal:545,altKey:'comida-espaguetis'},
+          {slot:'Merienda',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena',name:'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada',kcal:428,altKey:'cena-salteado'}
+        ]
       }
-      const isLatest = i === stats.length - 1;
-      const dateStr = new Date(entry.date + 'T12:00:00').toLocaleDateString('es-ES', {day:'2-digit',month:'short'});
+    ];
 
-      const card = document.createElement('div');
-      card.className = 'stat-entry' + (isLatest ? ' latest' : '');
-      card.innerHTML = `
-        <div class="stat-entry-date">${dateStr}${isLatest ? ' ← Última' : ''}</div>
-        <div class="stat-entry-val">${val}${def.unit}</div>
-        ${deltaHtml}
-      `;
-      timeline.appendChild(card);
-    });
+    plan.forEach(d => { d.totalKcal = d.meals.reduce((s,m) => s + m.kcal, 0); });
 
-    area.appendChild(timeline);
-    chartsEl.appendChild(area);
-  });
-}
+    const diasSemana = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+    const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
-document.getElementById('btn-add-stat').addEventListener('click', () => {
-  const now = new Date();
-  document.getElementById('stat-date').value = now.toISOString().slice(0,10);
-  document.getElementById('modal-stat').classList.add('open');
-});
-document.getElementById('modal-close-stat').addEventListener('click', () => {
-  document.getElementById('modal-stat').classList.remove('open');
-});
-document.getElementById('btn-save-stat').addEventListener('click', () => {
-  const date = document.getElementById('stat-date').value;
-  if (!date) { alert('Pon la fecha'); return; }
-  const entry = { date };
-  const fields = ['peso','grasa','subcutanea','musculo','musculo_kg','bmr'];
-  const ids = ['stat-peso','stat-grasa','stat-subcutanea','stat-musculo','stat-musculo-kg','stat-bmr'];
-  fields.forEach((f,i) => {
-    const v = parseFloat(document.getElementById(ids[i]).value);
-    if (!isNaN(v)) entry[f] = v;
-  });
-  const stats = loadStats();
-  // Reemplazar si misma fecha
-  const idx = stats.findIndex(s => s.date === date);
-  if (idx >= 0) stats[idx] = entry; else stats.push(entry);
-  stats.sort((a,b) => a.date.localeCompare(b.date));
-  saveStats(stats);
-  renderStats(stats);
-  document.getElementById('modal-stat').classList.remove('open');
-  // Limpiar
-  ids.forEach(id => document.getElementById(id).value = '');
-});
+    function updateClock() {
+      const now = new Date();
+      document.getElementById('clock-date').textContent = `${diasSemana[now.getDay()]}, ${now.getDate()} de ${meses[now.getMonth()]} de ${now.getFullYear()}`;
+      const h = String(now.getHours()).padStart(2,'0'), m = String(now.getMinutes()).padStart(2,'0'), s = String(now.getSeconds()).padStart(2,'0');
+      document.getElementById('clock-time').innerHTML = `${h}:${m}:<span>${s}</span>`;
+    }
+    updateClock(); setInterval(updateClock, 1000);
 
-// ═══════════════════════════════════════════════════════
-// ALTERNATIVAS (sin alimentos no tolerados)
-// ═══════════════════════════════════════════════════════
-const alternatives = {
-  'desayuno-porridge':[
-    {name:'Porridge leche sin lactosa + manzana + canela',kcal:310,note:'⭐ Original'},
-    {name:'Overnight oats + leche vegetal + arándanos + miel',kcal:308,note:'Preparar noche anterior'},
-    {name:'Tostadas pan integral + huevo cocido + queso fresco',kcal:305,note:'Alta proteína'},
-    {name:'Yogur griego 0% + avena + plátano + canela',kcal:300,note:'Muy saciante'},
-    {name:'Batido avena + proteína whey + fresas + leche',kcal:295,note:'Ideal post-entreno'},
-    {name:'Muesli sin azúcar + leche sin lactosa + kiwi',kcal:305,note:'Más fibra'},
-    {name:'Skyr + granola + arándanos + nueces',kcal:310,note:'Alto en proteína'},
-    {name:'Pan integral + mantequilla de cacahuete + manzana',kcal:312,note:'Energía sostenida'},
-    {name:'Tortitas avena (2) + miel + plátano troceado',kcal:315,note:'Más apetecible'},
-    {name:'Bowl yogur + granola + mango + coco rallado',kcal:320,note:'Tropical sabroso'}
-  ],
-  'desayuno-batido':[
-    {name:'Batido yogur desnatado + pera + melón',kcal:260,note:'⭐ Original'},
-    {name:'Yogur natural + kiwi + 10g miel',kcal:255,note:'Vitamina C'},
-    {name:'Tostada integral + queso fresco + pavo',kcal:252,note:'Salado proteico'},
-    {name:'Batido proteico + leche vegetal + plátano',kcal:265,note:'Post-entreno'},
-    {name:'Smoothie manzana + yogur 0% + avena',kcal:258,note:'Energizante'},
-    {name:'Queso cottage + fruta temporada + avena',kcal:260,note:'Alta proteína'},
-    {name:'Tostada maíz + pavo + pimiento rojo asado',kcal:250,note:'Sin gluten'},
-    {name:'Porridge avena + leche sin lactosa + pera',kcal:262,note:'Caliente'},
-    {name:'Clara revuelta + tostada integral + queso',kcal:248,note:'Muy alta proteína'},
-    {name:'Pan centeno + jamón york + kiwi',kcal:255,note:'Rápido y completo'}
-  ],
-  'desayuno-yogur-avena':[
-    {name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,note:'⭐ Original'},
-    {name:'Porridge avena + leche sin lactosa + frutos rojos',kcal:310,note:'Caliente'},
-    {name:'Skyr 0% + granola + manzana troceada',kcal:315,note:'Alta proteína'},
-    {name:'Tortitas avena (2) + miel + plátano',kcal:325,note:'Apetecible'},
-    {name:'Muesli + leche vegetal + fresas + almendras',kcal:318,note:'Fibra'},
-    {name:'Overnight oats + chía + arándanos + miel',kcal:322,note:'Omega-3'},
-    {name:'Pan integral + mantequilla almendra + plátano',kcal:316,note:'Energía'},
-    {name:'Batido avena + yogur griego + frambuesas',kcal:312,note:'Frío'},
-    {name:'Huevos revueltos (2) + tostada integral + queso',kcal:320,note:'Salado proteico'},
-    {name:'Bowl yogur + granola + mango + coco rallado',kcal:325,note:'Tropical'}
-  ],
-  'tentempie-atun':[
-    {name:'Bocadillo atún + lechuga + maíz',kcal:268,note:'⭐ Sin aceitunas'},
-    {name:'Tostada integral + atún + maíz + queso fresco',kcal:265,note:'Con queso'},
-    {name:'Wrap integral + pollo desmenuzado + lechuga',kcal:272,note:'Wrap proteico'},
-    {name:'Pan molde integral + atún + pimiento asado',kcal:268,note:'Con pimiento'},
-    {name:'Arroz integral (bol pequeño) + atún + maíz',kcal:275,note:'Sin pan'},
-    {name:'Cracker integral + atún + queso fresco',kcal:260,note:'Crujiente'},
-    {name:'Pita integral + atún + lechuga + maíz',kcal:270,note:'Pita'},
-    {name:'Tostada centeno + caballa al natural + lechuga',kcal:265,note:'Omega-3'},
-    {name:'Bocadillo pechuga pollo + lechuga + queso',kcal:272,note:'Con pollo'},
-    {name:'Tortilla trigo + pavo + lechuga + maíz',kcal:265,note:'Wrap pavo'}
-  ],
-  'tentempie-pavo':[
-    {name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,note:'⭐ Original'},
-    {name:'Tostada + pechuga pollo + lechuga',kcal:235,note:'Con pollo'},
-    {name:'Yogur griego 0% + 20g nueces',kcal:245,note:'Sin pan'},
-    {name:'Huevo cocido + 1 fruta + 10g almendras',kcal:230,note:'Simple'},
-    {name:'Cracker integral + pavo + mostaza + lechuga',kcal:238,note:'Crujiente'},
-    {name:'Pita mini + jamón york + lechuga',kcal:242,note:'Pita'},
-    {name:'Tostada maíz + jamón york + pimiento asado',kcal:235,note:'Sin gluten'},
-    {name:'Wrap lechuga + pavo + maíz + mostaza',kcal:228,note:'Low carb'},
-    {name:'Queso fresco batido + manzana + nueces',kcal:245,note:'Dulce-salado'},
-    {name:'Tortita arroz + pollo desmenuzado + queso',kcal:240,note:'Ligero'}
-  ],
-  'tentempie-jamon':[
-    {name:'Bocadillo jamón serrano + lechuga',kcal:220,note:'⭐ Sin rúcula'},
-    {name:'Tostada + pavo + pimiento asado',kcal:215,note:'Menos sal'},
-    {name:'Queso fresco + manzana + nueces (5)',kcal:225,note:'Sin pan'},
-    {name:'Batido proteico + 1 fruta',kcal:210,note:'Rápido'},
-    {name:'Cracker + jamón curado + lechuga',kcal:218,note:'Crujiente'},
-    {name:'Pan centeno + lomo ibérico + lechuga',kcal:222,note:'Sabor'},
-    {name:'Tostada integral + mozzarella light + pimiento',kcal:215,note:'Italiana'},
-    {name:'Wrap mini + jamón york + lechuga + maíz',kcal:220,note:'Variado'},
-    {name:'Pera + 2 lonchas jamón serrano + almendras',kcal:225,note:'Dulce-salado'},
-    {name:'Edamame (100g) + tostada integral',kcal:220,note:'Proteína vegetal'}
-  ],
-  'tentempie-hummus':[
-    {name:'Bocadillo hummus + pimiento asado',kcal:230,note:'⭐ Sin tomate ni pepino'},
-    {name:'Cracker + hummus + zanahoria baby',kcal:225,note:'Crujiente vegetal'},
-    {name:'Pita mini + hummus + lechuga',kcal:232,note:'Pita'},
-    {name:'Yogur + avena + canela + miel',kcal:225,note:'Dulce'},
-    {name:'Tostada centeno + queso ricotta + pimiento asado',kcal:225,note:'Italiana'},
-    {name:'Edamame (100g) + tostada integral',kcal:232,note:'Proteico'},
-    {name:'Wrap mini + hummus + lechuga + maíz',kcal:230,note:'Verde'},
-    {name:'Tortita arroz + queso crema light + pimiento',kcal:228,note:'Sin gluten'},
-    {name:'Falafel (2) + pita mini + lechuga',kcal:235,note:'Vegetal sabroso'},
-    {name:'Pan integral + queso fresco + pavo + maíz',kcal:240,note:'Proteico'}
-  ],
-  'tentempie-platano':[
-    {name:'Plátano + nueces (3-4)',kcal:250,note:'⭐ Original'},
-    {name:'Manzana + almendras (15g)',kcal:240,note:'Similar'},
-    {name:'Pera + yogur 0% + nueces',kcal:245,note:'Más volumen'},
-    {name:'Dátiles (3) + almendras + yogur griego',kcal:252,note:'Energía rápida'},
-    {name:'Smoothie plátano + leche vegetal + avena',kcal:255,note:'Batido saciante'},
-    {name:'Naranja + pistachos (15g)',kcal:242,note:'Vitamina C'},
-    {name:'Mango (100g) + coco rallado + yogur',kcal:250,note:'Tropical'},
-    {name:'Kiwi + nueces + cuajada 0%',kcal:245,note:'Digestivo'},
-    {name:'Barrita avena casera + fruta fresca',kcal:248,note:'Práctica'},
-    {name:'Uvas (120g) + queso fresco + almendras',kcal:250,note:'Mediterráneo'}
-  ],
-  'tentempie-melocoton':[
-    {name:'Melocotón + almendras',kcal:190,note:'⭐ Original'},
-    {name:'Nectarina + nueces (10g)',kcal:185,note:'Similar'},
-    {name:'Yogur 0% + arándanos + canela',kcal:180,note:'Sin frutos secos'},
-    {name:'Manzana + 8 almendras',kcal:195,note:'Clásico'},
-    {name:'Ciruela + pistachos (10g)',kcal:188,note:'Variado'},
-    {name:'Mandarina + avellanas (10g)',kcal:182,note:'Ligero'},
-    {name:'Sandía (200g) + semillas girasol',kcal:185,note:'Refrescante'},
-    {name:'Frambuesas + yogur griego 0%',kcal:180,note:'Antioxidante'},
-    {name:'Piña (150g) + coco rallado (5g)',kcal:190,note:'Tropical'},
-    {name:'Cerezas (100g) + almendras (8g)',kcal:185,note:'Temporada'}
-  ],
-  'tentempie-pera':[
-    {name:'Pera + avellanas',kcal:185,note:'⭐ Original'},
-    {name:'Manzana + nueces (10g)',kcal:190,note:'Similar'},
-    {name:'Kiwi + yogur 0%',kcal:175,note:'Vitamina C'},
-    {name:'Fresas (150g) + almendras (12g)',kcal:180,note:'Ligero'},
-    {name:'Uvas (100g) + queso fresco light',kcal:188,note:'Mediterráneo'},
-    {name:'Ciruela + avellanas (10g)',kcal:183,note:'Variado'},
-    {name:'Melocotón + yogur 0% + canela',kcal:178,note:'Dulce natural'},
-    {name:'Papaya (150g) + semillas chía',kcal:182,note:'Exótico'},
-    {name:'Mango (100g) + pistachos (8g)',kcal:187,note:'Tropical'},
-    {name:'Naranja + almendras (8g)',kcal:180,note:'Vitamina C'}
-  ],
-  'comida-pasta-atun':[
-    {name:'Pasta + atún + maíz + guisantes + aceite oliva',kcal:518,note:'⭐ Sin tomate'},
-    {name:'Pasta integral + pollo + pimiento + maíz',kcal:510,note:'Con pollo'},
-    {name:'Espaguetis + atún + pimiento asado',kcal:515,note:'Mediterráneo'},
-    {name:'Pasta + carne magra ternera + pimiento + zanahoria',kcal:530,note:'Boloñesa adaptada'},
-    {name:'Pasta + huevo + jamón york (carbonara ligera)',kcal:522,note:'Carbonara sana'},
-    {name:'Pasta + pechuga + nata vegetal',kcal:518,note:'Cremosa'},
-    {name:'Pasta + caballa al natural + pimiento asado',kcal:515,note:'Omega-3'},
-    {name:'Pasta + lomo cerdo + cebolla + zanahoria',kcal:525,note:'Con cerdo'},
-    {name:'Pasta integral + ternera picada + maíz + cebolla',kcal:520,note:'Boloñesa'],
-    {name:'Fideos + pollo + verduras (estilo wok)',kcal:510,note:'Asiático sin ajo'}
-  ],
-  'comida-espaguetis':[
-    {name:'Espaguetis boloñesa ternera + zanahoria + cebolla',kcal:548,note:'⭐ Sin espinacas'},
-    {name:'Pasta + carne magra + pimiento + cebolla',kcal:545,note:'Boloñesa mejorada'},
-    {name:'Espaguetis + pollo + tomate frito casero',kcal:535,note:'Con pollo'},
-    {name:'Pasta + lomo cerdo + cebolla + zanahoria',kcal:540,note:'Con cerdo'},
-    {name:'Pasta + huevos + jamón york + queso (carbonara)',kcal:545,note:'Carbonara'},
-    {name:'Tallarines + pechuga + pimiento + aceite',kcal:538,note:'Simple'},
-    {name:'Pasta + lentejas + zanahoria + cebolla',kcal:532,note:'Proteína vegetal'},
-    {name:'Pasta + atún + maíz + pimiento asado',kcal:520,note:'Ligera'},
-    {name:'Macarrones al queso ligeros + pollo',kcal:542,note:'Comfort proteico'},
-    {name:'Pasta + ternera picada + maíz + cebolla',kcal:538,note:'Boloñesa variante'}
-  ],
-  'comida-arroz':[
-    {name:'Arroz + pimiento + cebolla + calabacín + aceite',kcal:420,note:'⭐ Sin espinacas'},
-    {name:'Arroz integral + pollo + pimiento + zanahoria',kcal:450,note:'Más proteína'},
-    {name:'Arroz + merluza al horno + guisantes',kcal:430,note:'Pescado blanco suave'},
-    {name:'Arroz + huevo frito + pimiento + maíz',kcal:438,note:'Rápido sabroso'},
-    {name:'Quinoa + verduras salteadas + huevo + aceite',kcal:430,note:'Sin arroz'],
-    {name:'Arroz + pechuga + guisantes + zanahoria',kcal:445,note:'Completo'},
-    {name:'Arroz + lomo cerdo + cebolla + zanahoria',kcal:440,note:'Con cerdo'},
-    {name:'Arroz + atún + maíz + pimiento asado',kcal:435,note:'Rápido'},
-    {name:'Arroz + ternera picada + cebolla + zanahoria',kcal:448,note:'Con ternera'},
-    {name:'Pasta integral + verduras + queso parmesano',kcal:432,note:'Pasta en vez de arroz'}
-  ],
-  'comida-macarrones':[
-    {name:'Macarrones al queso ligero',kcal:478,note:'⭐ Original'},
-    {name:'Pasta + pollo + queso parmesano',kcal:472,note:'Italiana'},
-    {name:'Macarrones + carne ternera + tomate frito + queso',kcal:480,note:'Al horno'},
-    {name:'Pasta + carne magra + nata vegetal + queso',kcal:475,note:'Cremosa'},
-    {name:'Penne + verduras asadas + queso',kcal:465,note:'Vegetariano'},
-    {name:'Fusilli + atún + pimiento asado + maíz',kcal:470,note:'Mediterráneo'},
-    {name:'Pasta + jamón serrano + queso + aceite',kcal:475,note:'Española'},
-    {name:'Espirales + pollo + nata vegetal',kcal:470,note:'Cremosa'},
-    {name:'Tallarines + pechuga + queso crema + maíz',kcal:472,note:'Suave'},
-    {name:'Pasta + huevos revueltos + jamón york + queso',kcal:478,note:'Carbonara express'}
-  ],
-  'comida-patata-bonito':[
-    {name:'Ensalada patata + bonito + maíz + pimiento rojo',kcal:478,note:'⭐ Sin aceitunas'},
-    {name:'Pasta integral + atún + maíz + guisantes',kcal:480,note:'Con pasta'},
-    {name:'Patata asada + pechuga pollo + lechuga + maíz',kcal:475,note:'Más magra'},
-    {name:'Arroz integral + atún + pimiento + maíz',kcal:470,note:'Con arroz'},
-    {name:'Boniato asado + merluza al horno + lechuga',kcal:478,note:'Con boniato'},
-    {name:'Quinoa + garbanzos + pimiento + zanahoria',kcal:485,note:'Vegetariana'},
-    {name:'Lentejas + patata + zanahoria + aceite oliva',kcal:482,note:'Legumbre'},
-    {name:'Pasta espiral + bonito + pimiento asado + maíz',kcal:480,note:'Con pasta'},
-    {name:'Cuscús + pollo + zanahoria + maíz',kcal:472,note:'Oriental'},
-    {name:'Arroz basmati + merluza + guisantes + zanahoria',kcal:468,note:'Pescado blanco'}
-  ],
-  'merienda-fruta':[
-    {name:'Manzana / Cerezas / Albaricoques',kcal:70,note:'⭐ Original'},
-    {name:'Pera o naranja',kcal:65,note:'Similar'},
-    {name:'Yogur 0% natural',kcal:60,note:'Más proteína'},
-    {name:'Fresas (150g)',kcal:48,note:'Muy ligera'},
-    {name:'Sandía (200g)',kcal:60,note:'Refrescante'},
-    {name:'Kiwi (2 unidades)',kcal:84,note:'Vitamina C'},
-    {name:'Melocotón o nectarina',kcal:58,note:'Temporada'},
-    {name:'Mandarinas (2 pequeñas)',kcal:62,note:'Fácil'},
-    {name:'Uvas (100g)',kcal:68,note:'Dulces naturales'},
-    {name:'Mango (100g)',kcal:65,note:'Tropical'}
-  ],
-  'cena-tortilla':[
-    {name:'Ensalada lechuga + maíz + tortilla francesa + cuajada',kcal:418,note:'⭐ Original adaptado'},
-    {name:'Ensalada + huevos revueltos + queso fresco + yogur',kcal:410,note:'Revuelto'},
-    {name:'Ensalada + pechuga plancha + cuajada miel',kcal:400,note:'Más magra'},
-    {name:'Ensalada + tortilla de claras + queso fresco',kcal:390,note:'Alta proteína'},
-    {name:'Crema calabaza + tortilla francesa + gelatina',kcal:415,note:'Caliente'},
-    {name:'Ensalada + revuelto de pimiento + huevo + requesón',kcal:408,note:'Diferente'},
-    {name:'Sopa pollo ligera + tortilla + yogur',kcal:412,note:'Reconfortante'},
-    {name:'Ensalada + tortilla de maíz + cuajada',kcal:418,note:'Con maíz'},
-    {name:'Ensalada + revuelto jamón york + huevo + gelatina',kcal:415,note:'Con jamón'},
-    {name:'Ensalada + revuelto atún + maíz + cuajada',kcal:420,note:'Con atún'}
-  ],
-  'cena-merluza':[
-    {name:'Ensalada lechuga + merluza plancha + zanahoria + gelatina',kcal:378,note:'⭐ Sin brócoli'},
-    {name:'Ensalada + merluza al horno + guisantes + gelatina',kcal:375,note:'Al horno'},
-    {name:'Ensalada + pollo plancha + calabacín + gelatina',kcal:375,note:'Con pollo'},
-    {name:'Ensalada + pavo plancha + zanahoria + cuajada',kcal:370,note:'Con pavo'},
-    {name:'Crema verduras + merluza al horno + gelatina',kcal:378,note:'Caliente'},
-    {name:'Ensalada + pechuga pollo + guisantes + yogur',kcal:372,note:'Proteica'},
-    {name:'Ensalada + atún fresco plancha + guisantes',kcal:368,note:'Atún fresco'},
-    {name:'Ensalada + lomo cerdo magro + zanahoria + gelatina',kcal:380,note:'Con cerdo'},
-    {name:'Sopa verduras ligera + merluza + gelatina',kcal:372,note:'Reconfortante'},
-    {name:'Ensalada + ternera plancha + guisantes + cuajada',kcal:382,note:'Con ternera'}
-  ],
-  'cena-pollo':[
-    {name:'Ensalada lechuga + maíz + solomillo pollo + cuajada',kcal:428,note:'⭐ Sin tomate ni rúcula'},
-    {name:'Ensalada + pechuga + pimiento asado + yogur',kcal:420,note:'Con pimiento'},
-    {name:'Ensalada + pavo plancha + calabacín + cuajada',kcal:410,note:'Con pavo'},
-    {name:'Ensalada + pollo al curry suave + arroz pequeño',kcal:432,note:'Especiado'},
-    {name:'Crema calabaza + pechuga plancha + gelatina',kcal:428,note:'Caliente'},
-    {name:'Ensalada + pollo asado + pimiento + maíz',kcal:435,note:'Al horno'},
-    {name:'Ensalada + hamburguesa pollo casera + cuajada',kcal:430,note:'Diferente'},
-    {name:'Ensalada + pollo en salsa zanahoria + yogur',kcal:428,note:'Con salsa'},
-    {name:'Sopa pollo ligera + ensalada + cuajada',kcal:422,note:'Reconfortante'},
-    {name:'Ensalada + pollo salteado + cebolla + maíz',kcal:425,note:'Salteado'}
-  ],
-  'cena-ternera':[
-    {name:'Ensalada lechuga + solomillo ternera + guisantes + gelatina',kcal:448,note:'⭐ Sin habas'},
-    {name:'Ensalada + filete ternera + zanahoria plancha',kcal:440,note:'Con zanahoria'},
-    {name:'Ensalada + solomillo pollo + guisantes + cuajada',kcal:420,note:'Más ligera'},
-    {name:'Ensalada + entrecot ternera + pimiento asado',kcal:455,note:'Más sabor'},
-    {name:'Crema calabacín + ternera plancha + gelatina',kcal:448,note:'Caliente'},
-    {name:'Ensalada + hamburguesa ternera (100g) + maíz',kcal:445,note:'Hamburguesa sana'},
-    {name:'Ensalada + lomo bajo ternera + guisantes + gelatina',kcal:442,note:'Otro corte'},
-    {name:'Ensalada + ternera en salsa zanahoria + cuajada',kcal:452,note:'Con salsa'},
-    {name:'Ensalada + albóndigas ternera (3) + guisantes',kcal:448,note:'Albóndigas'},
-    {name:'Sopa caldo ternera + filete plancha + ensalada',kcal:445,note:'Reconfortante'}
-  ],
-  'cena-pavo-sesamo':[
-    {name:'Ensalada lechuga + tortilla pavo y sésamo + cuajada',kcal:408,note:'⭐ Sin canónigos'},
-    {name:'Ensalada + tortilla francesa + pavo + queso',kcal:400,note:'Con queso'},
-    {name:'Ensalada + pechuga + huevo cocido + yogur',kcal:405,note:'Proteína doble'},
-    {name:'Ensalada + tortilla de claras + queso + pavo',kcal:395,note:'Alta proteína'},
-    {name:'Ensalada + revuelto pavo + pimiento + cuajada',kcal:412,note:'Revuelto'},
-    {name:'Crema zanahoria + tortilla + gelatina',kcal:408,note:'Caliente'},
-    {name:'Ensalada + tortilla de verduras + requesón',kcal:405,note:'Vegetariana'},
-    {name:'Ensalada + tortilla atún + maíz + yogur',kcal:415,note:'Con atún'},
-    {name:'Ensalada + revuelto jamón + huevo + cuajada',kcal:412,note:'Con jamón'},
-    {name:'Ensalada + tortilla de maíz + queso fresco',kcal:408,note:'Con maíz'}
-  ],
-  'cena-cerdo':[
-    {name:'Ensalada lechuga + lomo cerdo + zanahoria + gelatina',kcal:458,note:'⭐ Sin champiñones'},
-    {name:'Ensalada + solomillo cerdo + pimiento asado',kcal:450,note:'Con pimiento'},
-    {name:'Ensalada + pollo + calabacín + cuajada',kcal:420,note:'Con pollo'},
-    {name:'Ensalada + secreto ibérico plancha + guisantes',kcal:465,note:'Ibérico'},
-    {name:'Ensalada + chuleta cerdo magra + pimiento + maíz',kcal:458,note:'Chuleta'},
-    {name:'Crema calabaza + lomo cerdo + gelatina',kcal:462,note:'Caliente'},
-    {name:'Ensalada + filete cerdo + manzana asada',kcal:455,note:'Dulce-salado'},
-    {name:'Ensalada + cinta lomo + guisantes + gelatina',kcal:448,note:'Ligero'},
-    {name:'Ensalada + cerdo al pimentón + zanahoria',kcal:460,note:'Con pimentón'},
-    {name:'Ensalada + ternera + guisantes + gelatina',kcal:445,note:'Cambio a ternera'}
-  ],
-  'cena-salteado':[
-    {name:'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada',kcal:428,note:'⭐ Sin champiñones'},
-    {name:'Ensalada + pollo wok + zanahoria + salsa soja',kcal:420,note:'Asiático'},
-    {name:'Ensalada + pavo salteado + calabacín + cuajada',kcal:410,note:'Con pavo'},
-    {name:'Ensalada + huevos revueltos + pimiento + maíz',kcal:400,note:'Sin carne'},
-    {name:'Ensalada + salteado ternera + zanahoria + salsa soja',kcal:435,note:'Con ternera'},
-    {name:'Ensalada + lomo cerdo salteado + pimiento + cebolla',kcal:430,note:'Con cerdo'},
-    {name:'Ensalada + pavo salteado + guisantes + yogur',kcal:418,note:'Ligero'},
-    {name:'Crema verduras + salteado pollo + gelatina',kcal:428,note:'Caliente'},
-    {name:'Ensalada + salteado cerdo + pimiento + cuajada',kcal:432,note:'Con cerdo'},
-    {name:'Ensalada + salteado pollo + maíz + cebolla + cuajada',kcal:425,note:'Variante'}
-  ]
-};
+    const STORAGE_KEY = 'plan-dietetico-checks-v3';
+    const SWAP_KEY = 'plan-dietetico-swaps-v1';
+    function loadChecks() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch { return {}; } }
+    function saveChecks(d) { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); }
+    function loadSwaps() { try { return JSON.parse(localStorage.getItem(SWAP_KEY)) || {}; } catch { return {}; } }
+    function saveSwaps(d) { localStorage.setItem(SWAP_KEY, JSON.stringify(d)); }
 
-// ═══════════════════════════════════════════════════════
-// RECETAS CON CANTIDADES
-// ═══════════════════════════════════════════════════════
-const recipes = {
-  'Porridge leche sin lactosa + manzana + canela':{
-    kcal:310,proteina:10,carbs:52,grasa:8,
-    ingredients:[
-      {name:'Avena en copos',qty:'60g'},
-      {name:'Leche sin lactosa',qty:'250ml'},
-      {name:'Manzana',qty:'1 mediana (150g)'},
-      {name:'Canela',qty:'1 cucharadita'},
-      {name:'Miel (opcional)',qty:'1 cucharadita'}
-    ],
-    steps:[
-      'Pon la leche en un cazo a fuego medio.',
-      'Añade la avena y remueve constantemente durante 5 min hasta que espese.',
-      'Pela y trocea la manzana en dados pequeños.',
-      'Sirve el porridge en un bol, pon la manzana encima y espolvorea canela.',
-      'Añade miel si quieres más dulzor.'
-    ]
-  },
-  'Espaguetis boloñesa ternera + zanahoria + cebolla':{
-    kcal:548,proteina:38,carbs:62,grasa:12,
-    ingredients:[
-      {name:'Espaguetis',qty:'80g (en seco)'},
-      {name:'Carne picada de ternera',qty:'150g'},
-      {name:'Cebolla',qty:'1/2 mediana'},
-      {name:'Zanahoria',qty:'1 pequeña'},
-      {name:'Tomate frito casero',qty:'3 cdas'},
-      {name:'Aceite oliva',qty:'1 cda'},
-      {name:'Sal y pimienta',qty:'al gusto'}
-    ],
-    steps:[
-      'Cuece los espaguetis en agua con sal según instrucciones del paquete (8-10 min).',
-      'Pica la cebolla y zanahoria en daditos pequeños.',
-      'Sofríe cebolla y zanahoria en aceite a fuego medio 5 min.',
-      'Añade la carne picada, salpimenta y cocina hasta que cambie de color (5 min).',
-      'Incorpora el tomate frito y mezcla bien. Cocina 5 min más.',
-      'Escurre la pasta y mezcla con la salsa boloñesa.'
-    ]
-  },
-  'Pasta + huevos + jamón york + queso (carbonara)':{
-    kcal:545,proteina:32,carbs:60,grasa:16,
-    ingredients:[
-      {name:'Pasta (espaguetis o macarrones)',qty:'80g (en seco)'},
-      {name:'Huevos',qty:'2 unidades'},
-      {name:'Jamón york',qty:'80g'},
-      {name:'Queso parmesano rallado',qty:'20g'},
-      {name:'Pimienta negra',qty:'al gusto'},
-      {name:'Sal',qty:'al gusto'}
-    ],
-    steps:[
-      'Cuece la pasta en agua con sal. Reserva un vaso del agua de cocción.',
-      'Bate los huevos con el queso rallado y pimienta en un bol.',
-      'Trocea el jamón york en daditos.',
-      'Escurre la pasta (no del todo) y apaga el fuego.',
-      'Añade los huevos batidos fuera del fuego y mezcla rápido añadiendo agua de cocción poco a poco.',
-      'Incorpora el jamón york y sirve inmediatamente.'
-    ]
-  },
-  'Macarrones al queso ligero':{
-    kcal:478,proteina:22,carbs:65,grasa:14,
-    ingredients:[
-      {name:'Macarrones',qty:'80g (en seco)'},
-      {name:'Queso crema light',qty:'60g'},
-      {name:'Queso rallado (mozzarella o gouda)',qty:'30g'},
-      {name:'Leche sin lactosa',qty:'50ml'},
-      {name:'Sal y pimienta',qty:'al gusto'}
-    ],
-    steps:[
-      'Cuece los macarrones en agua con sal 8-10 min. Escurre.',
-      'En el mismo cazo a fuego bajo, mezcla queso crema + leche hasta que se integre.',
-      'Añade los macarrones escurridos y mezcla bien.',
-      'Salpimenta al gusto.',
-      'Sirve con queso rallado por encima.'
-    ]
-  },
-  'Arroz integral + pollo + pimiento + zanahoria':{
-    kcal:450,proteina:34,carbs:52,grasa:8,
-    ingredients:[
-      {name:'Arroz integral',qty:'70g (en seco)'},
-      {name:'Pechuga de pollo',qty:'150g'},
-      {name:'Pimiento rojo',qty:'1/2 unidad'},
-      {name:'Zanahoria',qty:'1 pequeña'},
-      {name:'Aceite oliva',qty:'1 cda'},
-      {name:'Sal y especias',qty:'al gusto'}
-    ],
-    steps:[
-      'Cuece el arroz integral según instrucciones (20-25 min).',
-      'Corta el pollo en tiras y el pimiento y zanahoria en juliana.',
-      'Saltea el pimiento y zanahoria en aceite 3-4 min.',
-      'Añade el pollo, salpimenta y cocina hasta que esté hecho (6-8 min).',
-      'Mezcla con el arroz cocido y sirve.'
-    ]
-  },
-  'Ensalada lechuga + merluza plancha + zanahoria + gelatina':{
-    kcal:378,proteina:38,carbs:18,grasa:10,
-    ingredients:[
-      {name:'Merluza (filete)',qty:'180g'},
-      {name:'Lechuga',qty:'100g'},
-      {name:'Zanahoria',qty:'1 pequeña rallada'},
-      {name:'Maíz dulce',qty:'2 cdas'},
-      {name:'Aceite oliva',qty:'1 cda'},
-      {name:'Limón',qty:'unas gotas'},
-      {name:'Gelatina 0%',qty:'1 unidad'}
-    ],
-    steps:[
-      'Lava y trocea la lechuga. Ralla la zanahoria.',
-      'Monta la ensalada con lechuga, zanahoria y maíz. Aliña con aceite y limón.',
-      'Cocina la merluza a la plancha con sal 3-4 min por cada lado.',
-      'Sirve la merluza encima de la ensalada.',
-      'Toma la gelatina de postre.'
-    ]
-  },
-  'Ensalada lechuga + maíz + solomillo pollo + cuajada':{
-    kcal:428,proteina:42,carbs:22,grasa:12,
-    ingredients:[
-      {name:'Solomillo de pollo',qty:'180g'},
-      {name:'Lechuga',qty:'100g'},
-      {name:'Maíz dulce',qty:'3 cdas'},
-      {name:'Aceite oliva',qty:'1 cda'},
-      {name:'Limón',qty:'unas gotas'},
-      {name:'Cuajada',qty:'1 unidad'},
-      {name:'Miel',qty:'1 cucharadita'}
-    ],
-    steps:[
-      'Lava y trocea la lechuga. Monta ensalada con lechuga y maíz. Aliña.',
-      'Corta el solomillo en medallones, salpimenta.',
-      'Cocina a la plancha 4-5 min por lado hasta que esté dorado.',
-      'Sirve el pollo encima de la ensalada.',
-      'Toma la cuajada con miel de postre.'
-    ]
-  },
-  'Bocadillo atún + lechuga + maíz':{
-    kcal:268,proteina:18,carbs:32,grasa:6,
-    ingredients:[
-      {name:'Pan integral (1/4 baguette o 2 rebanadas)',qty:'60g'},
-      {name:'Atún en conserva (escurrido)',qty:'80g'},
-      {name:'Lechuga',qty:'2 hojas'},
-      {name:'Maíz dulce',qty:'2 cdas'}
-    ],
-    steps:[
-      'Escurre bien el atún.',
-      'Abre el pan y pon hojas de lechuga en la base.',
-      'Añade el atún desmenuzado y el maíz.',
-      'Cierra el bocadillo y consume.'
-    ]
-  },
-  'Batido yogur desnatado + pera + melón':{
-    kcal:260,proteina:14,carbs:42,grasa:3,
-    ingredients:[
-      {name:'Yogur desnatado',qty:'200g'},
-      {name:'Pera',qty:'1 pequeña (120g)'},
-      {name:'Melón',qty:'150g'},
-      {name:'Hielo (opcional)',qty:'3-4 cubitos'}
-    ],
-    steps:[
-      'Pela y trocea la pera y el melón.',
-      'Pon todos los ingredientes en la batidora.',
-      'Tritura hasta obtener textura homogénea.',
-      'Sirve frío. Añade hielo si quieres más fresco.'
-    ]
-  },
-  'Ensalada lechuga + maíz + tortilla francesa + cuajada':{
-    kcal:418,proteina:26,carbs:28,grasa:18,
-    ingredients:[
-      {name:'Huevos',qty:'3 unidades'},
-      {name:'Lechuga',qty:'100g'},
-      {name:'Maíz dulce',qty:'3 cdas'},
-      {name:'Aceite oliva',qty:'1 cda'},
-      {name:'Cuajada',qty:'1 unidad'},
-      {name:'Miel',qty:'1 cucharadita'},
-      {name:'Sal',qty:'al gusto'}
-    ],
-    steps:[
-      'Lava y trocea la lechuga. Monta ensalada con maíz y aliña.',
-      'Bate los huevos con una pizca de sal.',
-      'Calienta aceite en sartén a fuego medio. Vierte los huevos.',
-      'Cuando los bordes cuajen, dobla la tortilla por la mitad.',
-      'Sirve tortilla con la ensalada. Cuajada con miel de postre.'
-    ]
-  }
-};
-
-// Función para obtener receta del nombre de comida
-function getRecipe(mealName) {
-  // Buscar coincidencia exacta
-  if (recipes[mealName]) return recipes[mealName];
-  // Buscar coincidencia parcial
-  for (const key of Object.keys(recipes)) {
-    if (mealName.includes(key) || key.includes(mealName.substring(0,20))) return recipes[key];
-  }
-  return null;
-}
-
-// ═══════════════════════════════════════════════════════
-// PLAN SEMANAL CON HORARIOS
-// ═══════════════════════════════════════════════════════
-// Horarios L-V: lev 5:30, trabajo 6:30, come 8h, almuerza 10h, comida 12h, comer 14h, sale 17h, cena 20h
-// Finde: Sábado trabaja 6-11:30 (lev 5h), Domingo lev 8:30-9h
-
-const planBase = [
-  { id:1, name:'Día 1', label:'Lunes', type:'entreno-opt', sched:'laboral',
-    activities:[{id:'gym',label:'Gym (opción 1)'},{id:'cardio',label:'Cardio'}],
-    meals:[
-      {slot:'Desayuno',time:'05:45',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
-      {slot:'Media mañana',time:'08:00',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
-      {slot:'Almuerzo',time:'10:00',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
-      {slot:'Comida',time:'12:00',name:'Pasta + atún + maíz + guisantes + aceite oliva',kcal:518,altKey:'comida-pasta-atun'},
-      {slot:'Merienda',time:'16:30',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + maíz + tortilla francesa + cuajada',kcal:418,altKey:'cena-tortilla'}
-    ]
-  },
-  { id:2, name:'Día 2', label:'Martes', type:'entreno-opt', sched:'laboral',
-    activities:[{id:'gym',label:'Gym (opción 1)'},{id:'cardio',label:'Cardio'}],
-    meals:[
-      {slot:'Desayuno',time:'05:45',name:'Batido yogur desnatado + pera + melón',kcal:260,altKey:'desayuno-batido'},
-      {slot:'Media mañana',time:'08:00',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
-      {slot:'Almuerzo',time:'10:00',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
-      {slot:'Comida',time:'12:00',name:'Espaguetis boloñesa ternera + zanahoria + cebolla',kcal:548,altKey:'comida-espaguetis'},
-      {slot:'Merienda',time:'16:30',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + merluza plancha + zanahoria + gelatina',kcal:378,altKey:'cena-merluza'}
-    ]
-  },
-  { id:3, name:'Día 3', label:'Miércoles', type:'padel', sched:'laboral',
-    activities:[{id:'padel',label:'Pádel'}],
-    meals:[
-      {slot:'Desayuno',time:'05:45',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,altKey:'desayuno-yogur-avena'},
-      {slot:'Media mañana',time:'08:00',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
-      {slot:'Almuerzo',time:'10:00',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
-      {slot:'Comida',time:'12:00',name:'Pasta + carne magra ternera + pimiento + cebolla',kcal:545,altKey:'comida-espaguetis'},
-      {slot:'Merienda pre-pádel',time:'16:30',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + maíz + solomillo pollo + cuajada',kcal:428,altKey:'cena-pollo'}
-    ]
-  },
-  { id:4, name:'Día 4', label:'Jueves', type:'entreno-opt', sched:'laboral',
-    activities:[{id:'gym',label:'Gym (opción 2)'},{id:'cardio',label:'Cardio'}],
-    meals:[
-      {slot:'Desayuno',time:'05:45',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
-      {slot:'Media mañana',time:'08:00',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
-      {slot:'Almuerzo',time:'10:00',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
-      {slot:'Comida',time:'12:00',name:'Arroz integral + pollo + pimiento + zanahoria',kcal:450,altKey:'comida-arroz'},
-      {slot:'Merienda pre-gym',time:'16:30',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + solomillo ternera + guisantes + gelatina',kcal:448,altKey:'cena-ternera'}
-    ]
-  },
-  { id:5, name:'Día 5', label:'Viernes', type:'entreno-opt', sched:'laboral',
-    activities:[{id:'gym',label:'Gym (opción 2)'},{id:'cardio',label:'Cardio'}],
-    meals:[
-      {slot:'Desayuno',time:'05:45',name:'Batido yogur desnatado + pera + melón',kcal:260,altKey:'desayuno-batido'},
-      {slot:'Media mañana',time:'08:00',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
-      {slot:'Almuerzo',time:'10:00',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
-      {slot:'Comida',time:'12:00',name:'Macarrones al queso ligero',kcal:478,altKey:'comida-macarrones'},
-      {slot:'Merienda pre-gym',time:'16:30',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + tortilla pavo y sésamo + cuajada',kcal:408,altKey:'cena-pavo-sesamo'}
-    ]
-  },
-  { id:6, name:'Día 6', label:'Sábado', type:'rest', sched:'sabado',
-    activities:[],
-    meals:[
-      {slot:'Desayuno',time:'05:15',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,altKey:'desayuno-yogur-avena'},
-      {slot:'Media mañana',time:'08:00',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
-      {slot:'Post-trabajo',time:'11:45',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
-      {slot:'Comida',time:'14:00',name:'Pasta + pollo + queso parmesano',kcal:472,altKey:'comida-macarrones'},
-      {slot:'Merienda',time:'17:00',name:'Albaricoques',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + lomo cerdo + zanahoria + gelatina',kcal:458,altKey:'cena-cerdo'}
-    ]
-  },
-  { id:7, name:'Día 7', label:'Domingo', type:'rest', sched:'domingo',
-    activities:[],
-    meals:[
-      {slot:'Desayuno',time:'09:00',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
-      {slot:'Almuerzo',time:'11:30',name:'Bocadillo hummus + pimiento asado',kcal:230,altKey:'tentempie-hummus'},
-      {slot:'Comida',time:'14:00',name:'Pasta + huevos + jamón york (carbonara ligera)',kcal:545,altKey:'comida-espaguetis'},
-      {slot:'Merienda',time:'17:00',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada',kcal:428,altKey:'cena-salteado'}
-    ]
-  }
-];
-
-planBase.forEach(d => { d.totalKcal = d.meals.reduce((s,m) => s + m.kcal, 0); });
-
-// ═══════════════════════════════════════════════════════
-// RELOJ
-// ═══════════════════════════════════════════════════════
-const diasSemana=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-const meses=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-function updateClock(){
-  const now=new Date();
-  document.getElementById('clock-date').textContent=`${diasSemana[now.getDay()]}, ${now.getDate()} de ${meses[now.getMonth()]} de ${now.getFullYear()}`;
-  const h=String(now.getHours()).padStart(2,'0'),m=String(now.getMinutes()).padStart(2,'0'),s=String(now.getSeconds()).padStart(2,'0');
-  document.getElementById('clock-time').innerHTML=`${h}:${m}:<span>${s}</span>`;
-}
-updateClock(); setInterval(updateClock,1000);
-
-// ═══════════════════════════════════════════════════════
-// STORAGE
-// ═══════════════════════════════════════════════════════
-const STORAGE_KEY='plan-dietetico-checks-v3';
-const SWAP_KEY='plan-dietetico-swaps-v1';
-function loadChecks(){try{return JSON.parse(localStorage.getItem(STORAGE_KEY))||{};}catch{return {};}}
-function saveChecks(d){localStorage.setItem(STORAGE_KEY,JSON.stringify(d));}
-function loadSwaps(){try{return JSON.parse(localStorage.getItem(SWAP_KEY))||{};}catch{return {};}}
-function saveSwaps(d){localStorage.setItem(SWAP_KEY,JSON.stringify(d));}
-
-// ═══════════════════════════════════════════════════════
-// RENDER SEMANA
-// ═══════════════════════════════════════════════════════
-function renderWeek(){
-  const checks=loadChecks(),swaps=loadSwaps();
-  const grid=document.getElementById('week-grid');
-  const today=new Date().getDay();
-  const dayMap={1:1,2:2,3:3,4:4,5:5,6:6,7:0};
-  grid.innerHTML='';
-  planBase.forEach(day=>{
-    const isToday=dayMap[day.id]===today;
-    const card=document.createElement('div');
-    card.className=`day-card${isToday?' today':''}`;
-    let badges=day.type==='entreno-opt'?'<span class="badge badge-entreno">Entreno</span>':day.type==='padel'?'<span class="badge badge-padel">Pádel</span>':'';
-    let actHtml=day.activities.length?'<div class="activity-row">'+day.activities.map(act=>{
-      const key=`act-${day.id}-${act.id}`,done=!!checks[key];
-      return `<span class="activity-chip${act.id==='cardio'?' cardio':''}${done?' done':''}" data-key="${key}">${act.label}</span>`;
-    }).join('')+'</div>':'';
-    let dayKcal=0;
-    const mealsHtml=day.meals.map((meal,idx)=>{
-      const key=`${day.id}-${idx}`,done=!!checks[key],swap=swaps[key];
-      const displayName=swap?swap.name:meal.name,displayKcal=swap?swap.kcal:meal.kcal;
-      dayKcal+=displayKcal;
-      return `<div class="meal${done?' done':''}" data-key="${key}">
-        <div class="meal-check" data-check-key="${key}"></div>
-        <div class="meal-info">
-          <div class="meal-slot">
-            <span>${meal.slot}</span>
-            <span style="display:flex;gap:0.35rem;align-items:center">
-              <span class="meal-time">🕐 ${meal.time}</span>
-              <span class="meal-kcal-tag">${displayKcal}kcal</span>
-            </span>
+    function renderWeek() {
+      const checks = loadChecks(), swaps = loadSwaps();
+      const grid = document.getElementById('week-grid');
+      const today = new Date().getDay();
+      const dayMap = {1:1,2:2,3:3,4:4,5:5,6:6,7:0};
+      grid.innerHTML = '';
+      plan.forEach(day => {
+        const isToday = dayMap[day.id] === today;
+        const card = document.createElement('div');
+        card.className = `day-card${isToday ? ' today' : ''}`;
+        let badges = day.type === 'entreno-opt' ? '<span class="badge badge-entreno">Entreno posible</span>' : day.type === 'padel' ? '<span class="badge badge-padel">Pádel</span>' : '';
+        let actHtml = day.activities.length ? '<div class="activity-row">' + day.activities.map(act => {
+          const key = `act-${day.id}-${act.id}`, done = !!checks[key];
+          return `<span class="activity-chip${act.id==='cardio'?' cardio':''}${done?' done':''}" data-key="${key}">${act.label}</span>`;
+        }).join('') + '</div>' : '';
+        let dayKcal = 0;
+        const mealsHtml = day.meals.map((meal, idx) => {
+          const key = `${day.id}-${idx}`, done = !!checks[key], swap = swaps[key];
+          const displayName = swap ? swap.name : meal.name, displayKcal = swap ? swap.kcal : meal.kcal;
+          dayKcal += displayKcal;
+          return `<div class="meal${done?' done':''}" data-key="${key}">
+            <div class="meal-check" data-check-key="${key}"></div>
+            <div class="meal-info">
+              <div class="meal-slot"><span>${meal.slot}</span><span class="meal-kcal-tag">${displayKcal} kcal</span></div>
+              <div class="meal-name">${displayName}</div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:0.25rem;flex-shrink:0;margin-top:1px">
+            <button class="btn-similar" data-day="${day.id}" data-idx="${idx}" data-alt="${meal.altKey}" title="10 opciones">≈</button>
+            <button class="btn-recipe" data-name="${displayName}" title="Ver receta con cantidades">📋</button>
           </div>
-          <div class="meal-name">${displayName}</div>
-        </div>
-        <div class="meal-btns">
-          <button class="btn-similar" data-day="${day.id}" data-idx="${idx}" data-alt="${meal.altKey}" title="10 opciones">≈</button>
-          <button class="btn-recipe" data-day="${day.id}" data-idx="${idx}" data-name="${displayName}" title="Ver receta">📋</button>
-        </div>
-      </div>`;
-    }).join('');
-    const headerClass=day.type==='entreno-opt'?'entreno-opt':day.type==='padel'?'padel':'';
-    card.innerHTML=`<div class="day-header ${headerClass}">
-      <div class="day-name">${day.name} ${badges}</div>
-      <div class="day-label">${day.label}</div>
-      <div class="day-kcal">~${dayKcal} kcal totales</div>
-      ${actHtml}
-    </div><div class="meals">${mealsHtml}</div>`;
-    grid.appendChild(card);
-  });
+          </div>`;
+        }).join('');
+        const headerClass = day.type === 'entreno-opt' ? 'entreno-opt' : day.type === 'padel' ? 'padel' : '';
+        card.innerHTML = `<div class="day-header ${headerClass}">
+          <div class="day-name">${day.name} ${badges}</div>
+          <div class="day-label">${day.label}</div>
+          <div class="day-kcal">~${dayKcal} kcal totales</div>
+          ${actHtml}
+        </div><div class="meals">${mealsHtml}</div>`;
+        grid.appendChild(card);
+      });
+      document.querySelectorAll('.meal-check').forEach(el => {
+        el.addEventListener('click', e => {
+          e.stopPropagation();
+          const checks = loadChecks(); checks[el.dataset.checkKey] = !checks[el.dataset.checkKey];
+          saveChecks(checks); el.closest('.meal').classList.toggle('done'); updateProgress();
+        });
+      });
+      document.querySelectorAll('.activity-chip').forEach(el => {
+        el.addEventListener('click', e => {
+          e.stopPropagation();
+          const checks = loadChecks(); checks[el.dataset.key] = !checks[el.dataset.key];
+          saveChecks(checks); el.classList.toggle('done'); updateProgress();
+        });
+      });
+      document.querySelectorAll('.btn-similar').forEach(btn => {
+        btn.addEventListener('click', e => { e.stopPropagation(); openModal(+btn.dataset.day, +btn.dataset.idx, btn.dataset.alt); });
+      });
+      document.querySelectorAll('.btn-recipe').forEach(btn => {
+        btn.addEventListener('click', e => { e.stopPropagation(); openModalRecipe(btn.dataset.name); });
+      });
+      updateProgress();
+    }
 
-  document.querySelectorAll('.meal-check').forEach(el=>{
-    el.addEventListener('click',e=>{
-      e.stopPropagation();
-      const checks=loadChecks();checks[el.dataset.checkKey]=!checks[el.dataset.checkKey];
-      saveChecks(checks);el.closest('.meal').classList.toggle('done');updateProgress();
+    function openModal(dayId, mealIdx, altKey) {
+      const day = plan.find(d => d.id === dayId), meal = day.meals[mealIdx];
+      const alts = alternatives[altKey] || [], swaps = loadSwaps();
+      const key = `${dayId}-${mealIdx}`, current = swaps[key];
+      document.getElementById('modal-title').textContent = meal.slot + ' · 10 opciones';
+      document.getElementById('modal-subtitle').textContent = `~${meal.kcal} kcal · sin alimentos que no te gustan`;
+      const list = document.getElementById('alt-list');
+      list.innerHTML = alts.map((alt, i) => {
+        const isActive = current ? current.name === alt.name : i === 0;
+        return `<div class="alt-item${isActive?' active':''}" data-i="${i}">
+          <div class="alt-name">${alt.name}</div>
+          <div class="alt-meta"><span class="alt-kcal">${alt.kcal} kcal</span><span>${alt.note}</span></div>
+        </div>`;
+      }).join('');
+      list.querySelectorAll('.alt-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const alt = alts[+item.dataset.i], swaps = loadSwaps(), k = `${dayId}-${mealIdx}`;
+          if (+item.dataset.i === 0) { delete swaps[k]; } else { swaps[k] = {name: alt.name, kcal: alt.kcal}; }
+          saveSwaps(swaps); closeModal(); renderWeek();
+        });
+      });
+      document.getElementById('modal').classList.add('open');
+    }
+
+    function closeModal() { document.getElementById('modal').classList.remove('open'); }
+    document.getElementById('modal-close').addEventListener('click', closeModal);
+    document.getElementById('modal').addEventListener('click', e => { if (e.target.id === 'modal') closeModal(); });
+
+    function updateProgress() {
+      const checks = loadChecks();
+      const total = 42 + plan.reduce((a,d) => a + d.activities.length, 0);
+      const done = Object.values(checks).filter(Boolean).length;
+      document.getElementById('progress-text').textContent = `${done} / ${total}`;
+      document.getElementById('progress-fill').style.width = `${total ? Math.round(done/total*100) : 0}%`;
+    }
+
+    document.getElementById('reset-btn').addEventListener('click', () => {
+      if (confirm('¿Reiniciar marcas de comidas, actividades y cambios de menú?')) {
+        localStorage.removeItem(STORAGE_KEY); localStorage.removeItem(SWAP_KEY); renderWeek();
+      }
     });
-  });
-  document.querySelectorAll('.activity-chip').forEach(el=>{
-    el.addEventListener('click',e=>{
-      e.stopPropagation();
-      const checks=loadChecks();checks[el.dataset.key]=!checks[el.dataset.key];
-      saveChecks(checks);el.classList.toggle('done');updateProgress();
-    });
-  });
-  document.querySelectorAll('.btn-similar').forEach(btn=>{
-    btn.addEventListener('click',e=>{e.stopPropagation();openModalSimilar(+btn.dataset.day,+btn.dataset.idx,btn.dataset.alt);});
-  });
-  document.querySelectorAll('.btn-recipe').forEach(btn=>{
-    btn.addEventListener('click',e=>{e.stopPropagation();openModalRecipe(+btn.dataset.day,+btn.dataset.idx,btn.dataset.name);});
-  });
-  updateProgress();
-}
 
-// ═══════════════════════════════════════════════════════
-// MODAL OPCIONES SIMILARES
-// ═══════════════════════════════════════════════════════
-function openModalSimilar(dayId,mealIdx,altKey){
-  const day=planBase.find(d=>d.id===dayId),meal=day.meals[mealIdx];
-  const alts=alternatives[altKey]||[],swaps=loadSwaps();
-  const key=`${dayId}-${mealIdx}`,current=swaps[key];
-  document.getElementById('modal-title').textContent=meal.slot+' · 10 opciones';
-  document.getElementById('modal-subtitle').textContent=`~${meal.kcal} kcal · sin alimentos que no te gustan`;
-  const list=document.getElementById('alt-list');
-  list.innerHTML=alts.map((alt,i)=>{
-    const isActive=current?current.name===alt.name:i===0;
-    return `<div class="alt-item${isActive?' active':''}" data-i="${i}">
-      <div class="alt-name">${alt.name}</div>
-      <div class="alt-meta"><span class="alt-kcal">${alt.kcal} kcal</span><span>${alt.note}</span></div>
-    </div>`;
-  }).join('');
-  list.querySelectorAll('.alt-item').forEach(item=>{
-    item.addEventListener('click',()=>{
-      const alt=alts[+item.dataset.i],swaps=loadSwaps(),k=`${dayId}-${mealIdx}`;
-      if(+item.dataset.i===0){delete swaps[k];}else{swaps[k]={name:alt.name,kcal:alt.kcal};}
-      saveSwaps(swaps);closeModalSimilar();renderWeek();
-    });
-  });
-  document.getElementById('modal-similar').classList.add('open');
-}
-function closeModalSimilar(){document.getElementById('modal-similar').classList.remove('open');}
-document.getElementById('modal-close-similar').addEventListener('click',closeModalSimilar);
-document.getElementById('modal-similar').addEventListener('click',e=>{if(e.target.id==='modal-similar')closeModalSimilar();});
-
-// ═══════════════════════════════════════════════════════
-// MODAL RECETA
-// ═══════════════════════════════════════════════════════
-function openModalRecipe(dayId,mealIdx,mealName){
-  const day=planBase.find(d=>d.id===dayId),meal=day.meals[mealIdx];
-  const swaps=loadSwaps(),key=`${dayId}-${mealIdx}`;
-  const displayName=swaps[key]?swaps[key].name:meal.name;
-  const recipe=getRecipe(displayName);
-
-  document.getElementById('recipe-title').textContent=displayName;
-  document.getElementById('recipe-subtitle').textContent='Cantidades para 1 persona';
-
-  const content=document.getElementById('recipe-content');
-  if(!recipe){
-    content.innerHTML=`<p style="color:var(--text-muted);font-size:0.85rem;padding:1rem 0">Receta no disponible aún para esta opción. Cambia a otra comida o espera la próxima actualización.</p>`;
-  } else {
-    const macsHtml=`<div class="recipe-macros">
-      <div class="macro-chip">Kcal: <span>${recipe.kcal}</span></div>
-      <div class="macro-chip">Proteína: <span>${recipe.proteina}g</span></div>
-      <div class="macro-chip">Carbos: <span>${recipe.carbs}g</span></div>
-      <div class="macro-chip">Grasa: <span>${recipe.grasa}g</span></div>
-    </div>`;
-    const ingHtml=recipe.ingredients.map(i=>`<div class="recipe-ing"><span>${i.name}</span><span class="recipe-ing-qty">${i.qty}</span></div>`).join('');
-    const stepsHtml=recipe.steps.map((s,i)=>`<div class="recipe-step"><div class="step-num">${i+1}</div><div class="step-text">${s}</div></div>`).join('');
-    content.innerHTML=`
-      ${macsHtml}
-      <div class="recipe-section" style="margin-top:1rem"><h4>🛒 Ingredientes</h4><div class="recipe-ingredients">${ingHtml}</div></div>
-      <div class="recipe-section"><h4>👨‍🍳 Preparación</h4><div class="recipe-steps">${stepsHtml}</div></div>
-    `;
-  }
-  document.getElementById('modal-recipe').classList.add('open');
-}
-function closeModalRecipe(){document.getElementById('modal-recipe').classList.remove('open');}
-document.getElementById('modal-close-recipe').addEventListener('click',closeModalRecipe);
-document.getElementById('modal-recipe').addEventListener('click',e=>{if(e.target.id==='modal-recipe')closeModalRecipe();});
-
-// ═══════════════════════════════════════════════════════
-// PROGRESO
-// ═══════════════════════════════════════════════════════
-function updateProgress(){
-  const checks=loadChecks();
-  const total=planBase.reduce((a,d)=>a+d.meals.length+d.activities.length,0);
-  const done=Object.values(checks).filter(Boolean).length;
-  document.getElementById('progress-text').textContent=`${done} / ${total}`;
-  document.getElementById('progress-fill').style.width=`${total?Math.round(done/total*100):0}%`;
-}
-
-document.getElementById('reset-btn').addEventListener('click',()=>{
-  if(confirm('¿Reiniciar marcas de comidas, actividades y cambios de menú?')){
-    localStorage.removeItem(STORAGE_KEY);localStorage.removeItem(SWAP_KEY);renderWeek();
-  }
-});
-
-// ═══════════════════════════════════════════════════════
-// INIT
-// ═══════════════════════════════════════════════════════
-initStats();
-renderWeek();
-</script>
+    renderWeek();
+  </script>
 </body>
 </html>
+
