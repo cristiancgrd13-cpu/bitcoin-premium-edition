@@ -73,6 +73,7 @@
     .meal-name { font-size: 0.76rem; font-weight: 500; line-height: 1.3; }
     .btn-similar { flex-shrink: 0; margin-top: 1px; background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.6rem; font-weight: 600; padding: 0.18rem 0.4rem; border-radius: 5px; cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
     .btn-similar:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+    .meal-slot-time { color: #c084fc; font-size: 0.6rem; font-weight: 600; }
     .meal-btns { display: flex; flex-direction: column; gap: 0.25rem; flex-shrink: 0; margin-top: 1px; }
     .btn-recipe { background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 0.58rem; font-weight: 600; padding: 0.15rem 0.38rem; border-radius: 5px; cursor: pointer; font-family: inherit; transition: all 0.15s; white-space: nowrap; }
     .btn-recipe:hover { border-color: var(--purple, #c084fc); color: var(--purple, #c084fc); background: rgba(192,132,252,0.1); }
@@ -511,78 +512,78 @@
       { id:1, name:'Día 1', label:'Lunes', type:'entreno-opt',
         activities:[{id:'gym',label:'Gym (opción 1)'},{id:'cardio',label:'Cardio'}],
         meals:[
-          {slot:'Desayuno',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
-          {slot:'Tentempié 1',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
-          {slot:'Tentempié 2',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
-          {slot:'Comida',name:'Pasta integral + atún + maíz + guisantes + aceite',kcal:518,altKey:'comida-pasta-atun'},
-          {slot:'Merienda',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
-          {slot:'Cena',name:'Ensalada lechuga + maíz + tortilla francesa + cuajada miel',kcal:418,altKey:'cena-tortilla'}
+          {slot:'Desayuno · 05:45h',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
+          {slot:'Media mañana · 08:00h',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
+          {slot:'Almuerzo · 10:00h',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
+          {slot:'Comida · 12:00h',name:'Pasta integral + atún + maíz + guisantes + aceite',kcal:518,altKey:'comida-pasta-atun'},
+          {slot:'Merienda · 16:30h',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena · 20:00h',name:'Ensalada lechuga + maíz + tortilla francesa + cuajada miel',kcal:418,altKey:'cena-tortilla'}
         ]
       },
       { id:2, name:'Día 2', label:'Martes', type:'entreno-opt',
         activities:[{id:'gym',label:'Gym (opción 1)'},{id:'cardio',label:'Cardio'}],
         meals:[
-          {slot:'Desayuno',name:'Batido yogur desnatado + pera + melón',kcal:260,altKey:'desayuno-batido'},
-          {slot:'Tentempié 1',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
-          {slot:'Tentempié 2',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
-          {slot:'Comida',name:'Espaguetis boloñesa ternera + zanahoria + cebolla',kcal:548,altKey:'comida-espaguetis'},
-          {slot:'Merienda',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
-          {slot:'Cena',name:'Ensalada lechuga + merluza plancha + zanahoria + gelatina',kcal:378,altKey:'cena-merluza'}
+          {slot:'Desayuno · 05:45h',name:'Batido yogur desnatado + pera + melón',kcal:260,altKey:'desayuno-batido'},
+          {slot:'Media mañana · 08:00h',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
+          {slot:'Almuerzo · 10:00h',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
+          {slot:'Comida · 12:00h',name:'Espaguetis boloñesa ternera + zanahoria + cebolla',kcal:548,altKey:'comida-espaguetis'},
+          {slot:'Merienda · 16:30h',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena · 20:00h',name:'Ensalada lechuga + merluza plancha + zanahoria + gelatina',kcal:378,altKey:'cena-merluza'}
         ]
       },
       { id:3, name:'Día 3', label:'Miércoles', type:'padel',
         activities:[{id:'padel',label:'Pádel'}],
         meals:[
-          {slot:'Desayuno',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,altKey:'desayuno-yogur-avena'},
-          {slot:'Tentempié 1',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
-          {slot:'Tentempié 2',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
-          {slot:'Comida',name:'Pasta + pollo + cebolla + pimiento salteado',kcal:518,altKey:'comida-pasta-atun'},
-          {slot:'Merienda',name:'Albaricoques',kcal:70,altKey:'merienda-fruta'},
-          {slot:'Cena',name:'Ensalada lechuga + maíz + solomillo pollo + cuajada',kcal:428,altKey:'cena-pollo'}
+          {slot:'Desayuno · 05:45h',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,altKey:'desayuno-yogur-avena'},
+          {slot:'Media mañana · 08:00h',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
+          {slot:'Almuerzo · 10:00h',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
+          {slot:'Comida · 12:00h',name:'Pasta + pollo + cebolla + pimiento salteado',kcal:518,altKey:'comida-pasta-atun'},
+          {slot:'Merienda · 16:30h',name:'Albaricoques',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena · 20:00h',name:'Ensalada lechuga + maíz + solomillo pollo + cuajada',kcal:428,altKey:'cena-pollo'}
         ]
       },
       { id:4, name:'Día 4', label:'Jueves', type:'entreno-opt',
         activities:[{id:'gym',label:'Gym (opción 2)'},{id:'cardio',label:'Cardio'}],
         meals:[
-          {slot:'Desayuno',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
-          {slot:'Tentempié 1',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
-          {slot:'Tentempié 2',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
-          {slot:'Comida',name:'Arroz + pollo + pimiento + zanahoria',kcal:450,altKey:'comida-arroz'},
-          {slot:'Merienda',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
-          {slot:'Cena',name:'Ensalada lechuga + solomillo ternera + guisantes + gelatina',kcal:448,altKey:'cena-ternera'}
+          {slot:'Desayuno · 05:45h',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
+          {slot:'Media mañana · 08:00h',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
+          {slot:'Almuerzo · 10:00h',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
+          {slot:'Comida · 12:00h',name:'Arroz + pollo + pimiento + zanahoria',kcal:450,altKey:'comida-arroz'},
+          {slot:'Merienda · 16:30h',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena · 20:00h',name:'Ensalada lechuga + solomillo ternera + guisantes + gelatina',kcal:448,altKey:'cena-ternera'}
         ]
       },
       { id:5, name:'Día 5', label:'Viernes', type:'entreno-opt',
         activities:[{id:'gym',label:'Gym (opción 2)'},{id:'cardio',label:'Cardio'}],
         meals:[
-          {slot:'Desayuno',name:'Batido yogur desnatado + pera + melón',kcal:260,altKey:'desayuno-batido'},
-          {slot:'Tentempié 1',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
-          {slot:'Tentempié 2',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
-          {slot:'Comida',name:'Macarrones al queso ligero + pollo desmenuzado',kcal:478,altKey:'comida-macarrones'},
-          {slot:'Merienda',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
-          {slot:'Cena',name:'Ensalada lechuga + tortilla pavo y sésamo + cuajada',kcal:408,altKey:'cena-pavo-sesamo'}
+          {slot:'Desayuno · 05:45h',name:'Batido yogur desnatado + pera + melón',kcal:260,altKey:'desayuno-batido'},
+          {slot:'Media mañana · 08:00h',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
+          {slot:'Almuerzo · 10:00h',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
+          {slot:'Comida · 12:00h',name:'Macarrones al queso ligero + pollo desmenuzado',kcal:478,altKey:'comida-macarrones'},
+          {slot:'Merienda · 16:30h',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena · 20:00h',name:'Ensalada lechuga + tortilla pavo y sésamo + cuajada',kcal:408,altKey:'cena-pavo-sesamo'}
         ]
       },
       { id:6, name:'Día 6', label:'Sábado', type:'rest',
         activities:[],
         meals:[
-          {slot:'Desayuno',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,altKey:'desayuno-yogur-avena'},
-          {slot:'Tentempié 1',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
-          {slot:'Tentempié 2',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
-          {slot:'Comida',name:'Pasta + pollo + pimiento asado + queso parmesano',kcal:472,altKey:'comida-macarrones'},
-          {slot:'Merienda',name:'Albaricoques',kcal:70,altKey:'merienda-fruta'},
-          {slot:'Cena',name:'Ensalada lechuga + lomo cerdo + zanahoria + gelatina',kcal:458,altKey:'cena-cerdo'}
+          {slot:'Desayuno · 05:15h',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,altKey:'desayuno-yogur-avena'},
+          {slot:'Media mañana · 08:00h',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
+          {slot:'Post-trabajo · 11:45h',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
+          {slot:'Comida · 14:00h',name:'Pasta + pollo + pimiento asado + queso parmesano',kcal:472,altKey:'comida-macarrones'},
+          {slot:'Merienda · 17:00h',name:'Albaricoques',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena · 20:00h',name:'Ensalada lechuga + lomo cerdo + zanahoria + gelatina',kcal:458,altKey:'cena-cerdo'}
         ]
       },
       { id:7, name:'Día 7', label:'Domingo', type:'rest',
         activities:[],
         meals:[
-          {slot:'Desayuno',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
-          {slot:'Tentempié 1',name:'Bocadillo hummus + pimiento asado',kcal:230,altKey:'tentempie-hummus'},
+          {slot:'Desayuno · 09:00h',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
+          {slot:'Almuerzo · 11:30h',name:'Bocadillo hummus + pimiento asado',kcal:230,altKey:'tentempie-hummus'},
           {slot:'Tentempié 2',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
-          {slot:'Comida',name:'Espaguetis + huevos + jamón york (carbonara ligera)',kcal:545,altKey:'comida-espaguetis'},
-          {slot:'Merienda',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
-          {slot:'Cena',name:'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada',kcal:428,altKey:'cena-salteado'}
+          {slot:'Comida · 14:00h',name:'Espaguetis + huevos + jamón york (carbonara ligera)',kcal:545,altKey:'comida-espaguetis'},
+          {slot:'Merienda · 17:00h',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
+          {slot:'Cena · 20:00h',name:'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada',kcal:428,altKey:'cena-salteado'}
         ]
       }
     ];
@@ -717,4 +718,3 @@
   </script>
 </body>
 </html>
-
