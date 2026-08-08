@@ -516,7 +516,7 @@
           {slot:'Media mañana · 08:00h',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
           {slot:'Almuerzo · 10:00h',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
           {slot:'Fruta · 12:00h',name:'Fruta de temporada (manzana / pera / naranja)',kcal:65,altKey:'merienda-fruta'},
-          {slot:'Comida · 14:00h',name:'Pasta + atún + maíz + guisantes + aceite oliva',kcal:518,altKey:'comida-pasta-atun'},
+          {slot:'Comida · 14:00h',name:'Pasta + atún + maíz + guisantes + aceite oliva',kcal:518,altKey:'comida-variada'},
           {slot:'Merienda · 16:30h',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
           {slot:'Cena · 20:00h',name:'Ensalada lechuga + maíz + tortilla francesa + cuajada miel',kcal:418,altKey:'cena-tortilla'}
         ]
@@ -528,7 +528,7 @@
           {slot:'Media mañana · 08:00h',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
           {slot:'Almuerzo · 10:00h',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
           {slot:'Fruta · 12:00h',name:'Fruta de temporada (cerezas / kiwi / naranja)',kcal:65,altKey:'merienda-fruta'},
-          {slot:'Comida · 14:00h',name:'Espaguetis boloñesa ternera + zanahoria + cebolla',kcal:548,altKey:'comida-espaguetis'},
+          {slot:'Comida · 14:00h',name:'Espaguetis boloñesa ternera + zanahoria + cebolla',kcal:548,altKey:'comida-variada'},
           {slot:'Merienda · 16:30h',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
           {slot:'Cena · 20:00h',name:'Ensalada lechuga + merluza plancha + zanahoria + gelatina',kcal:378,altKey:'cena-merluza'}
         ]
@@ -540,7 +540,7 @@
           {slot:'Media mañana · 08:00h',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
           {slot:'Almuerzo · 10:00h',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
           {slot:'Fruta · 12:00h',name:'Fruta de temporada (albaricoques / uvas / mandarina)',kcal:65,altKey:'merienda-fruta'},
-          {slot:'Comida · 14:00h',name:'Pasta + pollo + cebolla + pimiento salteado',kcal:518,altKey:'comida-pasta-atun'},
+          {slot:'Comida · 14:00h',name:'Pasta + pollo + cebolla + pimiento salteado',kcal:518,altKey:'comida-variada'},
           {slot:'Merienda · 16:30h',name:'Albaricoques',kcal:70,altKey:'merienda-fruta'},
           {slot:'Cena · 20:00h',name:'Ensalada lechuga + maíz + solomillo pollo + cuajada',kcal:428,altKey:'cena-pollo'}
         ]
@@ -552,7 +552,7 @@
           {slot:'Media mañana · 08:00h',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
           {slot:'Almuerzo · 10:00h',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
           {slot:'Fruta · 12:00h',name:'Fruta de temporada (manzana / pera / naranja)',kcal:65,altKey:'merienda-fruta'},
-          {slot:'Comida · 14:00h',name:'Arroz + pollo + pimiento + zanahoria',kcal:450,altKey:'comida-arroz'},
+          {slot:'Comida · 14:00h',name:'Arroz + pollo + pimiento + zanahoria',kcal:450,altKey:'comida-variada'},
           {slot:'Merienda · 16:30h',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
           {slot:'Cena · 20:00h',name:'Ensalada lechuga + solomillo ternera + guisantes + gelatina',kcal:448,altKey:'cena-ternera'}
         ]
@@ -564,7 +564,7 @@
           {slot:'Media mañana · 08:00h',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
           {slot:'Almuerzo · 10:00h',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
           {slot:'Fruta · 12:00h',name:'Fruta de temporada (cerezas / kiwi / naranja)',kcal:65,altKey:'merienda-fruta'},
-          {slot:'Comida · 14:00h',name:'Macarrones al queso ligero + pollo desmenuzado',kcal:478,altKey:'comida-macarrones'},
+          {slot:'Comida · 14:00h',name:'Macarrones al queso ligero + pollo desmenuzado',kcal:478,altKey:'comida-variada'},
           {slot:'Merienda · 16:30h',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
           {slot:'Cena · 20:00h',name:'Ensalada lechuga + tortilla pavo y sésamo + cuajada',kcal:408,altKey:'cena-pavo-sesamo'}
         ]
@@ -711,6 +711,29 @@
       'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada': { kcal:428, proteina:40, carbs:24, grasa:14,
         ingredients:[{name:'Pechuga de pollo',qty:'160g'},{name:'Pimiento rojo',qty:'1/2 unidad'},{name:'Cebolla',qty:'1/4 unidad'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'3 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Sal y especias',qty:'al gusto'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
         steps:['Lava y trocea la lechuga. Monta ensalada con maíz. Aliña.','Corta el pollo en tiras, pica pimiento y cebolla.','Saltea pimiento y cebolla 3 min en aceite.','Añade el pollo y cocina 6-8 min.','Sirve el salteado sobre la ensalada. Cuajada con miel.']},
+
+      'Ensalada pasta fría + atún + maíz + almendras': { kcal:480, proteina:28, carbs:58, grasa:14,
+        ingredients:[{name:'Pasta (espirales o lazos)',qty:'80g en seco'},{name:'Atún en conserva escurrido',qty:'120g'},{name:'Maíz dulce',qty:'3 cucharadas'},{name:'Almendras crudas',qty:'20g'},{name:'Lechuga',qty:'50g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Limón',qty:'unas gotas'},{name:'Sal',qty:'al gusto'}],
+        steps:['Cuece la pasta 8-10 min. Escurre y deja enfriar (o enfría con agua fría).','Escurre bien el atún.','En un bol mezcla pasta, atún, maíz y lechuga troceada.','Añade las almendras enteras o troceadas.','Aliña con aceite, limón y sal.','Sirve fría o a temperatura ambiente.']},
+      'Arroz basmati + hamburguesa ternera + cebolla caramelizada': { kcal:490, proteina:36, carbs:52, grasa:14,
+        ingredients:[{name:'Arroz basmati',qty:'70g en seco'},{name:'Carne picada de ternera',qty:'150g'},{name:'Cebolla',qty:'1 mediana'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Sal, pimienta y orégano',qty:'al gusto'}],
+        steps:['Cuece el arroz basmati 12 min en agua con sal. Escurre.','Corta la cebolla en juliana fina.','Sofríe la cebolla en aceite a fuego bajo 15-20 min hasta que dore y caramelice.','Forma una hamburguesa con la carne picada, salpimenta y añade orégano.','Cocina la hamburguesa a la plancha 4-5 min por lado.','Sirve la hamburguesa sobre el arroz con la cebolla caramelizada encima.']},
+      'Patata asada + pollo al horno + ensalada lechuga': { kcal:475, proteina:38, carbs:44, grasa:10,
+        ingredients:[{name:'Pechuga de pollo',qty:'180g'},{name:'Patata mediana',qty:'1 unidad (200g)'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Orégano y pimentón',qty:'al gusto'},{name:'Sal',qty:'al gusto'}],
+        steps:['Precalienta el horno a 200°C.','Lava la patata, pincha con un tenedor y envuelve en papel aluminio.','Pon la patata en el horno 45-50 min.','Aliña el pollo con aceite, sal, orégano y pimentón.','A los 25 min de la patata, mete el pollo al horno otros 20-25 min.','Monta la ensalada con lechuga y maíz. Aliña.','Sirve todo junto.']},
+      'Tortilla de patata y pimiento + ensalada lechuga': { kcal:470, proteina:22, carbs:42, grasa:20,
+        ingredients:[{name:'Huevos',qty:'3 unidades'},{name:'Patata mediana',qty:'1 unidad (200g)'},{name:'Pimiento rojo',qty:'1/2 unidad'},{name:'Cebolla',qty:'1/4 unidad'},{name:'Aceite de oliva',qty:'2 cucharadas'},{name:'Lechuga',qty:'80g'},{name:'Sal',qty:'al gusto'}],
+        steps:['Pela y corta la patata en láminas finas. Pica el pimiento y cebolla.','Pocha patata, pimiento y cebolla en aceite a fuego medio-bajo 15 min.','Escurre el aceite y mezcla con los huevos batidos y sal.','Vierte en sartén antiadherente a fuego medio. Cuaja 4 min por cada lado.','Deja reposar 2 min antes de cortar.','Sirve con ensalada de lechuga aliñada.']},
+      'Lasaña de carne al horno': { kcal:520, proteina:36, carbs:52, grasa:18,
+        ingredients:[{name:'Placas de lasaña (precocidas)',qty:'4 unidades'},{name:'Carne picada de ternera',qty:'150g'},{name:'Tomate frito casero',qty:'4 cucharadas'},{name:'Cebolla',qty:'1/4 unidad'},{name:'Bechamel light (brick)',qty:'100ml'},{name:'Queso rallado',qty:'25g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Sal y orégano',qty:'al gusto'}],
+        steps:['Precalienta el horno a 180°C.','Sofríe la cebolla picada en aceite 3 min. Añade la carne y cocina 5 min.','Incorpora el tomate frito y orégano. Cocina 3 min más.','En una fuente pequeña, pon una capa de bechamel, placas de lasaña, carne, placas, carne y termina con bechamel.','Cubre con queso rallado.','Hornea 20-25 min hasta que dore.']},
+      'Pollo al horno con patatas y cebolla': { kcal:480, proteina:40, carbs:38, grasa:14,
+        ingredients:[{name:'Muslo o contramuslo de pollo (sin piel)',qty:'200g'},{name:'Patata mediana',qty:'1 unidad (180g)'},{name:'Cebolla',qty:'1/2 mediana'},{name:'Pimiento rojo',qty:'1/2 unidad'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Pimentón dulce y orégano',qty:'al gusto'},{name:'Sal',qty:'al gusto'}],
+        steps:['Precalienta el horno a 200°C.','Corta la patata en gajos, la cebolla en tiras y el pimiento en trozos.','Pon las verduras en una fuente, aliña con aceite, sal y pimentón.','Coloca el pollo encima, aliña igual.','Hornea 35-40 min, dando la vuelta al pollo a mitad.','Sirve todo junto directamente de la fuente.']},
+      'Milanesa de pollo al horno + arroz': { kcal:485, proteina:40, carbs:50, grasa:12,
+        ingredients:[{name:'Pechuga de pollo fileteada',qty:'180g'},{name:'Pan rallado',qty:'30g'},{name:'Huevo',qty:'1 unidad'},{name:'Arroz',qty:'70g en seco'},{name:'Limón',qty:'unas gotas'},{name:'Sal y orégano',qty:'al gusto'},{name:'Aceite spray',qty:'al gusto'}],
+        steps:['Precalienta el horno a 200°C.','Cuece el arroz 15 min en agua con sal. Escurre.','Bate el huevo con sal y orégano.','Pasa el pollo por huevo y luego por pan rallado, presionando bien.','Pon el pollo en bandeja con papel de horno. Pulveriza con aceite spray.','Hornea 20 min, dando la vuelta a mitad para que dore por los dos lados.','Sirve con el arroz y unas gotas de limón.']}
+
       'Fruta de temporada': { kcal:65, proteina:1, carbs:15, grasa:0,
         ingredients:[{name:'Fruta de temporada',qty:'1 pieza mediana (150g)'}],
         steps:['Lava la fruta.','Consume entera o troceada.','Opciones: manzana, pera, naranja, mandarina, cerezas, melocotón.']}
@@ -873,3 +896,4 @@
   </script>
 </body>
 </html>
+
