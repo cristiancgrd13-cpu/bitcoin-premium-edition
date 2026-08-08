@@ -271,9 +271,10 @@ function loadAssets() {
     const saved = localStorage.getItem('portfolio_assets_v2');
     if (saved) { try { return JSON.parse(saved); } catch(e) {} }
     return {
-        btc: { type: 'crypto', coingeckoId: 'bitcoin',  name: 'Bitcoin',  symbol: 'BTC', icon: '₿', color: '#f97316', amount: 0.15073571, invested: 10999.48 },
-        eth: { type: 'crypto', coingeckoId: 'ethereum', name: 'Ethereum', symbol: 'ETH', icon: 'Ξ', color: '#818cf8', amount: 1.14237,    invested: 2868.77  },
-        sol: { type: 'crypto', coingeckoId: 'solana',   name: 'Solana',   symbol: 'SOL', icon: '◎', color: '#a855f7', amount: 5.89,       invested: 622.49   }
+        btc: { type: 'crypto', coingeckoId: 'bitcoin',  name: 'Bitcoin',  symbol: 'BTC', icon: '₿', color: '#f97316', amount: 0.15653971, invested: 11324.09 },
+        eth: { type: 'crypto', coingeckoId: 'ethereum', name: 'Ethereum', symbol: 'ETH', icon: 'Ξ', color: '#818cf8', amount: 1.14482,    invested: 2868.77  },
+        sol: { type: 'crypto', coingeckoId: 'solana',   name: 'Solana',   symbol: 'SOL', icon: '◎', color: '#a855f7', amount: 6.24,       invested: 601.29   },
+        usdc_sol: { type: 'crypto', coingeckoId: 'usd-coin', name: 'USDC-SOL', symbol: 'USDC', icon: '💵', color: '#2775ca', amount: 11.44, invested: 21.20 }
     };
 }
 let assets = loadAssets();
@@ -452,7 +453,6 @@ function updateAnnualChart() {
                     borderColor: borderColors,
                     borderWidth: 2,
                     borderRadius: 6,
-                    // barras estrechas fijas independientemente del número de años
                     barPercentage: 0.35,
                     categoryPercentage: 0.5
                 }]
@@ -691,8 +691,6 @@ function submitUpdateQty() {
     if (isNaN(newQty) || newQty <= 0) { alert('Introduce una cantidad válida.'); return; }
     const a = assets[key];
     const currentPrice = livePrices[a.coingeckoId] || 0;
-    // Solo actualiza la cantidad — la inversión en € NO cambia
-    // El precio medio se recalcula automáticamente: invested / newAmount
     a.amount = parseFloat(newQty.toFixed(8));
     saveAssets();
     closeModifyDetail();
