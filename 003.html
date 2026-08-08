@@ -35,21 +35,11 @@
 
     <!-- 2. MIS ACTIVOS -->
     <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-        <p class="text-amber-400 text-sm mb-2 text-center tracking-widest">MIS ACTIVOS</p>
-        <p id="last-saved-indicator" class="text-xs text-zinc-500 mb-4 text-center"></p>
-        <div id="empty-state-banner" class="hidden bg-red-500/10 border border-red-500/40 rounded-2xl p-4 mb-4 text-left">
-            <p class="text-sm font-semibold text-red-400 mb-1">⚠️ No se encontraron datos guardados en este navegador</p>
-            <p class="text-xs text-zinc-400">Esto pasa si cambiaste de navegador/dispositivo o si el navegador borró los datos locales. Importa tu último backup para recuperar tu portafolio.</p>
-        </div>
+        <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MIS ACTIVOS</p>
         <div id="assets-list" class="space-y-3"></div>
         <div class="flex gap-3 mt-4">
             <button onclick="openAddAssetModal()" class="flex-1 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-400 font-semibold rounded-2xl py-3 transition">+ Añadir activo</button>
             <button onclick="openEditAssetModal()" class="flex-1 bg-zinc-700/40 hover:bg-zinc-700/60 border border-zinc-600 text-zinc-300 font-semibold rounded-2xl py-3 transition">✎ Modificar activo</button>
-        </div>
-        <div class="flex gap-3 mt-3">
-            <button onclick="exportBackup()" class="flex-1 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/40 text-blue-400 font-semibold rounded-2xl py-3 transition">⬇ Exportar backup</button>
-            <button onclick="document.getElementById('import-file-input').click()" class="flex-1 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/40 text-blue-400 font-semibold rounded-2xl py-3 transition">⬆ Importar backup</button>
-            <input type="file" id="import-file-input" accept="application/json" class="hidden" onchange="importBackup(event)">
         </div>
     </div>
 
@@ -277,69 +267,17 @@ const ASSET_TYPE_META = {
     aave:           { type: 'crypto', name: 'Aave',        symbol: 'AAVE', coingeckoId: 'aave',        icon: '👻', color: '#b6509e' }
 };
 
-const STORAGE_KEY = 'portfolio_assets_v2';
-const STORAGE_KEY_TS = 'portfolio_assets_v2_saved_at';
-let dataFoundOnLoad = true;
-
 function loadAssets() {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (saved) {
-        try { return JSON.parse(saved); } catch(e) { console.error('Portfolio data corrupted', e); }
-    }
-    // No hay nada guardado en este navegador: NO devolvemos datos antiguos de ejemplo,
-    // porque eso es lo que causaba que "resucitaran" cifras viejas tras perderse el localStorage.
-    dataFoundOnLoad = false;
-    return {};
+    const saved = localStorage.getItem('portfolio_assets_v2');
+    if (saved) { try { return JSON.parse(saved); } catch(e) {} }
+    return {
+        btc: { type: 'crypto', coingeckoId: 'bitcoin',  name: 'Bitcoin',  symbol: 'BTC', icon: '₿', color: '#f97316', amount: 0.15073571, invested: 10999.48 },
+        eth: { type: 'crypto', coingeckoId: 'ethereum', name: 'Ethereum', symbol: 'ETH', icon: 'Ξ', color: '#818cf8', amount: 1.14237,    invested: 2868.77  },
+        sol: { type: 'crypto', coingeckoId: 'solana',   name: 'Solana',   symbol: 'SOL', icon: '◎', color: '#a855f7', amount: 5.89,       invested: 622.49   }
+    };
 }
 let assets = loadAssets();
-function saveAssets() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(assets));
-    localStorage.setItem(STORAGE_KEY_TS, new Date().toISOString());
-    updateSavedIndicator();
-}
-function updateSavedIndicator() {
-    const el = document.getElementById('last-saved-indicator');
-    if (!el) return;
-    const ts = localStorage.getItem(STORAGE_KEY_TS);
-    el.textContent = ts ? `Guardado localmente: ${new Date(ts).toLocaleString('es-ES')}` : 'Aún no se ha guardado nada en este navegador';
-}
-
-// ── BACKUP: EXPORTAR / IMPORTAR ───────────────────────────────────────────────
-function exportBackup() {
-    if (!Object.keys(assets).length) { alert('No hay datos que exportar todavía.'); return; }
-    const dataStr = JSON.stringify(assets, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    const stamp = new Date().toISOString().slice(0, 10);
-    a.href = url;
-    a.download = `portfolio-backup-${stamp}.json`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-}
-function importBackup(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const imported = JSON.parse(e.target.result);
-            if (typeof imported !== 'object' || imported === null) throw new Error('formato inválido');
-            if (!confirm('Esto reemplazará el portafolio actual de este navegador por el del backup. ¿Continuar?')) return;
-            assets = imported;
-            dataFoundOnLoad = true;
-            saveAssets();
-            updateAll();
-            alert('✅ Backup importado correctamente.');
-        } catch(err) {
-            alert('⚠️ El archivo no es un backup válido de este portafolio.');
-        }
-    };
-    reader.readAsText(file);
-    event.target.value = '';
-}
+function saveAssets() { localStorage.setItem('portfolio_assets_v2', JSON.stringify(assets)); }
 
 let livePrices = {};
 let pieChart = null;
@@ -376,13 +314,7 @@ async function fetchCryptoPrices() {
 
 function renderAssetsList() {
     const container = document.getElementById('assets-list');
-    const banner = document.getElementById('empty-state-banner');
     container.innerHTML = '';
-    if (!dataFoundOnLoad && Object.keys(assets).length === 0) {
-        banner.classList.remove('hidden');
-    } else {
-        banner.classList.add('hidden');
-    }
     Object.keys(assets).forEach(key => {
         const a = assets[key];
         const val = getAssetValue(key);
@@ -477,7 +409,6 @@ function updateAnnualChart() {
     const now = new Date();
     const totalInvertido = Object.values(assets).reduce((s, a) => s + a.invested, 0);
     const totalActual = Object.keys(assets).reduce((s, k) => s + getAssetValue(k), 0);
-    if (!totalInvertido) return;
 
     const startYear = PORTFOLIO_START.getFullYear();
     const currentYear = now.getFullYear();
@@ -521,6 +452,7 @@ function updateAnnualChart() {
                     borderColor: borderColors,
                     borderWidth: 2,
                     borderRadius: 6,
+                    // barras estrechas fijas independientemente del número de años
                     barPercentage: 0.35,
                     categoryPercentage: 0.5
                 }]
@@ -566,7 +498,7 @@ async function updateAll() {
         animateNumber(document.getElementById('total-value'), total);
         document.getElementById('inv-total-subtitle').textContent = `Sobre inversión total de ${fmtEUR(totalInvertido)}`;
         document.getElementById('promedio-total-invertido').textContent = fmtEUR(totalInvertido);
-        const totalPerf = totalInvertido ? ((total - totalInvertido) / totalInvertido * 100).toFixed(2) : '0.00';
+        const totalPerf = ((total - totalInvertido) / totalInvertido * 100).toFixed(2);
         const percEl = document.getElementById('percentage');
         percEl.textContent = (totalPerf >= 0 ? '+' : '') + totalPerf + '%';
         percEl.className = 'text-5xl font-bold ' + (totalPerf >= 0 ? 'text-emerald-400' : 'text-red-400');
@@ -701,18 +633,13 @@ function submitAddAsset() {
         assets[key].amount += qty; assets[key].invested += inv;
         if (assets[key].type !== 'crypto') assets[key].currentValue = (assets[key].currentValue ?? (assets[key].invested - inv)) + inv;
     } else {
-        const meta = ASSET_TYPE_META[key] || {
-            btc: { type: 'crypto', name: 'Bitcoin', symbol: 'BTC', coingeckoId: 'bitcoin', icon: '₿', color: '#f97316' },
-            eth: { type: 'crypto', name: 'Ethereum', symbol: 'ETH', coingeckoId: 'ethereum', icon: 'Ξ', color: '#818cf8' },
-            sol: { type: 'crypto', name: 'Solana', symbol: 'SOL', coingeckoId: 'solana', icon: '◎', color: '#a855f7' }
-        }[key];
+        const meta = ASSET_TYPE_META[key];
         if (meta.type === 'crypto') {
             assets[key] = { type: 'crypto', coingeckoId: meta.coingeckoId, name: meta.name, symbol: meta.symbol, icon: meta.icon, color: meta.color, amount: qty, invested: inv };
         } else {
             assets[key] = { type: 'manual', name: meta.name, icon: meta.icon, color: meta.color, amount: qty, invested: inv, currentValue: inv };
         }
     }
-    dataFoundOnLoad = true;
     saveAssets(); closeAddAssetModal(); updateAll();
 }
 
@@ -764,6 +691,8 @@ function submitUpdateQty() {
     if (isNaN(newQty) || newQty <= 0) { alert('Introduce una cantidad válida.'); return; }
     const a = assets[key];
     const currentPrice = livePrices[a.coingeckoId] || 0;
+    // Solo actualiza la cantidad — la inversión en € NO cambia
+    // El precio medio se recalcula automáticamente: invested / newAmount
     a.amount = parseFloat(newQty.toFixed(8));
     saveAssets();
     closeModifyDetail();
@@ -771,7 +700,7 @@ function submitUpdateQty() {
     updateAll();
     const newVal = newQty * currentPrice;
     const newAvg = a.invested / newQty;
-    alert(`✅ Actualizado: ${newQty} ${a.symbol}\nValor actual: ${fmtEUR(newVal)}\nNuevo precio medio: ${fmtEUR(newAvg)}\nInversión: ${fmtEUR(a.invested)} (sin cambios)\n\nRecuerda pulsar "Exportar backup" de vez en cuando para tener una copia de seguridad.`);
+    alert(`✅ Actualizado: ${newQty} ${a.symbol}\nValor actual: ${fmtEUR(newVal)}\nNuevo precio medio: ${fmtEUR(newAvg)}\nInversión: ${fmtEUR(a.invested)} (sin cambios)`);
 }
 
 function submitPartialSell() {
@@ -781,6 +710,7 @@ function submitPartialSell() {
     const a = assets[key];
     if (isNaN(qty) || isNaN(received) || qty <= 0 || received < 0) { alert('Introduce una cantidad y un importe válidos.'); return; }
     if (qty >= a.amount) { alert('La cantidad vendida no puede ser mayor o igual al total. Usa "Eliminar" si vendes todo.'); return; }
+    // Ajustar inversión proporcional
     const ratio = qty / a.amount;
     a.invested = a.invested * (1 - ratio);
     a.amount = parseFloat((a.amount - qty).toFixed(8));
@@ -818,14 +748,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 window.onload = () => {
-    // Pide almacenamiento persistente al navegador para reducir el riesgo
-    // de que borre los datos automáticamente (ej. Safari ITP).
-    if (navigator.storage && navigator.storage.persist) {
-        navigator.storage.persist().then(granted => {
-            console.log('Almacenamiento persistente concedido:', granted);
-        });
-    }
-    updateSavedIndicator();
     renderAssetsList();
     renderPromedioCompra();
     updateAll();
@@ -841,5 +763,3 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
-
