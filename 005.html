@@ -1,100 +1,88 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Plan Dietético · Cristian Campos</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg:#0f1419;--card:#1a2332;--card-hover:#243044;
-      --accent:#00b4d8;--accent-soft:rgba(0,180,216,0.15);
-      --green:#2dd4bf;--green-soft:rgba(45,212,191,0.2);
-      --text:#e8eef4;--text-muted:#8b9cb3;--border:#2a3648;
-      --entreno:#f59e0b;--entreno-soft:rgba(245,158,11,0.15);
-      --padel:#a78bfa;--padel-soft:rgba(167,139,250,0.18);
-      --cardio:#34d399;--cardio-soft:rgba(52,211,153,0.15);
-      --kcal:#f472b6;--purple:#c084fc;
-    }
+    :root{--bg:#0f1419;--card:#1a2332;--hover:#243044;--accent:#00b4d8;--asoft:rgba(0,180,216,.15);--green:#2dd4bf;--gsoft:rgba(45,212,191,.2);--text:#e8eef4;--muted:#8b9cb3;--border:#2a3648;--amber:#f59e0b;--asoft2:rgba(245,158,11,.15);--padel:#a78bfa;--psoft:rgba(167,139,250,.18);--kcal:#f472b6;--purple:#c084fc}
     *{box-sizing:border-box;margin:0;padding:0}
-    body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
     .header{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,#0f1419 80%,transparent);padding:1.25rem 1.5rem 1rem;border-bottom:1px solid var(--border);backdrop-filter:blur(12px)}
     .header-inner{max-width:1400px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
-    .brand h1{font-size:1.35rem;font-weight:700;letter-spacing:-0.02em}
-    .brand span{font-size:0.8rem;color:var(--text-muted);font-weight:500}
-    .clock-box{display:flex;flex-direction:column;align-items:flex-end;gap:0.2rem}
-    .clock-date{font-size:0.95rem;font-weight:600;color:var(--accent);text-transform:capitalize}
-    .clock-time{font-size:1.75rem;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:0.05em}
+    .brand h1{font-size:1.35rem;font-weight:700}
+    .brand span{font-size:.8rem;color:var(--muted)}
+    .clock-box{display:flex;flex-direction:column;align-items:flex-end}
+    .clock-date{font-size:.95rem;font-weight:600;color:var(--accent);text-transform:capitalize}
+    .clock-time{font-size:1.75rem;font-weight:700;font-variant-numeric:tabular-nums}
     .clock-time span{color:var(--accent)}
     .main{max-width:1400px;margin:0 auto;padding:1.5rem}
-    .section-title{font-size:1.1rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:0.5rem}
-    .section-title::before{content:'';width:4px;height:1.1em;background:var(--accent);border-radius:2px}
-    .legend{display:flex;flex-wrap:wrap;gap:0.75rem 1.25rem;margin-bottom:1.25rem;font-size:0.78rem;color:var(--text-muted)}
-    .legend-item{display:flex;align-items:center;gap:0.4rem}
-    .legend-dot{width:10px;height:10px;border-radius:3px}
-    .legend-dot.entreno{background:var(--entreno)}
-    .legend-dot.padel{background:var(--padel)}
-    .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:0.75rem;overflow-x:auto;padding-bottom:0.5rem}
+    .sec-title{font-size:1.1rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+    .sec-title::before{content:'';width:4px;height:1.1em;background:var(--accent);border-radius:2px}
+    .legend{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;margin-bottom:1.25rem;font-size:.78rem;color:var(--muted)}
+    .legend-item{display:flex;align-items:center;gap:.4rem}
+    .ldot{width:10px;height:10px;border-radius:3px}
+    .ldot.e{background:var(--amber)}.ldot.p{background:var(--padel)}
+    .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.75rem;overflow-x:auto;padding-bottom:.5rem}
     @media(max-width:1100px){.week-grid{grid-template-columns:repeat(4,minmax(200px,1fr))}}
     @media(max-width:700px){.week-grid{grid-template-columns:repeat(2,minmax(180px,1fr))}}
     @media(max-width:420px){.week-grid{grid-template-columns:1fr}}
-    .day-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:border-color 0.2s;min-width:0;display:flex;flex-direction:column}
+    .day-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s}
     .day-card:hover{border-color:var(--accent)}
-    .day-card.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent-soft)}
-    .day-header{padding:0.7rem 0.85rem;background:rgba(0,0,0,0.25);display:flex;flex-direction:column;gap:0.25rem;border-bottom:1px solid var(--border)}
-    .day-header.entreno-opt{background:var(--entreno-soft)}
-    .day-header.padel{background:var(--padel-soft)}
-    .day-name{font-weight:700;font-size:0.95rem;display:flex;align-items:center;flex-wrap:wrap;gap:0.35rem}
-    .badge{font-size:0.62rem;font-weight:600;padding:0.12rem 0.38rem;border-radius:4px;text-transform:uppercase;letter-spacing:0.03em}
-    .badge-entreno{background:var(--entreno);color:#111}
-    .badge-padel{background:var(--padel);color:#111}
-    .day-label{font-size:0.7rem;color:var(--text-muted);font-weight:500}
-    .day-kcal{font-size:0.78rem;font-weight:700;color:var(--kcal);margin-top:0.15rem}
-    .activity-row{display:flex;flex-wrap:wrap;gap:0.35rem;margin-top:0.25rem}
-    .activity-chip{font-size:0.65rem;font-weight:600;padding:0.2rem 0.45rem;border-radius:6px;border:1px solid var(--border);cursor:pointer;transition:all 0.15s;user-select:none;color:var(--text-muted);background:transparent}
-    .activity-chip.done{background:var(--green-soft);border-color:var(--green);color:var(--green)}
-    .meals{padding:0.5rem;display:flex;flex-direction:column;gap:0.35rem;flex:1}
-    .meal{display:flex;align-items:flex-start;gap:0.45rem;padding:0.45rem 0.5rem;border-radius:8px;transition:background 0.15s;user-select:none}
-    .meal:hover{background:var(--card-hover)}
-    .meal.done{background:var(--green-soft)}
-    .meal.done .meal-name{text-decoration:line-through;color:var(--text-muted)}
-    .meal-check{flex-shrink:0;width:18px;height:18px;border:2px solid var(--border);border-radius:5px;margin-top:2px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;cursor:pointer}
-    .meal.done .meal-check{background:var(--green);border-color:var(--green)}
-    .meal.done .meal-check::after{content:'✓';color:#0f1419;font-size:12px;font-weight:700}
-    .meal-info{flex:1;min-width:0}
-    .meal-slot{font-size:0.62rem;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;color:var(--accent);margin-bottom:0.08rem;display:flex;align-items:center;justify-content:space-between;gap:0.3rem}
-    .meal-time{color:var(--purple);font-weight:600;text-transform:none;letter-spacing:0;font-size:0.6rem}
-    .meal-kcal-tag{font-size:0.6rem;color:var(--kcal);font-weight:600;text-transform:none;letter-spacing:0}
-    .meal-name{font-size:0.76rem;font-weight:500;line-height:1.3}
-    .meal-btns{display:flex;flex-direction:column;gap:0.25rem;flex-shrink:0;margin-top:1px}
-    .btn-similar,.btn-recipe{background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:0.58rem;font-weight:600;padding:0.15rem 0.38rem;border-radius:5px;cursor:pointer;font-family:inherit;transition:all 0.15s;white-space:nowrap}
-    .btn-similar:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
-    .btn-recipe:hover{border-color:var(--purple);color:var(--purple);background:rgba(192,132,252,0.1)}
-    .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:200;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
-    .modal-overlay.open{display:flex}
+    .day-card.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--asoft)}
+    .day-hdr{padding:.7rem .85rem;background:rgba(0,0,0,.25);border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:.25rem}
+    .day-hdr.e{background:var(--asoft2)}.day-hdr.p{background:var(--psoft)}
+    .day-name{font-weight:700;font-size:.95rem;display:flex;align-items:center;flex-wrap:wrap;gap:.35rem}
+    .badge{font-size:.62rem;font-weight:600;padding:.12rem .38rem;border-radius:4px;text-transform:uppercase}
+    .badge-e{background:var(--amber);color:#111}.badge-p{background:var(--padel);color:#111}
+    .day-label{font-size:.7rem;color:var(--muted);font-weight:500}
+    .day-kcal{font-size:.78rem;font-weight:700;color:var(--kcal)}
+    .act-row{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.25rem}
+    .chip{font-size:.65rem;font-weight:600;padding:.2rem .45rem;border-radius:6px;border:1px solid var(--border);cursor:pointer;color:var(--muted);background:transparent;transition:all .15s;user-select:none}
+    .chip.done{background:var(--gsoft);border-color:var(--green);color:var(--green)}
+    .meals{padding:.5rem;display:flex;flex-direction:column;gap:.35rem;flex:1}
+    .meal{display:flex;align-items:flex-start;gap:.45rem;padding:.45rem .5rem;border-radius:8px;transition:background .15s;user-select:none}
+    .meal:hover{background:var(--hover)}
+    .meal.done{background:var(--gsoft)}
+    .meal.done .meal-name{text-decoration:line-through;color:var(--muted)}
+    .mcheck{flex-shrink:0;width:18px;height:18px;border:2px solid var(--border);border-radius:5px;margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+    .meal.done .mcheck{background:var(--green);border-color:var(--green)}
+    .meal.done .mcheck::after{content:'✓';color:#0f1419;font-size:12px;font-weight:700}
+    .minfo{flex:1;min-width:0}
+    .mslot{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);margin-bottom:.08rem;display:flex;align-items:center;justify-content:space-between;gap:.3rem}
+    .mtime{color:var(--purple);font-weight:600;text-transform:none;letter-spacing:0;font-size:.6rem}
+    .mkcal{font-size:.6rem;color:var(--kcal);font-weight:600;text-transform:none}
+    .meal-name{font-size:.76rem;font-weight:500;line-height:1.3}
+    .mbtns{display:flex;flex-direction:column;gap:.25rem;flex-shrink:0;margin-top:1px}
+    .bsim,.brec{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:.58rem;font-weight:600;padding:.15rem .38rem;border-radius:5px;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+    .bsim:hover{border-color:var(--accent);color:var(--accent);background:var(--asoft)}
+    .brec:hover{border-color:var(--purple);color:var(--purple);background:rgba(192,132,252,.1)}
+    .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+    .modal-ov.open{display:flex}
     .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:440px;width:100%;max-height:88vh;overflow-y:auto;padding:1.25rem}
-    .modal-header{display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;margin-bottom:1rem}
-    .modal-header h3{font-size:1rem;font-weight:700}
-    .modal-header p{font-size:0.78rem;color:var(--text-muted);margin-top:0.2rem}
-    .modal-close{background:transparent;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;line-height:1;padding:0.1rem 0.3rem}
-    .modal-close:hover{color:var(--text)}
-    .alt-list{display:flex;flex-direction:column;gap:0.5rem}
-    .alt-item{background:rgba(0,0,0,0.25);border:1px solid var(--border);border-radius:10px;padding:0.75rem 0.9rem;cursor:pointer;transition:border-color 0.15s,background 0.15s}
-    .alt-item:hover{border-color:var(--accent);background:var(--accent-soft)}
-    .alt-item.active{border-color:var(--green);background:var(--green-soft)}
-    .alt-name{font-size:0.88rem;font-weight:600;margin-bottom:0.15rem}
-    .alt-meta{font-size:0.72rem;color:var(--text-muted);display:flex;gap:0.6rem;flex-wrap:wrap}
+    .modal.wide{max-width:480px}
+    .modal-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;margin-bottom:1rem}
+    .modal-hdr h3{font-size:1rem;font-weight:700}
+    .modal-hdr p{font-size:.78rem;color:var(--muted);margin-top:.2rem}
+    .mclose{background:transparent;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1;padding:.1rem .3rem}
+    .mclose:hover{color:var(--text)}
+    .alt-list{display:flex;flex-direction:column;gap:.5rem}
+    .alt-item{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:10px;padding:.75rem .9rem;cursor:pointer;transition:border-color .15s,background .15s}
+    .alt-item:hover{border-color:var(--accent);background:var(--asoft)}
+    .alt-item.active{border-color:var(--green);background:var(--gsoft)}
+    .alt-name{font-size:.88rem;font-weight:600;margin-bottom:.15rem}
+    .alt-meta{font-size:.72rem;color:var(--muted);display:flex;gap:.6rem;flex-wrap:wrap}
     .alt-kcal{color:var(--kcal);font-weight:600}
-    .progress-bar-wrap{margin-top:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
-    .progress-label{display:flex;justify-content:space-between;font-size:0.85rem;font-weight:500;margin-bottom:0.5rem}
-    .progress-label span:last-child{color:var(--accent);font-weight:600}
-    .progress-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
-    .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:4px;transition:width 0.3s ease;width:0%}
-    .reset-btn{margin-top:1rem;background:transparent;border:1px solid var(--border);color:var(--text-muted);font-size:0.8rem;padding:0.45rem 0.9rem;border-radius:8px;cursor:pointer;font-family:inherit;transition:all 0.15s}
+    .prog-wrap{margin-top:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
+    .prog-label{display:flex;justify-content:space-between;font-size:.85rem;font-weight:500;margin-bottom:.5rem}
+    .prog-label span:last-child{color:var(--accent);font-weight:600}
+    .prog-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:4px;transition:width .3s;width:0%}
+    .reset-btn{margin-top:1rem;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:.8rem;padding:.45rem .9rem;border-radius:8px;cursor:pointer;font-family:inherit;transition:all .15s}
     .reset-btn:hover{border-color:#ef4444;color:#ef4444}
-    .footer-note{margin-top:1.5rem;text-align:center;font-size:0.75rem;color:var(--text-muted)}
-    .note-kcal{margin-top:0.75rem;font-size:0.72rem;color:var(--text-muted);text-align:center}
+    .note{margin-top:.75rem;font-size:.72rem;color:var(--muted);text-align:center}
+    .footer{margin-top:1.5rem;text-align:center;font-size:.75rem;color:var(--muted)}
   </style>
 </head>
 <body>
@@ -105,150 +93,137 @@
       <span>Cristian Campos · Seguimiento semanal</span>
     </div>
     <div class="clock-box">
-      <div class="clock-date" id="clock-date">—</div>
-      <div class="clock-time" id="clock-time">00:00:<span>00</span></div>
+      <div class="clock-date" id="cd">—</div>
+      <div class="clock-time" id="ct">00:00:<span>00</span></div>
     </div>
   </div>
 </header>
-
 <main class="main">
-  <h2 class="section-title">Calendario semanal</h2>
+  <h2 class="sec-title">Calendario semanal</h2>
   <div class="legend">
-    <div class="legend-item"><span class="legend-dot entreno"></span> Gym (Lun/Mar + Jue/Vie)</div>
-    <div class="legend-item"><span class="legend-dot padel"></span> Pádel (Miércoles)</div>
+    <div class="legend-item"><span class="ldot e"></span>Gym (Lun/Mar + Jue/Vie)</div>
+    <div class="legend-item"><span class="ldot p"></span>Pádel (Miércoles)</div>
   </div>
   <div class="week-grid" id="week-grid"></div>
-  <p class="note-kcal">~1.800 kcal/día · Pulsa ≈ para 10 opciones de comida · Pulsa 📋 para ver receta con cantidades</p>
-  <div class="progress-bar-wrap">
-    <div class="progress-label"><span>Comidas + actividades completadas</span><span id="progress-text">0 / 0</span></div>
-    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  <p class="note">~1.800 kcal/día · ≈ para 10 opciones · 📋 para receta con cantidades</p>
+  <div class="prog-wrap">
+    <div class="prog-label"><span>Comidas + actividades completadas</span><span id="prog-txt">0 / 0</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
     <button class="reset-btn" id="reset-btn">Reiniciar marcas</button>
   </div>
-  <p class="footer-note">Plan v5 · Agosto 2025 · Sin: aceitunas, sardinas, aguacate, espárragos, rúcula, pepino, canónigos, espinacas, champiñones, alcaparras, salmón, gambas, ajo, perejil, mejillones, albahaca, eneldo, brócoli, lubina, bacalao, lenguado, dorada, pez espada, sepia, puerro, tzatziki, pesto, judías verdes, tofu</p>
+  <p class="footer">Plan v6 · Agosto 2025 · Sin: aceitunas, sardinas, aguacate, espárragos, rúcula, pepino, canónigos, espinacas, champiñones, alcaparras, salmón, gambas, ajo, perejil, mejillones, albahaca, eneldo, brócoli, lubina, bacalao, lenguado, dorada, pez espada, sepia, puerro, tzatziki, pesto, judías verdes, tofu</p>
 </main>
 
-<!-- MODAL OPCIONES -->
-<div class="modal-overlay" id="modal-similar">
+<!-- MODAL SIMILARES -->
+<div class="modal-ov" id="msim">
   <div class="modal">
-    <div class="modal-header">
-      <div><h3 id="modal-title">Opciones</h3><p id="modal-subtitle">Elige la que más te apetezca</p></div>
-      <button class="modal-close" id="close-similar">×</button>
+    <div class="modal-hdr">
+      <div><h3 id="msim-title">Opciones</h3><p id="msim-sub">Elige la que más te apetezca</p></div>
+      <button class="mclose" id="msim-close">×</button>
     </div>
     <div class="alt-list" id="alt-list"></div>
   </div>
 </div>
 
 <!-- MODAL RECETA -->
-<div class="modal-overlay" id="modal-recipe">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-header">
-      <div><h3 id="recipe-title">Receta</h3><p>Cantidades para 1 persona</p></div>
-      <button class="modal-close" id="close-recipe">×</button>
+<div class="modal-ov" id="mrec">
+  <div class="modal wide">
+    <div class="modal-hdr">
+      <div><h3 id="mrec-title">Receta</h3><p>Cantidades para 1 persona</p></div>
+      <button class="mclose" id="mrec-close">×</button>
     </div>
-    <div id="recipe-content"></div>
+    <div id="mrec-content"></div>
   </div>
 </div>
 
 <script>
-// ─── PLAN ────────────────────────────────────────────────────────────────────
-// Horarios L-V: Desayuno 05:45 · Media mañana 08:00 · Almuerzo 10:00 · Fruta 12:00 · Comida 14:00 · Merienda 16:30 · Cena 20:00
-// Sábado: Desayuno 05:15 · Media mañana 08:00 · Post-trabajo 11:45 · Comida 14:00 · Merienda 17:00 · Cena 20:00
-// Domingo: Desayuno 09:00 · Almuerzo 11:30 · Comida 14:00 · Merienda 17:00 · Cena 20:00
-
-const plan = [
-  { id:1, name:'Día 1', label:'Lunes', type:'entreno-opt',
-    activities:[{id:'gym',label:'Gym (opción 1)'},{id:'cardio',label:'Cardio'}],
-    meals:[
-      {slot:'Desayuno',time:'05:45',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
-      {slot:'Media mañana',time:'10:00',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
-      {slot:'Almuerzo',time:'08:00',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
-      {slot:'Fruta',time:'12:00',name:'Fruta de temporada',kcal:65,altKey:'merienda-fruta'},
-      {slot:'Comida',time:'14:00',name:'Pasta + atún + maíz + guisantes + aceite oliva',kcal:518,altKey:'comida-variada'},
-      {slot:'Merienda',time:'16:30',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + maíz + tortilla francesa + cuajada',kcal:418,altKey:'cena-tortilla'}
-    ]
-  },
-  { id:2, name:'Día 2', label:'Martes', type:'entreno-opt',
-    activities:[{id:'gym',label:'Gym (opción 1)'},{id:'cardio',label:'Cardio'}],
-    meals:[
-      {slot:'Desayuno',time:'05:45',name:'Batido yogur desnatado + pera + melón',kcal:260,altKey:'desayuno-batido'},
-      {slot:'Media mañana',time:'10:00',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
-      {slot:'Almuerzo',time:'08:00',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
-      {slot:'Fruta',time:'12:00',name:'Fruta de temporada',kcal:65,altKey:'merienda-fruta'},
-      {slot:'Comida',time:'14:00',name:'Espaguetis boloñesa ternera + zanahoria + cebolla',kcal:548,altKey:'comida-variada'},
-      {slot:'Merienda',time:'16:30',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + merluza plancha + zanahoria + gelatina',kcal:378,altKey:'cena-merluza'}
-    ]
-  },
-  { id:3, name:'Día 3', label:'Miércoles', type:'padel',
-    activities:[{id:'padel',label:'Pádel'}],
-    meals:[
-      {slot:'Desayuno',time:'05:45',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,altKey:'desayuno-yogur-avena'},
-      {slot:'Media mañana',time:'10:00',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
-      {slot:'Almuerzo',time:'08:00',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
-      {slot:'Fruta',time:'12:00',name:'Fruta de temporada',kcal:65,altKey:'merienda-fruta'},
-      {slot:'Comida',time:'14:00',name:'Pollo al horno con patatas y cebolla',kcal:480,altKey:'comida-variada'},
-      {slot:'Merienda pre-pádel',time:'16:30',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + maíz + solomillo pollo + cuajada',kcal:428,altKey:'cena-pollo'}
-    ]
-  },
-  { id:4, name:'Día 4', label:'Jueves', type:'entreno-opt',
-    activities:[{id:'gym',label:'Gym (opción 2)'},{id:'cardio',label:'Cardio'}],
-    meals:[
-      {slot:'Desayuno',time:'05:45',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
-      {slot:'Media mañana',time:'10:00',name:'Bocadillo atún + lechuga + maíz',kcal:268,altKey:'tentempie-atun'},
-      {slot:'Almuerzo',time:'08:00',name:'Plátano + nueces',kcal:250,altKey:'tentempie-platano'},
-      {slot:'Fruta',time:'12:00',name:'Fruta de temporada',kcal:65,altKey:'merienda-fruta'},
-      {slot:'Comida',time:'14:00',name:'Arroz basmati + hamburguesa ternera + cebolla caramelizada',kcal:490,altKey:'comida-variada'},
-      {slot:'Merienda pre-gym',time:'16:30',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + solomillo ternera + guisantes + gelatina',kcal:448,altKey:'cena-ternera'}
-    ]
-  },
-  { id:5, name:'Día 5', label:'Viernes', type:'entreno-opt',
-    activities:[{id:'gym',label:'Gym (opción 2)'},{id:'cardio',label:'Cardio'}],
-    meals:[
-      {slot:'Desayuno',time:'05:45',name:'Batido yogur desnatado + pera + melón',kcal:260,altKey:'desayuno-batido'},
-      {slot:'Media mañana',time:'10:00',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,altKey:'tentempie-pavo'},
-      {slot:'Almuerzo',time:'08:00',name:'Melocotón + almendras',kcal:190,altKey:'tentempie-melocoton'},
-      {slot:'Fruta',time:'12:00',name:'Fruta de temporada',kcal:65,altKey:'merienda-fruta'},
-      {slot:'Comida',time:'14:00',name:'Milanesa de pollo al horno + arroz',kcal:485,altKey:'comida-variada'},
-      {slot:'Merienda pre-gym',time:'16:30',name:'Cerezas',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + tortilla pavo y sésamo + cuajada',kcal:408,altKey:'cena-pavo-sesamo'}
-    ]
-  },
-  { id:6, name:'Día 6', label:'Sábado', type:'rest',
-    activities:[],
-    meals:[
-      {slot:'Desayuno',time:'05:15',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,altKey:'desayuno-yogur-avena'},
-      {slot:'Media mañana',time:'10:00',name:'Bocadillo jamón serrano + lechuga',kcal:220,altKey:'tentempie-jamon'},
-      {slot:'Post-trabajo',time:'11:45',name:'Pera + avellanas',kcal:185,altKey:'tentempie-pera'},
-      {slot:'Comida',time:'14:00',name:'Pasta + pollo + queso parmesano + orégano',kcal:472,altKey:'comida-variada'},
-      {slot:'Merienda',time:'17:00',name:'Albaricoques',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + lomo cerdo + zanahoria + gelatina',kcal:458,altKey:'cena-cerdo'}
-    ]
-  },
-  { id:7, name:'Día 7', label:'Domingo', type:'rest',
-    activities:[],
-    meals:[
-      {slot:'Desayuno',time:'09:00',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,altKey:'desayuno-porridge'},
-      {slot:'Almuerzo',time:'11:30',name:'Bocadillo hummus + pimiento asado',kcal:230,altKey:'tentempie-hummus'},
-      {slot:'Comida',time:'14:00',name:'Lasaña de carne al horno',kcal:520,altKey:'comida-variada'},
-      {slot:'Merienda',time:'17:00',name:'Manzana',kcal:70,altKey:'merienda-fruta'},
-      {slot:'Cena',time:'20:00',name:'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada',kcal:428,altKey:'cena-salteado'}
-    ]
-  }
+// ─── PLAN ─────────────────────────────────────────────────────────────────────
+var plan = [
+  {id:1,name:'Día 1',label:'Lunes',type:'e',
+   acts:[{id:'gym',label:'Gym (op. 1)'},{id:'cardio',label:'Cardio'}],
+   meals:[
+    {slot:'Desayuno',time:'05:45',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,alt:'desayuno-porridge'},
+    {slot:'Almuerzo',time:'08:00',name:'Plátano + nueces',kcal:250,alt:'tentempie-platano'},
+    {slot:'Media mañana',time:'10:00',name:'Bocadillo atún + lechuga + maíz',kcal:268,alt:'tentempie-atun'},
+    {slot:'Fruta',time:'12:00',name:'Fruta de temporada',kcal:65,alt:'merienda-fruta'},
+    {slot:'Comida',time:'14:00',name:'Pasta + atún + maíz + guisantes + aceite oliva',kcal:518,alt:'comida-variada'},
+    {slot:'Merienda',time:'16:30',name:'Manzana',kcal:70,alt:'merienda-fruta'},
+    {slot:'Cena',time:'20:00',name:'Ensalada lechuga + maíz + tortilla francesa + cuajada',kcal:418,alt:'cena-tortilla'}
+  ]},
+  {id:2,name:'Día 2',label:'Martes',type:'e',
+   acts:[{id:'gym',label:'Gym (op. 1)'},{id:'cardio',label:'Cardio'}],
+   meals:[
+    {slot:'Desayuno',time:'05:45',name:'Batido yogur desnatado + pera + melón',kcal:260,alt:'desayuno-batido'},
+    {slot:'Almuerzo',time:'08:00',name:'Melocotón + almendras',kcal:190,alt:'tentempie-melocoton'},
+    {slot:'Media mañana',time:'10:00',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,alt:'tentempie-pavo'},
+    {slot:'Fruta',time:'12:00',name:'Fruta de temporada',kcal:65,alt:'merienda-fruta'},
+    {slot:'Comida',time:'14:00',name:'Espaguetis boloñesa ternera + zanahoria + cebolla',kcal:548,alt:'comida-variada'},
+    {slot:'Merienda',time:'16:30',name:'Cerezas',kcal:70,alt:'merienda-fruta'},
+    {slot:'Cena',time:'20:00',name:'Ensalada lechuga + merluza plancha + zanahoria + gelatina',kcal:378,alt:'cena-merluza'}
+  ]},
+  {id:3,name:'Día 3',label:'Miércoles',type:'p',
+   acts:[{id:'padel',label:'Pádel'}],
+   meals:[
+    {slot:'Desayuno',time:'05:45',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,alt:'desayuno-yogur-avena'},
+    {slot:'Almuerzo',time:'08:00',name:'Pera + avellanas',kcal:185,alt:'tentempie-pera'},
+    {slot:'Media mañana',time:'10:00',name:'Bocadillo jamón serrano + lechuga',kcal:220,alt:'tentempie-jamon'},
+    {slot:'Fruta',time:'12:00',name:'Fruta de temporada',kcal:65,alt:'merienda-fruta'},
+    {slot:'Comida',time:'14:00',name:'Pollo al horno con patatas y cebolla',kcal:480,alt:'comida-variada'},
+    {slot:'Merienda pre-pádel',time:'16:30',name:'Plátano + nueces',kcal:250,alt:'tentempie-platano'},
+    {slot:'Cena',time:'20:00',name:'Ensalada lechuga + maíz + solomillo pollo + cuajada',kcal:428,alt:'cena-pollo'}
+  ]},
+  {id:4,name:'Día 4',label:'Jueves',type:'e',
+   acts:[{id:'gym',label:'Gym (op. 2)'},{id:'cardio',label:'Cardio'}],
+   meals:[
+    {slot:'Desayuno',time:'05:45',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,alt:'desayuno-porridge'},
+    {slot:'Almuerzo',time:'08:00',name:'Plátano + nueces',kcal:250,alt:'tentempie-platano'},
+    {slot:'Media mañana',time:'10:00',name:'Bocadillo atún + lechuga + maíz',kcal:268,alt:'tentempie-atun'},
+    {slot:'Fruta',time:'12:00',name:'Fruta de temporada',kcal:65,alt:'merienda-fruta'},
+    {slot:'Comida',time:'14:00',name:'Arroz basmati + hamburguesa ternera + cebolla caramelizada',kcal:490,alt:'comida-variada'},
+    {slot:'Merienda pre-gym',time:'16:30',name:'Manzana',kcal:70,alt:'merienda-fruta'},
+    {slot:'Cena',time:'20:00',name:'Ensalada lechuga + solomillo ternera + guisantes + gelatina',kcal:448,alt:'cena-ternera'}
+  ]},
+  {id:5,name:'Día 5',label:'Viernes',type:'e',
+   acts:[{id:'gym',label:'Gym (op. 2)'},{id:'cardio',label:'Cardio'}],
+   meals:[
+    {slot:'Desayuno',time:'05:45',name:'Batido yogur desnatado + pera + melón',kcal:260,alt:'desayuno-batido'},
+    {slot:'Almuerzo',time:'08:00',name:'Melocotón + almendras',kcal:190,alt:'tentempie-melocoton'},
+    {slot:'Media mañana',time:'10:00',name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,alt:'tentempie-pavo'},
+    {slot:'Fruta',time:'12:00',name:'Fruta de temporada',kcal:65,alt:'merienda-fruta'},
+    {slot:'Comida',time:'14:00',name:'Milanesa de pollo al horno + arroz',kcal:485,alt:'comida-variada'},
+    {slot:'Merienda pre-gym',time:'16:30',name:'Cerezas',kcal:70,alt:'merienda-fruta'},
+    {slot:'Cena',time:'20:00',name:'Ensalada lechuga + tortilla pavo y sésamo + cuajada',kcal:408,alt:'cena-pavo-sesamo'}
+  ]},
+  {id:6,name:'Día 6',label:'Sábado',type:'',
+   acts:[],
+   meals:[
+    {slot:'Desayuno',time:'05:15',name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,alt:'desayuno-yogur-avena'},
+    {slot:'Media mañana',time:'08:00',name:'Bocadillo jamón serrano + lechuga',kcal:220,alt:'tentempie-jamon'},
+    {slot:'Post-trabajo',time:'11:45',name:'Pera + avellanas',kcal:185,alt:'tentempie-pera'},
+    {slot:'Comida',time:'14:00',name:'Pasta + pollo + queso parmesano + orégano',kcal:472,alt:'comida-variada'},
+    {slot:'Merienda',time:'17:00',name:'Albaricoques',kcal:70,alt:'merienda-fruta'},
+    {slot:'Cena',time:'20:00',name:'Ensalada lechuga + lomo cerdo + zanahoria + gelatina',kcal:458,alt:'cena-cerdo'}
+  ]},
+  {id:7,name:'Día 7',label:'Domingo',type:'',
+   acts:[],
+   meals:[
+    {slot:'Desayuno',time:'09:00',name:'Porridge leche sin lactosa + manzana + canela',kcal:310,alt:'desayuno-porridge'},
+    {slot:'Almuerzo',time:'11:30',name:'Bocadillo hummus + pimiento asado',kcal:230,alt:'tentempie-hummus'},
+    {slot:'Comida',time:'14:00',name:'Lasagna de carne al horno',kcal:520,alt:'comida-variada'},
+    {slot:'Merienda',time:'17:00',name:'Manzana',kcal:70,alt:'merienda-fruta'},
+    {slot:'Cena',time:'20:00',name:'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada',kcal:428,alt:'cena-salteado'}
+  ]}
 ];
+plan.forEach(function(d){d.totalKcal=d.meals.reduce(function(s,m){return s+m.kcal;},0);});
 
-plan.forEach(d => { d.totalKcal = d.meals.reduce((s,m) => s+m.kcal, 0); });
-
-// ─── ALTERNATIVAS ────────────────────────────────────────────────────────────
-const alternatives = {
+// ─── ALTERNATIVAS ─────────────────────────────────────────────────────────────
+var alternatives = {
   'desayuno-porridge':[
-    {name:'Porridge leche sin lactosa + manzana + canela',kcal:310,note:'⭐ Original'},
+    {name:'Porridge leche sin lactosa + manzana + canela',kcal:310,note:'Original'},
     {name:'Overnight oats + leche vegetal + arándanos + miel',kcal:308,note:'Preparar noche anterior'},
-    {name:'Tostadas pan integral + huevo cocido + queso fresco',kcal:305,note:'Alta proteína'},
+    {name:'Tostadas integrales + huevo cocido + queso fresco',kcal:305,note:'Alta proteína'},
     {name:'Yogur griego 0% + avena + plátano + canela',kcal:300,note:'Muy saciante'},
-    {name:'Batido avena + proteína whey + fresas + leche',kcal:295,note:'Post-entreno'},
+    {name:'Batido avena + whey + fresas + leche',kcal:295,note:'Post-entreno'},
     {name:'Muesli sin azúcar + leche sin lactosa + kiwi',kcal:305,note:'Más fibra'},
     {name:'Skyr + granola + arándanos + nueces',kcal:310,note:'Alta proteína'},
     {name:'Pan integral + mantequilla cacahuete + manzana',kcal:312,note:'Energía sostenida'},
@@ -256,47 +231,47 @@ const alternatives = {
     {name:'Bowl yogur + granola + mango + coco rallado',kcal:320,note:'Tropical'}
   ],
   'desayuno-batido':[
-    {name:'Batido yogur desnatado + pera + melón',kcal:260,note:'⭐ Original'},
-    {name:'Yogur natural + kiwi + 10g miel',kcal:255,note:'Vitamina C'},
+    {name:'Batido yogur desnatado + pera + melón',kcal:260,note:'Original'},
+    {name:'Yogur natural + kiwi + miel',kcal:255,note:'Vitamina C'},
     {name:'Tostada integral + queso fresco + pavo',kcal:252,note:'Salado proteico'},
     {name:'Batido proteico + leche vegetal + plátano',kcal:265,note:'Post-entreno'},
     {name:'Smoothie manzana + yogur 0% + avena',kcal:258,note:'Energizante'},
-    {name:'Queso cottage + fruta temporada + avena',kcal:260,note:'Alta proteína'},
+    {name:'Queso cottage + fruta + avena',kcal:260,note:'Alta proteína'},
     {name:'Tostada maíz + pavo + pimiento rojo asado',kcal:250,note:'Sin gluten'},
     {name:'Porridge avena + leche sin lactosa + pera',kcal:262,note:'Caliente'},
-    {name:'Clara revuelta + tostada integral + queso',kcal:248,note:'Muy alta proteína'},
+    {name:'Claras revueltas + tostada integral + queso',kcal:248,note:'Alta proteína'},
     {name:'Pan centeno + jamón york + kiwi',kcal:255,note:'Rápido'}
   ],
   'desayuno-yogur-avena':[
-    {name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,note:'⭐ Original'},
+    {name:'Yogur desnatado + avena + nueces + arándanos',kcal:320,note:'Original'},
     {name:'Porridge avena + leche sin lactosa + frutos rojos',kcal:310,note:'Caliente'},
     {name:'Skyr 0% + granola + manzana troceada',kcal:315,note:'Alta proteína'},
     {name:'Tortitas avena (2) + miel + plátano',kcal:325,note:'Apetecible'},
     {name:'Muesli + leche vegetal + fresas + almendras',kcal:318,note:'Fibra'},
-    {name:'Overnight oats + chía + arándanos + miel',kcal:322,note:'Omega-3'},
+    {name:'Overnight oats + chia + arándanos + miel',kcal:322,note:'Omega-3'},
     {name:'Pan integral + mantequilla almendra + plátano',kcal:316,note:'Energía'},
     {name:'Batido avena + yogur griego + frambuesas',kcal:312,note:'Frío'},
     {name:'Huevos revueltos (2) + tostada integral + queso',kcal:320,note:'Salado proteico'},
     {name:'Bowl yogur + granola + mango + coco rallado',kcal:325,note:'Tropical'}
   ],
   'tentempie-atun':[
-    {name:'Bocadillo atún + lechuga + maíz',kcal:268,note:'⭐ Original'},
+    {name:'Bocadillo atún + lechuga + maíz',kcal:268,note:'Original'},
     {name:'Tostada integral + atún + maíz + queso fresco',kcal:265,note:'Con queso'},
     {name:'Wrap integral + pollo desmenuzado + lechuga',kcal:272,note:'Wrap proteico'},
-    {name:'Pan molde integral + atún + pimiento asado',kcal:268,note:'Con pimiento'},
-    {name:'Bol pequeño arroz integral + atún + maíz',kcal:275,note:'Sin pan'},
-    {name:'Cracker integral + atún + queso fresco',kcal:260,note:'Crujiente'},
+    {name:'Pan integral + atún + pimiento asado',kcal:268,note:'Con pimiento'},
+    {name:'Arroz integral (bol pequeño) + atún + maíz',kcal:275,note:'Sin pan'},
+    {name:'Crackers integrales + atún + queso fresco',kcal:260,note:'Crujiente'},
     {name:'Pita integral + atún + lechuga + maíz',kcal:270,note:'Pita'},
-    {name:'Tostada centeno + caballa al natural + lechuga',kcal:265,note:'Omega-3'},
+    {name:'Pan centeno + caballa al natural + lechuga',kcal:265,note:'Omega-3'},
     {name:'Bocadillo pechuga pollo + lechuga + queso',kcal:272,note:'Con pollo'},
-    {name:'Tortilla trigo + pavo + lechuga + maíz',kcal:265,note:'Wrap pavo'}
+    {name:'Wrap de pavo + lechuga + maíz',kcal:265,note:'Wrap pavo'}
   ],
   'tentempie-pavo':[
-    {name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,note:'⭐ Original'},
+    {name:'Bocadillo pavo + lechuga + queso fresco',kcal:240,note:'Original'},
     {name:'Tostada + pechuga pollo + lechuga',kcal:235,note:'Con pollo'},
-    {name:'Yogur griego 0% + 20g nueces',kcal:245,note:'Sin pan'},
-    {name:'Huevo cocido + fruta + 10g almendras',kcal:230,note:'Simple'},
-    {name:'Cracker integral + pavo + mostaza + lechuga',kcal:238,note:'Crujiente'},
+    {name:'Yogur griego 0% + nueces',kcal:245,note:'Sin pan'},
+    {name:'Huevo cocido + fruta + almendras',kcal:230,note:'Simple'},
+    {name:'Crackers + pavo + mostaza + lechuga',kcal:238,note:'Crujiente'},
     {name:'Pita mini + jamón york + lechuga',kcal:242,note:'Pita'},
     {name:'Tostada maíz + jamón york + pimiento asado',kcal:235,note:'Sin gluten'},
     {name:'Wrap lechuga + pavo + maíz + mostaza',kcal:228,note:'Low carb'},
@@ -304,103 +279,103 @@ const alternatives = {
     {name:'Tortita arroz + pollo desmenuzado + queso',kcal:240,note:'Ligero'}
   ],
   'tentempie-jamon':[
-    {name:'Bocadillo jamón serrano + lechuga',kcal:220,note:'⭐ Original'},
+    {name:'Bocadillo jamón serrano + lechuga',kcal:220,note:'Original'},
     {name:'Tostada + pavo + pimiento asado',kcal:215,note:'Menos sal'},
-    {name:'Queso fresco + manzana + nueces (5)',kcal:225,note:'Sin pan'},
+    {name:'Queso fresco + manzana + nueces',kcal:225,note:'Sin pan'},
     {name:'Batido proteico + fruta',kcal:210,note:'Rápido'},
-    {name:'Cracker + jamón curado + lechuga',kcal:218,note:'Crujiente'},
+    {name:'Crackers + jamón curado + lechuga',kcal:218,note:'Crujiente'},
     {name:'Pan centeno + lomo ibérico + lechuga',kcal:222,note:'Sabor'},
     {name:'Tostada integral + mozzarella light + pimiento',kcal:215,note:'Italiana'},
     {name:'Wrap mini + jamón york + lechuga + maíz',kcal:220,note:'Variado'},
-    {name:'Pera + 2 lonchas jamón serrano + almendras',kcal:225,note:'Dulce-salado'},
-    {name:'Edamame (100g) + tostada integral',kcal:220,note:'Proteína vegetal'}
+    {name:'Pera + jamón serrano + almendras',kcal:225,note:'Dulce-salado'},
+    {name:'Edamame + tostada integral',kcal:220,note:'Proteína vegetal'}
   ],
   'tentempie-hummus':[
-    {name:'Bocadillo hummus + pimiento asado',kcal:230,note:'⭐ Original'},
-    {name:'Cracker + hummus + zanahoria baby',kcal:225,note:'Crujiente vegetal'},
+    {name:'Bocadillo hummus + pimiento asado',kcal:230,note:'Original'},
+    {name:'Crackers + hummus + zanahoria baby',kcal:225,note:'Crujiente vegetal'},
     {name:'Pita mini + hummus + lechuga',kcal:232,note:'Pita'},
     {name:'Yogur + avena + canela + miel',kcal:225,note:'Dulce'},
-    {name:'Tostada centeno + queso ricotta + pimiento asado',kcal:225,note:'Italiana'},
-    {name:'Edamame (100g) + tostada integral',kcal:232,note:'Proteico'},
+    {name:'Pan centeno + queso ricotta + pimiento asado',kcal:225,note:'Italiana'},
+    {name:'Edamame + tostada integral',kcal:232,note:'Proteico'},
     {name:'Wrap mini + hummus + lechuga + maíz',kcal:230,note:'Verde'},
     {name:'Tortita arroz + queso crema light + pimiento',kcal:228,note:'Sin gluten'},
     {name:'Falafel (2) + pita mini + lechuga',kcal:235,note:'Vegetal sabroso'},
     {name:'Pan integral + queso fresco + pavo + maíz',kcal:240,note:'Proteico'}
   ],
   'tentempie-platano':[
-    {name:'Plátano + nueces (3-4)',kcal:250,note:'⭐ Original'},
-    {name:'Manzana + almendras (15g)',kcal:240,note:'Similar'},
+    {name:'Plátano + nueces',kcal:250,note:'Original'},
+    {name:'Manzana + almendras',kcal:240,note:'Similar'},
     {name:'Pera + yogur 0% + nueces',kcal:245,note:'Más volumen'},
-    {name:'Dátiles (3) + almendras + yogur griego',kcal:252,note:'Energía rápida'},
+    {name:'Dátiles + almendras + yogur griego',kcal:252,note:'Energía rápida'},
     {name:'Smoothie plátano + leche vegetal + avena',kcal:255,note:'Batido'},
-    {name:'Naranja + pistachos (15g)',kcal:242,note:'Vitamina C'},
-    {name:'Mango (100g) + coco rallado + yogur',kcal:250,note:'Tropical'},
+    {name:'Naranja + pistachos',kcal:242,note:'Vitamina C'},
+    {name:'Mango + coco rallado + yogur',kcal:250,note:'Tropical'},
     {name:'Kiwi + nueces + cuajada 0%',kcal:245,note:'Digestivo'},
     {name:'Barrita avena casera + fruta fresca',kcal:248,note:'Práctica'},
-    {name:'Uvas (120g) + queso fresco + almendras',kcal:250,note:'Mediterráneo'}
+    {name:'Uvas + queso fresco + almendras',kcal:250,note:'Mediterráneo'}
   ],
   'tentempie-melocoton':[
-    {name:'Melocotón + almendras',kcal:190,note:'⭐ Original'},
-    {name:'Nectarina + nueces (10g)',kcal:185,note:'Similar'},
+    {name:'Melocotón + almendras',kcal:190,note:'Original'},
+    {name:'Nectarina + nueces',kcal:185,note:'Similar'},
     {name:'Yogur 0% + arándanos + canela',kcal:180,note:'Sin frutos secos'},
-    {name:'Manzana + 8 almendras',kcal:195,note:'Clásico'},
-    {name:'Ciruela + pistachos (10g)',kcal:188,note:'Variado'},
-    {name:'Mandarina + avellanas (10g)',kcal:182,note:'Ligero'},
-    {name:'Sandía (200g) + semillas girasol',kcal:185,note:'Refrescante'},
+    {name:'Manzana + almendras',kcal:195,note:'Clásico'},
+    {name:'Ciruela + pistachos',kcal:188,note:'Variado'},
+    {name:'Mandarina + avellanas',kcal:182,note:'Ligero'},
+    {name:'Sandía + semillas girasol',kcal:185,note:'Refrescante'},
     {name:'Frambuesas + yogur griego 0%',kcal:180,note:'Antioxidante'},
-    {name:'Piña (150g) + coco rallado (5g)',kcal:190,note:'Tropical'},
-    {name:'Cerezas (100g) + almendras (8g)',kcal:185,note:'Temporada'}
+    {name:'Piña + coco rallado',kcal:190,note:'Tropical'},
+    {name:'Cerezas + almendras',kcal:185,note:'Temporada'}
   ],
   'tentempie-pera':[
-    {name:'Pera + avellanas',kcal:185,note:'⭐ Original'},
-    {name:'Manzana + nueces (10g)',kcal:190,note:'Similar'},
+    {name:'Pera + avellanas',kcal:185,note:'Original'},
+    {name:'Manzana + nueces',kcal:190,note:'Similar'},
     {name:'Kiwi + yogur 0%',kcal:175,note:'Vitamina C'},
-    {name:'Fresas (150g) + almendras (12g)',kcal:180,note:'Ligero'},
-    {name:'Uvas (100g) + queso fresco light',kcal:188,note:'Mediterráneo'},
-    {name:'Ciruela + avellanas (10g)',kcal:183,note:'Variado'},
+    {name:'Fresas + almendras',kcal:180,note:'Ligero'},
+    {name:'Uvas + queso fresco light',kcal:188,note:'Mediterráneo'},
+    {name:'Ciruela + avellanas',kcal:183,note:'Variado'},
     {name:'Melocotón + yogur 0% + canela',kcal:178,note:'Dulce natural'},
-    {name:'Papaya (150g) + semillas chía',kcal:182,note:'Exótico'},
-    {name:'Mango (100g) + pistachos (8g)',kcal:187,note:'Tropical'},
-    {name:'Naranja + almendras (8g)',kcal:180,note:'Vitamina C'}
+    {name:'Papaya + semillas chia',kcal:182,note:'Exótico'},
+    {name:'Mango + pistachos',kcal:187,note:'Tropical'},
+    {name:'Naranja + almendras',kcal:180,note:'Vitamina C'}
   ],
   'merienda-fruta':[
-    {name:'Manzana',kcal:70,note:'⭐ Clásica'},
+    {name:'Manzana',kcal:70,note:'Clásica'},
     {name:'Pera o naranja',kcal:65,note:'Similar'},
     {name:'Yogur 0% natural',kcal:60,note:'Proteína'},
     {name:'Fresas (150g)',kcal:48,note:'Muy ligera'},
     {name:'Sandía (200g)',kcal:60,note:'Refrescante'},
-    {name:'Kiwi (2 unidades)',kcal:84,note:'Vitamina C'},
+    {name:'Kiwi (2 uds)',kcal:84,note:'Vitamina C'},
     {name:'Melocotón o nectarina',kcal:58,note:'Temporada'},
     {name:'Mandarinas (2 pequeñas)',kcal:62,note:'Fácil'},
-    {name:'Uvas (100g)',kcal:68,note:'Dulces naturales'},
+    {name:'Uvas (100g)',kcal:68,note:'Dulces'},
     {name:'Cerezas (150g)',kcal:70,note:'Temporada'}
   ],
   'comida-variada':[
-    {name:'Pasta + atún + maíz + guisantes + aceite oliva',kcal:518,note:'⭐ Pasta clásica'},
+    {name:'Pasta + atún + maíz + guisantes + aceite oliva',kcal:518,note:'Pasta clásica'},
     {name:'Ensalada pasta fría + atún + maíz + almendras',kcal:480,note:'Fresca y completa'},
     {name:'Arroz basmati + hamburguesa ternera + cebolla caramelizada',kcal:490,note:'Sabrosa y proteica'},
     {name:'Patata asada + pollo al horno + ensalada lechuga',kcal:475,note:'Clásico sano'},
     {name:'Tortilla de patata y pimiento + ensalada lechuga',kcal:470,note:'Española'},
-    {name:'Lasaña de carne al horno',kcal:520,note:'Pasta diferente'},
+    {name:'Lasagna de carne al horno',kcal:520,note:'Pasta diferente'},
     {name:'Pollo al horno con patatas y cebolla',kcal:480,note:'Fácil de preparar'},
     {name:'Milanesa de pollo al horno + arroz',kcal:485,note:'Sin freír'},
     {name:'Espaguetis boloñesa ternera + zanahoria + cebolla',kcal:548,note:'Boloñesa clásica'},
     {name:'Arroz integral + pollo + pimiento + zanahoria',kcal:450,note:'Arroz completo'}
   ],
   'cena-tortilla':[
-    {name:'Ensalada lechuga + maíz + tortilla francesa + cuajada',kcal:418,note:'⭐ Original'},
+    {name:'Ensalada lechuga + maíz + tortilla francesa + cuajada',kcal:418,note:'Original'},
     {name:'Ensalada + huevos revueltos + queso fresco + yogur',kcal:410,note:'Revuelto'},
     {name:'Ensalada + pechuga plancha + cuajada miel',kcal:400,note:'Más magra'},
     {name:'Ensalada + tortilla de claras + queso fresco',kcal:390,note:'Alta proteína'},
     {name:'Crema calabaza + tortilla francesa + gelatina',kcal:415,note:'Caliente'},
-    {name:'Ensalada + revuelto de pimiento + huevo + requesón',kcal:408,note:'Diferente'},
+    {name:'Ensalada + revuelto pimiento + huevo + requeson',kcal:408,note:'Diferente'},
     {name:'Sopa pollo ligera + tortilla + yogur',kcal:412,note:'Reconfortante'},
-    {name:'Ensalada + tortilla de maíz + cuajada',kcal:418,note:'Con maíz'},
+    {name:'Ensalada + tortilla maíz + cuajada',kcal:418,note:'Con maíz'},
     {name:'Ensalada + revuelto jamón york + huevo + gelatina',kcal:415,note:'Con jamón'},
     {name:'Ensalada + revuelto atún + maíz + cuajada',kcal:420,note:'Con atún'}
   ],
   'cena-merluza':[
-    {name:'Ensalada lechuga + merluza plancha + zanahoria + gelatina',kcal:378,note:'⭐ Original'},
+    {name:'Ensalada lechuga + merluza plancha + zanahoria + gelatina',kcal:378,note:'Original'},
     {name:'Ensalada + merluza al horno + guisantes + gelatina',kcal:375,note:'Al horno'},
     {name:'Ensalada + pollo plancha + calabacín + gelatina',kcal:375,note:'Con pollo'},
     {name:'Ensalada + pavo plancha + zanahoria + cuajada',kcal:370,note:'Con pavo'},
@@ -412,19 +387,19 @@ const alternatives = {
     {name:'Ensalada + ternera plancha + guisantes + cuajada',kcal:382,note:'Con ternera'}
   ],
   'cena-pollo':[
-    {name:'Ensalada lechuga + maíz + solomillo pollo + cuajada',kcal:428,note:'⭐ Original'},
+    {name:'Ensalada lechuga + maíz + solomillo pollo + cuajada',kcal:428,note:'Original'},
     {name:'Ensalada + pechuga + pimiento asado + yogur',kcal:420,note:'Con pimiento'},
     {name:'Ensalada + pavo plancha + calabacín + cuajada',kcal:410,note:'Con pavo'},
     {name:'Ensalada + pollo al curry suave + arroz pequeño',kcal:432,note:'Especiado'},
     {name:'Crema calabaza + pechuga plancha + gelatina',kcal:428,note:'Caliente'},
     {name:'Ensalada + pollo asado + pimiento + maíz',kcal:435,note:'Al horno'},
-    {name:'Ensalada + hamburguesa pollo casera + cuajada',kcal:430,note:'Diferente'},
+    {name:'Ensalada + hamburguesa pollo casera + cuajada',kcal:430,note:'Hamburguesa'},
     {name:'Ensalada + pollo en salsa zanahoria + yogur',kcal:428,note:'Con salsa'},
     {name:'Sopa pollo ligera + ensalada + cuajada',kcal:422,note:'Reconfortante'},
     {name:'Ensalada + pollo salteado + cebolla + maíz',kcal:425,note:'Salteado'}
   ],
   'cena-ternera':[
-    {name:'Ensalada lechuga + solomillo ternera + guisantes + gelatina',kcal:448,note:'⭐ Original'},
+    {name:'Ensalada lechuga + solomillo ternera + guisantes + gelatina',kcal:448,note:'Original'},
     {name:'Ensalada + filete ternera + zanahoria plancha',kcal:440,note:'Con zanahoria'},
     {name:'Ensalada + solomillo pollo + guisantes + cuajada',kcal:420,note:'Más ligera'},
     {name:'Ensalada + entrecot ternera + pimiento asado',kcal:455,note:'Más sabor'},
@@ -436,19 +411,19 @@ const alternatives = {
     {name:'Sopa caldo ternera + filete plancha + ensalada',kcal:445,note:'Reconfortante'}
   ],
   'cena-pavo-sesamo':[
-    {name:'Ensalada lechuga + tortilla pavo y sésamo + cuajada',kcal:408,note:'⭐ Original'},
+    {name:'Ensalada lechuga + tortilla pavo y sésamo + cuajada',kcal:408,note:'Original'},
     {name:'Ensalada + tortilla francesa + pavo + queso',kcal:400,note:'Con queso'},
     {name:'Ensalada + pechuga + huevo cocido + yogur',kcal:405,note:'Proteína doble'},
     {name:'Ensalada + tortilla de claras + queso + pavo',kcal:395,note:'Alta proteína'},
     {name:'Ensalada + revuelto pavo + pimiento + cuajada',kcal:412,note:'Revuelto'},
     {name:'Crema zanahoria + tortilla + gelatina',kcal:408,note:'Caliente'},
-    {name:'Ensalada + tortilla de verduras + requesón',kcal:405,note:'Vegetariana'},
+    {name:'Ensalada + tortilla de verduras + requeson',kcal:405,note:'Vegetariana'},
     {name:'Ensalada + tortilla atún + maíz + yogur',kcal:415,note:'Con atún'},
     {name:'Ensalada + revuelto jamón + huevo + cuajada',kcal:412,note:'Con jamón'},
-    {name:'Ensalada + tortilla de maíz + queso fresco',kcal:408,note:'Con maíz'}
+    {name:'Ensalada + tortilla maíz + queso fresco',kcal:408,note:'Con maíz'}
   ],
   'cena-cerdo':[
-    {name:'Ensalada lechuga + lomo cerdo + zanahoria + gelatina',kcal:458,note:'⭐ Original'},
+    {name:'Ensalada lechuga + lomo cerdo + zanahoria + gelatina',kcal:458,note:'Original'},
     {name:'Ensalada + solomillo cerdo + pimiento asado',kcal:450,note:'Con pimiento'},
     {name:'Ensalada + pollo + calabacín + cuajada',kcal:420,note:'Con pollo'},
     {name:'Ensalada + secreto ibérico plancha + guisantes',kcal:465,note:'Ibérico'},
@@ -460,7 +435,7 @@ const alternatives = {
     {name:'Ensalada + ternera + guisantes + gelatina',kcal:445,note:'Cambio ternera'}
   ],
   'cena-salteado':[
-    {name:'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada',kcal:428,note:'⭐ Original'},
+    {name:'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada',kcal:428,note:'Original'},
     {name:'Ensalada + pollo wok + zanahoria + salsa soja',kcal:420,note:'Asiático'},
     {name:'Ensalada + pavo salteado + calabacín + cuajada',kcal:410,note:'Con pavo'},
     {name:'Ensalada + huevos revueltos + pimiento + maíz',kcal:400,note:'Sin carne'},
@@ -473,505 +448,282 @@ const alternatives = {
   ]
 };
 
-// ─── RECETAS ─────────────────────────────────────────────────────────────────
-const recipes = {
-  'Porridge leche sin lactosa + manzana + canela':{kcal:310,proteina:10,carbs:52,grasa:8,
-    ingredients:[{name:'Avena en copos',qty:'60g'},{name:'Leche sin lactosa',qty:'250ml'},{name:'Manzana',qty:'1 mediana (150g)'},{name:'Canela',qty:'1 cucharadita'},{name:'Miel (opcional)',qty:'1 cucharadita'}],
-    steps:['Pon la leche en un cazo a fuego medio.','Añade la avena y remueve 5 min hasta que espese.','Pela y trocea la manzana en dados.','Sirve en bol con la manzana encima y espolvorea canela.']},
-  'Batido yogur desnatado + pera + melón':{kcal:260,proteina:14,carbs:42,grasa:3,
-    ingredients:[{name:'Yogur desnatado',qty:'200g'},{name:'Pera',qty:'1 pequeña (120g)'},{name:'Melón',qty:'150g'},{name:'Hielo (opcional)',qty:'3-4 cubitos'}],
+// ─── RECETAS ──────────────────────────────────────────────────────────────────
+var recipes = {
+  'Porridge leche sin lactosa + manzana + canela':{kcal:310,p:10,c:52,g:8,
+    ing:[['Avena en copos','60g'],['Leche sin lactosa','250ml'],['Manzana','1 mediana (150g)'],['Canela','1 cucharadita'],['Miel','1 cucharadita']],
+    steps:['Calienta la leche en un cazo a fuego medio.','Añade la avena y remueve 5 min hasta que espese.','Pela y trocea la manzana en dados.','Sirve con la manzana encima y espolvorea canela.']},
+  'Batido yogur desnatado + pera + melón':{kcal:260,p:14,c:42,g:3,
+    ing:[['Yogur desnatado','200g'],['Pera','1 pequeña (120g)'],['Melón','150g'],['Hielo','3-4 cubitos']],
     steps:['Pela y trocea la pera y el melón.','Pon todo en la batidora.','Tritura hasta textura homogénea.','Sirve frío.']},
-  'Yogur desnatado + avena + nueces + arándanos':{kcal:320,proteina:16,carbs:38,grasa:10,
-    ingredients:[{name:'Yogur desnatado',qty:'200g'},{name:'Avena en copos',qty:'40g'},{name:'Nueces',qty:'20g (4-5 nueces)'},{name:'Arándanos',qty:'50g'}],
-    steps:['Pon el yogur en un bol.','Añade la avena y mezcla.','Añade nueces troceadas y arándanos encima.','Deja reposar 5 min para que la avena ablande.']},
-  'Bocadillo atún + lechuga + maíz':{kcal:268,proteina:18,carbs:32,grasa:6,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Atún en conserva escurrido',qty:'80g'},{name:'Lechuga',qty:'2 hojas'},{name:'Maíz dulce',qty:'2 cucharadas'}],
-    steps:['Escurre bien el atún.','Pon lechuga en la base del pan.','Añade el atún desmenuzado y el maíz.','Cierra y consume.']},
-  'Bocadillo pavo + lechuga + queso fresco':{kcal:240,proteina:20,carbs:28,grasa:5,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Pavo en lonchas',qty:'80g'},{name:'Queso fresco',qty:'40g'},{name:'Lechuga',qty:'2 hojas'}],
+  'Yogur desnatado + avena + nueces + arándanos':{kcal:320,p:16,c:38,g:10,
+    ing:[['Yogur desnatado','200g'],['Avena en copos','40g'],['Nueces','20g (4-5 nueces)'],['Arándanos','50g']],
+    steps:['Pon el yogur en un bol.','Añade la avena y mezcla.','Añade nueces troceadas y arándanos encima.','Deja reposar 5 min.']},
+  'Bocadillo atún + lechuga + maíz':{kcal:268,p:18,c:32,g:6,
+    ing:[['Pan integral (2 rebanadas)','60g'],['Atún en conserva escurrido','80g'],['Lechuga','2 hojas'],['Maíz dulce','2 cucharadas']],
+    steps:['Escurre bien el atún.','Pon lechuga en la base del pan.','Añade el atún y el maíz.','Cierra y consume.']},
+  'Bocadillo pavo + lechuga + queso fresco':{kcal:240,p:20,c:28,g:5,
+    ing:[['Pan integral (2 rebanadas)','60g'],['Pavo en lonchas','80g'],['Queso fresco','40g'],['Lechuga','2 hojas']],
     steps:['Pon lechuga en la base.','Añade el pavo y el queso fresco.','Cierra y consume.']},
-  'Bocadillo jamón serrano + lechuga':{kcal:220,proteina:14,carbs:28,grasa:6,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Jamón serrano',qty:'60g'},{name:'Lechuga',qty:'2 hojas'}],
+  'Bocadillo jamón serrano + lechuga':{kcal:220,p:14,c:28,g:6,
+    ing:[['Pan integral (2 rebanadas)','60g'],['Jamón serrano','60g'],['Lechuga','2 hojas']],
     steps:['Pon lechuga en la base del pan.','Añade el jamón serrano.','Cierra y consume.']},
-  'Bocadillo hummus + pimiento asado':{kcal:230,proteina:8,carbs:34,grasa:8,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Hummus',qty:'60g'},{name:'Pimiento asado',qty:'50g'}],
-    steps:['Extiende el hummus sobre el pan.','Añade el pimiento asado en tiras.','Cierra y consume.']},
-  'Plátano + nueces':{kcal:250,proteina:4,carbs:32,grasa:12,
-    ingredients:[{name:'Plátano',qty:'1 mediano (120g)'},{name:'Nueces',qty:'20g (3-4 nueces)'}],
+  'Bocadillo hummus + pimiento asado':{kcal:230,p:8,c:34,g:8,
+    ing:[['Pan integral (2 rebanadas)','60g'],['Hummus','60g'],['Pimiento asado','50g']],
+    steps:['Extiende el hummus sobre el pan.','Añade el pimiento en tiras.','Cierra y consume.']},
+  'Plátano + nueces':{kcal:250,p:4,c:32,g:12,
+    ing:[['Plátano','1 mediano (120g)'],['Nueces','20g (3-4 nueces)']],
     steps:['Pela el plátano.','Consume junto a las nueces.']},
-  'Melocotón + almendras':{kcal:190,proteina:5,carbs:22,grasa:9,
-    ingredients:[{name:'Melocotón',qty:'1 mediano (150g)'},{name:'Almendras',qty:'15g (12 almendras)'}],
+  'Melocotón + almendras':{kcal:190,p:5,c:22,g:9,
+    ing:[['Melocotón','1 mediano (150g)'],['Almendras','15g (12 almendras)']],
     steps:['Lava y trocea el melocotón.','Consume junto a las almendras.']},
-  'Pera + avellanas':{kcal:185,proteina:3,carbs:26,grasa:9,
-    ingredients:[{name:'Pera',qty:'1 mediana (150g)'},{name:'Avellanas',qty:'15g'}],
+  'Pera + avellanas':{kcal:185,p:3,c:26,g:9,
+    ing:[['Pera','1 mediana (150g)'],['Avellanas','15g']],
     steps:['Lava y trocea la pera.','Consume junto a las avellanas.']},
-  'Fruta de temporada':{kcal:65,proteina:1,carbs:15,grasa:0,
-    ingredients:[{name:'Fruta de temporada',qty:'1 pieza mediana (150g)'}],
+  'Fruta de temporada':{kcal:65,p:1,c:15,g:0,
+    ing:[['Fruta de temporada','1 pieza mediana (150g)']],
     steps:['Lava la fruta.','Consume entera o troceada.','Opciones: manzana, pera, naranja, mandarina, cerezas, melocotón, albaricoques.']},
-  'Manzana':{kcal:70,proteina:0,carbs:18,grasa:0,
-    ingredients:[{name:'Manzana',qty:'1 mediana (150g)'}],
+  'Manzana':{kcal:70,p:0,c:18,g:0,
+    ing:[['Manzana','1 mediana (150g)']],
     steps:['Lava la manzana.','Consume entera o troceada.']},
-  'Cerezas':{kcal:70,proteina:1,carbs:16,grasa:0,
-    ingredients:[{name:'Cerezas',qty:'150g'}],
+  'Cerezas':{kcal:70,p:1,c:16,g:0,
+    ing:[['Cerezas','150g']],
     steps:['Lava las cerezas.','Consume directamente.']},
-  'Albaricoques':{kcal:70,proteina:1,carbs:16,grasa:0,
-    ingredients:[{name:'Albaricoques',qty:'3 unidades medianas (150g)'}],
+  'Albaricoques':{kcal:70,p:1,c:16,g:0,
+    ing:[['Albaricoques','3 medianos (150g)']],
     steps:['Lava los albaricoques.','Consume directamente.']},
-  'Pasta + atún + maíz + guisantes + aceite oliva':{kcal:518,proteina:32,carbs:68,grasa:12,
-    ingredients:[{name:'Pasta (espirales o macarrones)',qty:'80g en seco'},{name:'Atún en conserva escurrido',qty:'120g'},{name:'Maíz dulce',qty:'3 cucharadas'},{name:'Guisantes cocidos',qty:'50g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Sal',qty:'al gusto'}],
-    steps:['Cuece la pasta en agua con sal 8-10 min. Escurre.','Escurre bien el atún.','Mezcla pasta, atún, maíz y guisantes en un bol.','Aliña con aceite de oliva y sal.','Sirve templada o fría.']},
-  'Ensalada pasta fría + atún + maíz + almendras':{kcal:480,proteina:28,carbs:58,grasa:14,
-    ingredients:[{name:'Pasta (espirales o lazos)',qty:'80g en seco'},{name:'Atún en conserva escurrido',qty:'120g'},{name:'Maíz dulce',qty:'3 cucharadas'},{name:'Almendras crudas',qty:'20g'},{name:'Lechuga',qty:'50g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Sal',qty:'al gusto'}],
-    steps:['Cuece la pasta 8-10 min. Escurre y enfría con agua fría.','Escurre bien el atún.','Mezcla pasta, atún, maíz y lechuga troceada en bol.','Añade las almendras enteras o troceadas.','Aliña con aceite y sal. Sirve fría.']},
-  'Espaguetis boloñesa ternera + zanahoria + cebolla':{kcal:548,proteina:38,carbs:62,grasa:12,
-    ingredients:[{name:'Espaguetis',qty:'80g en seco'},{name:'Carne picada de ternera',qty:'150g'},{name:'Cebolla',qty:'1/2 mediana'},{name:'Zanahoria',qty:'1 pequeña'},{name:'Tomate frito casero',qty:'3 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Sal y pimienta',qty:'al gusto'}],
-    steps:['Cuece los espaguetis en agua con sal 8-10 min.','Pica cebolla y zanahoria en daditos.','Sofríe cebolla y zanahoria en aceite 5 min.','Añade la carne, salpimenta y cocina 5 min.','Incorpora el tomate frito, cocina 5 min más.','Escurre la pasta y mezcla con la salsa.']},
-  'Arroz basmati + hamburguesa ternera + cebolla caramelizada':{kcal:490,proteina:36,carbs:52,grasa:14,
-    ingredients:[{name:'Arroz basmati',qty:'70g en seco'},{name:'Carne picada de ternera',qty:'150g'},{name:'Cebolla',qty:'1 mediana'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Sal, pimienta y orégano',qty:'al gusto'}],
-    steps:['Cuece el arroz basmati 12 min en agua con sal. Escurre.','Corta la cebolla en juliana fina.','Sofríe la cebolla en aceite a fuego bajo 15-20 min hasta que dore.','Forma una hamburguesa con la carne, salpimenta y añade orégano.','Cocina la hamburguesa a la plancha 4-5 min por lado.','Sirve sobre el arroz con la cebolla caramelizada encima.']},
-  'Patata asada + pollo al horno + ensalada lechuga':{kcal:475,proteina:38,carbs:44,grasa:10,
-    ingredients:[{name:'Pechuga de pollo',qty:'180g'},{name:'Patata mediana',qty:'1 unidad (200g)'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Orégano y pimentón',qty:'al gusto'},{name:'Sal',qty:'al gusto'}],
+  'Pasta + atún + maíz + guisantes + aceite oliva':{kcal:518,p:32,c:68,g:12,
+    ing:[['Pasta (espirales o macarrones)','80g en seco'],['Atún en conserva escurrido','120g'],['Maíz dulce','3 cucharadas'],['Guisantes cocidos','50g'],['Aceite de oliva','1 cucharada'],['Sal','al gusto']],
+    steps:['Cuece la pasta en agua con sal 8-10 min. Escurre.','Escurre el atún.','Mezcla pasta, atún, maíz y guisantes en un bol.','Aliña con aceite de oliva y sal.','Sirve templada o fría.']},
+  'Ensalada pasta fría + atún + maíz + almendras':{kcal:480,p:28,c:58,g:14,
+    ing:[['Pasta (espirales)','80g en seco'],['Atún en conserva escurrido','120g'],['Maíz dulce','3 cucharadas'],['Almendras crudas','20g'],['Lechuga','50g'],['Aceite de oliva','1 cucharada']],
+    steps:['Cuece la pasta 8-10 min. Escurre y enfría.','Escurre el atún.','Mezcla pasta, atún, maíz, lechuga y almendras.','Aliña con aceite y sal. Sirve fría.']},
+  'Espaguetis boloñesa ternera + zanahoria + cebolla':{kcal:548,p:38,c:62,g:12,
+    ing:[['Espaguetis','80g en seco'],['Carne picada de ternera','150g'],['Cebolla','1/2 mediana'],['Zanahoria','1 pequeña'],['Tomate frito casero','3 cucharadas'],['Aceite de oliva','1 cucharada']],
+    steps:['Cuece los espaguetis en agua con sal 8-10 min.','Pica cebolla y zanahoria en daditos. Sofríe en aceite 5 min.','Añade la carne, salpimenta y cocina 5 min.','Incorpora el tomate frito, cocina 5 min más.','Escurre la pasta y mezcla con la salsa.']},
+  'Arroz basmati + hamburguesa ternera + cebolla caramelizada':{kcal:490,p:36,c:52,g:14,
+    ing:[['Arroz basmati','70g en seco'],['Carne picada de ternera','150g'],['Cebolla','1 mediana'],['Aceite de oliva','1 cucharada'],['Sal y orégano','al gusto']],
+    steps:['Cuece el arroz basmati 12 min. Escurre.','Corta la cebolla en juliana fina. Sofríe a fuego bajo 15-20 min hasta que dore.','Forma una hamburguesa con la carne, salpimenta y añade orégano.','Cocina a la plancha 4-5 min por lado.','Sirve sobre el arroz con la cebolla encima.']},
+  'Patata asada + pollo al horno + ensalada lechuga':{kcal:475,p:38,c:44,g:10,
+    ing:[['Pechuga de pollo','180g'],['Patata mediana','1 unidad (200g)'],['Lechuga','100g'],['Maíz dulce','2 cucharadas'],['Aceite de oliva','1 cucharada'],['Orégano y pimentón','al gusto']],
     steps:['Precalienta el horno a 200°C.','Lava la patata, pincha con un tenedor y envuelve en papel aluminio. Hornea 45-50 min.','Aliña el pollo con aceite, sal, orégano y pimentón. Hornea 20-25 min.','Monta la ensalada con lechuga y maíz. Aliña.','Sirve todo junto.']},
-  'Tortilla de patata y pimiento + ensalada lechuga':{kcal:470,proteina:22,carbs:42,grasa:20,
-    ingredients:[{name:'Huevos',qty:'3 unidades'},{name:'Patata mediana',qty:'1 unidad (200g)'},{name:'Pimiento rojo',qty:'1/2 unidad'},{name:'Cebolla',qty:'1/4 unidad'},{name:'Aceite de oliva',qty:'2 cucharadas'},{name:'Lechuga',qty:'80g'},{name:'Sal',qty:'al gusto'}],
-    steps:['Pela y corta la patata en láminas finas. Pica el pimiento y cebolla.','Pocha todo en aceite a fuego medio-bajo 15 min.','Escurre el aceite y mezcla con los huevos batidos y sal.','Vierte en sartén antiadherente a fuego medio. Cuaja 4 min por cada lado.','Deja reposar 2 min. Sirve con ensalada de lechuga aliñada.']},
+  'Tortilla de patata y pimiento + ensalada lechuga':{kcal:470,p:22,c:42,g:20,
+    ing:[['Huevos','3 unidades'],['Patata mediana','1 unidad (200g)'],['Pimiento rojo','1/2 unidad'],['Cebolla','1/4 unidad'],['Aceite de oliva','2 cucharadas'],['Lechuga','80g']],
+    steps:['Pela y corta la patata en láminas finas. Pica el pimiento y cebolla.','Pocha todo en aceite a fuego medio-bajo 15 min.','Escurre el aceite y mezcla con los huevos batidos y sal.','Cuaja en sartén 4 min por cada lado.','Deja reposar 2 min. Sirve con ensalada de lechuga.']},
+  'Lasagna de carne al horno':{kcal:520,p:36,c:52,g:18,
+    ing:[['Placas de lasaña precocidas','4 unidades'],['Carne picada de ternera','150g'],['Tomate frito casero','4 cucharadas'],['Cebolla','1/4 unidad'],['Bechamel light','100ml'],['Queso rallado','25g'],['Aceite de oliva','1 cucharada']],
+    steps:['Precalienta el horno a 180°C.','Sofríe la cebolla 3 min, añade la carne y cocina 5 min.','Añade el tomate frito y cocina 3 min más.','En fuente: bechamel, placas, carne, placas, carne, bechamel.','Cubre con queso rallado. Hornea 20-25 min hasta que dore.']},
+  'Pollo al horno con patatas y cebolla':{kcal:480,p:40,c:38,g:14,
+    ing:[['Muslo o contramuslo sin piel','200g'],['Patata mediana','1 unidad (180g)'],['Cebolla','1/2 mediana'],['Pimiento rojo','1/2 unidad'],['Aceite de oliva','1 cucharada'],['Pimentón dulce y orégano','al gusto']],
+    steps:['Precalienta el horno a 200°C.','Corta la patata en gajos, la cebolla en tiras y el pimiento en trozos.','Pon las verduras en una fuente y aliña con aceite, sal y pimentón.','Coloca el pollo encima y aliña igual.','Hornea 35-40 min dando la vuelta al pollo a mitad.']},
+  'Milanesa de pollo al horno + arroz':{kcal:485,p:40,c:50,g:12,
+    ing:[['Pechuga de pollo fileteada','180g'],['Pan rallado','30g'],['Huevo','1 unidad'],['Arroz','70g en seco'],['Limón','unas gotas'],['Sal y orégano','al gusto'],['Aceite spray','al gusto']],
+    steps:['Precalienta el horno a 200°C.','Cuece el arroz 15 min en agua con sal. Escurre.','Bate el huevo con sal y orégano.','Pasa el pollo por huevo y luego por pan rallado.','Pon en bandeja con papel. Pulveriza con aceite spray.','Hornea 20 min dando la vuelta a mitad. Sirve con arroz y limón.']},
+  'Arroz integral + pollo + pimiento + zanahoria':{kcal:450,p:34,c:52,g:8,
+    ing:[['Arroz integral','70g en seco'],['Pechuga de pollo','150g'],['Pimiento rojo','1/2 unidad'],['Zanahoria','1 pequeña'],['Aceite de oliva','1 cucharada']],
+    steps:['Cuece el arroz integral 20-25 min.','Corta el pollo en tiras, pimiento y zanahoria en juliana.','Saltea pimiento y zanahoria en aceite 3-4 min.','Añade el pollo y cocina 6-8 min.','Mezcla con el arroz cocido.']},
+  'Pasta + pollo + queso parmesano + orégano':{kcal:472,p:36,c:52,g:12,
+    ing:[['Pasta','80g en seco'],['Pechuga de pollo','140g'],['Queso parmesano rallado','25g'],['Aceite de oliva','1 cucharada'],['Orégano','1 cucharadita']],
+    steps:['Cuece la pasta 8-10 min. Escurre.','Corta el pollo en tiras y cocina a la plancha 6-8 min.','Mezcla pasta con pollo y aceite.','Añade el parmesano y orégano. Sirve caliente.']},
+  'Ensalada lechuga + merluza plancha + zanahoria + gelatina':{kcal:378,p:38,c:18,g:10,
+    ing:[['Merluza (filete)','180g'],['Lechuga','100g'],['Zanahoria rallada','1 pequeña'],['Maíz dulce','2 cucharadas'],['Aceite de oliva','1 cucharada'],['Gelatina 0%','1 unidad']],
+    steps:['Lava y trocea la lechuga. Ralla la zanahoria.','Monta ensalada con lechuga, zanahoria y maíz. Aliña.','Cocina la merluza a la plancha 3-4 min por lado.','Sirve la merluza sobre la ensalada. Gelatina de postre.']},
+  'Ensalada lechuga + maíz + solomillo pollo + cuajada':{kcal:428,p:42,c:22,g:12,
+    ing:[['Solomillo de pollo','180g'],['Lechuga','100g'],['Maíz dulce','3 cucharadas'],['Aceite de oliva','1 cucharada'],['Cuajada','1 unidad'],['Miel','1 cucharadita']],
+    steps:['Lava y trocea la lechuga. Monta ensalada con maíz. Aliña.','Corta el solomillo en medallones, salpimenta.','Cocina a la plancha 4-5 min por lado.','Sirve el pollo sobre la ensalada. Cuajada con miel de postre.']},
+  'Ensalada lechuga + maíz + tortilla francesa + cuajada':{kcal:418,p:26,c:28,g:18,
+    ing:[['Huevos','3 unidades'],['Lechuga','100g'],['Maíz dulce','3 cucharadas'],['Aceite de oliva','1 cucharada'],['Cuajada','1 unidad'],['Miel','1 cucharadita']],
+    steps:['Monta ensalada con lechuga y maíz. Aliña.','Bate los huevos con sal.','Calienta aceite en sartén. Vierte los huevos.','Cuando los bordes cuajen, dobla la tortilla.','Sirve con ensalada. Cuajada con miel de postre.']},
+  'Ensalada lechuga + solomillo ternera + guisantes + gelatina':{kcal:448,p:40,c:20,g:16,
+    ing:[['Solomillo de ternera','170g'],['Lechuga','100g'],['Guisantes cocidos','50g'],['Aceite de oliva','1 cucharada'],['Gelatina 0%','1 unidad']],
+    steps:['Monta ensalada con lechuga y guisantes. Aliña.','Salpimenta el solomillo.','Cocina a la plancha 3-4 min por lado.','Sirve la ternera sobre la ensalada. Gelatina de postre.']},
+  'Ensalada lechuga + tortilla pavo y sésamo + cuajada':{kcal:408,p:30,c:22,g:16,
+    ing:[['Huevos','2 unidades'],['Pavo en lonchas','60g'],['Semillas de sésamo','1 cucharadita'],['Lechuga','100g'],['Maíz dulce','2 cucharadas'],['Aceite de oliva','1 cucharada'],['Cuajada','1 unidad'],['Miel','1 cucharadita']],
+    steps:['Monta ensalada con lechuga y maíz. Aliña.','Bate los huevos, añade pavo troceado y sésamo.','Cuaja en sartén con aceite.','Sirve la tortilla sobre la ensalada. Cuajada con miel de postre.']},
+  'Ensalada lechuga + lomo cerdo + zanahoria + gelatina':{kcal:458,p:38,c:18,g:18,
+    ing:[['Lomo de cerdo','170g'],['Lechuga','100g'],['Zanahoria rallada','1 pequeña'],['Maíz dulce','2 cucharadas'],['Aceite de oliva','1 cucharada'],['Gelatina 0%','1 unidad']],
+    steps:['Monta ensalada con lechuga, zanahoria y maíz. Aliña.','Salpimenta el lomo.','Cocina a la plancha 4-5 min por lado.','Sirve sobre la ensalada. Gelatina de postre.']},
+  'Ensalada lechuga + maíz + salteado pollo + pimiento + cuajada':{kcal:428,p:40,c:24,g:14,
+    ing:[['Pechuga de pollo','160g'],['Pimiento rojo','1/2 unidad'],['Cebolla','1/4 unidad'],['Lechuga','100g'],['Maíz dulce','3 cucharadas'],['Aceite de oliva','1 cucharada'],['Cuajada','1 unidad'],['Miel','1 cucharadita']],
+    steps:['Monta ensalada con lechuga y maíz. Aliña.','Corta el pollo en tiras, pica pimiento y cebolla.','Saltea pimiento y cebolla 3 min. Añade el pollo y cocina 6-8 min.','Sirve el salteado sobre la ensalada. Cuajada con miel.']}
+};
 
-  'Yogur griego 0% + avena + plátano + canela':{kcal:300,proteina:18,carbs:42,grasa:5,
-    ingredients:[{name:'Yogur griego 0%',qty:'200g'},{name:'Avena en copos',qty:'35g'},{name:'Plátano',qty:'1/2 mediano (60g)'},{name:'Canela',qty:'1 cucharadita'}],
-    steps:['Pon el yogur griego en un bol.','Añade la avena y mezcla bien.','Trocea el plátano en rodajas y coloca encima.','Espolvorea canela. Deja reposar 5 min para que la avena ablande.']},
-  'Overnight oats + leche vegetal + arándanos + miel':{kcal:308,proteina:9,carbs:52,grasa:7,
-    ingredients:[{name:'Avena en copos',qty:'60g'},{name:'Leche vegetal (avena o almendra)',qty:'200ml'},{name:'Arándanos',qty:'50g'},{name:'Miel',qty:'1 cucharadita'},{name:'Chía (opcional)',qty:'1 cucharadita'}],
-    steps:['La noche anterior: mezcla avena + leche vegetal + chía en un bol o tarro.','Remueve bien, tapa y mete en nevera toda la noche.','Por la mañana: añade los arándanos encima y rocía con miel.','Consume frío directamente del tarro.']},
-  'Tostadas pan integral + huevo cocido + queso fresco':{kcal:305,proteina:18,carbs:32,grasa:10,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Huevos',qty:'2 unidades'},{name:'Queso fresco',qty:'40g'},{name:'Sal y pimienta',qty:'al gusto'}],
-    steps:['Cuece los huevos en agua hirviendo 10 min. Enfría y pela.','Tuesta el pan.','Coloca el queso fresco encima del pan.','Añade el huevo cocido cortado en rodajas. Salpimenta.']},
-  'Batido avena + proteína whey + fresas + leche':{kcal:295,proteina:28,carbs:32,grasa:5,
-    ingredients:[{name:'Avena en copos',qty:'40g'},{name:'Proteína whey (1 cacito)',qty:'30g'},{name:'Fresas',qty:'100g'},{name:'Leche sin lactosa',qty:'250ml'}],
-    steps:['Pon todos los ingredientes en la batidora.','Tritura 30-40 segundos hasta que quede homogéneo.','Sirve inmediatamente o refrigera si no vas a tomar enseguida.']},
-  'Muesli sin azúcar + leche sin lactosa + kiwi':{kcal:305,proteina:10,carbs:48,grasa:8,
-    ingredients:[{name:'Muesli sin azúcar añadido',qty:'60g'},{name:'Leche sin lactosa',qty:'200ml'},{name:'Kiwi',qty:'1 unidad'}],
-    steps:['Pon el muesli en un bol.','Añade la leche sin lactosa.','Pela y trocea el kiwi en rodajas y coloca encima.','Deja reposar 2-3 min antes de consumir.']},
-  'Skyr + granola + arándanos + nueces':{kcal:310,proteina:20,carbs:35,grasa:9,
-    ingredients:[{name:'Skyr natural',qty:'200g'},{name:'Granola sin azúcar',qty:'30g'},{name:'Arándanos',qty:'50g'},{name:'Nueces',qty:'15g'}],
-    steps:['Pon el skyr en un bol.','Añade la granola encima.','Coloca los arándanos y las nueces troceadas.','Consume inmediatamente para que la granola no se ablande.']},
-  'Pan integral + mantequilla cacahuete + manzana':{kcal:312,proteina:10,carbs:42,grasa:12,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Mantequilla de cacahuete',qty:'20g'},{name:'Manzana',qty:'1 mediana (150g)'}],
-    steps:['Tuesta el pan ligeramente.','Extiende la mantequilla de cacahuete sobre el pan.','Pela y lamina la manzana.','Coloca las láminas de manzana encima y consume.']},
-  'Tortitas avena (2) + miel + plátano':{kcal:315,proteina:10,carbs:52,grasa:6,
-    ingredients:[{name:'Avena en copos',qty:'60g'},{name:'Huevo',qty:'1 unidad'},{name:'Leche sin lactosa',qty:'50ml'},{name:'Plátano',qty:'1/2 mediano'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Mezcla avena + huevo + leche hasta obtener una masa.','Calienta una sartén antiadherente sin aceite.','Vierte la mitad de la masa y cocina 2-3 min por lado. Repite.','Sirve con el plátano en rodajas y la miel por encima.']},
-  'Bowl yogur + granola + mango + coco rallado':{kcal:320,proteina:14,carbs:48,grasa:8,
-    ingredients:[{name:'Yogur griego 0%',qty:'200g'},{name:'Granola sin azúcar',qty:'30g'},{name:'Mango',qty:'100g'},{name:'Coco rallado',qty:'10g'}],
-    steps:['Pon el yogur en un bol.','Añade la granola.','Pela y trocea el mango en dados y coloca encima.','Espolvorea el coco rallado. Consume inmediatamente.']},
-  'Smoothie manzana + yogur 0% + avena':{kcal:258,proteina:12,carbs:42,grasa:3,
-    ingredients:[{name:'Manzana',qty:'1 mediana (150g)'},{name:'Yogur desnatado 0%',qty:'150g'},{name:'Avena en copos',qty:'30g'},{name:'Agua o leche vegetal',qty:'100ml'}],
-    steps:['Pela y trocea la manzana.','Pon todos los ingredientes en la batidora.','Tritura hasta textura homogénea.','Sirve frío. Añade hielo si quieres más fresco.']},
-  'Queso cottage + fruta temporada + avena':{kcal:260,proteina:18,carbs:30,grasa:5,
-    ingredients:[{name:'Queso cottage',qty:'150g'},{name:'Avena en copos',qty:'30g'},{name:'Fruta de temporada',qty:'100g'},{name:'Miel (opcional)',qty:'1 cucharadita'}],
-    steps:['Pon el queso cottage en un bol.','Añade la avena y mezcla.','Trocea la fruta y coloca encima.','Añade miel si quieres más dulzor.']},
-  'Tostada maíz + pavo + pimiento rojo asado':{kcal:250,proteina:16,carbs:28,grasa:5,
-    ingredients:[{name:'Tostadas de maíz (2)',qty:'40g'},{name:'Pavo en lonchas',qty:'80g'},{name:'Pimiento rojo asado',qty:'50g'}],
-    steps:['Pon las tostadas en un plato.','Coloca el pavo encima de cada tostada.','Añade el pimiento rojo asado en tiras.','Consume inmediatamente.']},
-  'Clara revuelta + tostada integral + queso':{kcal:248,proteina:22,carbs:24,grasa:6,
-    ingredients:[{name:'Claras de huevo',qty:'4 unidades (120g)'},{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Queso fresco light',qty:'30g'},{name:'Sal y pimienta',qty:'al gusto'}],
-    steps:['Bate las claras con sal y pimienta.','Cocina en sartén antiadherente a fuego medio removiendo hasta que cuajen.','Tuesta el pan.','Sirve las claras revueltas sobre el pan con el queso fresco encima.']},
-  'Pan centeno + jamón york + kiwi':{kcal:255,proteina:16,carbs:34,grasa:5,
-    ingredients:[{name:'Pan de centeno (2 rebanadas)',qty:'60g'},{name:'Jamón york',qty:'80g'},{name:'Kiwi',qty:'1 unidad'}],
-    steps:['Coloca el jamón york sobre el pan de centeno.','Pela el kiwi y córtalo en rodajas.','Consume el bocadillo y el kiwi por separado o junto.']},
-  'Porridge avena + leche sin lactosa + frutos rojos':{kcal:310,proteina:11,carbs:50,grasa:7,
-    ingredients:[{name:'Avena en copos',qty:'60g'},{name:'Leche sin lactosa',qty:'250ml'},{name:'Frutos rojos (fresas, frambuesas, arándanos)',qty:'80g'},{name:'Miel (opcional)',qty:'1 cucharadita'}],
-    steps:['Calienta la leche en un cazo a fuego medio.','Añade la avena y remueve 5 min hasta que espese.','Sirve en bol y coloca los frutos rojos encima.','Añade miel al gusto.']},
-  'Skyr 0% + granola + manzana troceada':{kcal:315,proteina:20,carbs:42,grasa:5,
-    ingredients:[{name:'Skyr 0%',qty:'200g'},{name:'Granola sin azúcar',qty:'30g'},{name:'Manzana',qty:'1/2 mediana (80g)'}],
-    steps:['Pon el skyr en un bol.','Añade la granola encima.','Pela y trocea la manzana en dados y coloca encima.','Consume inmediatamente.']},
-  'Muesli + leche vegetal + fresas + almendras':{kcal:318,proteina:10,carbs:48,grasa:10,
-    ingredients:[{name:'Muesli sin azúcar',qty:'60g'},{name:'Leche vegetal',qty:'200ml'},{name:'Fresas',qty:'80g'},{name:'Almendras',qty:'15g'}],
-    steps:['Pon el muesli en un bol.','Añade la leche vegetal.','Lava y corta las fresas por la mitad. Coloca encima junto a las almendras.','Deja reposar 2-3 min y consume.']},
-  'Overnight oats + chía + arándanos + miel':{kcal:322,proteina:11,carbs:52,grasa:8,
-    ingredients:[{name:'Avena en copos',qty:'60g'},{name:'Semillas de chía',qty:'10g'},{name:'Leche vegetal o sin lactosa',qty:'200ml'},{name:'Arándanos',qty:'50g'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['La noche anterior: mezcla avena + chía + leche en un tarro.','Remueve bien, tapa y refrigera toda la noche.','Por la mañana: añade los arándanos y la miel encima.','Consume frío.']},
-  'Pan integral + mantequilla almendra + plátano':{kcal:316,proteina:10,carbs:44,grasa:12,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Mantequilla de almendra',qty:'20g'},{name:'Plátano',qty:'1/2 mediano (60g)'}],
-    steps:['Tuesta el pan.','Extiende la mantequilla de almendra.','Corta el plátano en rodajas y coloca encima.','Consume inmediatamente.']},
-  'Batido avena + yogur griego + frambuesas':{kcal:312,proteina:18,carbs:42,grasa:6,
-    ingredients:[{name:'Avena en copos',qty:'40g'},{name:'Yogur griego 0%',qty:'150g'},{name:'Frambuesas',qty:'80g'},{name:'Leche sin lactosa',qty:'100ml'}],
-    steps:['Pon todos los ingredientes en la batidora.','Tritura hasta textura homogénea.','Sirve frío. Puedes añadir hielo para más frescor.']},
-  'Huevos revueltos (2) + tostada integral + queso':{kcal:320,proteina:20,carbs:26,grasa:13,
-    ingredients:[{name:'Huevos',qty:'2 unidades'},{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Queso fresco',qty:'30g'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Sal y pimienta',qty:'al gusto'}],
-    steps:['Bate los huevos con sal y pimienta.','Calienta aceite en sartén a fuego bajo.','Añade los huevos y remueve constantemente hasta que cuajen suavemente.','Tuesta el pan. Sirve los revueltos encima con queso fresco.']},
-  'Bocadillo pechuga pollo + lechuga + queso':{kcal:272,proteina:24,carbs:26,grasa:8,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Pechuga de pollo cocida o plancha',qty:'80g'},{name:'Lechuga',qty:'2 hojas'},{name:'Queso fresco',qty:'30g'}],
-    steps:['Cocina la pechuga a la plancha si no está lista. Déjala enfriar y lamina.','Pon lechuga en la base del pan.','Añade el pollo laminado y el queso fresco.','Cierra y consume.']},
-  'Bol pequeño arroz integral + atún + maíz':{kcal:275,proteina:18,carbs:38,grasa:5,
-    ingredients:[{name:'Arroz integral cocido',qty:'100g (40g en seco)'},{name:'Atún en conserva escurrido',qty:'60g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Sal',qty:'al gusto'}],
-    steps:['Cuece el arroz integral 20-25 min. Escurre y deja enfriar.','Escurre el atún.','Mezcla arroz, atún y maíz en un bol.','Aliña con aceite y sal. Sirve templado o frío.']},
-  'Cracker integral + atún + queso fresco':{kcal:260,proteina:18,carbs:24,grasa:8,
-    ingredients:[{name:'Crackers integrales',qty:'4 unidades (30g)'},{name:'Atún en conserva escurrido',qty:'60g'},{name:'Queso fresco',qty:'30g'}],
-    steps:['Escurre el atún.','Extiende el queso fresco sobre cada cracker.','Añade el atún desmenuzado encima.','Consume inmediatamente.']},
-  'Pita integral + atún + lechuga + maíz':{kcal:270,proteina:18,carbs:34,grasa:5,
-    ingredients:[{name:'Pan de pita integral',qty:'1 unidad (60g)'},{name:'Atún en conserva escurrido',qty:'80g'},{name:'Lechuga',qty:'2 hojas'},{name:'Maíz dulce',qty:'2 cucharadas'}],
-    steps:['Abre el pan de pita por la mitad.','Introduce la lechuga dentro.','Añade el atún desmenuzado y el maíz.','Consume inmediatamente.']},
-  'Tostada centeno + caballa al natural + lechuga':{kcal:265,proteina:18,carbs:24,grasa:8,
-    ingredients:[{name:'Pan de centeno (2 rebanadas)',qty:'60g'},{name:'Caballa al natural (lata)',qty:'80g'},{name:'Lechuga',qty:'2 hojas'}],
-    steps:['Tuesta el pan de centeno.','Escurre la caballa.','Pon lechuga sobre el pan.','Añade la caballa desmenuzada encima y consume.']},
-  'Tortilla trigo + pavo + lechuga + maíz':{kcal:265,proteina:18,carbs:30,grasa:6,
-    ingredients:[{name:'Tortilla de trigo integral',qty:'1 unidad (60g)'},{name:'Pavo en lonchas',qty:'80g'},{name:'Lechuga',qty:'2 hojas'},{name:'Maíz dulce',qty:'2 cucharadas'}],
-    steps:['Extiende la tortilla sobre una superficie plana.','Coloca la lechuga, el pavo y el maíz en el centro.','Enrolla la tortilla y consume.']},
-  'Tostada integral + atún + maíz + queso fresco':{kcal:265,proteina:20,carbs:28,grasa:7,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Atún en conserva escurrido',qty:'70g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Queso fresco',qty:'25g'}],
-    steps:['Tuesta el pan.','Extiende el queso fresco sobre el pan.','Añade el atún y el maíz encima.','Consume inmediatamente.']},
-  'Pan molde integral + atún + pimiento asado':{kcal:268,proteina:18,carbs:30,grasa:6,
-    ingredients:[{name:'Pan de molde integral (2 rebanadas)',qty:'60g'},{name:'Atún en conserva escurrido',qty:'80g'},{name:'Pimiento asado (tira)',qty:'50g'}],
-    steps:['Escurre el atún.','Coloca el atún sobre una rebanada.','Añade el pimiento asado cortado en tiras.','Tapa con la otra rebanada y consume.']},
-  'Cracker integral + pavo + mostaza + lechuga':{kcal:238,proteina:16,carbs:22,grasa:6,
-    ingredients:[{name:'Crackers integrales',qty:'4 unidades (30g)'},{name:'Pavo en lonchas',qty:'60g'},{name:'Mostaza',qty:'1 cucharadita'},{name:'Lechuga',qty:'1 hoja'}],
-    steps:['Extiende un poco de mostaza sobre cada cracker.','Coloca un trozo de lechuga y pavo encima.','Consume inmediatamente.']},
-  'Wrap lechuga + pavo + maíz + mostaza':{kcal:228,proteina:18,carbs:20,grasa:5,
-    ingredients:[{name:'Hojas de lechuga grandes',qty:'4 hojas'},{name:'Pavo en lonchas',qty:'80g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Mostaza',qty:'1 cucharadita'}],
-    steps:['Usa hojas de lechuga como sustituto del pan.','Pon pavo y maíz en el centro de cada hoja.','Añade un poco de mostaza.','Enrolla la hoja y consume como wrap.']},
-  'Tortita arroz + pollo desmenuzado + queso':{kcal:240,proteina:18,carbs:26,grasa:7,
-    ingredients:[{name:'Tortitas de arroz',qty:'3 unidades'},{name:'Pechuga de pollo cocida y desmenuzada',qty:'70g'},{name:'Queso fresco',qty:'25g'}],
-    steps:['Desmenuza el pollo cocido.','Extiende queso fresco sobre cada tortita.','Coloca el pollo desmenuzado encima.','Consume inmediatamente.']},
-  'Pita mini + jamón york + lechuga':{kcal:242,proteina:16,carbs:30,grasa:5,
-    ingredients:[{name:'Pan de pita mini',qty:'1 unidad (50g)'},{name:'Jamón york',qty:'70g'},{name:'Lechuga',qty:'2 hojas'}],
-    steps:['Abre el pan de pita.','Introduce la lechuga.','Añade el jamón york.','Consume inmediatamente.']},
-  'Tostada maíz + jamón york + pimiento asado':{kcal:235,proteina:14,carbs:28,grasa:5,
-    ingredients:[{name:'Tostadas de maíz (2)',qty:'40g'},{name:'Jamón york',qty:'70g'},{name:'Pimiento asado',qty:'50g'}],
-    steps:['Coloca el jamón york sobre las tostadas.','Añade el pimiento asado en tiras encima.','Consume inmediatamente.']},
-  'Queso fresco batido + manzana + nueces':{kcal:245,proteina:12,carbs:28,grasa:10,
-    ingredients:[{name:'Queso fresco batido',qty:'150g'},{name:'Manzana',qty:'1/2 mediana (80g)'},{name:'Nueces',qty:'15g (3 nueces)'}],
-    steps:['Pon el queso fresco batido en un bol.','Pela y trocea la manzana en dados.','Añade la manzana y las nueces troceadas encima.','Consume inmediatamente.']},
-  'Cracker + jamón curado + lechuga':{kcal:218,proteina:12,carbs:20,grasa:8,
-    ingredients:[{name:'Crackers integrales',qty:'4 unidades (30g)'},{name:'Jamón curado',qty:'40g'},{name:'Lechuga',qty:'1 hoja'}],
-    steps:['Coloca un trozo de lechuga sobre cada cracker.','Añade el jamón curado encima.','Consume inmediatamente.']},
-  'Pan centeno + lomo ibérico + lechuga':{kcal:222,proteina:14,carbs:22,grasa:8,
-    ingredients:[{name:'Pan de centeno (2 rebanadas)',qty:'60g'},{name:'Lomo ibérico en lonchas',qty:'50g'},{name:'Lechuga',qty:'2 hojas'}],
-    steps:['Coloca lechuga en la base del pan.','Añade el lomo ibérico encima.','Cierra el bocadillo y consume.']},
-  'Tostada integral + mozzarella light + pimiento':{kcal:215,proteina:12,carbs:24,grasa:6,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Mozzarella light',qty:'40g'},{name:'Pimiento asado',qty:'40g'}],
-    steps:['Tuesta el pan.','Coloca la mozzarella en lonchas sobre el pan.','Añade el pimiento asado en tiras.','Consume inmediatamente o calienta 1 min en microondas.']},
-  'Wrap mini + jamón york + lechuga + maíz':{kcal:220,proteina:14,carbs:26,grasa:5,
-    ingredients:[{name:'Tortilla de trigo mini',qty:'1 unidad (50g)'},{name:'Jamón york',qty:'60g'},{name:'Lechuga',qty:'1 hoja'},{name:'Maíz dulce',qty:'1 cucharada'}],
-    steps:['Extiende la tortilla.','Coloca lechuga, jamón y maíz en el centro.','Enrolla y consume.']},
-  'Pera + 2 lonchas jamón serrano + almendras':{kcal:225,proteina:10,carbs:24,grasa:10,
-    ingredients:[{name:'Pera',qty:'1 mediana (150g)'},{name:'Jamón serrano',qty:'30g (2 lonchas)'},{name:'Almendras',qty:'10g'}],
-    steps:['Lava y trocea la pera.','Consume con el jamón serrano y las almendras.']},
-  'Edamame (100g) + tostada integral':{kcal:220,proteina:12,carbs:24,grasa:6,
-    ingredients:[{name:'Edamame (vainas o granos)',qty:'100g'},{name:'Pan integral (1 rebanada)',qty:'30g'},{name:'Sal',qty:'al gusto'}],
-    steps:['Si el edamame está congelado, cuece 3-4 min en agua hirviendo con sal.','Escurre y sala ligeramente.','Tuesta el pan.','Consume junto al edamame.']},
-  'Cracker + hummus + zanahoria baby':{kcal:225,proteina:7,carbs:30,grasa:8,
-    ingredients:[{name:'Crackers integrales',qty:'4 unidades (30g)'},{name:'Hummus',qty:'50g'},{name:'Zanahorias baby',qty:'80g'}],
-    steps:['Extiende el hummus sobre los crackers.','Sirve con las zanahorias baby al lado para mojar.']},
-  'Pita mini + hummus + lechuga':{kcal:232,proteina:8,carbs:32,grasa:7,
-    ingredients:[{name:'Pan de pita mini',qty:'1 unidad (50g)'},{name:'Hummus',qty:'50g'},{name:'Lechuga',qty:'2 hojas'}],
-    steps:['Abre la pita por la mitad.','Unta el hummus dentro.','Añade la lechuga y consume.']},
-  'Yogur + avena + canela + miel':{kcal:225,proteina:12,carbs:36,grasa:4,
-    ingredients:[{name:'Yogur desnatado',qty:'200g'},{name:'Avena en copos',qty:'30g'},{name:'Canela',qty:'1 cucharadita'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Pon el yogur en un bol.','Añade la avena y mezcla.','Espolvorea canela y añade miel encima.','Deja reposar 5 min.']},
-  'Tostada centeno + queso ricotta + pimiento asado':{kcal:225,proteina:10,carbs:26,grasa:8,
-    ingredients:[{name:'Pan de centeno (2 rebanadas)',qty:'60g'},{name:'Queso ricotta',qty:'50g'},{name:'Pimiento asado',qty:'50g'}],
-    steps:['Tuesta el pan de centeno.','Extiende el queso ricotta encima.','Añade el pimiento asado en tiras.','Consume inmediatamente.']},
-  'Wrap mini + hummus + lechuga + maíz':{kcal:230,proteina:8,carbs:34,grasa:7,
-    ingredients:[{name:'Tortilla de trigo mini',qty:'1 unidad (50g)'},{name:'Hummus',qty:'40g'},{name:'Lechuga',qty:'1 hoja'},{name:'Maíz dulce',qty:'1 cucharada'}],
-    steps:['Extiende el hummus sobre la tortilla.','Añade lechuga y maíz en el centro.','Enrolla y consume.']},
-  'Tortita arroz + queso crema light + pimiento':{kcal:228,proteina:8,carbs:30,grasa:7,
-    ingredients:[{name:'Tortitas de arroz',qty:'3 unidades'},{name:'Queso crema light',qty:'40g'},{name:'Pimiento asado',qty:'50g'}],
-    steps:['Extiende el queso crema sobre cada tortita.','Coloca tiras de pimiento asado encima.','Consume inmediatamente.']},
-  'Falafel (2) + pita mini + lechuga':{kcal:235,proteina:8,carbs:34,grasa:8,
-    ingredients:[{name:'Falafel (2 unidades, comprado o casero)',qty:'80g'},{name:'Pan de pita mini',qty:'1 unidad (50g)'},{name:'Lechuga',qty:'2 hojas'},{name:'Yogur 0% como salsa',qty:'2 cucharadas'}],
-    steps:['Calienta el falafel en microondas 1-2 min o en sartén.','Abre la pita y mete la lechuga.','Añade el falafel y una cucharada de yogur como salsa.','Consume inmediatamente.']},
-  'Pan integral + queso fresco + pavo + maíz':{kcal:240,proteina:18,carbs:28,grasa:6,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Queso fresco',qty:'30g'},{name:'Pavo en lonchas',qty:'60g'},{name:'Maíz dulce',qty:'1 cucharada'}],
-    steps:['Extiende el queso fresco sobre el pan.','Coloca el pavo y el maíz encima.','Cierra y consume.']},
-  'Tostada integral + queso fresco + pavo':{kcal:252,proteina:18,carbs:26,grasa:7,
-    ingredients:[{name:'Pan integral (2 rebanadas)',qty:'60g'},{name:'Queso fresco',qty:'40g'},{name:'Pavo en lonchas',qty:'60g'}],
-    steps:['Tuesta el pan.','Extiende el queso fresco.','Coloca el pavo encima.','Consume inmediatamente.']},
-  'Batido proteico + leche vegetal + plátano':{kcal:265,proteina:24,carbs:32,grasa:4,
-    ingredients:[{name:'Proteína whey o vegana (1 cacito)',qty:'30g'},{name:'Leche vegetal',qty:'300ml'},{name:'Plátano',qty:'1/2 mediano (60g)'}],
-    steps:['Pon todos los ingredientes en la batidora.','Tritura hasta textura homogénea.','Sirve frío o con hielo.']},
-  'Batido proteico + fruta':{kcal:210,proteina:20,carbs:24,grasa:3,
-    ingredients:[{name:'Proteína whey (1 cacito)',qty:'30g'},{name:'Agua fría o leche vegetal',qty:'300ml'},{name:'Fruta de temporada',qty:'100g'}],
-    steps:['Pon el agua/leche y la proteína en la batidora.','Añade la fruta troceada.','Tritura y sirve inmediatamente.']},
-  'Yogur griego 0% + 20g nueces':{kcal:245,proteina:16,carbs:14,grasa:12,
-    ingredients:[{name:'Yogur griego 0%',qty:'200g'},{name:'Nueces',qty:'20g (3-4 nueces)'}],
-    steps:['Pon el yogur en un bol.','Trocea las nueces y añade encima.','Consume inmediatamente.']},
-  'Huevo cocido + fruta + 10g almendras':{kcal:230,proteina:12,carbs:18,grasa:12,
-    ingredients:[{name:'Huevos',qty:'2 unidades'},{name:'Fruta de temporada',qty:'1 pieza (120g)'},{name:'Almendras',qty:'10g (8 almendras)'}],
-    steps:['Cuece los huevos 10 min en agua hirviendo. Enfría y pela.','Pela y trocea la fruta.','Consume junto a las almendras.']},
-  'Queso fresco + manzana + nueces (5)':{kcal:225,proteina:10,carbs:22,grasa:10,
-    ingredients:[{name:'Queso fresco',qty:'80g'},{name:'Manzana',qty:'1 pequeña (120g)'},{name:'Nueces',qty:'15g (5 nueces)'}],
-    steps:['Trocea el queso fresco y la manzana.','Coloca en un bol junto a las nueces.','Consume inmediatamente.']},
-  'Dátiles (3) + almendras + yogur griego':{kcal:252,proteina:12,carbs:34,grasa:8,
-    ingredients:[{name:'Dátiles sin hueso',qty:'3 unidades (30g)'},{name:'Almendras',qty:'15g'},{name:'Yogur griego 0%',qty:'100g'}],
-    steps:['Pon el yogur en un bol.','Trocea los dátiles y añade junto a las almendras.','Mezcla o consume por capas.']},
-  'Smoothie plátano + leche vegetal + avena':{kcal:255,proteina:7,carbs:42,grasa:6,
-    ingredients:[{name:'Plátano',qty:'1 mediano (120g)'},{name:'Leche vegetal',qty:'250ml'},{name:'Avena en copos',qty:'30g'}],
-    steps:['Pon todos los ingredientes en la batidora.','Tritura hasta textura homogénea.','Sirve frío.']},
-  'Naranja + pistachos (15g)':{kcal:242,proteina:6,carbs:28,grasa:10,
-    ingredients:[{name:'Naranja',qty:'1 grande (200g)'},{name:'Pistachos pelados',qty:'15g'}],
-    steps:['Pela la naranja y separa en gajos.','Consume junto a los pistachos.']},
-  'Mango (100g) + coco rallado + yogur':{kcal:250,proteina:8,carbs:38,grasa:6,
-    ingredients:[{name:'Mango',qty:'100g'},{name:'Coco rallado sin azúcar',qty:'10g'},{name:'Yogur desnatado',qty:'100g'}],
-    steps:['Pela y trocea el mango.','Pon el yogur en un bol.','Coloca el mango encima y espolvorea el coco rallado.']},
-  'Kiwi + nueces + cuajada 0%':{kcal:245,proteina:10,carbs:24,grasa:10,
-    ingredients:[{name:'Kiwi',qty:'2 unidades'},{name:'Nueces',qty:'15g'},{name:'Cuajada 0%',qty:'1 unidad'}],
-    steps:['Pela y trocea los kiwis.','Sirve la cuajada con el kiwi y las nueces troceadas encima.']},
-  'Barrita avena casera + fruta fresca':{kcal:248,proteina:8,carbs:38,grasa:8,
-    ingredients:[{name:'Avena en copos',qty:'60g'},{name:'Miel',qty:'1 cucharada'},{name:'Mantequilla cacahuete',qty:'15g'},{name:'Fruta fresca',qty:'1 pieza (100g)'}],
-    steps:['Mezcla avena + miel + mantequilla de cacahuete.','Forma una barrita y refrigera 30 min (o prepara la noche anterior).','Consume junto a la fruta fresca.']},
-  'Uvas (120g) + queso fresco + almendras':{kcal:250,proteina:10,carbs:28,grasa:10,
-    ingredients:[{name:'Uvas',qty:'120g'},{name:'Queso fresco',qty:'60g'},{name:'Almendras',qty:'15g'}],
-    steps:['Lava las uvas.','Trocea el queso fresco.','Consume uvas, queso y almendras juntos.']},
-  'Nectarina + nueces (10g)':{kcal:185,proteina:3,carbs:24,grasa:8,
-    ingredients:[{name:'Nectarina',qty:'1 mediana (150g)'},{name:'Nueces',qty:'10g (2 nueces)'}],
-    steps:['Lava y trocea la nectarina.','Consume junto a las nueces.']},
-  'Yogur 0% + arándanos + canela':{kcal:180,proteina:10,carbs:24,grasa:1,
-    ingredients:[{name:'Yogur desnatado 0%',qty:'200g'},{name:'Arándanos',qty:'60g'},{name:'Canela',qty:'1 cucharadita'}],
-    steps:['Pon el yogur en un bol.','Añade los arándanos encima.','Espolvorea canela al gusto.']},
-  'Manzana + 8 almendras':{kcal:195,proteina:4,carbs:26,grasa:9,
-    ingredients:[{name:'Manzana',qty:'1 mediana (150g)'},{name:'Almendras',qty:'12g (8 almendras)'}],
-    steps:['Lava la manzana.','Consume junto a las almendras.']},
-  'Ciruela + pistachos (10g)':{kcal:188,proteina:4,carbs:24,grasa:9,
-    ingredients:[{name:'Ciruelas',qty:'2 medianas (150g)'},{name:'Pistachos pelados',qty:'10g'}],
-    steps:['Lava las ciruelas.','Consume junto a los pistachos.']},
-  'Mandarina + avellanas (10g)':{kcal:182,proteina:3,carbs:22,grasa:8,
-    ingredients:[{name:'Mandarinas',qty:'2 pequeñas (150g)'},{name:'Avellanas',qty:'10g'}],
-    steps:['Pela las mandarinas.','Consume junto a las avellanas.']},
-  'Sandía (200g) + semillas girasol':{kcal:185,proteina:4,carbs:24,grasa:8,
-    ingredients:[{name:'Sandía',qty:'200g (sin corteza)'},{name:'Semillas de girasol peladas',qty:'15g'}],
-    steps:['Trocea la sandía.','Espolvorea las semillas de girasol encima.','Consume inmediatamente.']},
-  'Frambuesas + yogur griego 0%':{kcal:180,proteina:12,carbs:18,grasa:2,
-    ingredients:[{name:'Frambuesas',qty:'100g'},{name:'Yogur griego 0%',qty:'150g'}],
-    steps:['Pon el yogur en un bol.','Añade las frambuesas encima.','Consume inmediatamente.']},
-  'Piña (150g) + coco rallado (5g)':{kcal:190,proteina:2,carbs:30,grasa:4,
-    ingredients:[{name:'Piña natural',qty:'150g'},{name:'Coco rallado sin azúcar',qty:'5g'}],
-    steps:['Pela y trocea la piña.','Espolvorea el coco rallado encima.','Consume inmediatamente.']},
-  'Cerezas (100g) + almendras (8g)':{kcal:185,proteina:4,carbs:24,grasa:8,
-    ingredients:[{name:'Cerezas',qty:'100g'},{name:'Almendras',qty:'8g (6 almendras)'}],
-    steps:['Lava las cerezas.','Consume junto a las almendras.']},
-  'Kiwi + yogur 0%':{kcal:175,proteina:10,carbs:24,grasa:1,
-    ingredients:[{name:'Kiwi',qty:'2 unidades'},{name:'Yogur desnatado 0%',qty:'150g'}],
-    steps:['Pela y trocea el kiwi.','Mezcla con el yogur o sírvelo encima.']},
-  'Fresas (150g) + almendras (12g)':{kcal:180,proteina:4,carbs:18,grasa:9,
-    ingredients:[{name:'Fresas',qty:'150g'},{name:'Almendras',qty:'12g (9 almendras)'}],
-    steps:['Lava y trocea las fresas.','Consume junto a las almendras.']},
-  'Uvas (100g) + queso fresco light':{kcal:188,proteina:8,carbs:24,grasa:5,
-    ingredients:[{name:'Uvas',qty:'100g'},{name:'Queso fresco light',qty:'60g'}],
-    steps:['Lava las uvas.','Trocea el queso fresco.','Consume juntos.']},
-  'Ciruela + avellanas (10g)':{kcal:183,proteina:3,carbs:22,grasa:8,
-    ingredients:[{name:'Ciruela',qty:'2 medianas (150g)'},{name:'Avellanas',qty:'10g'}],
-    steps:['Lava las ciruelas.','Consume junto a las avellanas.']},
-  'Melocotón + yogur 0% + canela':{kcal:178,proteina:9,carbs:26,grasa:1,
-    ingredients:[{name:'Melocotón',qty:'1 mediano (150g)'},{name:'Yogur desnatado 0%',qty:'150g'},{name:'Canela',qty:'1 cucharadita'}],
-    steps:['Lava y trocea el melocotón.','Pon el yogur en un bol, añade el melocotón y espolvorea canela.']},
-  'Papaya (150g) + semillas chía':{kcal:182,proteina:3,carbs:28,grasa:4,
-    ingredients:[{name:'Papaya',qty:'150g'},{name:'Semillas de chía',qty:'10g'}],
-    steps:['Pela y trocea la papaya.','Espolvorea las semillas de chía encima.','Consume inmediatamente.']},
-  'Mango (100g) + pistachos (8g)':{kcal:187,proteina:4,carbs:28,grasa:7,
-    ingredients:[{name:'Mango',qty:'100g'},{name:'Pistachos pelados',qty:'8g'}],
-    steps:['Pela y trocea el mango.','Consume junto a los pistachos.']},
-  'Naranja + almendras (8g)':{kcal:180,proteina:4,carbs:24,grasa:7,
-    ingredients:[{name:'Naranja',qty:'1 mediana (180g)'},{name:'Almendras',qty:'8g (6 almendras)'}],
-    steps:['Pela la naranja.','Consume junto a las almendras.']},
-  'Manzana + almendras (15g)':{kcal:240,proteina:4,carbs:28,grasa:10,
-    ingredients:[{name:'Manzana',qty:'1 mediana (150g)'},{name:'Almendras',qty:'15g (12 almendras)'}],
-    steps:['Lava la manzana.','Consume junto a las almendras.']},
-  'Manzana + nueces (10g)':{kcal:190,proteina:3,carbs:26,grasa:8,
-    ingredients:[{name:'Manzana',qty:'1 mediana (150g)'},{name:'Nueces',qty:'10g (2 nueces)'}],
-    steps:['Lava la manzana.','Consume junto a las nueces.']},
-  'Pera + yogur 0% + nueces':{kcal:245,proteina:10,carbs:30,grasa:8,
-    ingredients:[{name:'Pera',qty:'1 mediana (150g)'},{name:'Yogur desnatado 0%',qty:'150g'},{name:'Nueces',qty:'15g'}],
-    steps:['Pela y trocea la pera.','Pon el yogur en un bol, añade la pera y las nueces troceadas.']},
-  'Pera o naranja':{kcal:65,proteina:1,carbs:16,grasa:0,
-    ingredients:[{name:'Pera o naranja',qty:'1 pieza mediana (150g)'}],
-    steps:['Lava o pela la fruta.','Consume directamente.']},
-  'Yogur 0% natural':{kcal:60,proteina:8,carbs:8,grasa:0,
-    ingredients:[{name:'Yogur natural desnatado 0%',qty:'200g'}],
-    steps:['Consume directamente del envase o en un bol.']},
-  'Fresas (150g)':{kcal:48,proteina:1,carbs:10,grasa:0,
-    ingredients:[{name:'Fresas',qty:'150g'}],
-    steps:['Lava bien las fresas.','Retira el tallo y consume.']},
-  'Sandía (200g)':{kcal:60,proteina:1,carbs:14,grasa:0,
-    ingredients:[{name:'Sandía',qty:'200g (sin corteza)'}],
-    steps:['Trocea la sandía.','Consume frío.']},
-  'Kiwi (2 unidades)':{kcal:84,proteina:2,carbs:18,grasa:1,
-    ingredients:[{name:'Kiwi',qty:'2 unidades (160g)'}],
-    steps:['Pela los kiwis.','Córtalos en rodajas o por la mitad y consume con cuchara.']},
-  'Melocotón o nectarina':{kcal:58,proteina:1,carbs:14,grasa:0,
-    ingredients:[{name:'Melocotón o nectarina',qty:'1 mediano (150g)'}],
-    steps:['Lava la fruta.','Consume directamente.']},
-  'Mandarinas (2 pequeñas)':{kcal:62,proteina:1,carbs:14,grasa:0,
-    ingredients:[{name:'Mandarinas',qty:'2 pequeñas (150g)'}],
-    steps:['Pela las mandarinas.','Consume directamente.']},
-  'Uvas (100g)':{kcal:68,proteina:1,carbs:16,grasa:0,
-    ingredients:[{name:'Uvas',qty:'100g'}],
-    steps:['Lava las uvas.','Consume directamente.']},
-  'Porridge avena + leche sin lactosa + pera':{kcal:262,proteina:10,carbs:44,grasa:6,
-    ingredients:[{name:'Avena en copos',qty:'60g'},{name:'Leche sin lactosa',qty:'250ml'},{name:'Pera',qty:'1 pequeña (120g)'},{name:'Canela (opcional)',qty:'1 cucharadita'}],
-    steps:['Calienta la leche en un cazo.','Añade la avena y remueve 5 min.','Pela y trocea la pera. Sirve el porridge con la pera encima.']},
-  'Yogur natural + kiwi + 10g miel':{kcal:255,proteina:10,carbs:40,grasa:3,
-    ingredients:[{name:'Yogur natural entero o desnatado',qty:'200g'},{name:'Kiwi',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita (10g)'}],
-    steps:['Pon el yogur en un bol.','Pela y trocea el kiwi en rodajas.','Coloca encima y añade la miel.']},
-  'Ensalada + pechuga plancha + cuajada miel':{kcal:400,proteina:40,carbs:16,grasa:12,
-    ingredients:[{name:'Pechuga de pollo',qty:'180g'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Monta ensalada con lechuga y maíz. Aliña con aceite.','Cocina la pechuga a la plancha 5-6 min por lado. Salpimenta.','Sirve la pechuga sobre la ensalada.','Cuajada con miel de postre.']},
-  'Ensalada + tortilla de claras + queso fresco':{kcal:390,proteina:28,carbs:14,grasa:14,
-    ingredients:[{name:'Claras de huevo',qty:'5 unidades (150g)'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Queso fresco',qty:'40g'},{name:'Aceite de oliva',qty:'1 cucharada'}],
-    steps:['Monta ensalada con lechuga y maíz. Aliña.','Bate las claras con sal.','Cuaja en sartén como tortilla 3-4 min por lado.','Sirve con la ensalada y el queso fresco al lado.']},
-  'Ensalada + huevos revueltos + queso fresco + yogur':{kcal:410,proteina:28,carbs:14,grasa:18,
-    ingredients:[{name:'Huevos',qty:'3 unidades'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Queso fresco',qty:'30g'},{name:'Yogur 0%',qty:'1 unidad'},{name:'Aceite de oliva',qty:'1 cucharada'}],
-    steps:['Monta ensalada con lechuga y maíz. Aliña.','Bate los huevos y cuaja a fuego bajo removiendo.','Sirve los revueltos sobre la ensalada con queso fresco.','Yogur de postre.']},
-  'Crema calabaza + tortilla francesa + gelatina':{kcal:415,proteina:18,carbs:38,grasa:16,
-    ingredients:[{name:'Crema de calabaza (brick o casera)',qty:'250ml'},{name:'Huevos',qty:'2 unidades'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Gelatina 0%',qty:'1 unidad'},{name:'Sal',qty:'al gusto'}],
-    steps:['Calienta la crema de calabaza en un cazo.','Bate los huevos con sal.','Cuaja en sartén con aceite como tortilla.','Sirve la crema y la tortilla juntas. Gelatina de postre.']},
-  'Ensalada + revuelto de pimiento + huevo + requesón':{kcal:408,proteina:24,carbs:14,grasa:18,
-    ingredients:[{name:'Huevos',qty:'3 unidades'},{name:'Pimiento rojo',qty:'1/2 unidad'},{name:'Lechuga',qty:'100g'},{name:'Requesón',qty:'60g'},{name:'Aceite de oliva',qty:'1 cucharada'}],
-    steps:['Monta ensalada con lechuga. Aliña.','Pica el pimiento y saltea en aceite 3 min.','Añade los huevos batidos y remueve hasta que cuajen.','Sirve el revuelto sobre la ensalada con requesón al lado.']},
-  'Sopa pollo ligera + tortilla + yogur':{kcal:412,proteina:28,carbs:28,grasa:14,
-    ingredients:[{name:'Caldo de pollo desgrasado',qty:'300ml'},{name:'Pechuga de pollo desmenuzada',qty:'80g'},{name:'Fideos o arroz',qty:'20g'},{name:'Huevos',qty:'2 unidades'},{name:'Aceite',qty:'1 cucharadita'},{name:'Yogur 0%',qty:'1 unidad'}],
-    steps:['Calienta el caldo, añade los fideos y el pollo. Cocina 8 min.','Bate los huevos y cuaja en sartén como tortilla.','Sirve la sopa y la tortilla juntas. Yogur de postre.']},
-  'Ensalada + tortilla de maíz + cuajada':{kcal:418,proteina:22,carbs:32,grasa:16,
-    ingredients:[{name:'Huevos',qty:'3 unidades'},{name:'Maíz dulce',qty:'4 cucharadas'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Monta ensalada con lechuga. Aliña.','Bate los huevos con el maíz y sal.','Cuaja en sartén como tortilla.','Sirve con ensalada. Cuajada con miel de postre.']},
-  'Ensalada + revuelto jamón york + huevo + gelatina':{kcal:415,proteina:26,carbs:12,grasa:18,
-    ingredients:[{name:'Huevos',qty:'3 unidades'},{name:'Jamón york',qty:'60g'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Monta ensalada con lechuga y maíz. Aliña.','Trocea el jamón york. Bate los huevos.','Saltea el jamón y añade los huevos. Remueve hasta cuajar.','Sirve con ensalada. Gelatina de postre.']},
-  'Ensalada + revuelto atún + maíz + cuajada':{kcal:420,proteina:30,carbs:20,grasa:14,
-    ingredients:[{name:'Huevos',qty:'2 unidades'},{name:'Atún en conserva escurrido',qty:'80g'},{name:'Maíz dulce',qty:'3 cucharadas'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Monta ensalada con lechuga. Aliña.','Bate los huevos con el atún y maíz.','Cuaja en sartén removiendo hasta que esté hecho.','Sirve con ensalada. Cuajada con miel de postre.']},
-  'Ensalada + tortilla francesa + pavo + queso':{kcal:400,proteina:28,carbs:12,grasa:18,
-    ingredients:[{name:'Huevos',qty:'2 unidades'},{name:'Pavo en lonchas',qty:'60g'},{name:'Queso fresco',qty:'30g'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'}],
-    steps:['Monta ensalada con lechuga y maíz. Aliña.','Bate los huevos con sal.','Cuaja en sartén. Cuando esté casi hecha, añade el pavo y el queso.','Dobla la tortilla. Sirve con la ensalada.']},
-  'Ensalada + tortilla de claras + queso + pavo':{kcal:395,proteina:32,carbs:12,grasa:14,
-    ingredients:[{name:'Claras de huevo',qty:'5 unidades (150g)'},{name:'Pavo en lonchas',qty:'60g'},{name:'Queso fresco',qty:'30g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'}],
-    steps:['Monta ensalada con lechuga. Aliña.','Bate las claras con sal.','Cuaja en sartén. A mitad, añade el pavo troceado.','Dobla la tortilla. Sirve con ensalada y queso al lado.']},
-  'Ensalada + revuelto pavo + pimiento + cuajada':{kcal:412,proteina:28,carbs:14,grasa:16,
-    ingredients:[{name:'Huevos',qty:'3 unidades'},{name:'Pavo en lonchas',qty:'60g'},{name:'Pimiento rojo',qty:'1/4 unidad'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Monta ensalada con lechuga. Aliña.','Saltea el pimiento picado 2 min. Añade el pavo troceado.','Añade los huevos batidos y remueve hasta cuajar.','Sirve con ensalada. Cuajada con miel de postre.']},
-  'Crema zanahoria + tortilla + gelatina':{kcal:408,proteina:18,carbs:36,grasa:16,
-    ingredients:[{name:'Crema de zanahoria (brick o casera)',qty:'250ml'},{name:'Huevos',qty:'2 unidades'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Calienta la crema de zanahoria.','Bate los huevos y cuaja en sartén como tortilla.','Sirve la crema y la tortilla juntas. Gelatina de postre.']},
-  'Ensalada + tortilla de verduras + requesón':{kcal:405,proteina:20,carbs:20,grasa:18,
-    ingredients:[{name:'Huevos',qty:'3 unidades'},{name:'Pimiento rojo',qty:'1/4 unidad'},{name:'Zanahoria rallada',qty:'1 pequeña'},{name:'Lechuga',qty:'100g'},{name:'Requesón',qty:'60g'},{name:'Aceite de oliva',qty:'1 cucharada'}],
-    steps:['Monta ensalada con lechuga. Aliña.','Saltea el pimiento y zanahoria 3 min.','Añade los huevos batidos y cuaja como tortilla.','Sirve con ensalada y requesón al lado.']},
-  'Ensalada + tortilla atún + maíz + yogur':{kcal:415,proteina:30,carbs:18,grasa:16,
-    ingredients:[{name:'Huevos',qty:'2 unidades'},{name:'Atún en conserva escurrido',qty:'60g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Yogur 0%',qty:'1 unidad'}],
-    steps:['Monta ensalada con lechuga. Aliña.','Bate los huevos con el atún y maíz.','Cuaja en sartén como tortilla.','Sirve con ensalada. Yogur de postre.']},
-  'Ensalada + revuelto jamón + huevo + cuajada':{kcal:412,proteina:26,carbs:12,grasa:20,
-    ingredients:[{name:'Huevos',qty:'3 unidades'},{name:'Jamón serrano',qty:'40g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Monta ensalada con lechuga. Aliña.','Bate los huevos. Añade el jamón picado.','Cuaja en sartén removiendo.','Sirve con ensalada. Cuajada con miel de postre.']},
-  'Ensalada + tortilla de maíz + queso fresco':{kcal:408,proteina:22,carbs:28,grasa:16,
-    ingredients:[{name:'Huevos',qty:'3 unidades'},{name:'Maíz dulce',qty:'4 cucharadas'},{name:'Queso fresco',qty:'40g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'}],
-    steps:['Monta ensalada con lechuga. Aliña.','Bate los huevos con el maíz.','Cuaja en sartén como tortilla.','Sirve con ensalada y queso fresco al lado.']},
-  'Ensalada + pechuga + huevo cocido + yogur':{kcal:405,proteina:42,carbs:12,grasa:14,
-    ingredients:[{name:'Pechuga de pollo',qty:'150g'},{name:'Huevos',qty:'2 unidades'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Yogur 0%',qty:'1 unidad'}],
-    steps:['Cuece los huevos 10 min. Enfría y lamina.','Cocina la pechuga a la plancha 5-6 min por lado.','Monta ensalada con lechuga, maíz, huevo y pechuga. Aliña.','Yogur de postre.']},
-  'Ensalada + pechuga + pimiento asado + yogur':{kcal:420,proteina:40,carbs:16,grasa:12,
-    ingredients:[{name:'Pechuga de pollo',qty:'170g'},{name:'Pimiento asado',qty:'60g'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Yogur 0%',qty:'1 unidad'}],
-    steps:['Cocina la pechuga a la plancha.','Monta ensalada con lechuga, maíz y pimiento asado. Aliña.','Sirve la pechuga encima. Yogur de postre.']},
-  'Ensalada + pavo plancha + calabacín + cuajada':{kcal:410,proteina:36,carbs:14,grasa:14,
-    ingredients:[{name:'Filete de pavo',qty:'170g'},{name:'Calabacín',qty:'100g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Corta el calabacín en rodajas y cocina a la plancha 3 min por lado.','Cocina el pavo a la plancha 4-5 min por lado.','Monta ensalada con lechuga. Añade calabacín y pavo encima. Aliña.','Cuajada con miel de postre.']},
-  'Ensalada + pavo plancha + zanahoria + cuajada':{kcal:370,proteina:36,carbs:16,grasa:10,
-    ingredients:[{name:'Filete de pavo',qty:'170g'},{name:'Zanahoria',qty:'1 pequeña rallada'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Cocina el pavo a la plancha 4-5 min por lado.','Monta ensalada con lechuga, zanahoria rallada y maíz. Aliña.','Sirve el pavo encima. Cuajada con miel de postre.']},
-  'Ensalada + pollo plancha + calabacín + gelatina':{kcal:375,proteina:38,carbs:14,grasa:12,
-    ingredients:[{name:'Pechuga de pollo',qty:'170g'},{name:'Calabacín',qty:'100g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Corta el calabacín en rodajas y cocina a la plancha.','Cocina el pollo a la plancha.','Monta ensalada con lechuga. Añade calabacín y pollo. Aliña.','Gelatina de postre.']},
-  'Ensalada + merluza al horno + guisantes + gelatina':{kcal:375,proteina:38,carbs:18,grasa:10,
-    ingredients:[{name:'Merluza (filete)',qty:'180g'},{name:'Guisantes cocidos',qty:'50g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Limón',qty:'unas gotas'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Precalienta el horno a 180°C.','Pon la merluza en bandeja, aliña con aceite y limón. Hornea 15-18 min.','Monta ensalada con lechuga y guisantes. Aliña.','Sirve la merluza encima. Gelatina de postre.']},
-  'Crema verduras + merluza al horno + gelatina':{kcal:378,proteina:36,carbs:20,grasa:10,
-    ingredients:[{name:'Crema de verduras (brick)',qty:'250ml'},{name:'Merluza (filete)',qty:'160g'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Calienta la crema de verduras.','Hornea la merluza a 180°C 15 min con aceite y sal.','Sirve la crema y la merluza juntas. Gelatina de postre.']},
-  'Ensalada + pechuga pollo + guisantes + yogur':{kcal:372,proteina:40,carbs:18,grasa:10,
-    ingredients:[{name:'Pechuga de pollo',qty:'170g'},{name:'Guisantes cocidos',qty:'50g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Yogur 0%',qty:'1 unidad'}],
-    steps:['Cocina la pechuga a la plancha.','Monta ensalada con lechuga y guisantes. Aliña.','Sirve la pechuga encima. Yogur de postre.']},
-  'Ensalada + atún fresco plancha + guisantes':{kcal:368,proteina:36,carbs:16,grasa:12,
-    ingredients:[{name:'Atún fresco (filete)',qty:'160g'},{name:'Guisantes cocidos',qty:'50g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Sal y pimienta',qty:'al gusto'}],
-    steps:['Cocina el atún a la plancha 2-3 min por lado (que quede rosado dentro).','Monta ensalada con lechuga y guisantes. Aliña.','Sirve el atún encima.']},
-  'Ensalada + lomo cerdo magro + zanahoria + gelatina':{kcal:380,proteina:36,carbs:16,grasa:14,
-    ingredients:[{name:'Lomo de cerdo magro',qty:'160g'},{name:'Zanahoria rallada',qty:'1 pequeña'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Cocina el lomo a la plancha 4-5 min por lado.','Monta ensalada con lechuga, zanahoria y maíz. Aliña.','Sirve el lomo encima. Gelatina de postre.']},
-  'Sopa verduras ligera + merluza + gelatina':{kcal:372,proteina:34,carbs:22,grasa:8,
-    ingredients:[{name:'Caldo de verduras',qty:'300ml'},{name:'Verduras variadas (zanahoria, cebolla, calabacín)',qty:'100g'},{name:'Merluza (filete)',qty:'140g'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Cuece las verduras en el caldo 10 min.','Añade la merluza en trozos y cocina 5 min más.','Salpimenta al gusto. Gelatina de postre.']},
-  'Ensalada + ternera plancha + guisantes + cuajada':{kcal:382,proteina:38,carbs:18,grasa:14,
-    ingredients:[{name:'Filete de ternera',qty:'160g'},{name:'Guisantes cocidos',qty:'50g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Cocina el filete de ternera a la plancha al gusto.','Monta ensalada con lechuga y guisantes. Aliña.','Sirve la ternera encima. Cuajada con miel de postre.']},
-  'Ensalada + pollo al curry suave + arroz pequeño':{kcal:432,proteina:38,carbs:38,grasa:10,
-    ingredients:[{name:'Pechuga de pollo',qty:'150g'},{name:'Arroz basmati',qty:'40g en seco'},{name:'Curry en polvo',qty:'1 cucharadita'},{name:'Yogur 0%',qty:'2 cucharadas'},{name:'Lechuga',qty:'80g'},{name:'Aceite de oliva',qty:'1 cucharadita'}],
-    steps:['Cuece el arroz 12 min. Escurre.','Corta el pollo en dados. Marina con curry y yogur 10 min.','Cocina el pollo marinado en sartén 8 min.','Sirve el pollo sobre arroz con ensalada de lechuga al lado.']},
-  'Crema calabaza + pechuga plancha + gelatina':{kcal:428,proteina:38,carbs:28,grasa:12,
-    ingredients:[{name:'Crema de calabaza (brick)',qty:'250ml'},{name:'Pechuga de pollo',qty:'160g'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Calienta la crema de calabaza.','Cocina la pechuga a la plancha 5-6 min por lado.','Sirve la crema en plato hondo y la pechuga al lado. Gelatina de postre.']},
-  'Ensalada + pollo asado + pimiento + maíz':{kcal:435,proteina:40,carbs:22,grasa:14,
-    ingredients:[{name:'Pollo asado (pechuga o muslo sin piel)',qty:'180g'},{name:'Pimiento asado',qty:'60g'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'3 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'}],
-    steps:['Usa pollo asado ya preparado o calienta en horno 10 min.','Monta ensalada con lechuga, maíz y pimiento asado. Aliña.','Coloca el pollo encima y consume.']},
-  'Ensalada + hamburguesa pollo casera + cuajada':{kcal:430,proteina:38,carbs:16,grasa:16,
-    ingredients:[{name:'Pechuga de pollo picada',qty:'160g'},{name:'Cebolla en polvo',qty:'1 cucharadita'},{name:'Orégano',qty:'1 cucharadita'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Mezcla el pollo picado con cebolla en polvo, orégano y sal.','Forma una hamburguesa y cocina a la plancha 5 min por lado.','Monta ensalada con lechuga y maíz. Aliña.','Sirve la hamburguesa con la ensalada. Cuajada con miel de postre.']},
-  'Ensalada + pollo en salsa zanahoria + yogur':{kcal:428,proteina:38,carbs:22,grasa:12,
-    ingredients:[{name:'Pechuga de pollo',qty:'160g'},{name:'Zanahoria',qty:'1 mediana'},{name:'Caldo de pollo',qty:'100ml'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Yogur 0%',qty:'1 unidad'}],
-    steps:['Trocea la zanahoria y cuece en caldo 10 min. Tritura para hacer salsa.','Cocina el pollo en dados en la salsa 10 min.','Monta ensalada con lechuga. Aliña.','Sirve el pollo con salsa encima de la ensalada. Yogur de postre.']},
-  'Sopa pollo ligera + ensalada + cuajada':{kcal:422,proteina:36,carbs:22,grasa:12,
-    ingredients:[{name:'Caldo de pollo desgrasado',qty:'300ml'},{name:'Pechuga de pollo desmenuzada',qty:'100g'},{name:'Fideos o arroz',qty:'20g'},{name:'Lechuga',qty:'80g'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Cuece los fideos en el caldo con el pollo 8 min.','Monta ensalada pequeña con lechuga. Aliña.','Sirve la sopa y la ensalada juntas. Cuajada con miel de postre.']},
-  'Ensalada + pollo salteado + cebolla + maíz':{kcal:425,proteina:38,carbs:22,grasa:12,
-    ingredients:[{name:'Pechuga de pollo',qty:'160g'},{name:'Cebolla',qty:'1/4 unidad'},{name:'Maíz dulce',qty:'3 cucharadas'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Corta el pollo en tiras y la cebolla en juliana.','Saltea cebolla 2 min, añade pollo y cocina 6-8 min.','Monta ensalada con lechuga y maíz. Aliña.','Sirve el salteado encima. Cuajada con miel de postre.']},
-  'Ensalada + filete ternera + zanahoria plancha':{kcal:440,proteina:38,carbs:16,grasa:18,
-    ingredients:[{name:'Filete de ternera',qty:'170g'},{name:'Zanahoria',qty:'1 mediana en rodajas'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Cocina la zanahoria en rodajas a la plancha 3-4 min.','Cocina el filete a la plancha al gusto.','Monta ensalada con lechuga. Aliña.','Sirve el filete y la zanahoria encima. Gelatina de postre.']},
-  'Ensalada + solomillo pollo + guisantes + cuajada':{kcal:420,proteina:40,carbs:18,grasa:12,
-    ingredients:[{name:'Solomillo de pollo',qty:'170g'},{name:'Guisantes cocidos',qty:'50g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Cocina el solomillo a la plancha 4-5 min por lado.','Monta ensalada con lechuga y guisantes. Aliña.','Sirve el pollo encima. Cuajada con miel de postre.']},
-  'Ensalada + entrecot ternera + pimiento asado':{kcal:455,proteina:40,carbs:14,grasa:22,
-    ingredients:[{name:'Entrecot de ternera',qty:'170g'},{name:'Pimiento asado',qty:'60g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Cocina el entrecot a la plancha al gusto (vuelta y vuelta recomendado).','Monta ensalada con lechuga y pimiento. Aliña.','Sirve el entrecot encima. Gelatina de postre.']},
-  'Crema calabacín + ternera plancha + gelatina':{kcal:448,proteina:38,carbs:22,grasa:16,
-    ingredients:[{name:'Crema de calabacín (brick)',qty:'250ml'},{name:'Solomillo de ternera',qty:'160g'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Calienta la crema de calabacín.','Cocina la ternera a la plancha al gusto.','Sirve la crema en plato hondo con la ternera al lado. Gelatina de postre.']},
-  'Ensalada + hamburguesa ternera (100g) + maíz':{kcal:445,proteina:36,carbs:20,grasa:18,
-    ingredients:[{name:'Carne picada de ternera',qty:'100g'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'3 cucharadas'},{name:'Orégano y sal',qty:'al gusto'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Mezcla la carne con sal y orégano. Forma una hamburguesa.','Cocina a la plancha 4-5 min por lado.','Monta ensalada con lechuga y maíz. Aliña.','Sirve la hamburguesa encima. Gelatina de postre.']},
-  'Ensalada + lomo bajo ternera + guisantes + gelatina':{kcal:442,proteina:38,carbs:18,grasa:16,
-    ingredients:[{name:'Lomo bajo de ternera (filete)',qty:'160g'},{name:'Guisantes cocidos',qty:'50g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Cocina el filete a la plancha al gusto.','Monta ensalada con lechuga y guisantes. Aliña.','Sirve el filete encima. Gelatina de postre.']},
-  'Ensalada + ternera en salsa zanahoria + cuajada':{kcal:452,proteina:38,carbs:22,grasa:16,
-    ingredients:[{name:'Solomillo de ternera en dados',qty:'160g'},{name:'Zanahoria',qty:'1 mediana'},{name:'Caldo de carne',qty:'100ml'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Cuece la zanahoria en caldo 10 min. Tritura para hacer salsa.','Cocina la ternera en dados en la salsa 10 min.','Monta ensalada con lechuga. Aliña.','Sirve la ternera con salsa encima. Cuajada con miel de postre.']},
-  'Ensalada + albóndigas ternera (3) + guisantes':{kcal:448,proteina:36,carbs:22,grasa:18,
-    ingredients:[{name:'Carne picada de ternera',qty:'120g'},{name:'Pan rallado',qty:'10g'},{name:'Huevo',qty:'1/2 unidad'},{name:'Guisantes cocidos',qty:'50g'},{name:'Lechuga',qty:'100g'},{name:'Tomate frito',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Mezcla carne + pan rallado + huevo + sal. Forma 3 albóndigas.','Cocina en sartén con aceite 8-10 min hasta dorar.','Añade tomate frito y guisantes. Cocina 3 min.','Monta ensalada con lechuga. Aliña.','Sirve junto a las albóndigas. Gelatina de postre.']},
-  'Sopa caldo ternera + filete plancha + ensalada':{kcal:445,proteina:38,carbs:18,grasa:16,
-    ingredients:[{name:'Caldo de ternera desgrasado',qty:'300ml'},{name:'Fideos',qty:'20g'},{name:'Filete de ternera',qty:'150g'},{name:'Lechuga',qty:'80g'},{name:'Aceite de oliva',qty:'1 cucharadita'}],
-    steps:['Cuece los fideos en el caldo 6-8 min.','Cocina el filete a la plancha al gusto.','Sirve la sopa, el filete y una pequeña ensalada juntos.']},
-  'Ensalada + pavo salteado + calabacín + cuajada':{kcal:410,proteina:36,carbs:14,grasa:14,
-    ingredients:[{name:'Filete de pavo',qty:'160g'},{name:'Calabacín',qty:'100g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Corta el pavo y calabacín en trozos.','Saltea el calabacín 3 min, añade el pavo y cocina 6-8 min.','Monta ensalada con lechuga. Aliña.','Sirve el salteado encima. Cuajada con miel de postre.']},
-  'Ensalada + pavo salteado + guisantes + yogur':{kcal:418,proteina:36,carbs:18,grasa:12,
-    ingredients:[{name:'Filete de pavo',qty:'160g'},{name:'Guisantes cocidos',qty:'50g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Yogur 0%',qty:'1 unidad'}],
-    steps:['Corta el pavo en tiras y saltea 6-8 min.','Monta ensalada con lechuga y guisantes. Aliña.','Sirve el pavo encima. Yogur de postre.']},
-  'Ensalada + pollo + calabacín + cuajada':{kcal:420,proteina:38,carbs:14,grasa:14,
-    ingredients:[{name:'Pechuga de pollo',qty:'160g'},{name:'Calabacín',qty:'100g'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Corta el calabacín en rodajas y cocina a la plancha.','Cocina el pollo a la plancha.','Monta ensalada con lechuga. Añade calabacín y pollo. Aliña.','Cuajada con miel de postre.']},
-  'Ensalada + pollo wok + zanahoria + salsa soja':{kcal:420,proteina:38,carbs:18,grasa:12,
-    ingredients:[{name:'Pechuga de pollo',qty:'160g'},{name:'Zanahoria',qty:'1 pequeña en juliana'},{name:'Salsa de soja',qty:'1 cucharada'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharadita'}],
-    steps:['Corta el pollo en tiras.','Saltea la zanahoria 2 min, añade el pollo y cocina 6 min.','Añade la salsa de soja al final y mezcla.','Monta ensalada con lechuga. Aliña.','Sirve el wok encima de la ensalada.']},
-  'Ensalada + salteado ternera + zanahoria + salsa soja':{kcal:435,proteina:36,carbs:18,grasa:16,
-    ingredients:[{name:'Filete de ternera en tiras',qty:'150g'},{name:'Zanahoria',qty:'1 pequeña en juliana'},{name:'Salsa de soja',qty:'1 cucharada'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Saltea la zanahoria 2 min.','Añade la ternera y cocina 5 min.','Añade salsa de soja al final.','Monta ensalada con lechuga. Aliña.','Sirve el salteado encima. Gelatina de postre.']},
-  'Ensalada + lomo cerdo salteado + pimiento + cebolla':{kcal:430,proteina:36,carbs:16,grasa:18,
-    ingredients:[{name:'Lomo de cerdo en tiras',qty:'150g'},{name:'Pimiento rojo',qty:'1/2 unidad'},{name:'Cebolla',qty:'1/4 unidad'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Pica el pimiento y cebolla. Saltea 3 min.','Añade el cerdo en tiras y cocina 6-8 min.','Monta ensalada con lechuga. Aliña.','Sirve el salteado encima. Cuajada con miel de postre.']},
-  'Ensalada + salteado cerdo + pimiento + cuajada':{kcal:432,proteina:36,carbs:16,grasa:18,
-    ingredients:[{name:'Lomo de cerdo en tiras',qty:'150g'},{name:'Pimiento rojo',qty:'1/2 unidad'},{name:'Lechuga',qty:'100g'},{name:'Maíz dulce',qty:'2 cucharadas'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Pica el pimiento y saltea 2 min.','Añade el cerdo y cocina 6-8 min.','Monta ensalada con lechuga y maíz. Aliña.','Sirve el salteado encima. Cuajada con miel de postre.']},
-  'Ensalada + salteado pollo + maíz + cebolla + cuajada':{kcal:425,proteina:38,carbs:22,grasa:12,
-    ingredients:[{name:'Pechuga de pollo',qty:'160g'},{name:'Cebolla',qty:'1/4 unidad'},{name:'Maíz dulce',qty:'3 cucharadas'},{name:'Lechuga',qty:'100g'},{name:'Aceite de oliva',qty:'1 cucharada'},{name:'Cuajada',qty:'1 unidad'},{name:'Miel',qty:'1 cucharadita'}],
-    steps:['Corta el pollo en tiras, pica la cebolla.','Saltea cebolla 2 min, añade pollo y cocina 6-8 min.','Añade el maíz al final y mezcla.','Monta ensalada con lechuga. Aliña.','Sirve el salteado encima. Cuajada con miel.']},
-  'Crema verduras + salteado pollo + gelatina':{kcal:428,proteina:36,carbs:24,grasa:12,
-    ingredients:[{name:'Crema de verduras (brick)',qty:'250ml'},{name:'Pechuga de pollo',qty:'150g'},{name:'Pimiento rojo',qty:'1/4 unidad'},{name:'Aceite de oliva',qty:'1 cucharadita'},{name:'Gelatina 0%',qty:'1 unidad'}],
-    steps:['Calienta la crema de verduras.','Corta el pollo en tiras y saltea con el pimiento 8 min.','Sirve la crema en plato hondo con el pollo al lado. Gelatina de postre.']},
-  'Ensalada + secreto ibérico planc
+// ─── FUNCIONES ────────────────────────────────────────────────────────────────
+var DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+var MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+
+function updateClock(){
+  var n=new Date();
+  document.getElementById('cd').textContent=DIAS[n.getDay()]+', '+n.getDate()+' de '+MESES[n.getMonth()]+' de '+n.getFullYear();
+  var h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
+  document.getElementById('ct').innerHTML=h+':'+m+':<span>'+s+'</span>';
+}
+
+var SK='pdc-v6-checks', SW='pdc-v6-swaps';
+function loadC(){try{return JSON.parse(localStorage.getItem(SK))||{};}catch(e){return {};}}
+function saveC(d){localStorage.setItem(SK,JSON.stringify(d));}
+function loadS(){try{return JSON.parse(localStorage.getItem(SW))||{};}catch(e){return {};}}
+function saveS(d){localStorage.setItem(SW,JSON.stringify(d));}
+
+function getRecipe(name){
+  if(recipes[name]) return recipes[name];
+  var keys=Object.keys(recipes);
+  for(var i=0;i<keys.length;i++){
+    if(keys[i].substring(0,20)===name.substring(0,20)) return recipes[keys[i]];
+  }
+  return null;
+}
+
+function renderWeek(){
+  var checks=loadC(), swaps=loadS();
+  var grid=document.getElementById('week-grid');
+  var todayDow=new Date().getDay();
+  var dowMap={1:1,2:2,3:3,4:4,5:5,6:6,7:0};
+  grid.innerHTML='';
+  plan.forEach(function(day){
+    var isToday=dowMap[day.id]===todayDow;
+    var card=document.createElement('div');
+    card.className='day-card'+(isToday?' today':'');
+    var badge=day.type==='e'?'<span class="badge badge-e">Entreno</span>':day.type==='p'?'<span class="badge badge-p">Pádel</span>':'';
+    var actHtml='';
+    if(day.acts.length){
+      actHtml='<div class="act-row">';
+      day.acts.forEach(function(a){
+        var k='act-'+day.id+'-'+a.id;
+        actHtml+='<span class="chip'+(checks[k]?' done':'')+'" data-key="'+k+'">'+a.label+'</span>';
+      });
+      actHtml+='</div>';
+    }
+    var dayKcal=0;
+    var mealsHtml='';
+    day.meals.forEach(function(meal,idx){
+      var k=day.id+'-'+idx;
+      var swap=swaps[k];
+      var name=swap?swap.name:meal.name;
+      var kcal=swap?swap.kcal:meal.kcal;
+      dayKcal+=kcal;
+      mealsHtml+='<div class="meal'+(checks[k]?' done':'')+'">';
+      mealsHtml+='<div class="mcheck" data-k="'+k+'"></div>';
+      mealsHtml+='<div class="minfo">';
+      mealsHtml+='<div class="mslot"><span>'+meal.slot+' <span class="mtime">· '+meal.time+'h</span></span><span class="mkcal">'+kcal+'kcal</span></div>';
+      mealsHtml+='<div class="meal-name">'+name+'</div>';
+      mealsHtml+='</div>';
+      mealsHtml+='<div class="mbtns">';
+      mealsHtml+='<button class="bsim" data-day="'+day.id+'" data-idx="'+idx+'" data-alt="'+meal.alt+'">≈</button>';
+      mealsHtml+='<button class="brec" data-name="'+name.replace(/"/g,"'")+'">📋</button>';
+      mealsHtml+='</div></div>';
+    });
+    var hClass=day.type==='e'?'e':day.type==='p'?'p':'';
+    card.innerHTML='<div class="day-hdr '+hClass+'"><div class="day-name">'+day.name+' '+badge+'</div><div class="day-label">'+day.label+'</div><div class="day-kcal">~'+dayKcal+' kcal totales</div>'+actHtml+'</div><div class="meals">'+mealsHtml+'</div>';
+    grid.appendChild(card);
+  });
+
+  document.querySelectorAll('.mcheck').forEach(function(el){
+    el.addEventListener('click',function(e){
+      e.stopPropagation();
+      var c=loadC(); c[el.dataset.k]=!c[el.dataset.k]; saveC(c);
+      el.closest('.meal').classList.toggle('done'); updateProgress();
+    });
+  });
+  document.querySelectorAll('.chip').forEach(function(el){
+    el.addEventListener('click',function(e){
+      e.stopPropagation();
+      var c=loadC(); c[el.dataset.key]=!c[el.dataset.key]; saveC(c);
+      el.classList.toggle('done'); updateProgress();
+    });
+  });
+  document.querySelectorAll('.bsim').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      openSimilar(parseInt(btn.dataset.day),parseInt(btn.dataset.idx),btn.dataset.alt);
+    });
+  });
+  document.querySelectorAll('.brec').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      openRecipe(btn.dataset.name);
+    });
+  });
+  updateProgress();
+}
+
+function openSimilar(dayId,idx,altKey){
+  var day=plan.find(function(d){return d.id===dayId;});
+  var meal=day.meals[idx];
+  var alts=alternatives[altKey]||[];
+  var swaps=loadS();
+  var cur=swaps[dayId+'-'+idx];
+  document.getElementById('msim-title').textContent=meal.slot+' · opciones';
+  document.getElementById('msim-sub').textContent='~'+meal.kcal+' kcal · sin ingredientes que no te gustan';
+  var list=document.getElementById('alt-list');
+  list.innerHTML='';
+  alts.forEach(function(a,i){
+    var active=cur?cur.name===a.name:i===0;
+    var div=document.createElement('div');
+    div.className='alt-item'+(active?' active':'');
+    div.dataset.i=i;
+    div.innerHTML='<div class="alt-name">'+a.name+'</div><div class="alt-meta"><span class="alt-kcal">'+a.kcal+' kcal</span><span>'+a.note+'</span></div>';
+    div.addEventListener('click',function(){
+      var sw=loadS(); var k=dayId+'-'+idx;
+      if(i===0) delete sw[k]; else sw[k]={name:a.name,kcal:a.kcal};
+      saveS(sw); closeSimilar(); renderWeek();
+    });
+    list.appendChild(div);
+  });
+  document.getElementById('msim').classList.add('open');
+}
+function closeSimilar(){document.getElementById('msim').classList.remove('open');}
+document.getElementById('msim-close').addEventListener('click',closeSimilar);
+document.getElementById('msim').addEventListener('click',function(e){if(e.target.id==='msim')closeSimilar();});
+
+function openRecipe(name){
+  var r=getRecipe(name);
+  document.getElementById('mrec-title').textContent=name;
+  var cont=document.getElementById('mrec-content');
+  if(!r){
+    cont.innerHTML='<p style="color:var(--muted);font-size:.85rem;padding:1rem 0">Receta no disponible para esta opción aún.</p>';
+  } else {
+    var acc='#00b4d8',mut='#8b9cb3',kc='#f472b6';
+    var macros='<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">';
+    [['Kcal',r.kcal],['Proteína',r.p+'g'],['Carbos',r.c+'g'],['Grasa',r.g+'g']].forEach(function(m){
+      macros+='<div style="background:rgba(0,0,0,.3);border:1px solid #2a3648;border-radius:8px;padding:.3rem .6rem;font-size:.72rem"><span style="color:'+acc+';font-weight:700">'+m[0]+'</span>: '+m[1]+'</div>';
+    });
+    macros+='</div>';
+    var ingHtml='<div style="font-size:.85rem;font-weight:700;color:'+acc+';margin-bottom:.5rem">🛒 Ingredientes</div><div style="display:flex;flex-direction:column;gap:.3rem;margin-bottom:1rem">';
+    r.ing.forEach(function(i){
+      ingHtml+='<div style="display:flex;justify-content:space-between;background:rgba(0,0,0,.25);border-radius:8px;padding:.4rem .7rem;font-size:.8rem"><span>'+i[0]+'</span><span style="color:'+kc+';font-weight:600">'+i[1]+'</span></div>';
+    });
+    ingHtml+='</div>';
+    var stepsHtml='<div style="font-size:.85rem;font-weight:700;color:'+acc+';margin-bottom:.5rem">👨‍🍳 Preparación</div><div style="display:flex;flex-direction:column;gap:.5rem">';
+    r.steps.forEach(function(s,i){
+      stepsHtml+='<div style="display:flex;gap:.6rem;align-items:flex-start"><div style="flex-shrink:0;width:22px;height:22px;background:rgba(0,180,216,.15);border:1px solid '+acc+';border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:'+acc+'">'+(i+1)+'</div><div style="font-size:.8rem;color:'+mut+';padding-top:.15rem;line-height:1.4">'+s+'</div></div>';
+    });
+    stepsHtml+='</div>';
+    cont.innerHTML=macros+ingHtml+stepsHtml;
+  }
+  document.getElementById('mrec').classList.add('open');
+}
+function closeRecipe(){document.getElementById('mrec').classList.remove('open');}
+document.getElementById('mrec-close').addEventListener('click',closeRecipe);
+document.getElementById('mrec').addEventListener('click',function(e){if(e.target.id==='mrec')closeRecipe();});
+
+function updateProgress(){
+  var c=loadC();
+  var total=plan.reduce(function(a,d){return a+d.meals.length+d.acts.length;},0);
+  var done=Object.values(c).filter(Boolean).length;
+  document.getElementById('prog-txt').textContent=done+' / '+total;
+  document.getElementById('prog-fill').style.width=(total?Math.round(done/total*100):0)+'%';
+}
+
+document.getElementById('reset-btn').addEventListener('click',function(){
+  if(confirm('Reiniciar marcas de comidas y actividades?')){
+    localStorage.removeItem(SK); localStorage.removeItem(SW); renderWeek();
+  }
+});
+
+updateClock();
+setInterval(updateClock,1000);
+renderWeek();
+</script>
+</body>
+</html>
