@@ -83,6 +83,28 @@
     .reset-btn:hover{border-color:#ef4444;color:#ef4444}
     .note{margin-top:.75rem;font-size:.72rem;color:var(--muted);text-align:center}
     .footer{margin-top:1.5rem;text-align:center;font-size:.75rem;color:var(--muted)}
+
+    .stats-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem;margin-bottom:1.5rem}
+    .stats-tabs{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+    .stat-tab{font-size:.68rem;font-weight:600;padding:.28rem .6rem;border-radius:8px;border:1px solid var(--border);cursor:pointer;color:var(--muted);background:transparent;transition:all .15s;white-space:nowrap}
+    .stat-tab.active{background:var(--asoft);border-color:var(--accent);color:var(--accent)}
+    .stat-area{display:none}
+    .stat-area.active{display:block}
+    .stat-timeline{display:flex;gap:.6rem;overflow-x:auto;padding-bottom:.5rem}
+    .stat-entry{min-width:88px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;padding:.55rem .65rem;text-align:center;flex-shrink:0}
+    .stat-entry.latest{border-color:var(--accent)}
+    .stat-entry-date{font-size:.6rem;color:var(--muted);margin-bottom:.2rem}
+    .stat-entry-val{font-size:1.05rem;font-weight:700;color:var(--accent)}
+    .stat-entry-delta{font-size:.62rem;font-weight:600;margin-top:.12rem}
+    .delta-up{color:#ef4444}.delta-down{color:var(--green)}.delta-ok{color:var(--muted)}
+    .stat-add-btn{margin-top:.75rem;background:transparent;border:1px dashed var(--border);color:var(--muted);font-size:.78rem;padding:.4rem .9rem;border-radius:8px;cursor:pointer;font-family:inherit;transition:all .15s;width:100%}
+    .stat-add-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .stats-form{display:flex;flex-direction:column;gap:.6rem}
+    .stats-form label{font-size:.72rem;color:var(--muted);display:flex;flex-direction:column;gap:.2rem}
+    .stats-form input,.stats-form select{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:.45rem .65rem;color:var(--text);font-family:inherit;font-size:.82rem;outline:none}
+    .stats-form input:focus{border-color:var(--accent)}
+    .btn-save{background:var(--accent);color:#111;font-weight:700;font-size:.85rem;border:none;border-radius:10px;padding:.6rem 1.2rem;cursor:pointer;font-family:inherit;transition:opacity .15s;width:100%;margin-top:.4rem}
+    .btn-save:hover{opacity:.85}
   </style>
 </head>
 <body>
@@ -99,6 +121,13 @@
   </div>
 </header>
 <main class="main">
+  <h2 class="sec-title">📊 Evolución corporal</h2>
+  <div class="stats-wrap">
+    <div class="stats-tabs" id="stats-tabs"></div>
+    <div id="stats-areas"></div>
+    <button class="stat-add-btn" id="btn-add-stat">+ Añadir medición semanal</button>
+  </div>
+
   <h2 class="sec-title">Calendario semanal</h2>
   <div class="legend">
     <div class="legend-item"><span class="ldot e"></span>Gym (Lun/Mar + Jue/Vie)</div>
@@ -133,6 +162,33 @@
       <button class="mclose" id="mrec-close">×</button>
     </div>
     <div id="mrec-content"></div>
+  </div>
+</div>
+
+
+<!-- MODAL AÑADIR MEDICIÓN -->
+<div class="modal-ov" id="mstat">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><h3>Nueva medición</h3><p>Introduce los datos de la báscula</p></div>
+      <button class="mclose" id="mstat-close">×</button>
+    </div>
+    <div class="stats-form">
+      <label>Fecha<input type="date" id="s-date"></label>
+      <label>Peso (kg)<input type="number" step="0.1" id="s-peso" placeholder="63.8"></label>
+      <label>IMC<input type="number" step="0.1" id="s-imc" placeholder="22.6"></label>
+      <label>% Grasa corporal<input type="number" step="0.1" id="s-grasa" placeholder="17.6"></label>
+      <label>% Grasa subcutánea<input type="number" step="0.1" id="s-subcut" placeholder="19.3"></label>
+      <label>% Músculo<input type="number" step="0.1" id="s-musc" placeholder="48.4"></label>
+      <label>Peso muscular (kg)<input type="number" step="0.1" id="s-muscKg" placeholder="30.9"></label>
+      <label>Grasa corporal (kg)<input type="number" step="0.1" id="s-grasaKg" placeholder="11.2"></label>
+      <label>Grasa visceral<input type="number" step="1" id="s-visceral" placeholder="6"></label>
+      <label>BMR (kcal)<input type="number" step="1" id="s-bmr" placeholder="1352"></label>
+      <label>% Humedad<input type="number" step="0.1" id="s-humedad" placeholder="59.7"></label>
+      <label>Masa ósea (kg)<input type="number" step="0.1" id="s-osea" placeholder="2.6"></label>
+      <label>% Proteína<input type="number" step="0.1" id="s-proteina" placeholder="16.7"></label>
+      <button class="btn-save" id="btn-save-stat">Guardar medición</button>
+    </div>
   </div>
 </div>
 
@@ -721,9 +777,117 @@ document.getElementById('reset-btn').addEventListener('click',function(){
   }
 });
 
+
+// ─── DATOS CORPORALES ───────────────────────────────────────────────────────
+var STK='pdc-v6-stats';
+var STAT_DEFS=[
+  {key:'peso',label:'Peso (kg)',unit:'kg',lower:true},
+  {key:'imc',label:'IMC',unit:'',lower:false},
+  {key:'grasa',label:'Grasa corporal (%)',unit:'%',lower:true},
+  {key:'subcut',label:'Grasa subcutánea (%)',unit:'%',lower:true},
+  {key:'musc',label:'Músculo (%)',unit:'%',lower:false},
+  {key:'muscKg',label:'Peso muscular (kg)',unit:'kg',lower:false},
+  {key:'grasaKg',label:'Grasa corporal (kg)',unit:'kg',lower:true},
+  {key:'visceral',label:'Grasa visceral',unit:'',lower:true},
+  {key:'bmr',label:'BMR (kcal)',unit:'kcal',lower:false},
+  {key:'humedad',label:'Humedad (%)',unit:'%',lower:false},
+  {key:'osea',label:'Masa ósea (kg)',unit:'kg',lower:false},
+  {key:'proteina',label:'Proteína (%)',unit:'%',lower:false}
+];
+
+function loadStats(){try{return JSON.parse(localStorage.getItem(STK))||[];}catch(e){return [];}}
+function saveStats(d){localStorage.setItem(STK,JSON.stringify(d));}
+
+function initStats(){
+  var s=loadStats();
+  if(!s.length){
+    s=[{date:'2026-08-05',peso:63.8,imc:22.6,grasa:17.6,subcut:19.3,musc:48.4,muscKg:30.9,grasaKg:11.2,visceral:6,bmr:1352,humedad:59.7,osea:2.6,proteina:16.7}];
+    saveStats(s);
+  }
+  renderStats(s);
+}
+
+function renderStats(stats){
+  var tabsEl=document.getElementById('stats-tabs');
+  var areasEl=document.getElementById('stats-areas');
+  tabsEl.innerHTML='';
+  areasEl.innerHTML='';
+  STAT_DEFS.forEach(function(def,di){
+    var tab=document.createElement('button');
+    tab.className='stat-tab'+(di===0?' active':'');
+    tab.textContent=def.label;
+    tab.addEventListener('click',function(){
+      document.querySelectorAll('.stat-tab').forEach(function(t){t.classList.remove('active');});
+      document.querySelectorAll('.stat-area').forEach(function(a){a.classList.remove('active');});
+      tab.classList.add('active');
+      document.getElementById('sa-'+def.key).classList.add('active');
+    });
+    tabsEl.appendChild(tab);
+
+    var area=document.createElement('div');
+    area.className='stat-area'+(di===0?' active':'');
+    area.id='sa-'+def.key;
+    var timeline=document.createElement('div');
+    timeline.className='stat-timeline';
+
+    stats.forEach(function(entry,i){
+      var val=entry[def.key];
+      if(val==null) return;
+      var prev=i>0?stats[i-1][def.key]:null;
+      var deltaHtml='';
+      if(prev!=null){
+        var diff=(val-prev).toFixed(1);
+        var isGood=def.lower?diff<0:diff>0;
+        var cls=diff==0?'delta-ok':(isGood?'delta-down':'delta-up');
+        var sign=diff>0?'+':'';
+        deltaHtml='<div class="stat-entry-delta '+cls+'">'+sign+diff+def.unit+'</div>';
+      }
+      var isLatest=i===stats.length-1;
+      var d=new Date(entry.date+'T12:00:00');
+      var dateStr=d.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][d.getMonth()];
+      var card=document.createElement('div');
+      card.className='stat-entry'+(isLatest?' latest':'');
+      card.innerHTML='<div class="stat-entry-date">'+dateStr+(isLatest?' · Actual':'')+'</div><div class="stat-entry-val">'+val+def.unit+'</div>'+deltaHtml;
+      timeline.appendChild(card);
+    });
+    area.appendChild(timeline);
+    areasEl.appendChild(area);
+  });
+}
+
+document.getElementById('btn-add-stat').addEventListener('click',function(){
+  document.getElementById('s-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('mstat').classList.add('open');
+});
+document.getElementById('mstat-close').addEventListener('click',function(){
+  document.getElementById('mstat').classList.remove('open');
+});
+document.getElementById('mstat').addEventListener('click',function(e){if(e.target.id==='mstat')document.getElementById('mstat').classList.remove('open');});
+
+document.getElementById('btn-save-stat').addEventListener('click',function(){
+  var date=document.getElementById('s-date').value;
+  if(!date){alert('Pon la fecha');return;}
+  var entry={date:date};
+  var fields=['peso','imc','grasa','subcut','musc','muscKg','grasaKg','visceral','bmr','humedad','osea','proteina'];
+  var ids=['s-peso','s-imc','s-grasa','s-subcut','s-musc','s-muscKg','s-grasaKg','s-visceral','s-bmr','s-humedad','s-osea','s-proteina'];
+  fields.forEach(function(f,i){
+    var v=parseFloat(document.getElementById(ids[i]).value);
+    if(!isNaN(v)) entry[f]=v;
+  });
+  var stats=loadStats();
+  var idx=stats.findIndex(function(s){return s.date===date;});
+  if(idx>=0) stats[idx]=entry; else stats.push(entry);
+  stats.sort(function(a,b){return a.date.localeCompare(b.date);});
+  saveStats(stats);
+  renderStats(stats);
+  document.getElementById('mstat').classList.remove('open');
+  ids.forEach(function(id){document.getElementById(id).value='';});
+});
+
 updateClock();
 setInterval(updateClock,1000);
 renderWeek();
+initStats();
 </script>
 </body>
 </html>
