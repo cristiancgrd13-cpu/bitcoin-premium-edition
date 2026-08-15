@@ -1,728 +1,710 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portafolio Personal</title>
-    <script>
-        tailwind = { config: { darkMode: 'class' } };
-    </script>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', system-ui, sans-serif; }
-        .gauge-wrap { position: relative; width: 180px; height: 100px; margin: 0 auto; }
-        .gauge-bg {
-            width: 180px; height: 90px;
-            border-radius: 90px 90px 0 0;
-            background: conic-gradient(
-                #ef4444 0deg 54deg,
-                #f97316 54deg 90deg,
-                #eab308 90deg 126deg,
-                #84cc16 126deg 162deg,
-                #22c55e 162deg 180deg
-            );
-        }
-        .gauge-center {
-            position: absolute; bottom: 0; left: 50%;
-            transform: translateX(-50%);
-            width: 130px; height: 65px;
-            background: #18181b;
-            border-radius: 65px 65px 0 0;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .gauge-needle {
-            position: absolute; bottom: 0; left: 50%;
-            width: 3px; height: 72px;
-            background: white;
-            transform-origin: bottom center;
-            border-radius: 3px 3px 0 0;
-            transition: transform 1s ease;
-        }
-        .gauge-dot {
-            position: absolute; bottom: -5px; left: 50%;
-            transform: translateX(-50%);
-            width: 12px; height: 12px;
-            background: white; border-radius: 50%;
-        }
-        /* ---- Modo claro (overrides simples sobre las clases de Tailwind) ---- */
-        body.light-mode { background: #f4f4f5; color: #18181b; }
-        body.light-mode [class*="bg-black"]:not(.gauge-center) { background: #ffffff !important; }
-        body.light-mode [class*="bg-zinc-900"] { background: #ffffff !important; border-color: rgba(217,119,6,.35) !important; }
-        body.light-mode [class*="text-white"] { color: #18181b !important; }
-        body.light-mode [class*="text-zinc-400"] { color: #52525b !important; }
-        body.light-mode [class*="text-zinc-500"] { color: #71717a !important; }
-        body.light-mode input { background: #f4f4f5 !important; color: #18181b !important; border-color: #d4d4d8 !important; }
-        body.light-mode .modal-box { background: #ffffff !important; }
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center; z-index: 50; padding: 1rem; }
-        .modal-box { max-height: 85vh; overflow-y: auto; }
-        .news-scroll::-webkit-scrollbar { width: 6px; }
-        .news-scroll::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 3px; }
-    </style>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Plan Dietético · Andrea Rojano</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--bg:#0f1419;--card:#1a2332;--hover:#243044;--accent:#00b4d8;--asoft:rgba(0,180,216,.15);--green:#2dd4bf;--gsoft:rgba(45,212,191,.2);--text:#e8eef4;--muted:#8b9cb3;--border:#2a3648;--amber:#f59e0b;--asoft2:rgba(245,158,11,.15);--padel:#a78bfa;--psoft:rgba(167,139,250,.18);--kcal:#f472b6;--purple:#c084fc}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.5}
+    .header{position:sticky;top:0;z-index:100;background:linear-gradient(180deg,#0f1419 80%,transparent);padding:1.25rem 1.5rem 1rem;border-bottom:1px solid var(--border);backdrop-filter:blur(12px)}
+    .header-inner{max-width:1400px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem}
+    .brand h1{font-size:1.35rem;font-weight:700}
+    .brand span{font-size:.8rem;color:var(--muted)}
+    .clock-box{display:flex;flex-direction:column;align-items:flex-end}
+    .clock-date{font-size:.95rem;font-weight:600;color:var(--accent);text-transform:capitalize}
+    .clock-time{font-size:1.75rem;font-weight:700;font-variant-numeric:tabular-nums}
+    .clock-time span{color:var(--accent)}
+    .main{max-width:1400px;margin:0 auto;padding:1.5rem}
+    .sec-title{font-size:1.1rem;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+    .sec-title::before{content:'';width:4px;height:1.1em;background:var(--accent);border-radius:2px}
+    .legend{display:flex;flex-wrap:wrap;gap:.75rem 1.25rem;margin-bottom:1.25rem;font-size:.78rem;color:var(--muted)}
+    .legend-item{display:flex;align-items:center;gap:.4rem}
+    .ldot{width:10px;height:10px;border-radius:3px}
+    .ldot.e{background:var(--amber)}.ldot.p{background:var(--padel)}
+    .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:.75rem;overflow-x:auto;padding-bottom:.5rem}
+    @media(max-width:1100px){.week-grid{grid-template-columns:repeat(4,minmax(200px,1fr))}}
+    @media(max-width:700px){.week-grid{grid-template-columns:repeat(2,minmax(180px,1fr))}}
+    @media(max-width:420px){.week-grid{grid-template-columns:1fr}}
+    .day-card{background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s}
+    .day-card:hover{border-color:var(--accent)}
+    .day-card.today{border-color:var(--accent);box-shadow:0 0 0 1px var(--asoft)}
+    .day-hdr{padding:.7rem .85rem;background:rgba(0,0,0,.25);border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:.25rem}
+    .day-hdr.e{background:var(--asoft2)}.day-hdr.p{background:var(--psoft)}
+    .day-name{font-weight:700;font-size:.95rem;display:flex;align-items:center;flex-wrap:wrap;gap:.35rem}
+    .badge{font-size:.62rem;font-weight:600;padding:.12rem .38rem;border-radius:4px;text-transform:uppercase}
+    .badge-e{background:var(--amber);color:#111}.badge-p{background:var(--padel);color:#111}
+    .day-label{font-size:.7rem;color:var(--muted);font-weight:500}
+    .day-kcal{font-size:.78rem;font-weight:700;color:var(--kcal)}
+    .act-row{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.25rem}
+    .chip{font-size:.65rem;font-weight:600;padding:.2rem .45rem;border-radius:6px;border:1px solid var(--border);cursor:pointer;color:var(--muted);background:transparent;transition:all .15s;user-select:none}
+    .chip.done{background:var(--gsoft);border-color:var(--green);color:var(--green)}
+    .meals{padding:.5rem;display:flex;flex-direction:column;gap:.35rem;flex:1}
+    .meal{display:flex;align-items:flex-start;gap:.45rem;padding:.45rem .5rem;border-radius:8px;transition:background .15s;user-select:none}
+    .meal:hover{background:var(--hover)}
+    .meal.done{background:var(--gsoft)}
+    .meal.done .meal-name{text-decoration:line-through;color:var(--muted)}
+    .mcheck{flex-shrink:0;width:18px;height:18px;border:2px solid var(--border);border-radius:5px;margin-top:2px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s}
+    .meal.done .mcheck{background:var(--green);border-color:var(--green)}
+    .meal.done .mcheck::after{content:'✓';color:#0f1419;font-size:12px;font-weight:700}
+    .minfo{flex:1;min-width:0}
+    .mslot{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--accent);margin-bottom:.08rem;display:flex;align-items:center;justify-content:space-between;gap:.3rem}
+    .mtime{color:var(--purple);font-weight:600;text-transform:none;letter-spacing:0;font-size:.6rem}
+    .mkcal{font-size:.6rem;color:var(--kcal);font-weight:600;text-transform:none}
+    .meal-name{font-size:.76rem;font-weight:500;line-height:1.3}
+    .mbtns{display:flex;flex-direction:column;gap:.25rem;flex-shrink:0;margin-top:1px}
+    .bsim,.brec{background:transparent;border:1px solid var(--border);color:var(--muted);font-size:.58rem;font-weight:600;padding:.15rem .38rem;border-radius:5px;cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap}
+    .bsim:hover{border-color:var(--accent);color:var(--accent);background:var(--asoft)}
+    .brec:hover{border-color:var(--purple);color:var(--purple);background:rgba(192,132,252,.1)}
+    .modal-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:200;align-items:center;justify-content:center;padding:1rem;backdrop-filter:blur(4px)}
+    .modal-ov.open{display:flex}
+    .modal{background:var(--card);border:1px solid var(--border);border-radius:16px;max-width:440px;width:100%;max-height:88vh;overflow-y:auto;padding:1.25rem}
+    .modal.wide{max-width:480px}
+    .modal-hdr{display:flex;justify-content:space-between;align-items:flex-start;gap:.75rem;margin-bottom:1rem}
+    .modal-hdr h3{font-size:1rem;font-weight:700}
+    .modal-hdr p{font-size:.78rem;color:var(--muted);margin-top:.2rem}
+    .mclose{background:transparent;border:none;color:var(--muted);font-size:1.4rem;cursor:pointer;line-height:1;padding:.1rem .3rem}
+    .mclose:hover{color:var(--text)}
+    .alt-list{display:flex;flex-direction:column;gap:.5rem}
+    .alt-item{background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:10px;padding:.75rem .9rem;cursor:pointer;transition:border-color .15s,background .15s}
+    .alt-item:hover{border-color:var(--accent);background:var(--asoft)}
+    .alt-item.active{border-color:var(--green);background:var(--gsoft)}
+    .alt-name{font-size:.88rem;font-weight:600;margin-bottom:.15rem}
+    .alt-meta{font-size:.72rem;color:var(--muted);display:flex;gap:.6rem;flex-wrap:wrap}
+    .alt-kcal{color:var(--kcal);font-weight:600}
+    .prog-wrap{margin-top:1.5rem;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1rem 1.25rem}
+    .prog-label{display:flex;justify-content:space-between;font-size:.85rem;font-weight:500;margin-bottom:.5rem}
+    .prog-label span:last-child{color:var(--accent);font-weight:600}
+    .prog-track{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+    .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--green));border-radius:4px;transition:width .3s;width:0%}
+    .reset-btn{margin-top:1rem;background:transparent;border:1px solid var(--border);color:var(--muted);font-size:.8rem;padding:.45rem .9rem;border-radius:8px;cursor:pointer;font-family:inherit;transition:all .15s}
+    .reset-btn:hover{border-color:#ef4444;color:#ef4444}
+    .note{margin-top:.75rem;font-size:.72rem;color:var(--muted);text-align:center}
+    .footer{margin-top:1.5rem;text-align:center;font-size:.75rem;color:var(--muted)}
+
+    .stats-wrap{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:1rem;margin-bottom:1.5rem}
+    .stats-tabs{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1rem}
+    .stat-tab{font-size:.68rem;font-weight:600;padding:.28rem .6rem;border-radius:8px;border:1px solid var(--border);cursor:pointer;color:var(--muted);background:transparent;transition:all .15s;white-space:nowrap}
+    .stat-tab.active{background:var(--asoft);border-color:var(--accent);color:var(--accent)}
+    .stat-area{display:none}
+    .stat-area.active{display:block}
+    .stat-timeline{display:flex;gap:.6rem;overflow-x:auto;padding-bottom:.5rem}
+    .stat-entry{min-width:88px;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;padding:.55rem .65rem;text-align:center;flex-shrink:0}
+    .stat-entry.latest{border-color:var(--accent)}
+    .stat-entry-date{font-size:.6rem;color:var(--muted);margin-bottom:.2rem}
+    .stat-entry-val{font-size:1.05rem;font-weight:700;color:var(--accent)}
+    .stat-entry-delta{font-size:.62rem;font-weight:600;margin-top:.12rem}
+    .delta-up{color:#ef4444}.delta-down{color:var(--green)}.delta-ok{color:var(--muted)}
+    .stat-add-btn{margin-top:.75rem;background:transparent;border:1px dashed var(--border);color:var(--muted);font-size:.78rem;padding:.4rem .9rem;border-radius:8px;cursor:pointer;font-family:inherit;transition:all .15s;width:100%}
+    .stat-add-btn:hover{border-color:var(--accent);color:var(--accent)}
+    .stats-form{display:flex;flex-direction:column;gap:.6rem}
+    .stats-form label{font-size:.72rem;color:var(--muted);display:flex;flex-direction:column;gap:.2rem}
+    .stats-form input,.stats-form select{background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:8px;padding:.45rem .65rem;color:var(--text);font-family:inherit;font-size:.82rem;outline:none}
+    .stats-form input:focus{border-color:var(--accent)}
+    .btn-save{background:var(--accent);color:#111;font-weight:700;font-size:.85rem;border:none;border-radius:10px;padding:.6rem 1.2rem;cursor:pointer;font-family:inherit;transition:opacity .15s;width:100%;margin-top:.4rem}
+    .btn-save:hover{opacity:.85}
+  </style>
 </head>
-<body class="bg-black text-white min-h-screen p-4">
-    <div class="max-w-md w-full mx-auto text-center">
-
-        <div class="flex items-center justify-between mb-6">
-            <div class="text-left">
-                <h1 class="text-3xl font-bold text-amber-400">Portafolio Personal</h1>
-                <p class="text-xs text-zinc-500">#001</p>
-            </div>
-            <button id="theme-toggle" onclick="toggleTheme()" class="w-11 h-11 rounded-full bg-zinc-900 border border-amber-500/30 text-xl flex items-center justify-center">☀️</button>
-        </div>
-
-        <!-- 1. VALOR TOTAL -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-6 border border-amber-500/30">
-            <div class="flex items-baseline justify-center gap-3">
-                <div id="total-value" class="text-6xl font-bold text-white">0.00</div>
-                <div class="text-5xl font-bold text-amber-400">€</div>
-            </div>
-            <p class="text-xs text-zinc-500 mt-2">Valor total del portafolio en tiempo real</p>
-        </div>
-
-        <!-- 2. MIS ACTIVOS -->
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MIS ACTIVOS</p>
-            <div id="assets-list" class="space-y-3">
-                <div class="text-zinc-500 text-sm py-4">Cargando activos...</div>
-            </div>
-            <button onclick="openAddAssetModal()" class="w-full mt-4 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-400 font-semibold rounded-2xl py-3 transition">+ Añadir activo</button>
-        </div>
-
-        <!-- 3. RENDIMIENTO TOTAL -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-6 border border-amber-500/30">
-            <p class="text-zinc-400 text-sm mb-3">RENDIMIENTO TOTAL</p>
-            <div id="percentage" class="text-5xl font-bold">—</div>
-            <p id="inv-total-subtitle" class="text-xs text-zinc-500 mt-2">Sobre inversión total de —</p>
-        </div>
-
-        <!-- 4. GRÁFICA QUESO -->
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">DISTRIBUCIÓN DEL PORTAFOLIO</p>
-            <div class="flex justify-center">
-                <canvas id="pie-chart" width="220" height="220"></canvas>
-            </div>
-        </div>
-
-        <!-- 5. COMPARATIVA VS OTROS ACTIVOS -->
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">COMPARATIVA VS OTROS ACTIVOS</p>
-            <p class="text-xs text-zinc-500 mb-4">Si tu inversión total la hubieras puesto entera en un solo activo</p>
-            <div id="comparativa-list" class="space-y-2 text-left">
-                <div class="text-zinc-500 text-sm py-2">Calculando...</div>
-            </div>
-        </div>
-
-        <!-- 6. DOMINANCIA BTC -->
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">DOMINANCIA DE MERCADO</p>
-            <div class="flex justify-around">
-                <div>
-                    <div id="btc-dominance" class="text-3xl font-bold text-amber-400">—</div>
-                    <div class="text-xs text-zinc-500 mt-1">Bitcoin</div>
-                </div>
-                <div>
-                    <div id="eth-dominance" class="text-3xl font-bold text-indigo-400">—</div>
-                    <div class="text-xs text-zinc-500 mt-1">Ethereum</div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 7. ÍNDICE DE SENTIMIENTO -->
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-5 text-center tracking-widest">ÍNDICE DE SENTIMIENTO</p>
-            <div class="gauge-wrap mb-2">
-                <div class="gauge-bg"></div>
-                <div class="gauge-center">
-                    <div id="fear-value" class="text-3xl font-bold text-white">—</div>
-                </div>
-                <div id="gauge-needle" class="gauge-needle"></div>
-                <div class="gauge-dot"></div>
-            </div>
-            <div id="fear-label" class="text-xl font-bold mt-3">—</div>
-            <p class="text-xs text-zinc-500 mt-1">Fear & Greed Index · Actualizado diariamente</p>
-        </div>
-
-        <!-- 8. EVOLUCIÓN DIARIA -->
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-3 text-center">EVOLUCIÓN DIARIA DEL PORTAFOLIO</p>
-            <div id="evolution-container" class="overflow-x-auto pb-2">
-                <div id="evolution-days" class="flex gap-4 min-w-max">
-                    <div class="text-zinc-500 text-sm py-4">Cargando datos reales...</div>
-                </div>
-            </div>
-            <p class="text-xs text-zinc-500 text-center mt-2">Desliza → para ver más días</p>
-        </div>
-
-        <!-- 9. NOTICIAS -->
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">NOTICIAS CRIPTO Y MERCADOS</p>
-            <div id="news-list" class="news-scroll space-y-2 text-left max-h-80 overflow-y-auto pr-1">
-                <div class="text-zinc-500 text-sm py-4">Cargando noticias...</div>
-            </div>
-            <p class="text-xs text-zinc-500 text-center mt-3">Actualización cada 60 segundos · Cointelegraph & CoinDesk</p>
-        </div>
-
-        <!-- 10. PROMEDIO DE COMPRA -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-6 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-5 text-center tracking-widest">PROMEDIO DE COMPRA</p>
-            <div class="space-y-4">
-                <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
-                    <div>
-                        <div class="text-xs text-zinc-400 mb-1">Inversión total</div>
-                        <div id="promedio-total-invertido" class="text-2xl font-bold text-white">—</div>
-                    </div>
-                    <span class="text-3xl text-amber-400">💶</span>
-                </div>
-                <div class="bg-black/40 rounded-2xl p-4 flex justify-between items-center">
-                    <div>
-                        <div class="text-xs text-zinc-400 mb-1">DCA mensual</div>
-                        <div class="text-2xl font-bold text-white">300,00 € <span class="text-sm text-zinc-400 font-normal">/ mes</span></div>
-                    </div>
-                    <span class="text-3xl text-amber-400">📅</span>
-                </div>
-                <div id="promedio-list" class="space-y-4">
-                </div>
-            </div>
-        </div>
-
-        <!-- 11. MERCADO TOP 100 (último) -->
-        <div class="bg-zinc-900 rounded-3xl p-6 mb-8 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-4 text-center tracking-widest">MERCADO — TOP 100</p>
-            <div class="mb-3">
-                <input id="market-search" type="text" placeholder="Buscar cripto..."
-                    class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-sm text-white placeholder-zinc-500 outline-none">
-            </div>
-            <div id="market-list" class="space-y-2 max-h-[480px] overflow-y-auto pr-1">
-                <div class="text-zinc-500 text-sm py-4">Cargando mercado...</div>
-            </div>
-            <p class="text-xs text-zinc-500 text-center mt-3">Actualización cada 60 segundos · Fuente: CoinGecko</p>
-        </div>
-
+<body>
+<header class="header">
+  <div class="header-inner">
+    <div class="brand">
+      <h1>Plan Dietético + Entreno</h1>
+      <span>Andrea Rojano · Seguimiento semanal (Pelusilla)</span>
     </div>
-
-    <!-- MODAL: DETALLE DE ACTIVO -->
-    <div id="asset-detail-modal" class="modal-overlay hidden">
-        <div class="modal-box bg-zinc-900 border border-amber-500/30 rounded-3xl p-6 max-w-sm w-full">
-            <div class="flex justify-between items-center mb-4">
-                <p id="detail-modal-title" class="text-lg font-bold text-amber-400">Activo</p>
-                <button onclick="closeAssetDetail()" class="text-zinc-400 text-2xl leading-none">&times;</button>
-            </div>
-            <div id="detail-chart-wrap">
-                <canvas id="detail-chart" height="200"></canvas>
-                <p class="text-xs text-zinc-500 mt-3 text-center">Precio en € · Últimos 30 días</p>
-            </div>
-            <div id="detail-manual-wrap" class="hidden text-left">
-                <p class="text-xs text-zinc-400 mb-3">Este activo no tiene precio de mercado en vivo disponible. Actualiza su valor actual manualmente cuando quieras.</p>
-                <label class="text-xs text-zinc-500">Valor actual (€)</label>
-                <input id="manual-current-value-input" type="number" step="0.01" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-3 outline-none">
-                <input type="hidden" id="manual-asset-key">
-                <button onclick="saveManualValue()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl py-3 transition">Guardar valor actual</button>
-            </div>
-        </div>
+    <div class="clock-box">
+      <div class="clock-date" id="cd">—</div>
+      <div class="clock-time" id="ct">00:00:<span>00</span></div>
     </div>
+  </div>
+</header>
+<main class="main">
+  <h2 class="sec-title">📊 Evolución corporal</h2>
+  <div class="stats-wrap">
+    <div class="stats-tabs" id="stats-tabs"></div>
+    <div id="stats-areas"></div>
+    <button class="stat-add-btn" id="btn-add-stat">+ Añadir medición semanal</button>
+  </div>
 
-    <!-- MODAL: AÑADIR ACTIVO -->
-    <div id="add-asset-modal" class="modal-overlay hidden">
-        <div class="modal-box bg-zinc-900 border border-amber-500/30 rounded-3xl p-6 max-w-sm w-full text-left">
-            <div class="flex justify-between items-center mb-4">
-                <p class="text-lg font-bold text-amber-400">Añadir activo</p>
-                <button onclick="closeAddAssetModal()" class="text-zinc-400 text-2xl leading-none">&times;</button>
-            </div>
-            <label class="text-xs text-zinc-500">Tipo de activo</label>
-            <select id="add-asset-type" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-3 outline-none">
-                <option value="btc">Bitcoin (BTC)</option>
-                <option value="eth">Ethereum (ETH)</option>
-                <option value="sol">Solana (SOL)</option>
-                <option value="etf_gold">ETF Oro Físico</option>
-                <option value="etf_nasdaq">ETF Nasdaq</option>
-                <option value="etf_sp500">ETF S&P 500</option>
-                <option value="rental">Inmobiliario (Rental)</option>
-            </select>
-            <label class="text-xs text-zinc-500">Cantidad (monedas / participaciones / unidades)</label>
-            <input id="add-qty" type="number" step="any" placeholder="Ej. 0.005 / 2 / 1" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-3 outline-none">
-            <label class="text-xs text-zinc-500">€ invertidos en esta compra</label>
-            <input id="add-invested" type="number" step="0.01" placeholder="Ej. 300" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-4 outline-none">
-            <button onclick="submitAddAsset()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl py-3 transition">Añadir y actualizar portafolio</button>
-        </div>
+  <h2 class="sec-title">Calendario semanal</h2>
+  <div class="legend">
+    <div class="legend-item"><span class="ldot e"></span>Gym (Lun/Mar + Jue/Vie)</div>
+    <div class="legend-item"><span class="ldot p"></span>Pádel (Miércoles)</div>
+  </div>
+  <div class="week-grid" id="week-grid"></div>
+  <p class="note">≈1.200-1.500 kcal/día · ≈ para ver otras opciones de su propio plan · 📋 para receta con cantidades</p>
+  <div class="prog-wrap">
+    <div class="prog-label"><span>Comidas + actividades completadas</span><span id="prog-txt">0 / 0</span></div>
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    <button class="reset-btn" id="reset-btn">Reiniciar marcas</button>
+  </div>
+  <p class="footer">Plan v1 · 27 Mayo 2025 · Intolerancia a la lactosa (alta sensibilidad): usar siempre bebida de avena, leche y yogur sin lactosa · Objetivo: reducir grasa corporal · Priorizar siempre versiones integrales en pan y pasta · Alérgenos variables por día: gluten, lácteos, pescado, huevos, frutos secos, soja, crustáceos, moluscos, apio</p>
+</main>
+
+<!-- MODAL SIMILARES -->
+<div class="modal-ov" id="msim">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><h3 id="msim-title">Opciones</h3><p id="msim-sub">Elige la que más te apetezca</p></div>
+      <button class="mclose" id="msim-close">×</button>
     </div>
+    <div class="alt-list" id="alt-list"></div>
+  </div>
+</div>
 
-    <script>
-        // ── Estado y persistencia ────────────────────────────────────────────────
-        const ASSET_TYPE_META = {
-            etf_gold:   { name: 'ETF Oro Físico', icon: '🥇', color: '#eab308' },
-            etf_nasdaq: { name: 'ETF Nasdaq',      icon: '📈', color: '#38bdf8' },
-            etf_sp500:  { name: 'ETF S&P 500',     icon: '📊', color: '#4ade80' },
-            rental:     { name: 'Inmobiliario (Rental)', icon: '🏠', color: '#f472b6' }
-        };
+<!-- MODAL RECETA -->
+<div class="modal-ov" id="mrec">
+  <div class="modal wide">
+    <div class="modal-hdr">
+      <div><h3 id="mrec-title">Receta</h3><p>Cantidades para 1 persona</p></div>
+      <button class="mclose" id="mrec-close">×</button>
+    </div>
+    <div id="mrec-content"></div>
+  </div>
+</div>
 
-        function loadAssets() {
-            const saved = localStorage.getItem('portfolio_assets_v2');
-            if (saved) { try { return JSON.parse(saved); } catch(e) {} }
-            return {
-                btc: { type: 'crypto', coingeckoId: 'bitcoin',  name: 'Bitcoin',  symbol: 'BTC', icon: '₿', color: '#f97316', amount: 0.15073571, invested: 10999.48 },
-                eth: { type: 'crypto', coingeckoId: 'ethereum', name: 'Ethereum', symbol: 'ETH', icon: 'Ξ', color: '#818cf8', amount: 1.14237,    invested: 2868.77  },
-                sol: { type: 'crypto', coingeckoId: 'solana',   name: 'Solana',   symbol: 'SOL', icon: '◎', color: '#a855f7', amount: 5.89,       invested: 622.51   }
-            };
-        }
-        let assets = loadAssets();
-        function saveAssets() { localStorage.setItem('portfolio_assets_v2', JSON.stringify(assets)); }
 
-        let livePrices = {};
-        let pieChart = null;
-        let allMarketData = [];
+<!-- MODAL AÑADIR MEDICIÓN -->
+<div class="modal-ov" id="mstat">
+  <div class="modal">
+    <div class="modal-hdr">
+      <div><h3>Nueva medición</h3><p>Introduce los datos de la báscula</p></div>
+      <button class="mclose" id="mstat-close">×</button>
+    </div>
+    <div class="stats-form">
+      <label>Fecha<input type="date" id="s-date"></label>
+      <label>Peso (kg)<input type="number" step="0.1" id="s-peso" placeholder="60.6"></label>
+      <label>IMC<input type="number" step="0.1" id="s-imc" placeholder="24.3"></label>
+      <label>% Grasa corporal<input type="number" step="0.1" id="s-grasa" placeholder="31.2"></label>
+      <label>% Grasa subcutánea<input type="number" step="0.1" id="s-subcut" placeholder="32.0"></label>
+      <label>% Músculo<input type="number" step="0.1" id="s-musc" placeholder="38.8"></label>
+      <label>Peso muscular (kg)<input type="number" step="0.1" id="s-muscKg" placeholder="23.5"></label>
+      <label>Grasa corporal (kg)<input type="number" step="0.1" id="s-grasaKg" placeholder="18.9"></label>
+      <label>Grasa visceral<input type="number" step="1" id="s-visceral" placeholder="4"></label>
+      <label>BMR (kcal)<input type="number" step="1" id="s-bmr" placeholder="1183"></label>
+      <label>% Humedad<input type="number" step="0.1" id="s-humedad" placeholder="49.7"></label>
+      <label>Masa ósea (kg)<input type="number" step="0.1" id="s-osea" placeholder="2.2"></label>
+      <label>% Proteína<input type="number" step="0.1" id="s-proteina" placeholder="13.1"></label>
+      <button class="btn-save" id="btn-save-stat">Guardar medición</button>
+    </div>
+  </div>
+</div>
 
-        function fmtEUR(n) { return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
+<script>
+// ─── PLAN (Andrea Rojano · DIETOPRO.COM · 27 Mayo 2025) ───────────────────────
+// Gym / Cardio / Pádel se mantienen igual que en el plan anterior.
+var plan = [
+  {id:1,name:'Día 1',label:'Lunes',type:'e',
+   acts:[{id:'gym',label:'Gym (op. 1)'},{id:'cardio',label:'Cardio'}],
+   meals:[
+    {slot:'Desayuno',time:'07:30',name:'Copos de avena, frutas desecadas, frutos secos y bebida de avena',kcal:260,alt:'desayuno'},
+    {slot:'Tentempié 1',time:'09:00',name:'Bocadillo de atún con pimiento',kcal:250,alt:'tentempie'},
+    {slot:'Comida',time:'14:00',name:'Batido de proteína con bebida de avena',kcal:200,alt:'comida-entreno'},
+    {slot:'Comida',time:'14:00',name:'Manzana',kcal:70,alt:'fruta'},
+    {slot:'Cena',time:'20:00',name:'Ensalada mixta',kcal:140,alt:'cena-ensalada'},
+    {slot:'Cena',time:'20:00',name:'Tortilla con pepino y tomate',kcal:300,alt:'cena-principal'}
+  ]},
+  {id:2,name:'Día 2',label:'Martes',type:'e',
+   acts:[{id:'gym',label:'Gym (op. 1)'},{id:'cardio',label:'Cardio'}],
+   meals:[
+    {slot:'Desayuno',time:'07:30',name:'Leche desnatada sin lactosa',kcal:100,alt:'desayuno'},
+    {slot:'Tentempié 1',time:'09:00',name:'Bol de yogur sin lactosa con piña y semillas de calabaza',kcal:345,alt:'tentempie'},
+    {slot:'Tentempié 1',time:'09:00',name:'Kiwi',kcal:70,alt:'fruta'},
+    {slot:'Comida',time:'14:00',name:'Ensalada de canónigos y tomate',kcal:90,alt:'comida-acompanamiento'},
+    {slot:'Comida',time:'14:00',name:'Macarrones con tomate y atún',kcal:350,alt:'comida-principal'},
+    {slot:'Cena',time:'20:00',name:'Ensalada de pepino y tomate',kcal:160,alt:'cena-ensalada'},
+    {slot:'Cena',time:'20:00',name:'Lubina a la plancha con canónigos y zanahoria',kcal:350,alt:'cena-principal'}
+  ]},
+  {id:3,name:'Día 3',label:'Miércoles',type:'p',
+   acts:[{id:'padel',label:'Pádel'}],
+   meals:[
+    {slot:'Desayuno',time:'07:30',name:'Leche desnatada sin lactosa',kcal:100,alt:'desayuno'},
+    {slot:'Tentempié 1',time:'09:00',name:'Bebida de avena con copos de avena, melocotón y frambuesas',kcal:275,alt:'tentempie'},
+    {slot:'Comida',time:'14:00',name:'Crema de calabaza y zanahoria',kcal:90,alt:'comida-acompanamiento'},
+    {slot:'Comida',time:'14:00',name:'Guisantes tricolor',kcal:290,alt:'comida-principal'},
+    {slot:'Cena',time:'20:00',name:'Ensalada de lechuga y tomate',kcal:140,alt:'cena-ensalada'},
+    {slot:'Cena',time:'20:00',name:'Pechuga de pollo a la plancha con berenjena',kcal:330,alt:'cena-principal'}
+  ]},
+  {id:4,name:'Día 4',label:'Jueves',type:'e',
+   acts:[{id:'gym',label:'Gym (op. 2)'},{id:'cardio',label:'Cardio'}],
+   meals:[
+    {slot:'Desayuno',time:'07:30',name:'Leche desnatada sin lactosa',kcal:100,alt:'desayuno'},
+    {slot:'Tentempié 1',time:'09:00',name:'Bol de yogur sin lactosa con piña y semillas de calabaza',kcal:345,alt:'tentempie'},
+    {slot:'Tentempié 1',time:'09:00',name:'Kiwi',kcal:70,alt:'fruta'},
+    {slot:'Comida',time:'14:00',name:'Espárragos blancos con jamón serrano',kcal:80,alt:'comida-acompanamiento'},
+    {slot:'Comida',time:'14:00',name:'Patatas asadas con tomate natural',kcal:290,alt:'comida-principal'},
+    {slot:'Cena',time:'20:00',name:'Ensalada de tomate, cebolla, pimiento verde',kcal:145,alt:'cena-ensalada'},
+    {slot:'Cena',time:'20:00',name:'Merluza con gambas y guisantes al microondas',kcal:320,alt:'cena-principal'}
+  ]},
+  {id:5,name:'Día 5',label:'Viernes',type:'e',
+   acts:[{id:'gym',label:'Gym (op. 2)'},{id:'cardio',label:'Cardio'}],
+   meals:[
+    {slot:'Desayuno',time:'07:30',name:'Copos de avena, frutas desecadas, frutos secos y bebida de avena',kcal:260,alt:'desayuno'},
+    {slot:'Tentempié 1',time:'09:00',name:'Bocadillo de jamón serrano con tomate',kcal:260,alt:'tentempie'},
+    {slot:'Comida',time:'14:00',name:'Batido de proteína con bebida de avena',kcal:200,alt:'comida-entreno'},
+    {slot:'Comida',time:'14:00',name:'Manzana',kcal:70,alt:'fruta'},
+    {slot:'Cena',time:'20:00',name:'Ensalada mixta',kcal:140,alt:'cena-ensalada'},
+    {slot:'Cena',time:'20:00',name:'Tortilla de habas',kcal:400,alt:'cena-principal'}
+  ]},
+  {id:6,name:'Día 6',label:'Sábado',type:'',
+   acts:[],
+   meals:[
+    {slot:'Desayuno',time:'07:30',name:'Leche desnatada sin lactosa',kcal:100,alt:'desayuno'},
+    {slot:'Tentempié 1',time:'09:00',name:'Bebida de avena con copos de avena, melocotón y frambuesas',kcal:275,alt:'tentempie'},
+    {slot:'Comida',time:'14:00',name:'Ensalada de canónigos y tomate',kcal:90,alt:'comida-acompanamiento'},
+    {slot:'Comida',time:'14:00',name:'Arroz con verduras al curry',kcal:240,alt:'comida-principal'},
+    {slot:'Cena',time:'20:00',name:'Ensalada de pepino y tomate',kcal:160,alt:'cena-ensalada'},
+    {slot:'Cena',time:'20:00',name:'Calamares con jamón al ajillo',kcal:390,alt:'cena-principal'}
+  ]},
+  {id:7,name:'Día 7',label:'Domingo',type:'',
+   acts:[],
+   meals:[
+    {slot:'Desayuno',time:'07:30',name:'Leche desnatada sin lactosa',kcal:100,alt:'desayuno'},
+    {slot:'Tentempié 1',time:'09:00',name:'Bocadillo de aguacate y tomate',kcal:280,alt:'tentempie'},
+    {slot:'Comida',time:'14:00',name:'Ensalada de lechuga y cebolla',kcal:105,alt:'comida-acompanamiento'},
+    {slot:'Comida',time:'14:00',name:'Espaguetis integrales con tomate y albahaca',kcal:310,alt:'comida-principal'},
+    {slot:'Cena',time:'20:00',name:'Ensalada de tomate con ajo',kcal:155,alt:'cena-ensalada'},
+    {slot:'Cena',time:'20:00',name:'Salteado de pollo en tiras con pimiento verde',kcal:335,alt:'cena-principal'}
+  ]}
+];
+plan.forEach(function(d){d.totalKcal=d.meals.reduce(function(s,m){return s+m.kcal;},0);});
 
-        function getAssetValue(key) {
-            const a = assets[key];
-            if (a.type === 'crypto') return a.amount * (livePrices[a.coingeckoId] || 0);
-            return (a.currentValue != null ? a.currentValue : a.invested);
-        }
+// ─── ALTERNATIVAS (variedad real dentro de la propia semana de Andrea) ────────
+var alternatives = {
+  'desayuno':[
+    {name:'Copos de avena, frutas desecadas, frutos secos y bebida de avena',kcal:260,note:'Días de entreno (1 y 5)'},
+    {name:'Leche desnatada sin lactosa',kcal:100,note:'Días 2, 3, 4, 6 y 7'}
+  ],
+  'tentempie':[
+    {name:'Bocadillo de atún con pimiento',kcal:250,note:'Día 1'},
+    {name:'Bol de yogur sin lactosa con piña y semillas de calabaza',kcal:345,note:'Días 2 y 4'},
+    {name:'Bebida de avena con copos de avena, melocotón y frambuesas',kcal:275,note:'Días 3 y 6'},
+    {name:'Bocadillo de jamón serrano con tomate',kcal:260,note:'Día 5'},
+    {name:'Bocadillo de aguacate y tomate',kcal:280,note:'Día 7'}
+  ],
+  'fruta':[
+    {name:'Manzana',kcal:70,note:'Días 1 y 5'},
+    {name:'Kiwi',kcal:70,note:'Días 2 y 4'}
+  ],
+  'comida-acompanamiento':[
+    {name:'Ensalada de canónigos y tomate',kcal:90,note:'Días 2 y 6'},
+    {name:'Crema de calabaza y zanahoria',kcal:90,note:'Día 3'},
+    {name:'Espárragos blancos con jamón serrano',kcal:80,note:'Día 4'},
+    {name:'Ensalada de lechuga y cebolla',kcal:105,note:'Día 7'}
+  ],
+  'comida-entreno':[
+    {name:'Batido de proteína con bebida de avena',kcal:200,note:'Días de entreno, junto a la manzana'}
+  ],
+  'comida-principal':[
+    {name:'Macarrones con tomate y atún',kcal:350,note:'Día 2'},
+    {name:'Guisantes tricolor',kcal:290,note:'Día 3'},
+    {name:'Patatas asadas con tomate natural',kcal:290,note:'Día 4'},
+    {name:'Arroz con verduras al curry',kcal:240,note:'Día 6'},
+    {name:'Espaguetis integrales con tomate y albahaca',kcal:310,note:'Día 7'}
+  ],
+  'cena-ensalada':[
+    {name:'Ensalada mixta',kcal:140,note:'Días 1 y 5'},
+    {name:'Ensalada de pepino y tomate',kcal:160,note:'Días 2 y 6'},
+    {name:'Ensalada de lechuga y tomate',kcal:140,note:'Día 3'},
+    {name:'Ensalada de tomate, cebolla, pimiento verde',kcal:145,note:'Día 4'},
+    {name:'Ensalada de tomate con ajo',kcal:155,note:'Día 7'}
+  ],
+  'cena-principal':[
+    {name:'Tortilla con pepino y tomate',kcal:300,note:'Día 1'},
+    {name:'Lubina a la plancha con canónigos y zanahoria',kcal:350,note:'Día 2'},
+    {name:'Pechuga de pollo a la plancha con berenjena',kcal:330,note:'Día 3'},
+    {name:'Merluza con gambas y guisantes al microondas',kcal:320,note:'Día 4'},
+    {name:'Tortilla de habas',kcal:400,note:'Día 5'},
+    {name:'Calamares con jamón al ajillo',kcal:390,note:'Día 6'},
+    {name:'Salteado de pollo en tiras con pimiento verde',kcal:335,note:'Día 7'}
+  ]
+};
 
-        // ── Tema claro/oscuro ────────────────────────────────────────────────────
-        function applyTheme() {
-            const theme = localStorage.getItem('theme') || 'dark';
-            document.body.classList.toggle('light-mode', theme === 'light');
-            document.getElementById('theme-toggle').textContent = theme === 'light' ? '🌙' : '☀️';
-        }
-        function toggleTheme() {
-            const current = localStorage.getItem('theme') || 'dark';
-            localStorage.setItem('theme', current === 'dark' ? 'light' : 'dark');
-            applyTheme();
-        }
+// ─── RECETAS (extraídas del plan DIETOPRO.COM de Andrea Rojano) ───────────────
+var recipes = {
+  'Copos de avena, frutas desecadas, frutos secos y bebida de avena':{kcal:260,p:6,c:34,g:10,
+    ing:[['Bebida de avena','150g (1 vaso pequeño)'],['Avena','15g (1 cucharada sopera)'],['Albaricoque desecado','10g (1 unidad)'],['Ciruela desecada','10g (1 unidad)'],['Nuez pelada','5g (1 nuez)'],['Avellana sin cáscara','5g (5 unidades)'],['Almendra sin cáscara','5g (5 almendras)']],
+    steps:['Poner en un bol la cantidad indicada de copos de avena con la bebida de avena. Mezclar bien para que se hidrate la avena.','Agregar los frutos secos pelados y las frutas desecadas picadas. Mezclar y tomar.']},
+  'Leche desnatada sin lactosa':{kcal:100,p:10,c:14,g:0,
+    ing:[['Leche desnatada sin lactosa 0%MG','300g (1 taza)']],
+    steps:['Servir en un vaso o taza y tomar tal cual, fría o templada.']},
+  'Bocadillo de atún con pimiento':{kcal:250,p:20,c:30,g:6,
+    ing:[['Pan blanco','70g'],['Pimiento verde','40g (3 rodajas)'],['Atún enlatado en agua','55g (1 lata pequeña redonda)']],
+    steps:['Lavar y trocear el pimiento verde en pequeños dados y mezclar con el atún escurrido y desmenuzado.','Rellenar el bocadillo con la mezcla.']},
+  'Bol de yogur sin lactosa con piña y semillas de calabaza':{kcal:345,p:14,c:40,g:14,
+    ing:[['Yogur natural 0% sin lactosa','250g (2 yogures)'],['Semillas de calabaza','20g (2 cucharadas soperas)'],['Piña natural','260g (3 rodajas finas)']],
+    steps:['Trocear la piña y mezclar con las semillas de calabaza y el yogur sin lactosa en un bol.']},
+  'Kiwi':{kcal:70,p:1,c:17,g:0,
+    ing:[['Kiwi','120g (1 unidad grande)']],
+    steps:['Pelar y consumir tal cual, entero o troceado.']},
+  'Bebida de avena con copos de avena, melocotón y frambuesas':{kcal:275,p:6,c:46,g:6,
+    ing:[['Bebida de avena','225g (1 vaso grande)'],['Melocotón/durazno','130g (1 unidad pequeña)'],['Avena','30g (2 cucharas soperas)'],['Frambuesa','40g (15 unidades)']],
+    steps:['Colocar en un bol la cantidad indicada de copos de avena, el melocotón pelado y troceado y las frambuesas.','Cubrir con la bebida de avena, mezclar y tomar.']},
+  'Bocadillo de jamón serrano con tomate':{kcal:260,p:14,c:30,g:8,
+    ing:[['Pan blanco','70g'],['Tomate crudo','90g (1 tomate pequeño tipo pera)'],['Jamón serrano','30g (3 lonchas)']],
+    steps:['Montar el bocadillo con el tomate loncheado y el jamón serrano.']},
+  'Bocadillo de aguacate y tomate':{kcal:280,p:6,c:32,g:14,
+    ing:[['Pan blanco','70g'],['Aguacate/palta','50g (1/4 pieza)'],['Tomate crudo','90g (1 tomate pequeño tipo pera)']],
+    steps:['Montar el bocadillo con el aguacate y el tomate loncheados.']},
+  'Batido de proteína con bebida de avena':{kcal:200,p:26,c:10,g:4,
+    ing:[['Proteína de suero 90%','30g'],['Bebida de avena','225g (1 vaso grande)']],
+    steps:['Poner la cantidad indicada de proteína de suero junto con la bebida de avena en el vaso mezclador.','Agitar y tomar. Ideal antes de entrenar, no es pesado.']},
+  'Manzana':{kcal:70,p:0,c:18,g:0,
+    ing:[['Manzana roja','150g (1 unidad pequeña)']],
+    steps:['Lavar y consumir entera o troceada.']},
+  'Ensalada de canónigos y tomate':{kcal:90,p:2,c:8,g:6,
+    ing:[['Aceite de oliva','5g (1 cucharada de postre)'],['Canónigos','75g (1 plato mediano)'],['Tomate crudo','150g (1 tomate pequeño tipo raff)']],
+    steps:['Lavar y trocear el tomate.','Emplatar los canónigos en la base y colocar encima los trozos de tomate. Aliñar con aceite de oliva.']},
+  'Macarrones con tomate y atún':{kcal:350,p:22,c:48,g:8,
+    ing:[['Macarrones','60g (1 vaso pequeño y 1/2 de 100ml)'],['Aceite de oliva','8g (1 cucharada de postre)'],['Tomate triturado natural','45g'],['Atún al natural en conserva','55g (1 lata pequeña redonda)']],
+    steps:['Cocer los macarrones en abundante agua con sal durante 12 minutos. Escurrir y reservar.','Pochar el tomate triturado hasta que evapore su agua; se puede condimentar la salsa con especias o hierbas aromáticas.','Agregar el atún escurrido y los macarrones a la salsa de tomate, mezclar bien.']},
+  'Crema de calabaza y zanahoria':{kcal:90,p:2,c:16,g:2,
+    ing:[['Crema de calabaza y zanahoria comercial','175g (1/2 unidad)']],
+    steps:['Crema de calabaza y zanahoria que podemos encontrar refrigerada en comercios.','Perforar la tapa del envase y calentar al microondas a máxima potencia durante 2 minutos.','Consumir en el mismo envase o en el recipiente que se quiera.']},
+  'Guisantes tricolor':{kcal:290,p:10,c:40,g:8,
+    ing:[['Guisante congelado crudo','150g (2 vasos pequeños de 100ml)'],['Zanahoria','80g (1 unidad mediana)'],['Patata','100g (1 unidad pequeña)'],['Cebolla blanca','80g (1 unidad pequeña)'],['Laurel','2g (al gusto)'],['Aceite de oliva','5g (1 cucharada de postre)']],
+    steps:['Trocear la cebolla y dorarla en una cazuela con la cantidad sugerida de aceite.','Añadir las patatas y las zanahorias cortadas en trozos de similar tamaño.','Añadir los guisantes (frescos o congelados) y rehogar todo junto.','Incorporar la hoja de laurel y cubrir de agua.','Dejar cocer hasta que las verduras estén en su punto.']},
+  'Espárragos blancos con jamón serrano':{kcal:80,p:8,c:4,g:4,
+    ing:[['Espárrago blanco','75g (3 espárragos medianos)'],['Jamón serrano','30g (3 lonchas)']],
+    steps:['Sacar los espárragos del envase y escurrir.','Emplatar los espárragos con el jamón serrano.']},
+  'Patatas asadas con tomate natural':{kcal:290,p:6,c:46,g:10,
+    ing:[['Patata','240g (1 unidad mediana)'],['Tomate crudo','150g (1 tomate pequeño tipo raff)'],['Pimienta negra','2g (al gusto)'],['Aceite de oliva','8g (1 cucharada de postre)']],
+    steps:['Lavar bien las patatas y cortar en rodajas finas.','Calentar el aceite indicado en una sartén y asar las rodajas de patata.','Lavar el tomate y trocearlo en rodajas.','Emplatar la patata asada con el tomate alternando capas. Aderezar cada capa con pimienta molida.']},
+  'Arroz con verduras al curry':{kcal:240,p:6,c:42,g:6,
+    ing:[['Curry','1g'],['Arroz blanco crudo','40g (2 cucharadas soperas)'],['Aceite de oliva','5g (1 cucharada de postre)'],['Ajo','3g (1/2 diente)'],['Calabacín/zapallito','25g'],['Cebolla o cebolleta','30g (1 trozo pequeño)'],['Champiñón o seta','40g'],['Pimiento rojo','30g (2 rodajas)'],['Tomate crudo','30g (2 rodajas)'],['Pimiento verde','30g (2 rodajas)']],
+    steps:['Picar la cebolla, el calabacín en dados, los pimientos en cuadritos. Lavar y cortar los champiñones.','Poner el aceite en una cazuela y sofreír a fuego lento la cebolla hasta que dore un poco; añadir el calabacín, los pimientos y los champiñones y pochar a fuego lento.','Agregar el tomate natural triturado y el ajo machacado en el mortero.','Dejar cocer unos 10 minutos tapado.','Añadir el arroz y el curry, rehogar todo junto.','Añadir el doble de agua que de arroz y cocer a fuego suave durante 20 minutos.','Dejar reposar 5-10 minutos antes de servir.']},
+  'Ensalada de lechuga y cebolla':{kcal:105,p:2,c:8,g:8,
+    ing:[['Aceite de oliva','8g (1 cucharada de postre)'],['Lechuga','80g (4 hojas grandes)'],['Cebolla o cebolleta','60g (1/3 de cebolleta)']],
+    steps:['Lavar la lechuga y trocearla. Cortar en tiras la cebolla.','Emplatar la lechuga con la cebolla y aliñar con aceite de oliva en hilo.']},
+  'Espaguetis integrales con tomate y albahaca':{kcal:310,p:10,c:48,g:10,
+    ing:[['Aceite de oliva','8g (1 cucharada de postre)'],['Ajo','5g (1 diente)'],['Pimienta negra','1g (al gusto)'],['Tomate crudo','125g (1 tomate pequeño tipo raff)'],['Albahaca','5g (al gusto)'],['Espaguetis integrales','60g']],
+    steps:['Cocer los espaguetis integrales en abundante agua hirviendo durante 10 minutos. Escurrir y reservar.','Lavar y secar las hojas de albahaca y pelar los dientes de ajo. Mezclar la albahaca, el ajo picado y el tomate troceado, sazonar con pimienta y triturar en el vaso de la batidora incorporando poco a poco el aceite.','Emplatar los espaguetis mezclándolos con la salsa.']},
+  'Ensalada mixta':{kcal:140,p:2,c:10,g:10,
+    ing:[['Aceite de oliva','8g (1 cucharada de postre)'],['Cebolla o cebolleta','50g (1/3 de cebolleta)'],['Lechuga','40g (2 hojas grandes)'],['Tomate crudo','90g (1 tomate pequeño tipo pera)'],['Zanahoria','60g (1 unidad pequeña)']],
+    steps:['Lavar, pelar y trocear las hortalizas al gusto.','Emplatar, mezclar y aliñar con aceite de oliva.']},
+  'Tortilla con pepino y tomate':{kcal:300,p:20,c:10,g:20,
+    ing:[['Clara de huevo pasteurizada','105g (3 unidades)'],['Pepino','125g (1 unidad mediana)'],['Tomate crudo','250g (1 tomate grande)'],['Aceite de oliva','10g (1 cucharada sopera)'],['Huevo de gallina','60g (1 unidad talla M)']],
+    steps:['Batir el huevo con las claras.','Poner a calentar el aceite en una sartén, verter y extender la mezcla, dejar cuajar 5 minutos, doblar por la mitad y voltear para que se cuaje por el otro lado.','Lavar, cortar y trocear el pepino y el tomate.','Emplatar la tortilla con las hortalizas de guarnición.']},
+  'Ensalada de pepino y tomate':{kcal:160,p:2,c:12,g:12,
+    ing:[['Tomate crudo','250g (1 tomate grande)'],['Pepino','200g (1 unidad grande)'],['Aceite de oliva','10g (1 cucharada sopera)']],
+    steps:['Pelar y trocear el pepino y el tomate.','Emplatar y aliñar con aceite de oliva.']},
+  'Lubina a la plancha con canónigos y zanahoria':{kcal:350,p:34,c:8,g:20,
+    ing:[['Lubina/róbalo','250g (1/2 unidad de 600g)'],['Canónigos','75g (1 plato mediano)'],['Zanahoria','80g (1 unidad mediana)'],['Aceite de oliva','5g (1 cucharada de postre)']],
+    steps:['Asar el lomo de lubina limpio de espinas a la plancha.','Mezclar los canónigos con la zanahoria cortada en rodajas finas y aliñar con aceite de oliva.','Emplatar la lubina asada con la ensalada de guarnición.']},
+  'Ensalada de lechuga y tomate':{kcal:140,p:2,c:10,g:10,
+    ing:[['Aceite de oliva','10g (1 cucharada sopera)'],['Lechuga','90g (1 plato hondo)'],['Tomate crudo','180g (1 tomate mediano)']],
+    steps:['Lavar y trocear la lechuga y el tomate.','Emplatar las hortalizas y aliñar con aceite de oliva.']},
+  'Pechuga de pollo a la plancha con berenjena':{kcal:330,p:38,c:8,g:16,
+    ing:[['Aceite de oliva','8g (1 cucharada de postre)'],['Berenjena','200g (1 unidad pequeña)'],['Pollo, pechuga, solomillo','200g']],
+    steps:['Asar a la plancha la pechuga de pollo. Se puede sazonar con especias o hierbas aromáticas al gusto.','En una sartén caliente con la cantidad sugerida de aceite, asar la berenjena cortada en rodajas.','Emplatar el pollo con la berenjena asada.']},
+  'Ensalada de tomate, cebolla, pimiento verde':{kcal:145,p:2,c:12,g:10,
+    ing:[['Tomate crudo','150g (1 tomate pequeño tipo raff)'],['Cebolla blanca','75g (1 unidad pequeña)'],['Pimiento verde','75g (1 unidad pequeña)'],['Aceite de oliva','8g (1 cucharada de postre)']],
+    steps:['Lavar y trocear las hortalizas.','Mezclar y aliñar con aceite de oliva.']},
+  'Merluza con gambas y guisantes al microondas':{kcal:320,p:36,c:14,g:14,
+    ing:[['Merluza','200g (1/4 de unidad de 1kg)'],['Cebolla o cebolleta','50g (1/3 de cebolleta)'],['Ajo','5g (1 diente)'],['Perejil','5g (al gusto)'],['Gamba o camarón','80g (1 ración mediana)'],['Guisante al natural enlatado','50g (1/2 unidad)'],['Aceite de oliva','5g (1 cucharada de postre)']],
+    steps:['Saltear en la cantidad sugerida de aceite la cebolla, el ajo y el perejil finamente picados. Cuando empiecen a dorar, agregar las gambas peladas y los guisantes escurridos. Continuar rehogando 5 minutos.','Colocar el lomo de merluza limpio de espinas en un recipiente apto para microondas y repartir por encima el salteado de gambas con guisantes y cebolla.','Tapar el recipiente y asar al microondas a máxima potencia durante 8-10 minutos.']},
+  'Tortilla de habas':{kcal:400,p:22,c:30,g:22,
+    ing:[['Huevo de gallina','120g (2 unidades talla M)'],['Aceite de oliva','8g (1 cucharada de postre)'],['Haba seca','45g (1 vaso pequeño de 100ml)']],
+    steps:['Desgranar las habas sacándolas de sus vainas. Escaldarlas en abundante agua hirviendo durante 5 minutos.','Batir el huevo y agregar las habas escurridas.','Poner a calentar el aceite en una sartén, verter y extender la mezcla, dejar cuajar 5 minutos, doblar por la mitad y voltear para que se cuaje por el otro lado.']},
+  'Calamares con jamón al ajillo':{kcal:390,p:38,c:14,g:20,
+    ing:[['Aceite de oliva','10g (1 cucharada sopera)'],['Ajo','10g (2 dientes)'],['Perejil','5g (al gusto)'],['Tomate triturado natural','90g'],['Jamón serrano','30g (3 lonchas)'],['Calamar y similares','250g (5 unidades pequeñas)']],
+    steps:['Poner los ajos laminados en una sartén con el aceite caliente; cuando empiecen a dorar, añadir el tomate triturado y cocinar a fuego suave.','Lavar y trocear el calamar, agregar a la salsa de tomate junto con los tacos de jamón y el perejil picado.','Rehogar el conjunto y cocinar durante 10 minutos o hasta que el calamar esté tierno.']},
+  'Ensalada de tomate con ajo':{kcal:155,p:2,c:14,g:11,
+    ing:[['Tomate crudo','250g (1 tomate grande)'],['Ajo','15g (3 dientes)'],['Aceite de oliva','10g (1 cucharada sopera)']],
+    steps:['Lavar y cortar el tomate en trozos gruesos.','Picar el ajo muy fino.','Emplatar el tomate, repartir el ajo por encima y aliñar con aceite de oliva.']},
+  'Salteado de pollo en tiras con pimiento verde':{kcal:335,p:38,c:8,g:16,
+    ing:[['Aceite de oliva','8g (1 cucharada de postre)'],['Pollo, pechuga, solomillo','200g'],['Pimiento verde','180g (1 unidad mediana)']],
+    steps:['Cortar el filete de pechuga de pollo en tiras. Se puede sazonar con especias o hierbas aromáticas al gusto. Saltear con el aceite.','Agregar al salteado el pimiento verde cortado en tiras de similar tamaño. Rehogar el conjunto hasta que el pimiento esté pochado.']}
+};
 
-        // ── Animación de entrada (contador) ─────────────────────────────────────
-        function animateNumber(el, target) {
-            const start = parseFloat(el.dataset.val || '0') || 0;
-            const startTime = performance.now();
-            const duration = 800;
-            function step(now) {
-                const p = Math.min((now - startTime) / duration, 1);
-                const eased = 1 - Math.pow(1 - p, 3);
-                const val = start + (target - start) * eased;
-                el.textContent = val.toFixed(2);
-                if (p < 1) requestAnimationFrame(step); else el.dataset.val = target;
-            }
-            requestAnimationFrame(step);
-        }
+// ─── FUNCIONES ────────────────────────────────────────────────────────────────
+var DIAS=['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+var MESES=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
 
-        // ── Precios cripto en vivo ───────────────────────────────────────────────
-        async function fetchCryptoPrices() {
-            const ids = [...new Set(Object.values(assets).filter(a => a.type === 'crypto').map(a => a.coingeckoId))];
-            if (!ids.length) return;
-            const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=eur`);
-            const data = await res.json();
-            ids.forEach(id => { if (data[id]) livePrices[id] = data[id].eur; });
-        }
+function updateClock(){
+  var n=new Date();
+  document.getElementById('cd').textContent=DIAS[n.getDay()]+', '+n.getDate()+' de '+MESES[n.getMonth()]+' de '+n.getFullYear();
+  var h=String(n.getHours()).padStart(2,'0'),m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
+  document.getElementById('ct').innerHTML=h+':'+m+':<span>'+s+'</span>';
+}
 
-        // ── Render: Mis activos ──────────────────────────────────────────────────
-        function renderAssetsList() {
-            const container = document.getElementById('assets-list');
-            container.innerHTML = '';
-            Object.keys(assets).forEach(key => {
-                const a = assets[key];
-                const val = getAssetValue(key);
-                const perf = ((val - a.invested) / a.invested * 100).toFixed(2);
-                const isPos = parseFloat(perf) >= 0;
-                const qtyLabel = a.type === 'crypto' ? `${a.amount} ${a.symbol}` : `${a.amount} ud.`;
-                const row = document.createElement('div');
-                row.className = 'bg-black/40 rounded-2xl p-4 flex justify-between items-center cursor-pointer hover:bg-black/60 transition';
-                row.onclick = () => openAssetDetail(key);
-                row.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <span class="text-2xl">${a.icon}</span>
-                        <div class="text-left">
-                            <div class="font-semibold" style="color:${a.color}">${a.name}</div>
-                            <div class="text-xs text-zinc-400">${qtyLabel}</div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="font-bold text-white">${fmtEUR(val)}</div>
-                        <div class="text-xs ${isPos ? 'text-emerald-400' : 'text-red-400'}">${isPos ? '+' : ''}${perf}%</div>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-        }
+var SK='pdc-andrea-v1', SW='pdc-andrea-v1-swaps';
+function loadC(){try{return JSON.parse(localStorage.getItem(SK))||{};}catch(e){return {};}}
+function saveC(d){localStorage.setItem(SK,JSON.stringify(d));}
+function loadS(){try{return JSON.parse(localStorage.getItem(SW))||{};}catch(e){return {};}}
+function saveS(d){localStorage.setItem(SW,JSON.stringify(d));}
 
-        // ── Render: Promedio de compra ───────────────────────────────────────────
-        function renderPromedioCompra() {
-            const container = document.getElementById('promedio-list');
-            container.innerHTML = '';
-            Object.keys(assets).forEach(key => {
-                const a = assets[key];
-                const label = a.type === 'crypto' ? 'Precio medio' : 'Valor actual';
-                const value = a.type === 'crypto' ? fmtEUR(a.invested / a.amount) : fmtEUR(getAssetValue(key));
-                const qty = a.type === 'crypto' ? `${a.amount} ${a.symbol}` : `${a.amount} ud.`;
-                const div = document.createElement('div');
-                div.className = 'bg-black/40 rounded-2xl p-4';
-                div.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <div class="text-left">
-                            <div class="text-xs text-zinc-400 mb-1">${a.name}</div>
-                            <div class="font-bold" style="color:${a.color}">${qty}</div>
-                        </div>
-                        <div class="text-right">
-                            <div class="text-xs text-zinc-400 mb-1">${label}</div>
-                            <div class="font-bold text-white">${value}</div>
-                        </div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
+function getRecipe(name){
+  if(recipes[name]) return recipes[name];
+  var keys=Object.keys(recipes);
+  for(var i=0;i<keys.length;i++){
+    if(keys[i].substring(0,20)===name.substring(0,20)) return recipes[keys[i]];
+  }
+  return null;
+}
 
-        // ── Gráfica queso ─────────────────────────────────────────────────────────
-        function updatePieChart() {
-            const labels = [];
-            const data = [];
-            const colors = [];
-            let total = 0;
-            Object.keys(assets).forEach(key => { total += getAssetValue(key); });
-            Object.keys(assets).forEach(key => {
-                const a = assets[key];
-                const val = getAssetValue(key);
-                const pct = total ? (val / total * 100).toFixed(1) : '0.0';
-                labels.push(`${a.symbol || a.name} ${pct}%`);
-                data.push(val);
-                colors.push(a.color);
-            });
-            const ctx = document.getElementById('pie-chart').getContext('2d');
-            if (pieChart) {
-                pieChart.data.labels = labels;
-                pieChart.data.datasets[0].data = data;
-                pieChart.data.datasets[0].backgroundColor = colors;
-                pieChart.update();
-            } else {
-                pieChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: { labels, datasets: [{ data, backgroundColor: colors, borderColor: '#18181b', borderWidth: 3 }] },
-                    options: {
-                        cutout: '60%',
-                        plugins: {
-                            legend: { display: true, position: 'bottom', labels: { color: '#a1a1aa', font: { size: 11 }, padding: 12 } },
-                            tooltip: { callbacks: { label: (ctx) => ` ${ctx.parsed.toFixed(2)} €` } }
-                        }
-                    }
-                });
-            }
-        }
+function renderWeek(){
+  var checks=loadC(), swaps=loadS();
+  var grid=document.getElementById('week-grid');
+  var todayDow=new Date().getDay();
+  var dowMap={1:1,2:2,3:3,4:4,5:5,6:6,7:0};
+  grid.innerHTML='';
+  plan.forEach(function(day){
+    var isToday=dowMap[day.id]===todayDow;
+    var card=document.createElement('div');
+    card.className='day-card'+(isToday?' today':'');
+    var badge=day.type==='e'?'<span class="badge badge-e">Entreno</span>':day.type==='p'?'<span class="badge badge-p">Pádel</span>':'';
+    var actHtml='';
+    if(day.acts.length){
+      actHtml='<div class="act-row">';
+      day.acts.forEach(function(a){
+        var k='act-'+day.id+'-'+a.id;
+        actHtml+='<span class="chip'+(checks[k]?' done':'')+'" data-key="'+k+'">'+a.label+'</span>';
+      });
+      actHtml+='</div>';
+    }
+    var dayKcal=0;
+    var mealsHtml='';
+    day.meals.forEach(function(meal,idx){
+      var k=day.id+'-'+idx;
+      var swap=swaps[k];
+      var name=swap?swap.name:meal.name;
+      var kcal=swap?swap.kcal:meal.kcal;
+      dayKcal+=kcal;
+      mealsHtml+='<div class="meal'+(checks[k]?' done':'')+'">';
+      mealsHtml+='<div class="mcheck" data-k="'+k+'"></div>';
+      mealsHtml+='<div class="minfo">';
+      mealsHtml+='<div class="mslot"><span>'+meal.slot+' <span class="mtime">· '+meal.time+'h</span></span><span class="mkcal">'+kcal+'kcal</span></div>';
+      mealsHtml+='<div class="meal-name">'+name+'</div>';
+      mealsHtml+='</div>';
+      mealsHtml+='<div class="mbtns">';
+      mealsHtml+='<button class="bsim" data-day="'+day.id+'" data-idx="'+idx+'" data-alt="'+meal.alt+'">≈</button>';
+      mealsHtml+='<button class="brec" data-name="'+name.replace(/"/g,"'")+'">📋</button>';
+      mealsHtml+='</div></div>';
+    });
+    var hClass=day.type==='e'?'e':day.type==='p'?'p':'';
+    card.innerHTML='<div class="day-hdr '+hClass+'"><div class="day-name">'+day.name+' '+badge+'</div><div class="day-label">'+day.label+'</div><div class="day-kcal">~'+dayKcal+' kcal totales</div>'+actHtml+'</div><div class="meals">'+mealsHtml+'</div>';
+    grid.appendChild(card);
+  });
 
-        // ── Comparativa vs otros activos ─────────────────────────────────────────
-        function updateComparativa(totalInvertido, totalActual) {
-            const container = document.getElementById('comparativa-list');
-            container.innerHTML = '';
+  document.querySelectorAll('.mcheck').forEach(function(el){
+    el.addEventListener('click',function(e){
+      e.stopPropagation();
+      var c=loadC(); c[el.dataset.k]=!c[el.dataset.k]; saveC(c);
+      el.closest('.meal').classList.toggle('done'); updateProgress();
+    });
+  });
+  document.querySelectorAll('.chip').forEach(function(el){
+    el.addEventListener('click',function(e){
+      e.stopPropagation();
+      var c=loadC(); c[el.dataset.key]=!c[el.dataset.key]; saveC(c);
+      el.classList.toggle('done'); updateProgress();
+    });
+  });
+  document.querySelectorAll('.bsim').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      openSimilar(parseInt(btn.dataset.day),parseInt(btn.dataset.idx),btn.dataset.alt);
+    });
+  });
+  document.querySelectorAll('.brec').forEach(function(btn){
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      openRecipe(btn.dataset.name);
+    });
+  });
+  updateProgress();
+}
 
-            const realRow = document.createElement('div');
-            realRow.className = 'flex justify-between items-center bg-amber-500/10 border border-amber-500/30 rounded-xl px-4 py-3';
-            realRow.innerHTML = `<span class="text-sm font-semibold text-amber-400">Tu portafolio real</span><span class="font-bold text-white">${fmtEUR(totalActual)}</span>`;
-            container.appendChild(realRow);
+function openSimilar(dayId,idx,altKey){
+  var day=plan.find(function(d){return d.id===dayId;});
+  var meal=day.meals[idx];
+  var alts=alternatives[altKey]||[];
+  var swaps=loadS();
+  var k=dayId+'-'+idx;
+  var cur=swaps[k];
+  document.getElementById('msim-title').textContent=meal.slot+' · opciones';
+  document.getElementById('msim-sub').textContent='Otros platos de la propia semana de Andrea';
+  var list=document.getElementById('alt-list');
+  list.innerHTML='';
+  alts.forEach(function(a){
+    var currentName=cur?cur.name:meal.name;
+    var active=currentName===a.name;
+    var div=document.createElement('div');
+    div.className='alt-item'+(active?' active':'');
+    div.innerHTML='<div class="alt-name">'+a.name+'</div><div class="alt-meta"><span class="alt-kcal">'+a.kcal+' kcal</span><span>'+a.note+'</span></div>';
+    div.addEventListener('click',function(){
+      var sw=loadS();
+      if(a.name===meal.name) delete sw[k]; else sw[k]={name:a.name,kcal:a.kcal};
+      saveS(sw); closeSimilar(); renderWeek();
+    });
+    list.appendChild(div);
+  });
+  document.getElementById('msim').classList.add('open');
+}
+function closeSimilar(){document.getElementById('msim').classList.remove('open');}
+document.getElementById('msim-close').addEventListener('click',closeSimilar);
+document.getElementById('msim').addEventListener('click',function(e){if(e.target.id==='msim')closeSimilar();});
 
-            Object.keys(assets).forEach(key => {
-                const a = assets[key];
-                if (a.type !== 'crypto') return;
-                const avgPrice = a.invested / a.amount;
-                const livePrice = livePrices[a.coingeckoId];
-                if (!livePrice) return;
-                const hipotetico = totalInvertido * (livePrice / avgPrice);
-                const row = document.createElement('div');
-                row.className = 'flex justify-between items-center bg-black/40 rounded-xl px-4 py-3';
-                row.innerHTML = `<span class="text-sm text-zinc-300">Todo en ${a.name}</span><span class="font-bold text-white">${fmtEUR(hipotetico)}</span>`;
-                container.appendChild(row);
-            });
-        }
+function openRecipe(name){
+  var r=getRecipe(name);
+  document.getElementById('mrec-title').textContent=name;
+  var cont=document.getElementById('mrec-content');
+  if(!r){
+    cont.innerHTML='<p style="color:var(--muted);font-size:.85rem;padding:1rem 0">Receta no disponible para esta opción aún.</p>';
+  } else {
+    var acc='#00b4d8',mut='#8b9cb3',kc='#f472b6';
+    var macros='<div style="display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem">';
+    [['Kcal',r.kcal],['Proteína',r.p+'g'],['Carbos',r.c+'g'],['Grasa',r.g+'g']].forEach(function(m){
+      macros+='<div style="background:rgba(0,0,0,.3);border:1px solid #2a3648;border-radius:8px;padding:.3rem .6rem;font-size:.72rem"><span style="color:'+acc+';font-weight:700">'+m[0]+'</span>: '+m[1]+'</div>';
+    });
+    macros+='</div>';
+    var ingHtml='<div style="font-size:.85rem;font-weight:700;color:'+acc+';margin-bottom:.5rem">🛒 Ingredientes</div><div style="display:flex;flex-direction:column;gap:.3rem;margin-bottom:1rem">';
+    r.ing.forEach(function(i){
+      ingHtml+='<div style="display:flex;justify-content:space-between;background:rgba(0,0,0,.25);border-radius:8px;padding:.4rem .7rem;font-size:.8rem"><span>'+i[0]+'</span><span style="color:'+kc+';font-weight:600">'+i[1]+'</span></div>';
+    });
+    ingHtml+='</div>';
+    var stepsHtml='<div style="font-size:.85rem;font-weight:700;color:'+acc+';margin-bottom:.5rem">👨‍🍳 Preparación</div><div style="display:flex;flex-direction:column;gap:.5rem">';
+    r.steps.forEach(function(s,i){
+      stepsHtml+='<div style="display:flex;gap:.6rem;align-items:flex-start"><div style="flex-shrink:0;width:22px;height:22px;background:rgba(0,180,216,.15);border:1px solid '+acc+';border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;color:'+acc+'">'+(i+1)+'</div><div style="font-size:.8rem;color:'+mut+';padding-top:.15rem;line-height:1.4">'+s+'</div></div>';
+    });
+    stepsHtml+='</div>';
+    cont.innerHTML=macros+ingHtml+stepsHtml;
+  }
+  document.getElementById('mrec').classList.add('open');
+}
+function closeRecipe(){document.getElementById('mrec').classList.remove('open');}
+document.getElementById('mrec-close').addEventListener('click',closeRecipe);
+document.getElementById('mrec').addEventListener('click',function(e){if(e.target.id==='mrec')closeRecipe();});
 
-        // ── Ciclo principal de actualización ─────────────────────────────────────
-        async function updateAll() {
-            try {
-                await fetchCryptoPrices();
-                renderAssetsList();
-                renderPromedioCompra();
+function updateProgress(){
+  var c=loadC();
+  var total=plan.reduce(function(a,d){return a+d.meals.length+d.acts.length;},0);
+  var done=Object.values(c).filter(Boolean).length;
+  document.getElementById('prog-txt').textContent=done+' / '+total;
+  document.getElementById('prog-fill').style.width=(total?Math.round(done/total*100):0)+'%';
+}
 
-                const totalInvertido = Object.values(assets).reduce((s, a) => s + a.invested, 0);
-                const total = Object.keys(assets).reduce((s, k) => s + getAssetValue(k), 0);
+document.getElementById('reset-btn').addEventListener('click',function(){
+  if(confirm('Reiniciar marcas de comidas y actividades?')){
+    localStorage.removeItem(SK); localStorage.removeItem(SW); renderWeek();
+  }
+});
 
-                animateNumber(document.getElementById('total-value'), total);
-                document.getElementById('inv-total-subtitle').textContent = `Sobre inversión total de ${fmtEUR(totalInvertido)}`;
-                document.getElementById('promedio-total-invertido').textContent = fmtEUR(totalInvertido);
 
-                const totalPerf = ((total - totalInvertido) / totalInvertido * 100).toFixed(2);
-                const percEl = document.getElementById('percentage');
-                percEl.textContent = (totalPerf >= 0 ? '+' : '') + totalPerf + '%';
-                percEl.className = 'text-5xl font-bold ' + (totalPerf >= 0 ? 'text-emerald-400' : 'text-red-400');
+// ─── DATOS CORPORALES ───────────────────────────────────────────────────────
+var STK='pdc-andrea-v1-stats';
+var STAT_DEFS=[
+  {key:'peso',label:'Peso (kg)',unit:'kg',lower:true},
+  {key:'imc',label:'IMC',unit:'',lower:false},
+  {key:'grasa',label:'Grasa corporal (%)',unit:'%',lower:true},
+  {key:'subcut',label:'Grasa subcutánea (%)',unit:'%',lower:true},
+  {key:'musc',label:'Músculo (%)',unit:'%',lower:false},
+  {key:'muscKg',label:'Peso muscular (kg)',unit:'kg',lower:false},
+  {key:'grasaKg',label:'Grasa corporal (kg)',unit:'kg',lower:true},
+  {key:'visceral',label:'Grasa visceral',unit:'',lower:true},
+  {key:'bmr',label:'BMR (kcal)',unit:'kcal',lower:false},
+  {key:'humedad',label:'Humedad (%)',unit:'%',lower:false},
+  {key:'osea',label:'Masa ósea (kg)',unit:'kg',lower:false},
+  {key:'proteina',label:'Proteína (%)',unit:'%',lower:false}
+];
 
-                updatePieChart();
-                updateComparativa(totalInvertido, total);
-            } catch (e) {
-                console.error('Error updateAll', e);
-            }
-        }
+function loadStats(){try{return JSON.parse(localStorage.getItem(STK))||[];}catch(e){return [];}}
+function saveStats(d){localStorage.setItem(STK,JSON.stringify(d));}
 
-        // ── Fear & Greed ──────────────────────────────────────────────────────────
-        async function updateFearGreed() {
-            try {
-                const res = await fetch('https://api.alternative.me/fng/?limit=1');
-                const data = await res.json();
-                const value = parseInt(data.data[0].value);
-                const label = data.data[0].value_classification;
-                document.getElementById('fear-value').textContent = value;
-                const labelMap = { 'Extreme Fear': 'Miedo Extremo', 'Fear': 'Miedo', 'Neutral': 'Neutral', 'Greed': 'Codicia', 'Extreme Greed': 'Codicia Extrema' };
-                const colorMap = { 'Extreme Fear': 'text-red-500', 'Fear': 'text-orange-400', 'Neutral': 'text-yellow-400', 'Greed': 'text-lime-400', 'Extreme Greed': 'text-emerald-400' };
-                const labelEl = document.getElementById('fear-label');
-                labelEl.textContent = labelMap[label] || label;
-                labelEl.className = 'text-xl font-bold mt-3 ' + (colorMap[label] || 'text-white');
-                const deg = (value / 100) * 180 - 90;
-                document.getElementById('gauge-needle').style.transform = `translateX(-50%) rotate(${deg}deg)`;
-            } catch(e) { console.error('Fear & Greed error', e); }
-        }
+function initStats(){
+  var s=loadStats();
+  if(!s.length){
+    // Medición báscula "Pelusilla" · 05/08/2026 20:54
+    s=[{date:'2026-08-05',peso:60.6,imc:24.3,grasa:31.2,subcut:32.0,musc:38.8,muscKg:23.5,grasaKg:18.9,visceral:4,bmr:1183,humedad:49.7,osea:2.2,proteina:13.1}];
+    saveStats(s);
+  }
+  renderStats(s);
+}
 
-        // ── Dominancia de mercado ────────────────────────────────────────────────
-        async function updateDominance() {
-            try {
-                const res = await fetch('https://api.coingecko.com/api/v3/global');
-                const data = await res.json();
-                document.getElementById('btc-dominance').textContent = data.data.market_cap_percentage.btc.toFixed(1) + '%';
-                document.getElementById('eth-dominance').textContent = data.data.market_cap_percentage.eth.toFixed(1) + '%';
-            } catch(e) { console.error('Dominance error', e); }
-        }
+function renderStats(stats){
+  var tabsEl=document.getElementById('stats-tabs');
+  var areasEl=document.getElementById('stats-areas');
+  tabsEl.innerHTML='';
+  areasEl.innerHTML='';
+  STAT_DEFS.forEach(function(def,di){
+    var tab=document.createElement('button');
+    tab.className='stat-tab'+(di===0?' active':'');
+    tab.textContent=def.label;
+    tab.addEventListener('click',function(){
+      document.querySelectorAll('.stat-tab').forEach(function(t){t.classList.remove('active');});
+      document.querySelectorAll('.stat-area').forEach(function(a){a.classList.remove('active');});
+      tab.classList.add('active');
+      document.getElementById('sa-'+def.key).classList.add('active');
+    });
+    tabsEl.appendChild(tab);
 
-        // ── Noticias ──────────────────────────────────────────────────────────────
-        const RSS_FEEDS = [
-            'https://cointelegraph.com/rss',
-            'https://www.coindesk.com/arc/outboundfeeds/rss/'
-        ];
-        async function updateNews() {
-            try {
-                const results = await Promise.all(RSS_FEEDS.map(url =>
-                    fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(url)}`)
-                        .then(r => r.json()).catch(() => ({ items: [] }))
-                ));
-                let items = results.flatMap(r => r.items || []);
-                items.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
-                items = items.slice(0, 20);
-                const container = document.getElementById('news-list');
-                container.innerHTML = '';
-                if (!items.length) { container.innerHTML = '<div class="text-zinc-500 text-sm py-4">Sin noticias disponibles ahora mismo</div>'; return; }
-                items.forEach(it => {
-                    const div = document.createElement('a');
-                    div.href = it.link; div.target = '_blank'; div.rel = 'noopener';
-                    div.className = 'block bg-black/40 rounded-xl p-3 hover:bg-black/60 transition';
-                    const date = new Date(it.pubDate).toLocaleString('es-ES', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' });
-                    const safeTitle = (it.title || '').replace(/</g, '&lt;');
-                    div.innerHTML = `<div class="text-xs text-zinc-500 mb-1">${date}</div><div class="text-sm font-medium text-white">${safeTitle}</div>`;
-                    container.appendChild(div);
-                });
-            } catch(e) {
-                document.getElementById('news-list').innerHTML = '<div class="text-zinc-500 text-sm py-4">No se pudieron cargar las noticias</div>';
-            }
-        }
+    var area=document.createElement('div');
+    area.className='stat-area'+(di===0?' active':'');
+    area.id='sa-'+def.key;
+    var timeline=document.createElement('div');
+    timeline.className='stat-timeline';
 
-        // ── Evolución diaria del portafolio completo ──────────────────────────────
-        async function generateDailyEvolution() {
-            const container = document.getElementById('evolution-days');
-            if (!container) return;
-            try {
-                const cryptoKeys = Object.keys(assets).filter(k => assets[k].type === 'crypto');
-                const manualTotal = Object.keys(assets).filter(k => assets[k].type !== 'crypto').reduce((s, k) => s + getAssetValue(k), 0);
+    stats.forEach(function(entry,i){
+      var val=entry[def.key];
+      if(val==null) return;
+      var prev=i>0?stats[i-1][def.key]:null;
+      var deltaHtml='';
+      if(prev!=null){
+        var diff=(val-prev).toFixed(1);
+        var isGood=def.lower?diff<0:diff>0;
+        var cls=diff==0?'delta-ok':(isGood?'delta-down':'delta-up');
+        var sign=diff>0?'+':'';
+        deltaHtml='<div class="stat-entry-delta '+cls+'">'+sign+diff+def.unit+'</div>';
+      }
+      var isLatest=i===stats.length-1;
+      var d=new Date(entry.date+'T12:00:00');
+      var dateStr=d.getDate()+' '+['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'][d.getMonth()];
+      var card=document.createElement('div');
+      card.className='stat-entry'+(isLatest?' latest':'');
+      card.innerHTML='<div class="stat-entry-date">'+dateStr+(isLatest?' · Actual':'')+'</div><div class="stat-entry-val">'+val+def.unit+'</div>'+deltaHtml;
+      timeline.appendChild(card);
+    });
+    area.appendChild(timeline);
+    areasEl.appendChild(area);
+  });
+}
 
-                function dedup(prices) {
-                    const seen = new Set(); const u = [];
-                    for (const [ts, p] of prices) {
-                        const k = new Date(ts).toISOString().slice(0, 10);
-                        if (!seen.has(k)) { seen.add(k); u.push([k, p]); }
-                    }
-                    return u;
-                }
+document.getElementById('btn-add-stat').addEventListener('click',function(){
+  document.getElementById('s-date').value=new Date().toISOString().slice(0,10);
+  document.getElementById('mstat').classList.add('open');
+});
+document.getElementById('mstat-close').addEventListener('click',function(){
+  document.getElementById('mstat').classList.remove('open');
+});
+document.getElementById('mstat').addEventListener('click',function(e){if(e.target.id==='mstat')document.getElementById('mstat').classList.remove('open');});
 
-                const histories = await Promise.all(cryptoKeys.map(k =>
-                    fetch(`https://api.coingecko.com/api/v3/coins/${assets[k].coingeckoId}/market_chart?vs_currency=eur&days=7&interval=daily`).then(r => r.json())
-                ));
-                const seriesPerAsset = histories.map(h => dedup(h.prices).slice(-5));
-                const len = Math.min(...seriesPerAsset.map(s => s.length), 5);
+document.getElementById('btn-save-stat').addEventListener('click',function(){
+  var date=document.getElementById('s-date').value;
+  if(!date){alert('Pon la fecha');return;}
+  var entry={date:date};
+  var fields=['peso','imc','grasa','subcut','musc','muscKg','grasaKg','visceral','bmr','humedad','osea','proteina'];
+  var ids=['s-peso','s-imc','s-grasa','s-subcut','s-musc','s-muscKg','s-grasaKg','s-visceral','s-bmr','s-humedad','s-osea','s-proteina'];
+  fields.forEach(function(f,i){
+    var v=parseFloat(document.getElementById(ids[i]).value);
+    if(!isNaN(v)) entry[f]=v;
+  });
+  var stats=loadStats();
+  var idx=stats.findIndex(function(s){return s.date===date;});
+  if(idx>=0) stats[idx]=entry; else stats.push(entry);
+  stats.sort(function(a,b){return a.date.localeCompare(b.date);});
+  saveStats(stats);
+  renderStats(stats);
+  document.getElementById('mstat').classList.remove('open');
+  ids.forEach(function(id){document.getElementById(id).value='';});
+});
 
-                await fetchCryptoPrices();
-                seriesPerAsset.forEach((s, i) => {
-                    if (s.length) s[s.length - 1][1] = livePrices[assets[cryptoKeys[i]].coingeckoId] ?? s[s.length - 1][1];
-                });
-
-                container.innerHTML = '';
-                for (let i = 1; i < len; i++) {
-                    let prevTotal = manualTotal, curTotal = manualTotal;
-                    cryptoKeys.forEach((k, idx) => {
-                        prevTotal += assets[k].amount * seriesPerAsset[idx][i - 1][1];
-                        curTotal  += assets[k].amount * seriesPerAsset[idx][i][1];
-                    });
-                    const isToday = i === len - 1;
-                    const dateKey = seriesPerAsset[0] ? seriesPerAsset[0][i][0] : null;
-                    const date = isToday ? new Date() : new Date(dateKey);
-                    const day = date.getDate();
-                    const month = date.toLocaleString('es-ES', { month: 'short' });
-                    const change = ((curTotal - prevTotal) / prevTotal * 100).toFixed(2);
-                    const isPos = parseFloat(change) >= 0;
-
-                    const div = document.createElement('div');
-                    div.className = 'bg-black/40 rounded-2xl px-5 py-4 text-center min-w-[110px] flex-shrink-0' + (isToday ? ' ring-1 ring-amber-400/50' : '');
-                    div.innerHTML = `
-                        <div class="text-xs text-zinc-400">${isToday ? 'Hoy' : day + ' ' + month}</div>
-                        <div class="font-mono text-base mt-1">${curTotal.toFixed(2)} €</div>
-                        <div class="text-xs ${isPos ? 'text-emerald-400' : 'text-red-400'}">${isPos ? '+' : ''}${change}%</div>
-                    `;
-                    container.appendChild(div);
-                }
-            } catch(e) {
-                container.innerHTML = '<div class="text-zinc-500 text-sm py-4">No se pudieron cargar los datos</div>';
-            }
-        }
-
-        // ── Top 100 Mercado ───────────────────────────────────────────────────────
-        async function updateMarket() {
-            try {
-                const res = await fetch(
-                    'https://api.coingecko.com/api/v3/coins/markets?vs_currency=eur&order=market_cap_desc&per_page=100&page=1&price_change_percentage=24h'
-                );
-                allMarketData = await res.json();
-                renderMarket(allMarketData);
-            } catch(e) { console.error('Market error', e); }
-        }
-
-        function renderMarket(coins) {
-            const container = document.getElementById('market-list');
-            container.innerHTML = '';
-            coins.forEach((coin, i) => {
-                const change = coin.price_change_percentage_24h?.toFixed(2) ?? '—';
-                const isPos = parseFloat(change) >= 0;
-                const price = coin.current_price >= 1
-                    ? coin.current_price.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                    : coin.current_price.toFixed(6);
-                const div = document.createElement('div');
-                div.className = 'bg-black/40 rounded-2xl px-4 py-3 flex justify-between items-center';
-                div.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <span class="text-xs text-zinc-500 w-5 text-right">${i + 1}</span>
-                        <img src="${coin.image}" class="w-7 h-7 rounded-full" loading="lazy">
-                        <div class="text-left">
-                            <div class="text-sm font-semibold">${coin.name}</div>
-                            <div class="text-xs text-zinc-500 uppercase">${coin.symbol}</div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <div class="text-sm font-bold">${price} €</div>
-                        <div class="text-xs ${isPos ? 'text-emerald-400' : 'text-red-400'}">${isPos ? '▲' : '▼'} ${Math.abs(change)}%</div>
-                    </div>
-                `;
-                container.appendChild(div);
-            });
-        }
-
-        // ── Modal: detalle de activo (gráfico o valor manual) ────────────────────
-        let detailChart = null;
-        async function openAssetDetail(key) {
-            const a = assets[key];
-            document.getElementById('detail-modal-title').textContent = a.name;
-            document.getElementById('asset-detail-modal').classList.remove('hidden');
-            const chartWrap = document.getElementById('detail-chart-wrap');
-            const manualWrap = document.getElementById('detail-manual-wrap');
-            if (a.type === 'crypto') {
-                chartWrap.classList.remove('hidden');
-                manualWrap.classList.add('hidden');
-                await loadAssetChart(a.coingeckoId);
-            } else {
-                chartWrap.classList.add('hidden');
-                manualWrap.classList.remove('hidden');
-                document.getElementById('manual-current-value-input').value = a.currentValue ?? a.invested;
-                document.getElementById('manual-asset-key').value = key;
-            }
-        }
-        function closeAssetDetail() { document.getElementById('asset-detail-modal').classList.add('hidden'); }
-
-        async function loadAssetChart(coingeckoId) {
-            try {
-                const res = await fetch(`https://api.coingecko.com/api/v3/coins/${coingeckoId}/market_chart?vs_currency=eur&days=30&interval=daily`);
-                const data = await res.json();
-                const labels = data.prices.map(p => new Date(p[0]).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit' }));
-                const values = data.prices.map(p => p[1]);
-                const ctx = document.getElementById('detail-chart').getContext('2d');
-                if (detailChart) detailChart.destroy();
-                detailChart = new Chart(ctx, {
-                    type: 'line',
-                    data: { labels, datasets: [{ data: values, borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,.12)', fill: true, tension: .3, pointRadius: 0 }] },
-                    options: {
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { ticks: { color: '#a1a1aa', maxTicksLimit: 6 }, grid: { display: false } },
-                            y: { ticks: { color: '#a1a1aa' }, grid: { color: '#27272a' } }
-                        }
-                    }
-                });
-            } catch(e) { console.error('Chart error', e); }
-        }
-        function saveManualValue() {
-            const key = document.getElementById('manual-asset-key').value;
-            const val = parseFloat(document.getElementById('manual-current-value-input').value);
-            if (!isNaN(val) && val >= 0) {
-                assets[key].currentValue = val;
-                saveAssets();
-                closeAssetDetail();
-                updateAll();
-            }
-        }
-
-        // ── Modal: añadir activo ──────────────────────────────────────────────────
-        function openAddAssetModal() { document.getElementById('add-asset-modal').classList.remove('hidden'); }
-        function closeAddAssetModal() {
-            document.getElementById('add-asset-modal').classList.add('hidden');
-            document.getElementById('add-qty').value = '';
-            document.getElementById('add-invested').value = '';
-        }
-        function submitAddAsset() {
-            const key = document.getElementById('add-asset-type').value;
-            const qty = parseFloat(document.getElementById('add-qty').value);
-            const inv = parseFloat(document.getElementById('add-invested').value);
-            if (isNaN(qty) || isNaN(inv) || qty <= 0 || inv <= 0) { alert('Introduce una cantidad y un importe válidos.'); return; }
-
-            if (assets[key]) {
-                assets[key].amount += qty;
-                assets[key].invested += inv;
-                if (assets[key].type !== 'crypto') {
-                    assets[key].currentValue = (assets[key].currentValue ?? assets[key].invested - inv) + inv;
-                }
-            } else {
-                const meta = ASSET_TYPE_META[key];
-                assets[key] = { type: 'manual', name: meta.name, icon: meta.icon, color: meta.color, amount: qty, invested: inv, currentValue: inv };
-            }
-            saveAssets();
-            closeAddAssetModal();
-            updateAll();
-            generateDailyEvolution();
-        }
-
-        // ── Buscador de mercado ───────────────────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('market-search').addEventListener('input', (e) => {
-                const q = e.target.value.toLowerCase();
-                renderMarket(allMarketData.filter(c => c.name.toLowerCase().includes(q) || c.symbol.toLowerCase().includes(q)));
-            });
-        });
-
-        // ── Init ──────────────────────────────────────────────────────────────────
-        window.onload = () => {
-            applyTheme();
-            renderAssetsList();
-            renderPromedioCompra();
-            updateAll();
-            updateFearGreed();
-            updateMarket();
-            updateDominance();
-            updateNews();
-            generateDailyEvolution();
-            setInterval(updateAll, 5000);
-            setInterval(updateMarket, 60000);
-            setInterval(updateFearGreed, 3600000);
-            setInterval(updateDominance, 300000);
-            setInterval(updateNews, 60000);
-        };
-    </script>
+updateClock();
+setInterval(updateClock,1000);
+renderWeek();
+initStats();
+</script>
 </body>
 </html>
