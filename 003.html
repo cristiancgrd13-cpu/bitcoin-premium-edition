@@ -261,12 +261,15 @@
             <option value="btc">Bitcoin (BTC)</option>
             <option value="eth">Ethereum (ETH)</option>
             <option value="sol">Solana (SOL)</option>
+            <option value="kraken">Kraken (importar CSV Ledgers)</option>
         </select>
-        <label class="text-xs text-zinc-500">Dirección / clave pública</label>
-        <input id="wallet-address" type="text" placeholder="Pega aquí la dirección" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-3 outline-none text-sm">
+        <div id="wallet-address-wrap">
+            <label class="text-xs text-zinc-500">Dirección / clave pública</label>
+            <input id="wallet-address" type="text" placeholder="Pega aquí la dirección" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-3 outline-none text-sm">
+        </div>
         <label class="text-xs text-zinc-500">Alias (opcional)</label>
-        <input id="wallet-alias" type="text" placeholder="Ej. Ledger BTC" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-3 outline-none">
-        <label class="flex items-center gap-2 text-xs text-zinc-400 mb-3">
+        <input id="wallet-alias" type="text" placeholder="Ej. Ledger BTC / Phantom Pools" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 mb-3 outline-none">
+        <label id="wallet-is-mine-wrap" class="flex items-center gap-2 text-xs text-zinc-400 mb-3">
             <input id="wallet-is-mine" type="checkbox" checked>
             Es mía (los movimientos hacia/desde otras wallets marcadas como "mías" se excluyen de compra/venta)
         </label>
@@ -275,7 +278,17 @@
             <input id="etherscan-key-input" type="text" placeholder="Pega tu API key" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 outline-none text-sm">
             <p class="text-xs text-zinc-600 mt-1">Consíguela gratis en etherscan.io → My Profile → API Keys. Se guarda solo en tu navegador.</p>
         </div>
-        <button onclick="submitAddWallet()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl py-3 transition">Guardar clave pública</button>
+        <div id="sol-key-wrap" class="hidden mb-3">
+            <label class="text-xs text-zinc-500">API key de Helius (gratuita)</label>
+            <input id="helius-key-input" type="text" placeholder="Pega tu API key" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 outline-none text-sm">
+            <p class="text-xs text-zinc-600 mt-1">Consíguela gratis en helius.dev → regístrate → Dashboard → API Key. Necesaria para decodificar swaps y pools de Orca correctamente. Se guarda solo en tu navegador.</p>
+        </div>
+        <div id="kraken-csv-wrap" class="hidden mb-3">
+            <label class="text-xs text-zinc-500">Archivo CSV de Kraken (History → Export → Ledgers)</label>
+            <input id="kraken-csv-input" type="file" accept=".csv" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 outline-none text-sm">
+            <p class="text-xs text-zinc-600 mt-1">Se procesa localmente en tu navegador, no se sube a ningún servidor. Podrás reimportar un CSV más reciente cuando quieras.</p>
+        </div>
+        <button onclick="submitAddWallet()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl py-3 transition">Guardar</button>
     </div>
 </div>
 
@@ -750,8 +763,10 @@ function submitDeleteAsset() {
 const NETWORK_META = {
     btc: { label: 'Bitcoin', symbol: 'BTC', coingeckoId: 'bitcoin', color: '#f97316', explorer: (addr) => `https://blockstream.info/address/${addr}` },
     eth: { label: 'Ethereum', symbol: 'ETH', coingeckoId: 'ethereum', color: '#818cf8', explorer: (addr) => `https://etherscan.io/address/${addr}` },
-    sol: { label: 'Solana', symbol: 'SOL', coingeckoId: 'solana', color: '#a855f7', explorer: (addr) => `https://solscan.io/account/${addr}` }
+    sol: { label: 'Solana', symbol: 'SOL', coingeckoId: 'solana', color: '#a855f7', explorer: (addr) => `https://solscan.io/account/${addr}` },
+    kraken: { label: 'Kraken', symbol: '', coingeckoId: '', color: '#5741d9', explorer: () => 'https://www.kraken.com' }
 };
+const ASSET_ID_MAP = { XBT: 'bitcoin', BTC: 'bitcoin', ETH: 'ethereum', SOL: 'solana', XETH: 'ethereum', XXBT: 'bitcoin' };
 
 function loadWallets() {
     try { return JSON.parse(localStorage.getItem('saved_wallets_v1') || '{}'); } catch(e) { return {}; }
@@ -773,14 +788,14 @@ function renderWalletsList() {
     ids.forEach(id => {
         const w = wallets[id];
         const meta = NETWORK_META[w.network];
-        const short = w.address.slice(0, 6) + '…' + w.address.slice(-4);
+        const short = w.network === 'kraken' ? `${(w.ledgerRows||[]).length} movimientos importados` : (w.address.slice(0, 6) + '…' + w.address.slice(-4));
         const row = document.createElement('div');
         row.className = 'bg-black/40 rounded-2xl p-4 flex justify-between items-center';
         row.innerHTML = `
             <div class="flex items-center gap-3 cursor-pointer" onclick="openWalletTx('${id}')">
                 <span class="text-xl" style="color:${meta.color}">●</span>
                 <div class="text-left">
-                    <div class="font-semibold text-sm">${w.alias || meta.label}${w.isMine ? '' : ' <span class=\'text-zinc-500 font-normal\'>(externa)</span>'}</div>
+                    <div class="font-semibold text-sm">${w.alias || meta.label}${w.network!=='kraken' && !w.isMine ? ' <span class=\'text-zinc-500 font-normal\'>(externa)</span>' : ''}</div>
                     <div class="text-xs text-zinc-500">${meta.label} · ${short}</div>
                 </div>
             </div>
@@ -801,20 +816,112 @@ function closeAddWalletModal() {
 function onWalletNetworkChange() {
     const net = document.getElementById('wallet-network').value;
     document.getElementById('eth-key-wrap').classList.toggle('hidden', net !== 'eth');
+    document.getElementById('sol-key-wrap').classList.toggle('hidden', net !== 'sol');
+    document.getElementById('kraken-csv-wrap').classList.toggle('hidden', net !== 'kraken');
+    document.getElementById('wallet-address-wrap').classList.toggle('hidden', net === 'kraken');
+    document.getElementById('wallet-is-mine-wrap').classList.toggle('hidden', net === 'kraken');
     if (net === 'eth') {
         const saved = localStorage.getItem('etherscan_api_key');
         if (saved) document.getElementById('etherscan-key-input').value = saved;
     }
+    if (net === 'sol') {
+        const saved = localStorage.getItem('helius_api_key');
+        if (saved) document.getElementById('helius-key-input').value = saved;
+    }
 }
+
+function parseKrakenCSV(text) {
+    const lines = text.split(/\r?\n/).filter(l => l.trim().length);
+    const headers = lines[0].split(',').map(h => h.replace(/"/g,'').trim());
+    const rows = [];
+    for (let i = 1; i < lines.length; i++) {
+        // split respetando comillas simples de Kraken
+        const cells = lines[i].match(/(".*?"|[^,]+|(?<=,)(?=,)|(?<=,)$)/g) || lines[i].split(',');
+        const row = {};
+        headers.forEach((h, idx) => { row[h] = (cells[idx] || '').replace(/^"|"$/g, ''); });
+        rows.push(row);
+    }
+    return rows;
+}
+
+function buildKrakenTxs(ledgerRows) {
+    const byRefid = {};
+    ledgerRows.forEach(r => {
+        if (!r.refid) return;
+        (byRefid[r.refid] = byRefid[r.refid] || []).push(r);
+    });
+    const results = [];
+    Object.entries(byRefid).forEach(([refid, rows]) => {
+        const type = (rows[0].type || '').toLowerCase();
+        const time = new Date((rows[0].time || '').replace(' ', 'T') + 'Z');
+        if (type === 'trade') {
+            const fiatRow = rows.find(r => ['ZEUR','EUR'].includes((r.asset||'').toUpperCase()));
+            const cryptoRow = rows.find(r => !['ZEUR','EUR'].includes((r.asset||'').toUpperCase()));
+            if (fiatRow && cryptoRow) {
+                const eurAmount = Math.abs(parseFloat(fiatRow.amount));
+                const cryptoAmount = Math.abs(parseFloat(cryptoRow.amount));
+                const isSale = parseFloat(fiatRow.amount) > 0; // recibiste EUR = vendiste cripto
+                results.push({
+                    date: time, hash: refid, direction: isSale ? 'out' : 'in',
+                    amount: cryptoAmount, asset: (cryptoRow.asset||'').toUpperCase(),
+                    coingeckoId: ASSET_ID_MAP[(cryptoRow.asset||'').toUpperCase()] || null,
+                    eurValue: eurAmount, category: isSale ? 'venta' : 'compra', exact: true
+                });
+            } else if (rows.length === 2) {
+                // permuta cripto-cripto sin pata fiat
+                const out = rows.find(r => parseFloat(r.amount) < 0);
+                if (out) results.push({
+                    date: time, hash: refid, direction: 'out',
+                    amount: Math.abs(parseFloat(out.amount)), asset: (out.asset||'').toUpperCase(),
+                    coingeckoId: ASSET_ID_MAP[(out.asset||'').toUpperCase()] || null,
+                    eurValue: null, category: 'permuta', exact: false
+                });
+            }
+        } else if (type === 'deposit' || type === 'withdrawal') {
+            rows.forEach(r => {
+                const asset = (r.asset||'').toUpperCase();
+                if (['ZEUR','EUR'].includes(asset)) return;
+                results.push({
+                    date: time, hash: refid, direction: type === 'deposit' ? 'in' : 'out',
+                    amount: Math.abs(parseFloat(r.amount)), asset,
+                    coingeckoId: ASSET_ID_MAP[asset] || null,
+                    eurValue: null, category: 'interna', exact: false
+                });
+            });
+        }
+    });
+    return results;
+}
+
 function submitAddWallet() {
     const network = document.getElementById('wallet-network').value;
-    const address = document.getElementById('wallet-address').value.trim();
     const alias = document.getElementById('wallet-alias').value.trim();
     const isMine = document.getElementById('wallet-is-mine').checked;
+
+    if (network === 'kraken') {
+        const fileInput = document.getElementById('kraken-csv-input');
+        const file = fileInput.files[0];
+        if (!file) { alert('Selecciona el archivo CSV exportado de Kraken.'); return; }
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            const rows = parseKrakenCSV(e.target.result);
+            const id = 'kraken_' + (alias || 'cuenta');
+            wallets[id] = { network: 'kraken', address: '', alias: alias || 'Kraken', isMine: false, ledgerRows: rows };
+            saveWallets(); closeAddWalletModal(); renderWalletsList();
+        };
+        reader.readAsText(file);
+        return;
+    }
+
+    const address = document.getElementById('wallet-address').value.trim();
     if (!address) { alert('Introduce una dirección válida.'); return; }
     if (network === 'eth') {
         const key = document.getElementById('etherscan-key-input').value.trim();
         if (key) localStorage.setItem('etherscan_api_key', key);
+    }
+    if (network === 'sol') {
+        const key = document.getElementById('helius-key-input').value.trim();
+        if (key) localStorage.setItem('helius_api_key', key);
     }
     const id = network + '_' + address;
     wallets[id] = { network, address, alias, isMine };
@@ -892,8 +999,88 @@ async function fetchBTCTxs(address, fromDate, toDate) {
     return results;
 }
 
-// ── SOL via RPC público (sin API key, solo transferencias nativas de SOL) ──
+// ── SOL: Helius (decodifica swaps/pools Orca) con fallback a RPC público ───
 async function fetchSOLTxs(address, fromDate, toDate) {
+    const heliusKey = localStorage.getItem('helius_api_key');
+    if (heliusKey) return fetchSOLTxsHelius(address, fromDate, toDate, heliusKey);
+    return fetchSOLTxsRPC(address, fromDate, toDate);
+}
+
+async function fetchSOLTxsHelius(address, fromDate, toDate, apiKey) {
+    let all = [];
+    let before = undefined;
+    for (let page = 0; page < 20; page++) {
+        const url = `https://api.helius.xyz/v0/addresses/${address}/transactions?api-key=${apiKey}&limit=100${before ? '&before=' + before : ''}`;
+        const res = await fetch(url);
+        if (!res.ok) throw new Error('HELIUS_ERROR');
+        const batch = await res.json();
+        if (!batch.length) break;
+        all = all.concat(batch);
+        before = batch[batch.length - 1].signature;
+        const oldest = batch[batch.length - 1].timestamp;
+        if (oldest && oldest * 1000 < fromDate.getTime()) break;
+    }
+    const inRange = all.filter(tx => tx.timestamp * 1000 >= fromDate.getTime() && tx.timestamp * 1000 <= toDate.getTime());
+    const results = [];
+    inRange.forEach(tx => {
+        const date = new Date(tx.timestamp * 1000);
+        const isOrca = (tx.source || '').toUpperCase() === 'ORCA';
+        const tokenTransfers = tx.tokenTransfers || [];
+        const nativeTransfers = tx.nativeTransfers || [];
+
+        if (tx.type === 'SWAP') {
+            // pierna que sale de la wallet = valor de la permuta
+            const outLeg = tokenTransfers.find(t => t.fromUserAccount === address) ||
+                            nativeTransfers.find(t => t.fromUserAccount === address);
+            if (outLeg) {
+                const isNative = !outLeg.mint;
+                results.push({
+                    date, hash: tx.signature, direction: 'out',
+                    amount: isNative ? outLeg.amount / 1e9 : outLeg.tokenAmount,
+                    asset: isNative ? 'SOL' : (outLeg.mint ? outLeg.mint.slice(0,4) : '?'),
+                    coingeckoId: isNative ? 'solana' : null,
+                    category: 'permuta', note: 'Swap' + (isOrca ? ' (Orca)' : '')
+                });
+            }
+            return;
+        }
+
+        if (isOrca && tokenTransfers.length >= 2) {
+            // aportación/retirada de liquidez en pool Orca: varias piernas de tokens
+            tokenTransfers.forEach(t => {
+                if (t.fromUserAccount !== address && t.toUserAccount !== address) return;
+                results.push({
+                    date, hash: tx.signature, direction: t.fromUserAccount === address ? 'out' : 'in',
+                    amount: t.tokenAmount, asset: t.mint ? t.mint.slice(0,4) : '?',
+                    coingeckoId: null, category: 'permuta', note: 'Pool Orca (revisar)'
+                });
+            });
+            return;
+        }
+
+        // transferencia simple
+        nativeTransfers.forEach(t => {
+            if (t.fromUserAccount !== address && t.toUserAccount !== address) return;
+            if (t.amount < 1000) return;
+            results.push({
+                date, hash: tx.signature, direction: t.fromUserAccount === address ? 'out' : 'in',
+                amount: t.amount / 1e9, asset: 'SOL', coingeckoId: 'solana',
+                counterparty: t.fromUserAccount === address ? t.toUserAccount : t.fromUserAccount
+            });
+        });
+        tokenTransfers.forEach(t => {
+            if (t.fromUserAccount !== address && t.toUserAccount !== address) return;
+            results.push({
+                date, hash: tx.signature, direction: t.fromUserAccount === address ? 'out' : 'in',
+                amount: t.tokenAmount, asset: t.mint ? t.mint.slice(0,4) : '?', coingeckoId: null,
+                counterparty: t.fromUserAccount === address ? t.toUserAccount : t.fromUserAccount
+            });
+        });
+    });
+    return results;
+}
+
+async function fetchSOLTxsRPC(address, fromDate, toDate) {
     const rpc = async (method, params) => {
         const res = await fetch('https://api.mainnet-beta.solana.com', {
             method: 'POST', headers: { 'Content-Type': 'application/json' },
@@ -958,9 +1145,9 @@ async function fetchETHTxs(address, fromDate, toDate) {
 }
 
 function suggestCategory(tx, wallet) {
-    // Comprueba si la contraparte es otra wallet propia guardada -> transferencia interna
+    if (tx.category) return tx.category; // ya viene decidido (swap, pool Orca, Kraken trade...)
     if (tx.counterparty) {
-        const ownAddrs = Object.values(wallets).filter(w => w.isMine).map(w => w.address.toLowerCase());
+        const ownAddrs = Object.values(wallets).filter(w => w.network !== 'kraken' && w.isMine).map(w => w.address.toLowerCase());
         if (ownAddrs.includes((tx.counterparty || '').toLowerCase())) return 'interna';
     }
     return tx.direction === 'in' ? 'compra' : 'venta';
@@ -977,7 +1164,14 @@ async function loadWalletTransactions() {
     try {
         let rawTxs = [];
         if (w.network === 'btc') rawTxs = await fetchBTCTxs(w.address, fromDate, toDate);
-        else if (w.network === 'sol') rawTxs = await fetchSOLTxs(w.address, fromDate, toDate);
+        else if (w.network === 'sol') {
+            try { rawTxs = await fetchSOLTxs(w.address, fromDate, toDate); }
+            catch(err) {
+                document.getElementById('tx-warning').classList.remove('hidden');
+                document.getElementById('tx-warning').textContent = 'Error con la API key de Helius. Comprueba que sea válida. Mientras tanto no se muestran movimientos de Orca decodificados.';
+                rawTxs = [];
+            }
+        }
         else if (w.network === 'eth') {
             try { rawTxs = await fetchETHTxs(w.address, fromDate, toDate); }
             catch(err) {
@@ -986,18 +1180,28 @@ async function loadWalletTransactions() {
                 rawTxs = [];
             }
         }
-        // precio histórico + categoría sugerida
+        else if (w.network === 'kraken') {
+            rawTxs = buildKrakenTxs(w.ledgerRows || []).filter(t => t.date >= fromDate && t.date <= toDate);
+        }
+        // precio histórico (solo si no viene ya con valor exacto) + categoría sugerida
         for (const tx of rawTxs) {
-            tx.eurValue = await getHistoricalPrice(tx.coingeckoId, tx.date) * tx.amount;
+            if (tx.eurValue == null) {
+                tx.eurValue = tx.coingeckoId ? await getHistoricalPrice(tx.coingeckoId, tx.date) * tx.amount : 0;
+            }
             tx.category = suggestCategory(tx, w);
         }
         rawTxs.sort((a,b) => b.date - a.date);
         currentTxList = rawTxs;
         renderTxList();
         computeTotals();
-        if (w.network === 'sol' && rawTxs.length === 0) {
+        if (w.network === 'sol' && !localStorage.getItem('helius_api_key') && rawTxs.length >= 0) {
             document.getElementById('tx-warning').classList.remove('hidden');
-            document.getElementById('tx-warning').textContent = 'Nota: en Solana solo se detectan transferencias nativas de SOL. Los movimientos dentro de pools de liquidez (tokens SPL) no se listan aquí — sigue registrándolos con Dexter.';
+            document.getElementById('tx-warning').textContent = 'Sin API key de Helius solo se detectan transferencias nativas de SOL, no swaps ni pools de Orca. Edita esta wallet y añade una key gratuita de helius.dev.';
+        }
+        const noPrice = rawTxs.some(t => !t.coingeckoId && t.eurValue === 0);
+        if (noPrice) {
+            document.getElementById('tx-warning').classList.remove('hidden');
+            document.getElementById('tx-warning').textContent += (document.getElementById('tx-warning').textContent ? ' ' : '') + 'Algunos tokens (SPL/ERC20 minoritarios) no tienen precio automático — revisa e introduce su valor manualmente antes de exportar si aplica.';
         }
     } catch(e) {
         console.error(e);
