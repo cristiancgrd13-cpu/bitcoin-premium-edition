@@ -253,7 +253,7 @@
 <div id="add-wallet-modal" class="modal-overlay hidden">
     <div class="modal-box bg-zinc-900 border border-amber-500/30 rounded-3xl p-6 max-w-sm w-full text-left">
         <div class="flex justify-between items-center mb-4">
-            <p class="text-lg font-bold text-amber-400">Añadir clave pública</p>
+            <p id="wallet-modal-title" class="text-lg font-bold text-amber-400">Añadir clave pública</p>
             <button onclick="closeAddWalletModal()" class="text-zinc-400 text-2xl leading-none">&times;</button>
         </div>
         <label class="text-xs text-zinc-500">Red</label>
@@ -801,17 +801,50 @@ function renderWalletsList() {
             </div>
             <div class="flex items-center gap-2">
                 <button onclick="openWalletTx('${id}')" class="text-xs text-amber-400 hover:text-amber-300 underline">Ver movimientos</button>
+                <button onclick="openEditWallet('${id}')" class="text-xs text-zinc-400 hover:text-zinc-200 underline">Editar</button>
                 <button onclick="deleteWallet('${id}')" class="text-zinc-500 hover:text-red-400 text-lg leading-none px-1">&times;</button>
             </div>`;
         container.appendChild(row);
     });
 }
 
-function openAddWalletModal() { document.getElementById('add-wallet-modal').classList.remove('hidden'); onWalletNetworkChange(); }
+let editingWalletId = null;
+
+function openAddWalletModal() {
+    editingWalletId = null;
+    document.getElementById('wallet-modal-title').textContent = 'Añadir clave pública';
+    document.getElementById('wallet-network').disabled = false;
+    document.getElementById('wallet-network').value = 'btc';
+    document.getElementById('wallet-address').value = '';
+    document.getElementById('wallet-alias').value = '';
+    document.getElementById('wallet-is-mine').checked = true;
+    document.getElementById('etherscan-key-input').value = '';
+    document.getElementById('helius-key-input').value = '';
+    document.getElementById('add-wallet-modal').classList.remove('hidden');
+    onWalletNetworkChange();
+}
+
+function openEditWallet(id) {
+    const w = wallets[id];
+    editingWalletId = id;
+    document.getElementById('wallet-modal-title').textContent = 'Editar clave pública';
+    document.getElementById('wallet-network').value = w.network;
+    document.getElementById('wallet-network').disabled = true; // no cambiar de red al editar
+    document.getElementById('wallet-address').value = w.address || '';
+    document.getElementById('wallet-alias').value = w.alias || '';
+    document.getElementById('wallet-is-mine').checked = !!w.isMine;
+    if (w.network === 'eth') document.getElementById('etherscan-key-input').value = localStorage.getItem('etherscan_api_key') || '';
+    if (w.network === 'sol') document.getElementById('helius-key-input').value = localStorage.getItem('helius_api_key') || '';
+    document.getElementById('add-wallet-modal').classList.remove('hidden');
+    onWalletNetworkChange();
+}
+
 function closeAddWalletModal() {
     document.getElementById('add-wallet-modal').classList.add('hidden');
     document.getElementById('wallet-address').value = '';
     document.getElementById('wallet-alias').value = '';
+    document.getElementById('wallet-network').disabled = false;
+    editingWalletId = null;
 }
 function onWalletNetworkChange() {
     const net = document.getElementById('wallet-network').value;
@@ -901,14 +934,19 @@ function submitAddWallet() {
     if (network === 'kraken') {
         const fileInput = document.getElementById('kraken-csv-input');
         const file = fileInput.files[0];
-        if (!file) { alert('Selecciona el archivo CSV exportado de Kraken.'); return; }
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const rows = parseKrakenCSV(e.target.result);
-            const id = 'kraken_' + (alias || 'cuenta');
-            wallets[id] = { network: 'kraken', address: '', alias: alias || 'Kraken', isMine: false, ledgerRows: rows };
+        const finishKraken = (rows) => {
+            const id = editingWalletId || ('kraken_' + (alias || 'cuenta') + '_' + Date.now());
+            const prevRows = editingWalletId ? (wallets[editingWalletId].ledgerRows || []) : [];
+            wallets[id] = { network: 'kraken', address: '', alias: alias || 'Kraken', isMine: false, ledgerRows: rows || prevRows };
             saveWallets(); closeAddWalletModal(); renderWalletsList();
         };
+        if (!file) {
+            if (!editingWalletId) { alert('Selecciona el archivo CSV exportado de Kraken.'); return; }
+            finishKraken(null); // edición sin nuevo CSV: conserva el histórico ya importado
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = (e) => finishKraken(parseKrakenCSV(e.target.result));
         reader.readAsText(file);
         return;
     }
@@ -923,8 +961,9 @@ function submitAddWallet() {
         const key = document.getElementById('helius-key-input').value.trim();
         if (key) localStorage.setItem('helius_api_key', key);
     }
-    const id = network + '_' + address;
-    wallets[id] = { network, address, alias, isMine };
+    const newId = network + '_' + address;
+    if (editingWalletId && editingWalletId !== newId) delete wallets[editingWalletId]; // dirección cambió
+    wallets[newId] = { network, address, alias, isMine };
     saveWallets(); closeAddWalletModal(); renderWalletsList();
 }
 function deleteWallet(id) {
