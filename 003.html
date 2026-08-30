@@ -146,6 +146,33 @@
         <button onclick="openAddWalletModal()" class="w-full mt-4 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/40 text-amber-400 font-semibold rounded-2xl py-3 transition">+ Añadir clave pública</button>
     </div>
 
+    <!-- 10. PANEL FISCAL -->
+    <div class="bg-zinc-900 rounded-3xl p-6 mb-8 border border-amber-500/30">
+        <p class="text-amber-400 text-sm mb-1 text-center tracking-widest">PANEL FISCAL</p>
+        <p class="text-xs text-zinc-500 text-center mb-4">Todas tus wallets y Kraken juntas · ganancia real por FIFO</p>
+        <div class="flex gap-2 mb-3">
+            <select id="fiscal-year" class="flex-1 bg-black/40 border border-zinc-700 rounded-xl px-3 py-2 text-white outline-none text-sm"></select>
+            <button onclick="runFiscalPanel()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl py-2 transition text-sm">Calcular año completo</button>
+        </div>
+        <div id="fiscal-loading" class="hidden py-8">
+            <div class="spinner"></div>
+            <p class="text-xs text-zinc-500 text-center mt-3">Consultando todas las wallets y calculando FIFO…</p>
+        </div>
+        <div id="fiscal-warning" class="hidden text-xs text-amber-400/90 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 mb-3"></div>
+        <div id="fiscal-summary" class="hidden bg-black/40 rounded-2xl p-4 space-y-1 text-sm mb-4">
+            <div class="flex justify-between"><span class="text-zinc-400">Ganancias patrimoniales</span><span id="fis-ganancias" class="font-bold text-emerald-400">0,00 €</span></div>
+            <div class="flex justify-between"><span class="text-zinc-400">Pérdidas patrimoniales</span><span id="fis-perdidas" class="font-bold text-red-400">0,00 €</span></div>
+            <div class="border-t border-zinc-700 my-2"></div>
+            <div class="flex justify-between"><span class="text-white font-semibold">Neto (casilla Modelo 100)</span><span id="fis-neto" class="font-bold text-amber-400 text-lg">0,00 €</span></div>
+            <div class="flex justify-between mt-2"><span class="text-zinc-500 text-xs">Volumen ventas</span><span id="fis-vol-venta" class="text-xs text-zinc-400">0,00 €</span></div>
+            <div class="flex justify-between"><span class="text-zinc-500 text-xs">Volumen permutas</span><span id="fis-vol-permuta" class="text-xs text-zinc-400">0,00 €</span></div>
+            <div class="flex justify-between"><span class="text-zinc-500 text-xs">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="text-xs text-zinc-500">0,00 €</span></div>
+        </div>
+        <div id="fiscal-table" class="space-y-2 max-h-[420px] overflow-y-auto pr-1 mb-4"></div>
+        <button onclick="exportFiscalPDF()" class="w-full bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl py-3 transition">📄 Exportar informe fiscal anual (PDF)</button>
+        <p class="text-xs text-zinc-600 text-center mt-2">Revisa las categorías en cada clave pública antes de calcular — el panel usa las que ya hayas confirmado.</p>
+    </div>
+
 </div>
 
 <!-- MODAL: DETALLE ACTIVO -->
@@ -1342,11 +1369,198 @@ function exportWalletPDF() {
     doc.save(fileName);
 }
 
+// ══════════════════════════════════════════════════════════════════════════
+// ── PANEL FISCAL: agregación multi-wallet + cálculo FIFO ────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+
+function populateFiscalYearSelect() {
+    const sel = document.getElementById('fiscal-year');
+    const startYear = PORTFOLIO_START.getFullYear();
+    const nowYear = new Date().getFullYear();
+    sel.innerHTML = '';
+    for (let y = nowYear; y >= startYear; y--) {
+        const opt = document.createElement('option'); opt.value = y; opt.textContent = y;
+        sel.appendChild(opt);
+    }
+}
+
+async function fetchRawTxsForWallet(w, fromDate, toDate) {
+    if (w.network === 'btc') return await fetchBTCTxs(w.address, fromDate, toDate);
+    if (w.network === 'sol') return await fetchSOLTxs(w.address, fromDate, toDate);
+    if (w.network === 'eth') return await fetchETHTxs(w.address, fromDate, toDate);
+    if (w.network === 'kraken') return buildKrakenTxs(w.ledgerRows || []).filter(t => t.date >= fromDate && t.date <= toDate);
+    return [];
+}
+
+async function runFiscalPanel() {
+    const year = parseInt(document.getElementById('fiscal-year').value);
+    const fromDate = new Date(Date.UTC(year, 0, 1, 0, 0, 0));
+    const now = new Date();
+    const toDate = (year === now.getFullYear()) ? now : new Date(Date.UTC(year, 11, 31, 23, 59, 59));
+
+    document.getElementById('fiscal-loading').classList.remove('hidden');
+    document.getElementById('fiscal-warning').classList.add('hidden');
+    document.getElementById('fiscal-summary').classList.add('hidden');
+    document.getElementById('fiscal-table').innerHTML = '';
+
+    let allTxs = [];
+    const errors = [];
+    for (const id of Object.keys(wallets)) {
+        const w = wallets[id];
+        const meta = NETWORK_META[w.network];
+        try {
+            const raw = await fetchRawTxsForWallet(w, fromDate, toDate);
+            for (const tx of raw) {
+                if (tx.eurValue == null) tx.eurValue = tx.coingeckoId ? await getHistoricalPrice(tx.coingeckoId, tx.date) * tx.amount : 0;
+                tx.category = suggestCategory(tx, w);
+                tx.walletAlias = w.alias || meta.label;
+                tx.walletId = id;
+            }
+            allTxs = allTxs.concat(raw);
+        } catch (e) {
+            errors.push(`${w.alias || meta.label}: ${e.message || 'error de consulta'}`);
+        }
+    }
+
+    allTxs.sort((a,b) => a.date - b.date); // ascendente para FIFO
+
+    // ── FIFO por activo (agrupado por coingeckoId) ──
+    const lotsByAsset = {}; // coingeckoId -> [{date, remaining, unitCost}]
+    // Semilla con "Mis Activos" como coste medio estimado para historial no importado
+    Object.values(assets).forEach(a => {
+        if (a.type === 'crypto' && a.amount > 0) {
+            lotsByAsset[a.coingeckoId] = lotsByAsset[a.coingeckoId] || [];
+            lotsByAsset[a.coingeckoId].push({ date: PORTFOLIO_START, remaining: a.amount, unitCost: a.invested / a.amount, estimated: true });
+        }
+    });
+
+    let usedEstimatedCost = false;
+    allTxs.forEach(tx => {
+        if (!tx.coingeckoId) return; // token sin identificar: no se puede hacer FIFO fiable
+        lotsByAsset[tx.coingeckoId] = lotsByAsset[tx.coingeckoId] || [];
+        if (tx.category === 'compra') {
+            lotsByAsset[tx.coingeckoId].push({ date: tx.date, remaining: tx.amount, unitCost: tx.amount > 0 ? tx.eurValue / tx.amount : 0, estimated: false });
+        } else if (tx.category === 'venta' || tx.category === 'permuta') {
+            let toConsume = tx.amount;
+            let costBasis = 0;
+            const lots = lotsByAsset[tx.coingeckoId];
+            for (const lot of lots) {
+                if (toConsume <= 0) break;
+                if (lot.remaining <= 0) continue;
+                const take = Math.min(lot.remaining, toConsume);
+                costBasis += take * lot.unitCost;
+                if (lot.estimated) usedEstimatedCost = true;
+                lot.remaining -= take;
+                toConsume -= take;
+            }
+            if (toConsume > 0.00000001) { tx.costBasis = null; tx.gain = null; tx.noCostData = true; }
+            else { tx.costBasis = costBasis; tx.gain = tx.eurValue - costBasis; }
+        }
+    });
+
+    allTxs.sort((a,b) => b.date - a.date); // descendente para mostrar
+    renderFiscalTable(allTxs);
+    renderFiscalSummary(allTxs);
+    window._fiscalTxs = allTxs; window._fiscalYear = year;
+
+    let warnMsg = '';
+    if (errors.length) warnMsg += 'Algunas wallets fallaron: ' + errors.join(' · ') + '. ';
+    if (usedEstimatedCost) warnMsg += 'Para parte del coste base se usó el precio medio estimado de "Mis Activos" (historial de compra anterior no importado desde ninguna wallet) — revísalo antes de enviarlo a tu gestor. ';
+    if (allTxs.some(t => t.noCostData)) warnMsg += 'Algunas ventas no tienen suficiente historial de compra registrado para calcular su coste — aparecen marcadas, complétalas manualmente. ';
+    if (warnMsg) { document.getElementById('fiscal-warning').classList.remove('hidden'); document.getElementById('fiscal-warning').textContent = warnMsg; }
+    document.getElementById('fiscal-loading').classList.add('hidden');
+}
+
+function renderFiscalTable(txs) {
+    const container = document.getElementById('fiscal-table');
+    container.innerHTML = '';
+    if (!txs.length) { container.innerHTML = '<p class="text-xs text-zinc-500 text-center py-4">Sin movimientos ese año.</p>'; return; }
+    const catLabel = { compra: 'Compra', venta: 'Venta', permuta: 'Permuta', interna: 'Interna' };
+    txs.forEach(tx => {
+        const row = document.createElement('div');
+        row.className = 'bg-black/40 rounded-xl px-3 py-2 flex justify-between items-center';
+        const dateStr = tx.date.toLocaleDateString('es-ES', { day:'2-digit', month:'2-digit', year:'2-digit' });
+        const gainStr = tx.gain != null ? (tx.gain >= 0 ? '+' : '') + fmtEUR(tx.gain) : (tx.noCostData ? 'sin coste' : '—');
+        const gainColor = tx.gain == null ? 'text-zinc-500' : (tx.gain >= 0 ? 'text-emerald-400' : 'text-red-400');
+        row.innerHTML = `
+            <div class="text-left">
+                <div class="text-xs text-zinc-500">${dateStr} · ${tx.walletAlias} · ${catLabel[tx.category]||tx.category}</div>
+                <div class="text-sm font-semibold">${tx.direction === 'in' ? '↓' : '↑'} ${tx.amount.toFixed(6)} ${tx.asset} <span class="text-zinc-500 font-normal">(${fmtEUR(tx.eurValue)})</span></div>
+            </div>
+            <div class="text-xs font-bold ${gainColor}">${gainStr}</div>`;
+        container.appendChild(row);
+    });
+}
+
+function renderFiscalSummary(txs) {
+    let ganancias = 0, perdidas = 0, volVenta = 0, volPermuta = 0, volInterna = 0;
+    txs.forEach(tx => {
+        if (tx.category === 'venta') volVenta += tx.eurValue;
+        if (tx.category === 'permuta') volPermuta += tx.eurValue;
+        if (tx.category === 'interna') volInterna += tx.eurValue;
+        if (tx.gain != null) { if (tx.gain >= 0) ganancias += tx.gain; else perdidas += Math.abs(tx.gain); }
+    });
+    document.getElementById('fis-ganancias').textContent = fmtEUR(ganancias);
+    document.getElementById('fis-perdidas').textContent = fmtEUR(perdidas);
+    document.getElementById('fis-neto').textContent = fmtEUR(ganancias - perdidas);
+    document.getElementById('fis-vol-venta').textContent = fmtEUR(volVenta);
+    document.getElementById('fis-vol-permuta').textContent = fmtEUR(volPermuta);
+    document.getElementById('fis-vol-interna').textContent = fmtEUR(volInterna);
+    document.getElementById('fiscal-summary').classList.remove('hidden');
+}
+
+function exportFiscalPDF() {
+    const txs = window._fiscalTxs;
+    if (!txs || !txs.length) { alert('Pulsa "Calcular año completo" primero.'); return; }
+    const year = window._fiscalYear;
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const catLabel = { compra: 'Compra', venta: 'Venta', permuta: 'Permuta', interna: 'Interna' };
+
+    doc.setFontSize(16); doc.text(`Informe fiscal cripto — ${year}`, 14, 18);
+    doc.setFontSize(9);
+    doc.text('Método de coste: FIFO (primero en entrar, primero en salir)', 14, 25);
+    doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, 14, 30);
+
+    let y = 40;
+    doc.setFontSize(9);
+    doc.text('Fecha', 14, y); doc.text('Wallet', 38, y); doc.text('Tipo', 70, y); doc.text('Cantidad', 90, y); doc.text('Valor €', 125, y); doc.text('Ganancia/Pérdida', 155, y);
+    y += 4; doc.line(14, y, 196, y); y += 5;
+    txs.forEach(tx => {
+        if (y > 275) { doc.addPage(); y = 20; }
+        doc.text(tx.date.toLocaleDateString('es-ES'), 14, y);
+        doc.text((tx.walletAlias||'').slice(0,14), 38, y);
+        doc.text(catLabel[tx.category]||tx.category, 70, y);
+        doc.text(`${tx.amount.toFixed(4)} ${tx.asset}`, 90, y);
+        doc.text(fmtEUR(tx.eurValue), 125, y);
+        doc.text(tx.gain != null ? fmtEUR(tx.gain) : (tx.noCostData ? 'sin coste' : '—'), 155, y);
+        y += 6;
+    });
+
+    let ganancias = 0, perdidas = 0;
+    txs.forEach(tx => { if (tx.gain != null) { if (tx.gain >= 0) ganancias += tx.gain; else perdidas += Math.abs(tx.gain); } });
+
+    y += 6; if (y > 260) { doc.addPage(); y = 20; }
+    doc.line(14, y, 196, y); y += 8;
+    doc.setFontSize(12); doc.text('Resumen para IRPF (ganancias patrimoniales)', 14, y); y += 8;
+    doc.setFontSize(10);
+    doc.text(`Ganancias patrimoniales: ${fmtEUR(ganancias)}`, 14, y); y += 6;
+    doc.text(`Pérdidas patrimoniales: ${fmtEUR(perdidas)}`, 14, y); y += 6;
+    doc.setFontSize(12);
+    doc.text(`NETO: ${fmtEUR(ganancias - perdidas)}`, 14, y); y += 10;
+    doc.setFontSize(8);
+    doc.text('Nota: el coste base de operaciones sin historial de compra importado usa el precio medio', 14, y); y += 4;
+    doc.text('de "Mis Activos" como estimación. Revisar con el gestor antes de presentar.', 14, y);
+
+    doc.save(`informe_fiscal_${year}.pdf`);
+}
+
 // ── INIT ──────────────────────────────────────────────────────────────────────
 window.onload = () => {
     renderAssetsList();
     renderPromedioCompra();
     renderWalletsList();
+    populateFiscalYearSelect();
     updateAll();
     updateFearGreed();
     updateDominance();
