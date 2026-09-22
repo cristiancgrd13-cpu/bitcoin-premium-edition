@@ -450,12 +450,27 @@ let annualChart = null;
 
 const PORTFOLIO_START = new Date('2026-01-01');
 
-// Volatilidad anual estimada para activos sin histórico de mercado en CoinGecko
 const MANUAL_VOL_ESTIMATES = {
     etf_gold: 0.14, etf_nasdaq: 0.22, etf_sp500: 0.16, rental: 0.08,
     spacex: 0.35, etf_acwi: 0.15, etf_msci_world: 0.15
 };
-const STABLE_VOL = 0.005; // stablecoins (USDC, etc.)
+const STABLE_VOL = 0.005;
+
+function loadATH() {
+    const saved = localStorage.getItem('portfolio_ath_v1');
+    if (!saved) return null;
+    try { return JSON.parse(saved); } catch(e) { return null; }
+}
+function saveATH(value, date) { localStorage.setItem('portfolio_ath_v1', JSON.stringify({ value, date })); }
+function updateATH(currentTotal) {
+    let ath = loadATH();
+    if (!ath || currentTotal > ath.value) {
+        ath = { value: currentTotal, date: new Date().toISOString() };
+        saveATH(ath.value, ath.date);
+    }
+    const dateStr = new Date(ath.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    document.getElementById('ath-value').textContent = `Máximo histórico: ${fmtEUR(ath.value)} · ${dateStr}`;
+}
 
 function fmtEUR(n) { return (n||0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
 function getAssetValue(key) {
@@ -473,23 +488,6 @@ function animateNumber(el, target) {
         if (p < 1) requestAnimationFrame(step); else el.dataset.val = target;
     }
     requestAnimationFrame(step);
-}
-
-// ── MÁXIMO HISTÓRICO (ATH) DEL PORTAFOLIO ───────────────────────────────────
-function loadATH() {
-    const saved = localStorage.getItem('portfolio_ath_v1');
-    if (!saved) return null;
-    try { return JSON.parse(saved); } catch(e) { return null; }
-}
-function saveATH(value, date) { localStorage.setItem('portfolio_ath_v1', JSON.stringify({ value, date })); }
-function updateATH(currentTotal) {
-    let ath = loadATH();
-    if (!ath || currentTotal > ath.value) {
-        ath = { value: currentTotal, date: new Date().toISOString() };
-        saveATH(ath.value, ath.date);
-    }
-    const dateStr = new Date(ath.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
-    document.getElementById('ath-value').textContent = `Máximo histórico: ${fmtEUR(ath.value)} · ${dateStr}`;
 }
 
 async function fetchCryptoPrices() {
@@ -667,7 +665,7 @@ function updateAnnualChart() {
 }
 
 async function updateAll() {
-    await fetchCryptoPrices(); // ya no lanza excepción: si falla, conserva últimos precios
+    await fetchCryptoPrices();
     try {
         renderAssetsList();
         renderPromedioCompra();
@@ -1729,18 +1727,17 @@ async function runRiskAnalysis() {
         keys.forEach(k => { undiversifiedVol += weights[k] * volByKey[k]; });
 
         let portfolioVariance = 0;
-        const mcrRaw = {}; // contribución marginal (sin normalizar) por activo
+        const mcrRaw = {};
         keys.forEach(i => {
             let crossSum = 0;
             keys.forEach(j => {
                 let corr;
                 if (i === j) corr = 1;
                 else if (returnsByKey[i] && returnsByKey[j]) corr = pearsonCorrelation(returnsByKey[i], returnsByKey[j]);
-                else corr = 0; // sin histórico común: se asume sin correlación (supuesto conservador)
+                else corr = 0;
                 const term = weights[i] * weights[j] * volByKey[i] * volByKey[j] * corr;
                 portfolioVariance += term;
-                if (i !== j) crossSum += weights[j] * volByKey[i] * volByKey[j] * corr;
-                else crossSum += weights[j] * volByKey[i] * volByKey[j] * corr;
+                crossSum += weights[j] * volByKey[i] * volByKey[j] * corr;
             });
             mcrRaw[i] = weights[i] * crossSum;
         });
@@ -1756,7 +1753,6 @@ async function runRiskAnalysis() {
 
         const sharpe = portfolioVol > 0 ? (annualizedReturn - riskFree) / portfolioVol : 0;
 
-        // ── Render ──
         document.getElementById('sharpe-value').textContent = sharpe.toFixed(2);
         const label = sharpeLabel(sharpe);
         document.getElementById('sharpe-value').className = 'text-4xl font-bold ' + label.color;
@@ -1784,4 +1780,14 @@ async function runRiskAnalysis() {
                 <div class="flex items-center gap-2 text-left">
                     <span>${a.icon}</span>
                     <div>
-                        <div class="text-sm font-semibold" style="color:${a.color}">${a.name}</di
+                        <div class="text-sm font-semibold" style="color:${a.color}">${a.name}</div>
+                        <div class="text-xs text-zinc-500">Peso: ${(weights[k]*100).toFixed(1)}% · Vol: ${(volByKey[k]*100).toFixed(1)}%</div>
+                    </div>
+                </div>
+                <div class="text-sm font-bold text-white">${pctRisk.toFixed(1)}%</div>`;
+            breakdown.appendChild(row);
+        });
+
+        if (fetchErrors.length) {
+            document.getElementById('risk-warning').classList.remove('hidden');
+            document.getElementById('ris
