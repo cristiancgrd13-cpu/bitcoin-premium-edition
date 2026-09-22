@@ -495,9 +495,14 @@ function updateATH(currentTotal) {
 async function fetchCryptoPrices() {
     const ids = [...new Set(Object.values(assets).filter(a => a.type === 'crypto').map(a => a.coingeckoId))];
     if (!ids.length) return;
-    const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=eur`);
-    const data = await res.json();
-    ids.forEach(id => { if (data[id]) livePrices[id] = data[id].eur; });
+    try {
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=eur`);
+        if (!res.ok) throw new Error('CoinGecko respondió ' + res.status);
+        const data = await res.json();
+        ids.forEach(id => { if (data[id]) livePrices[id] = data[id].eur; });
+    } catch (e) {
+        console.error('fetchCryptoPrices error (se mantienen los últimos precios conocidos)', e);
+    }
 }
 
 function renderAssetsList() {
@@ -662,12 +667,16 @@ function updateAnnualChart() {
 }
 
 async function updateAll() {
+    await fetchCryptoPrices(); // ya no lanza excepción: si falla, conserva últimos precios
     try {
-        await fetchCryptoPrices();
         renderAssetsList();
         renderPromedioCompra();
+    } catch(e) { console.error('Error renderizando activos', e); }
+
+    let total = 0;
+    try {
         const totalInvertido = Object.values(assets).reduce((s, a) => s + a.invested, 0);
-        const total = Object.keys(assets).reduce((s, k) => s + getAssetValue(k), 0);
+        total = Object.keys(assets).reduce((s, k) => s + getAssetValue(k), 0);
         animateNumber(document.getElementById('total-value'), total);
         document.getElementById('inv-total-subtitle').textContent = `Sobre inversión total de ${fmtEUR(totalInvertido)}`;
         document.getElementById('promedio-total-invertido').textContent = fmtEUR(totalInvertido);
@@ -675,10 +684,11 @@ async function updateAll() {
         const percEl = document.getElementById('percentage');
         percEl.textContent = (totalPerf >= 0 ? '+' : '') + totalPerf + '%';
         percEl.className = 'text-5xl font-bold ' + (totalPerf >= 0 ? 'text-emerald-400' : 'text-red-400');
-        updatePieChart();
-        updateAnnualChart();
-        updateATH(total);
-    } catch(e) { console.error('Error updateAll', e); }
+    } catch(e) { console.error('Error calculando totales', e); }
+
+    try { updatePieChart(); } catch(e) { console.error('Error en gráfica de distribución', e); }
+    try { updateAnnualChart(); } catch(e) { console.error('Error en gráfica anual', e); }
+    try { updateATH(total); } catch(e) { console.error('Error actualizando máximo histórico', e); }
 }
 
 async function updateFearGreed() {
@@ -1774,14 +1784,4 @@ async function runRiskAnalysis() {
                 <div class="flex items-center gap-2 text-left">
                     <span>${a.icon}</span>
                     <div>
-                        <div class="text-sm font-semibold" style="color:${a.color}">${a.name}</div>
-                        <div class="text-xs text-zinc-500">Peso: ${(weights[k]*100).toFixed(1)}% · Vol: ${(volByKey[k]*100).toFixed(1)}%</div>
-                    </div>
-                </div>
-                <div class="text-sm font-bold text-white">${pctRisk.toFixed(1)}%</div>`;
-            breakdown.appendChild(row);
-        });
-
-        if (fetchErrors.length) {
-            document.getElementById('risk-warning').classList.remove('hidden');
-            document.getElementById('risk-warning').textContent = `No se pudo obtener histórico de precios para: ${fetchErrors.join
+                        <div class="text-sm font-semibold" style="color:${a.color}">${a.name}</di
