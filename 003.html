@@ -35,6 +35,7 @@
             <div class="text-5xl font-bold text-amber-400">€</div>
         </div>
         <p class="text-xs text-zinc-500 mt-2">Valor total del portafolio en tiempo real</p>
+        <p class="text-sm text-amber-400 font-semibold mt-3">Valor Máximo: <span id="ath-value">—</span> <span id="ath-date" class="text-amber-400/70 font-normal"></span></p>
     </div>
 
     <!-- 2. MIS ACTIVOS -->
@@ -600,7 +601,27 @@ async function updateAll() {
         percEl.className = 'text-5xl font-bold ' + (totalPerf >= 0 ? 'text-emerald-400' : 'text-red-400');
         updatePieChart();
         updateAnnualChart();
+        checkAndUpdateATH(total);
     } catch(e) { console.error('Error updateAll', e); }
+}
+
+function loadATH() {
+    try { return JSON.parse(localStorage.getItem('portfolio_ath_v1') || 'null'); } catch(e) { return null; }
+}
+function renderATH(ath) {
+    if (!ath) { document.getElementById('ath-value').textContent = '—'; document.getElementById('ath-date').textContent = ''; return; }
+    document.getElementById('ath-value').textContent = fmtEUR(ath.value);
+    document.getElementById('ath-date').textContent = '· ' + new Date(ath.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+function checkAndUpdateATH(total) {
+    const current = loadATH();
+    if (!current || total > current.value) {
+        const updated = { value: total, date: new Date().toISOString() };
+        localStorage.setItem('portfolio_ath_v1', JSON.stringify(updated));
+        renderATH(updated);
+    } else {
+        renderATH(current);
+    }
 }
 
 async function updateFearGreed() {
@@ -1559,6 +1580,7 @@ function exportFiscalPDF() {
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 window.onload = () => {
+    renderATH(loadATH());
     renderAssetsList();
     renderPromedioCompra();
     renderWalletsList();
