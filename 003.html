@@ -1100,11 +1100,11 @@ async function fetchSOLTxsHelius(address, fromDate, toDate, apiKey) {
                             nativeTransfers.find(t => t.fromUserAccount === address);
             if (outLeg) {
                 const isNative = !outLeg.mint;
+                const resolved = isNative ? { symbol: 'SOL', coingeckoId: 'solana' } : resolveMint(outLeg.mint);
                 results.push({
                     date, hash: tx.signature, direction: 'out',
                     amount: isNative ? outLeg.amount / 1e9 : outLeg.tokenAmount,
-                    asset: isNative ? 'SOL' : (outLeg.mint ? outLeg.mint.slice(0,4) : '?'),
-                    coingeckoId: isNative ? 'solana' : null,
+                    asset: resolved.symbol, coingeckoId: resolved.coingeckoId,
                     category: 'permuta', note: 'Swap' + (isOrca ? ' (Orca)' : '')
                 });
             }
@@ -1115,10 +1115,11 @@ async function fetchSOLTxsHelius(address, fromDate, toDate, apiKey) {
             // aportación/retirada de liquidez en pool Orca: varias piernas de tokens
             tokenTransfers.forEach(t => {
                 if (t.fromUserAccount !== address && t.toUserAccount !== address) return;
+                const resolved = resolveMint(t.mint);
                 results.push({
                     date, hash: tx.signature, direction: t.fromUserAccount === address ? 'out' : 'in',
-                    amount: t.tokenAmount, asset: t.mint ? t.mint.slice(0,4) : '?',
-                    coingeckoId: null, category: 'permuta', note: 'Pool Orca (revisar)'
+                    amount: t.tokenAmount, asset: resolved.symbol,
+                    coingeckoId: resolved.coingeckoId, category: 'permuta', note: 'Pool Orca (revisar)'
                 });
             });
             return;
@@ -1136,9 +1137,10 @@ async function fetchSOLTxsHelius(address, fromDate, toDate, apiKey) {
         });
         tokenTransfers.forEach(t => {
             if (t.fromUserAccount !== address && t.toUserAccount !== address) return;
+            const resolved = resolveMint(t.mint);
             results.push({
                 date, hash: tx.signature, direction: t.fromUserAccount === address ? 'out' : 'in',
-                amount: t.tokenAmount, asset: t.mint ? t.mint.slice(0,4) : '?', coingeckoId: null,
+                amount: t.tokenAmount, asset: resolved.symbol, coingeckoId: resolved.coingeckoId,
                 counterparty: t.fromUserAccount === address ? t.toUserAccount : t.fromUserAccount
             });
         });
