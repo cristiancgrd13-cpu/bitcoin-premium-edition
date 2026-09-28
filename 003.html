@@ -34,7 +34,7 @@
             <div id="total-value" class="text-6xl font-bold text-white">0.00</div>
             <div class="text-5xl font-bold text-amber-400">€</div>
         </div>
-        <p class="text-xs text-zinc-500 mt-2">Valor total del portafolio en tiempo real</p>
+        <p class="text-xs text-zinc-500 mt-2">Valor total del portafolio · precios cada 30 segundos</p>
         <p class="text-sm text-amber-400 font-semibold mt-3">Valor Máximo: <span id="ath-value">—</span> <span id="ath-date" class="text-amber-400/70 font-normal"></span></p>
     </div>
 
@@ -86,7 +86,7 @@
                 <span id="rest-marketcap" class="font-bold text-zinc-300">—</span>
             </div>
         </div>
-        <p class="text-xs text-zinc-500 text-center mt-3">Actualizado cada 5 segundos</p>
+        <p class="text-xs text-zinc-500 text-center mt-3">Actualizado cada 60 segundos</p>
     </div>
 
     <!-- 6. ÍNDICE DE SENTIMIENTO -->
@@ -461,12 +461,50 @@ function animateNumber(el, target) {
     requestAnimationFrame(step);
 }
 
+// ── Utilidades de red robustas (CoinGecko con reintentos + CryptoCompare de respaldo) ──
+const CC_SYMBOL = { bitcoin: 'BTC', ethereum: 'ETH', solana: 'SOL', 'usd-coin': 'USDC', tether: 'USDT', bittensor: 'TAO', hyperliquid: 'HYPE', aave: 'AAVE', 'lido-staked-sol': 'STSOL', msol: 'MSOL' };
+function ccSymbol(coingeckoId) {
+    if (CC_SYMBOL[coingeckoId]) return CC_SYMBOL[coingeckoId];
+    const a = Object.values(assets).find(x => x.coingeckoId === coingeckoId);
+    return a && a.symbol ? a.symbol.toUpperCase() : null;
+}
+async function fetchJSON(url, tries = 3) {
+    for (let i = 0; i < tries; i++) {
+        try {
+            const res = await fetch(url);
+            if (res.status === 429) { await sleep(1500 * (i + 1)); continue; } // límite de peticiones: esperar y reintentar
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            return await res.json();
+        } catch (e) {
+            if (i === tries - 1) throw e;
+            await sleep(700);
+        }
+    }
+    throw new Error('RATE_LIMIT');
+}
+const LAST_PRICES_KEY = 'last_live_prices_v1';
+function loadLastPrices() { try { return JSON.parse(localStorage.getItem(LAST_PRICES_KEY) || '{}'); } catch (e) { return {}; } }
+
 async function fetchCryptoPrices() {
     const ids = [...new Set(Object.values(assets).filter(a => a.type === 'crypto').map(a => a.coingeckoId))];
     if (!ids.length) return;
-    const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=eur`);
-    const data = await res.json();
-    ids.forEach(id => { if (data[id]) livePrices[id] = data[id].eur; });
+    const got = {};
+    try {
+        const data = await fetchJSON(`https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=eur`, 2);
+        ids.forEach(id => { if (data[id] && data[id].eur) got[id] = data[id].eur; });
+    } catch (e) { /* se prueba la fuente de respaldo */ }
+    const missing = ids.filter(id => !got[id]);
+    const syms = missing.map(ccSymbol).filter(Boolean);
+    if (syms.length) {
+        try {
+            const data = await fetchJSON(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${syms.join(',')}&tsyms=EUR`, 2);
+            missing.forEach(id => { const s = ccSymbol(id); if (s && data[s] && data[s].EUR) got[id] = data[s].EUR; });
+        } catch (e) { /* último recurso: precio guardado */ }
+    }
+    Object.assign(livePrices, got);
+    if (Object.keys(got).length) localStorage.setItem(LAST_PRICES_KEY, JSON.stringify({ ...loadLastPrices(), ...got }));
+    const last = loadLastPrices();
+    ids.forEach(id => { if (!livePrices[id] && last[id]) livePrices[id] = last[id]; });
 }
 
 function renderAssetsList() {
@@ -1080,20 +1118,37 @@ function openWalletTx(id) {
 }
 function closeWalletTx() { document.getElementById('wallet-tx-modal').classList.add('hidden'); }
 
+const HIST_KEY = 'hist_prices_v1';
+function loadHistStore() { try { return JSON.parse(localStorage.getItem(HIST_KEY) || '{}'); } catch (e) { return {}; } }
+const histStore = loadHistStore();
+
 async function getHistoricalPrice(coingeckoId, dateObj) {
     const dd = String(dateObj.getUTCDate()).padStart(2,'0');
     const mm = String(dateObj.getUTCMonth()+1).padStart(2,'0');
     const yyyy = dateObj.getUTCFullYear();
     const dateStr = `${dd}-${mm}-${yyyy}`;
     const cacheKey = coingeckoId + '|' + dateStr;
-    if (priceCache[cacheKey] != null) return priceCache[cacheKey];
+    if (histStore[cacheKey]) return histStore[cacheKey];
+    let price = 0;
     try {
-        const res = await fetch(`https://api.coingecko.com/api/v3/coins/${coingeckoId}/history?date=${dateStr}&localization=false`);
-        const data = await res.json();
-        const price = data?.market_data?.current_price?.eur || 0;
-        priceCache[cacheKey] = price;
-        return price;
-    } catch(e) { return 0; }
+        const data = await fetchJSON(`https://api.coingecko.com/api/v3/coins/${coingeckoId}/history?date=${dateStr}&localization=false`, 2);
+        price = data?.market_data?.current_price?.eur || 0;
+    } catch (e) { /* respaldo */ }
+    if (!price) {
+        const sym = ccSymbol(coingeckoId);
+        if (sym) {
+            try {
+                const ts = Math.floor(Date.UTC(yyyy, dateObj.getUTCMonth(), dateObj.getUTCDate(), 12, 0, 0) / 1000);
+                const data = await fetchJSON(`https://min-api.cryptocompare.com/data/pricehistorical?fsym=${sym}&tsyms=EUR&ts=${ts}`, 2);
+                price = data?.[sym]?.EUR || 0;
+            } catch (e) { /* sin precio */ }
+        }
+    }
+    if (price > 0) { // solo se guardan precios válidos; un fallo nunca queda como 0 permanente
+        histStore[cacheKey] = price;
+        try { localStorage.setItem(HIST_KEY, JSON.stringify(histStore)); } catch (e) {}
+    }
+    return price;
 }
 
 // ── BTC via Blockstream (sin API key) ──────────────────────────────────────
@@ -1323,6 +1378,7 @@ async function loadWalletTransactions() {
                 tx.eurValue = tx.coingeckoId ? await getHistoricalPrice(tx.coingeckoId, tx.date) * tx.amount : 0;
             }
             tx.category = suggestCategory(tx, w);
+            applyOverrides(tx);
         }
         rawTxs.sort((a,b) => b.date - a.date);
         currentTxList = rawTxs;
@@ -1332,10 +1388,10 @@ async function loadWalletTransactions() {
             document.getElementById('tx-warning').classList.remove('hidden');
             document.getElementById('tx-warning').textContent = 'Sin API key de Helius solo se detectan transferencias nativas de SOL, no swaps ni pools de Orca. Edita esta wallet y añade una key gratuita de helius.dev.';
         }
-        const noPrice = rawTxs.some(t => !t.coingeckoId && t.eurValue === 0);
+        const noPrice = rawTxs.some(t => t.eurValue === 0 && t.amount > 0 && t.category !== 'interna');
         if (noPrice) {
             document.getElementById('tx-warning').classList.remove('hidden');
-            document.getElementById('tx-warning').textContent += (document.getElementById('tx-warning').textContent ? ' ' : '') + 'Algunos tokens (SPL/ERC20 minoritarios) no tienen precio automático — revisa e introduce su valor manualmente antes de exportar si aplica.';
+            document.getElementById('tx-warning').textContent += (document.getElementById('tx-warning').textContent ? ' ' : '') + 'Algunos movimientos aparecen con 0,00 €: son tokens sin precio automático o las fuentes de precios están limitadas ahora mismo. Pulsa "✎" junto al importe para ponerlo a mano, o vuelve a buscar en un minuto.';
         }
     } catch(e) {
         console.error(e);
@@ -1361,7 +1417,7 @@ function renderTxList() {
             <div class="text-left">
                 <div class="text-xs text-zinc-400">${dateStr}</div>
                 <div class="text-sm font-semibold">${tx.direction === 'in' ? '↓' : '↑'} ${tx.amount.toFixed(6)} ${tx.asset}</div>
-                <div class="text-xs text-zinc-500">${fmtEUR(tx.eurValue)}</div>
+                <div class="text-xs text-zinc-500">${fmtEUR(tx.eurValue)}${tx.manualValue ? ' (manual)' : ''} <button onclick="editTxValue(${i})" class="text-amber-400 hover:text-amber-300 ml-1">✎</button></div>
             </div>
             <select class="cat-select" onchange="changeTxCategory(${i}, this.value)">
                 <option value="compra" ${tx.category==='compra'?'selected':''}>Compra</option>
@@ -1374,7 +1430,34 @@ function renderTxList() {
     document.getElementById('tx-totals').classList.remove('hidden');
 }
 
-function changeTxCategory(i, val) { currentTxList[i].category = val; computeTotals(); }
+function changeTxCategory(i, val) { currentTxList[i].category = val; saveOverride(currentTxList[i], { category: val }); computeTotals(); }
+
+// ── Correcciones manuales persistentes (categoría y valor €) ────────────────
+const OVERRIDES_KEY = 'tx_overrides_v1';
+function loadOverrides() { try { return JSON.parse(localStorage.getItem(OVERRIDES_KEY) || '{}'); } catch (e) { return {}; } }
+function txKey(tx) { return [tx.hash, tx.asset, tx.direction, tx.amount.toFixed(8)].join('|'); }
+function applyOverrides(tx) {
+    const o = loadOverrides()[txKey(tx)];
+    if (!o) return;
+    if (o.category) tx.category = o.category;
+    if (o.eurValue != null) { tx.eurValue = o.eurValue; tx.manualValue = true; }
+}
+function saveOverride(tx, patch) {
+    const all = loadOverrides();
+    const k = txKey(tx);
+    all[k] = { ...(all[k] || {}), ...patch };
+    try { localStorage.setItem(OVERRIDES_KEY, JSON.stringify(all)); } catch (e) {}
+}
+function editTxValue(i) {
+    const tx = currentTxList[i];
+    const input = prompt(`Valor en € de este movimiento (${tx.amount.toFixed(6)} ${tx.asset}).\nActual: ${fmtEUR(tx.eurValue)}\n\nIntroduce el importe correcto:`);
+    if (input === null) return;
+    const v = parseFloat(input.replace(',', '.'));
+    if (isNaN(v) || v < 0) { alert('Importe no válido.'); return; }
+    tx.eurValue = v; tx.manualValue = true;
+    saveOverride(tx, { eurValue: v });
+    renderTxList(); computeTotals();
+}
 
 function computeTotals() {
     const tot = { compra: 0, venta: 0, permuta: 0, interna: 0 };
@@ -1481,6 +1564,7 @@ async function runFiscalPanel() {
             for (const tx of raw) {
                 if (tx.eurValue == null) tx.eurValue = tx.coingeckoId ? await getHistoricalPrice(tx.coingeckoId, tx.date) * tx.amount : 0;
                 tx.category = suggestCategory(tx, w);
+                applyOverrides(tx);
                 tx.walletAlias = w.alias || meta.label;
                 tx.walletId = id;
             }
@@ -1535,6 +1619,8 @@ async function runFiscalPanel() {
     if (errors.length) warnMsg += 'Algunas wallets fallaron: ' + errors.join(' · ') + '. ';
     if (usedEstimatedCost) warnMsg += 'Para parte del coste base se usó el precio medio estimado de "Mis Activos" (historial de compra anterior no importado desde ninguna wallet) — revísalo antes de enviarlo a tu gestor. ';
     if (allTxs.some(t => t.noCostData)) warnMsg += 'Algunas ventas no tienen suficiente historial de compra registrado para calcular su coste — aparecen marcadas, complétalas manualmente. ';
+    const zeroCount = allTxs.filter(t => t.eurValue === 0 && t.amount > 0 && t.category !== 'interna').length;
+    if (zeroCount) warnMsg += `${zeroCount} movimientos tienen valor 0,00 € (token sin precio o fuentes limitadas). Ponles el importe a mano desde su clave con "✎" o repite el cálculo en un minuto: con valor 0 el resultado fiscal no es fiable. `;
     if (warnMsg) { document.getElementById('fiscal-warning').classList.remove('hidden'); document.getElementById('fiscal-warning').textContent = warnMsg; }
     document.getElementById('fiscal-loading').classList.add('hidden');
 }
@@ -1632,14 +1718,25 @@ const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 async function fetchDailyPriceSeries(coingeckoId, days) {
     const key = coingeckoId + '|' + days;
     const cached = riskCache[key];
-    if (cached && Date.now() - cached.ts < 6 * 3600 * 1000) return { series: cached.series, fromCache: true };
-    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${coingeckoId}/market_chart?vs_currency=eur&days=${days}&interval=daily`);
-    if (!res.ok) throw new Error('COINGECKO_' + res.status);
-    const data = await res.json();
+    if (cached && Date.now() - cached.ts < 6 * 3600 * 1000) return { series: cached.series, fromCache: true, source: cached.source };
     const series = {};
-    (data.prices || []).forEach(p => { series[new Date(p[0]).toISOString().slice(0, 10)] = p[1]; });
-    riskCache[key] = { ts: Date.now(), series };
-    return { series, fromCache: false };
+    let source = null;
+    const sym = ccSymbol(coingeckoId);
+    if (sym) {
+        try {
+            const data = await fetchJSON(`https://min-api.cryptocompare.com/data/v2/histoday?fsym=${sym}&tsym=EUR&limit=${days}`, 2);
+            (data?.Data?.Data || []).forEach(p => { if (p.close > 0) series[new Date(p.time * 1000).toISOString().slice(0, 10)] = p.close; });
+            if (Object.keys(series).length >= 10) source = 'cryptocompare';
+        } catch (e) { /* respaldo */ }
+    }
+    if (!source) {
+        const data = await fetchJSON(`https://api.coingecko.com/api/v3/coins/${coingeckoId}/market_chart?vs_currency=eur&days=${days}&interval=daily`, 3);
+        (data.prices || []).forEach(p => { series[new Date(p[0]).toISOString().slice(0, 10)] = p[1]; });
+        if (Object.keys(series).length < 10) throw new Error('SIN_DATOS_' + coingeckoId);
+        source = 'coingecko';
+    }
+    riskCache[key] = { ts: Date.now(), series, source };
+    return { series, fromCache: false, source };
 }
 
 const rMean = (a) => a.reduce((s, x) => s + x, 0) / a.length;
@@ -1650,92 +1747,4 @@ function rCorr(a, b) {
     for (let i = 0; i < a.length; i++) { num += (a[i] - ma) * (b[i] - mb); da += (a[i] - ma) ** 2; db += (b[i] - mb) ** 2; }
     return (da > 0 && db > 0) ? num / Math.sqrt(da * db) : 0;
 }
-const toRets = (vals) => vals.slice(1).map((v, i) => v / vals[i] - 1);
-
-async function runRiskAnalysis() {
-    const days = parseInt(document.getElementById('risk-period').value);
-    const rf = (parseFloat(document.getElementById('risk-free').value) || 0) / 100;
-    const rfDaily = rf / 365;
-    const warnEl = document.getElementById('risk-warning');
-    const setWarn = (msg) => { warnEl.textContent = msg; warnEl.classList.toggle('hidden', !msg); };
-    document.getElementById('risk-loading').classList.remove('hidden');
-    document.getElementById('risk-results').classList.add('hidden');
-    setWarn('');
-
-    try {
-        const cryptoKeys = Object.keys(assets).filter(k => assets[k].type === 'crypto' && assets[k].amount > 0);
-        if (!cryptoKeys.length) { setWarn('No hay activos cripto en el portafolio con histórico de precios para calcular.'); return; }
-
-        const ids = [...new Set(cryptoKeys.map(k => assets[k].coingeckoId))];
-        const seriesById = {};
-        const failed = [];
-        for (const id of ids) {
-            try {
-                const { series, fromCache } = await fetchDailyPriceSeries(id, days);
-                seriesById[id] = series;
-                if (!fromCache) await sleep(1300); // evitar límite de peticiones de CoinGecko
-            } catch (e) { failed.push(id); }
-        }
-        const usable = cryptoKeys.filter(k => seriesById[assets[k].coingeckoId]);
-        if (!usable.length) { setWarn('No se pudo descargar el histórico de precios (CoinGecko limita peticiones). Inténtalo de nuevo en un minuto.'); return; }
-
-        // fechas comunes a todos los activos usables
-        let dates = Object.keys(seriesById[assets[usable[0]].coingeckoId]);
-        usable.forEach(k => { const s = seriesById[assets[k].coingeckoId]; dates = dates.filter(d => s[d] != null); });
-        dates.sort();
-        if (dates.length < 10) { setWarn('Datos insuficientes en común entre activos para calcular (menos de 10 días).'); return; }
-
-        // valor de cada activo por día (cantidades actuales sobre precios pasados)
-        const assetVals = {};
-        usable.forEach(k => { const s = seriesById[assets[k].coingeckoId]; assetVals[k] = dates.map(d => assets[k].amount * s[d]); });
-        const portVals = dates.map((_, i) => usable.reduce((sum, k) => sum + assetVals[k][i], 0));
-        const portRets = toRets(portVals);
-
-        const meanD = rMean(portRets), stdD = rStd(portRets);
-        const sharpe = stdD > 0 ? (meanD - rfDaily) / stdD * Math.sqrt(365) : NaN;
-        const downside = Math.sqrt(portRets.reduce((s, r) => s + Math.min(0, r - rfDaily) ** 2, 0) / portRets.length);
-        const sortino = downside > 0 ? (meanD - rfDaily) / downside * Math.sqrt(365) : NaN;
-        const volAnn = stdD * Math.sqrt(365);
-        const periodRet = portVals[portVals.length - 1] / portVals[0] - 1;
-        let peak = portVals[0], mdd = 0;
-        portVals.forEach(v => { if (v > peak) peak = v; mdd = Math.min(mdd, v / peak - 1); });
-
-        // diversificación
-        const lastTotal = portVals[portVals.length - 1];
-        const weights = usable.map(k => assetVals[k][assetVals[k].length - 1] / lastTotal);
-        const assetRets = usable.map(k => toRets(assetVals[k]));
-        const assetStds = assetRets.map(r => rStd(r));
-        const weightedVol = weights.reduce((s, w, i) => s + w * assetStds[i], 0);
-        const divRatio = stdD > 0 ? weightedVol / stdD : NaN;
-        let corrSum = 0, corrN = 0;
-        for (let i = 0; i < usable.length; i++) for (let j = i + 1; j < usable.length; j++) { corrSum += rCorr(assetRets[i], assetRets[j]); corrN++; }
-        const avgCorr = corrN ? corrSum / corrN : NaN;
-        const effN = 1 / weights.reduce((s, w) => s + w * w, 0);
-
-        // render
-        const pct = (x) => (x >= 0 ? '+' : '') + (x * 100).toFixed(2) + '%';
-        const num = (x, d = 2) => (isFinite(x) ? x.toFixed(d) : '—');
-        document.getElementById('risk-sharpe').textContent = num(sharpe);
-        const lblEl = document.getElementById('risk-sharpe-label');
-        let lbl = '—', cls = 'text-zinc-400';
-        if (isFinite(sharpe)) {
-            if (sharpe < 0) { lbl = 'Peor que la tasa libre de riesgo'; cls = 'text-red-400'; }
-            else if (sharpe < 1) { lbl = 'Bajo: el riesgo pesa más que el beneficio'; cls = 'text-orange-400'; }
-            else if (sharpe < 2) { lbl = 'Bueno'; cls = 'text-lime-400'; }
-            else { lbl = 'Muy alto (ojo: periodos cortos inflan el ratio)'; cls = 'text-emerald-400'; }
-        }
-        lblEl.textContent = lbl; lblEl.className = 'text-sm font-semibold mt-2 ' + cls;
-        const prEl = document.getElementById('risk-period-ret');
-        prEl.textContent = pct(periodRet); prEl.className = 'font-bold ' + (periodRet >= 0 ? 'text-emerald-400' : 'text-red-400');
-        document.getElementById('risk-vol').textContent = (volAnn * 100).toFixed(1) + '%';
-        document.getElementById('risk-sortino').textContent = num(sortino);
-        document.getElementById('risk-mdd').textContent = (mdd * 100).toFixed(1) + '%';
-        document.getElementById('risk-divratio').textContent = num(divRatio);
-        document.getElementById('risk-corr').textContent = num(avgCorr);
-        document.getElementById('risk-effn').textContent = num(effN, 1);
-
-        const table = document.getElementById('risk-table');
-        table.innerHTML = '';
-        usable.forEach((k, i) => {
-            const a = assets[k];
-            con
+const toRets = 
