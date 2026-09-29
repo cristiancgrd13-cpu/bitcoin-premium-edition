@@ -34,8 +34,8 @@
             <div id="total-value" class="text-6xl font-bold text-white">0.00</div>
             <div class="text-5xl font-bold text-amber-400">€</div>
         </div>
-        <p class="text-xs text-zinc-500 mt-2">Valor total del portafolio · precios cada 30 segundos</p>
-        <p class="text-sm text-amber-400 font-semibold mt-3">Valor Máximo: <span id="ath-value">—</span> <span id="ath-date" class="text-amber-400/70 font-normal"></span></p>
+        <p class="text-xs text-zinc-500 mt-2">Valor total del portafolio en tiempo real</p>
+        <p id="ath-value" class="text-xs text-amber-400 mt-1 font-semibold">Máximo histórico: —</p>
     </div>
 
     <!-- 2. MIS ACTIVOS -->
@@ -86,7 +86,7 @@
                 <span id="rest-marketcap" class="font-bold text-zinc-300">—</span>
             </div>
         </div>
-        <p class="text-xs text-zinc-500 text-center mt-3">Actualizado cada 60 segundos</p>
+        <p class="text-xs text-zinc-500 text-center mt-3">Actualizado cada 5 segundos</p>
     </div>
 
     <!-- 6. ÍNDICE DE SENTIMIENTO -->
@@ -174,48 +174,55 @@
         <p class="text-xs text-zinc-600 text-center mt-2">Revisa las categorías en cada clave pública antes de calcular — el panel usa las que ya hayas confirmado.</p>
     </div>
 
-    <!-- 11. RIESGO / BENEFICIO (SHARPE) -->
+    <!-- 11. RATIO RIESGO/BENEFICIO (SHARPE) -->
     <div class="bg-zinc-900 rounded-3xl p-6 mb-8 border border-amber-500/30">
-        <p class="text-amber-400 text-sm mb-1 text-center tracking-widest">RIESGO / BENEFICIO</p>
-        <p class="text-xs text-zinc-500 text-center mb-4">Ratio de Sharpe y diversificación de tus activos</p>
-        <div class="flex gap-2 mb-3">
-            <select id="risk-period" class="flex-1 bg-black/40 border border-zinc-700 rounded-xl px-3 py-2 text-white outline-none text-sm">
-                <option value="30">Últimos 30 días</option>
-                <option value="90" selected>Últimos 90 días</option>
-                <option value="180">Últimos 180 días</option>
-                <option value="365">Último año</option>
-            </select>
-            <button onclick="runRiskAnalysis()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl py-2 transition text-sm">Calcular</button>
+        <p class="text-amber-400 text-sm mb-1 text-center tracking-widest">RATIO RIESGO/BENEFICIO (SHARPE)</p>
+        <p class="text-xs text-zinc-500 text-center mb-4">Rendimiento ajustado al riesgo, según la diversificación real de tus activos</p>
+
+        <div class="flex gap-2 items-end mb-4">
+            <div class="flex-1">
+                <label class="text-xs text-zinc-500">Tipo libre de riesgo (%)</label>
+                <input id="risk-free-input" type="number" step="0.1" value="2.5" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-3 py-2 text-white mt-1 outline-none text-sm">
+            </div>
+            <button onclick="runRiskAnalysis()" class="flex-1 bg-amber-500 hover:bg-amber-400 text-black font-semibold rounded-xl py-2 transition text-sm">Analizar riesgo/beneficio</button>
         </div>
-        <div class="mb-3 text-left">
-            <label class="text-xs text-zinc-500">Tasa libre de riesgo anual (%) — editable</label>
-            <input id="risk-free" type="number" step="0.1" value="2.5" class="w-full bg-black/40 border border-zinc-700 rounded-xl px-4 py-2 text-white mt-1 outline-none text-sm">
-        </div>
-        <div id="risk-loading" class="hidden py-6">
+
+        <div id="risk-loading" class="hidden py-8">
             <div class="spinner"></div>
-            <p class="text-xs text-zinc-500 text-center mt-3">Descargando histórico de precios…</p>
+            <p class="text-xs text-zinc-500 text-center mt-3">Descargando históricos de precios y calculando correlaciones…</p>
         </div>
-        <div id="risk-warning" class="hidden text-xs text-amber-400/90 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 mb-3 text-left"></div>
-        <div id="risk-results" class="hidden">
-            <div class="bg-black/40 rounded-2xl p-5 mb-3">
-                <p class="text-xs text-zinc-400 mb-1">Ratio de Sharpe</p>
-                <div id="risk-sharpe" class="text-5xl font-bold text-amber-400">—</div>
-                <div id="risk-sharpe-label" class="text-sm font-semibold mt-2">—</div>
+
+        <div id="risk-warning" class="hidden text-xs text-amber-400/90 bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 mb-3"></div>
+
+        <div id="risk-summary" class="hidden">
+            <div class="bg-black/40 rounded-2xl p-5 mb-4 text-center">
+                <div class="text-xs text-zinc-400 mb-1">Ratio de Sharpe</div>
+                <div id="sharpe-value" class="text-4xl font-bold">—</div>
+                <div id="sharpe-label" class="text-sm font-semibold mt-1">—</div>
             </div>
-            <div class="grid grid-cols-2 gap-2 mb-3">
-                <div class="bg-black/40 rounded-xl p-3"><div class="text-xs text-zinc-500">Rentab. del periodo</div><div id="risk-period-ret" class="font-bold">—</div></div>
-                <div class="bg-black/40 rounded-xl p-3"><div class="text-xs text-zinc-500">Volatilidad anual</div><div id="risk-vol" class="font-bold">—</div></div>
-                <div class="bg-black/40 rounded-xl p-3"><div class="text-xs text-zinc-500">Sortino</div><div id="risk-sortino" class="font-bold">—</div></div>
-                <div class="bg-black/40 rounded-xl p-3"><div class="text-xs text-zinc-500">Máx. caída</div><div id="risk-mdd" class="font-bold text-red-400">—</div></div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+                <div class="bg-black/40 rounded-2xl p-3 text-center">
+                    <div class="text-xs text-zinc-400 mb-1">Rendimiento anualizado</div>
+                    <div id="risk-return" class="font-bold text-white">—</div>
+                </div>
+                <div class="bg-black/40 rounded-2xl p-3 text-center">
+                    <div class="text-xs text-zinc-400 mb-1">Volatilidad anualizada</div>
+                    <div id="risk-vol" class="font-bold text-white">—</div>
+                </div>
             </div>
-            <p class="text-amber-400 text-xs tracking-widest mb-2">DIVERSIFICACIÓN</p>
-            <div class="grid grid-cols-3 gap-2 mb-3">
-                <div class="bg-black/40 rounded-xl p-3"><div class="text-xs text-zinc-500">Ratio divers.</div><div id="risk-divratio" class="font-bold">—</div></div>
-                <div class="bg-black/40 rounded-xl p-3"><div class="text-xs text-zinc-500">Correl. media</div><div id="risk-corr" class="font-bold">—</div></div>
-                <div class="bg-black/40 rounded-xl p-3"><div class="text-xs text-zinc-500">Activos efect.</div><div id="risk-effn" class="font-bold">—</div></div>
+            <div class="bg-black/40 rounded-2xl p-4 mb-4 space-y-1">
+                <div class="flex justify-between text-sm">
+                    <span class="text-zinc-400">Volatilidad sin diversificar</span>
+                    <span id="risk-vol-undiversified" class="font-bold text-zinc-300">—</span>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span class="text-zinc-400">Reducción por diversificación</span>
+                    <span id="risk-diversification-benefit" class="font-bold text-emerald-400">—</span>
+                </div>
             </div>
-            <div id="risk-table" class="space-y-2 mb-3"></div>
-            <p class="text-xs text-zinc-600 text-left">Sharpe: rentabilidad extra sobre la tasa libre de riesgo por cada unidad de volatilidad (&gt;1 suele considerarse bueno, &lt;0 peor que no arriesgar). Ratio de diversificación &gt;1 indica que combinar activos reduce el riesgo frente a tenerlos por separado. Se calcula con tus cantidades actuales sobre precios pasados; no garantiza resultados futuros ni es asesoramiento financiero.</p>
+            <p class="text-amber-400 text-xs mb-2 tracking-widest text-center">CONTRIBUCIÓN AL RIESGO POR ACTIVO</p>
+            <div id="risk-breakdown" class="space-y-2"></div>
+            <p class="text-xs text-zinc-600 text-center mt-3">Basado en los últimos 90 días de precios y en la correlación real entre tus criptoactivos. Los activos sin histórico de mercado (ETFs, inmobiliario, SpaceX) usan una volatilidad estimada por categoría.</p>
         </div>
     </div>
 
@@ -443,6 +450,28 @@ let annualChart = null;
 
 const PORTFOLIO_START = new Date('2026-01-01');
 
+const MANUAL_VOL_ESTIMATES = {
+    etf_gold: 0.14, etf_nasdaq: 0.22, etf_sp500: 0.16, rental: 0.08,
+    spacex: 0.35, etf_acwi: 0.15, etf_msci_world: 0.15
+};
+const STABLE_VOL = 0.005;
+
+function loadATH() {
+    const saved = localStorage.getItem('portfolio_ath_v1');
+    if (!saved) return null;
+    try { return JSON.parse(saved); } catch(e) { return null; }
+}
+function saveATH(value, date) { localStorage.setItem('portfolio_ath_v1', JSON.stringify({ value, date })); }
+function updateATH(currentTotal) {
+    let ath = loadATH();
+    if (!ath || currentTotal > ath.value) {
+        ath = { value: currentTotal, date: new Date().toISOString() };
+        saveATH(ath.value, ath.date);
+    }
+    const dateStr = new Date(ath.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+    document.getElementById('ath-value').textContent = `Máximo histórico: ${fmtEUR(ath.value)} · ${dateStr}`;
+}
+
 function fmtEUR(n) { return (n||0).toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'; }
 function getAssetValue(key) {
     const a = assets[key];
@@ -461,50 +490,17 @@ function animateNumber(el, target) {
     requestAnimationFrame(step);
 }
 
-// ── Utilidades de red robustas (CoinGecko con reintentos + CryptoCompare de respaldo) ──
-const CC_SYMBOL = { bitcoin: 'BTC', ethereum: 'ETH', solana: 'SOL', 'usd-coin': 'USDC', tether: 'USDT', bittensor: 'TAO', hyperliquid: 'HYPE', aave: 'AAVE', 'lido-staked-sol': 'STSOL', msol: 'MSOL' };
-function ccSymbol(coingeckoId) {
-    if (CC_SYMBOL[coingeckoId]) return CC_SYMBOL[coingeckoId];
-    const a = Object.values(assets).find(x => x.coingeckoId === coingeckoId);
-    return a && a.symbol ? a.symbol.toUpperCase() : null;
-}
-async function fetchJSON(url, tries = 3) {
-    for (let i = 0; i < tries; i++) {
-        try {
-            const res = await fetch(url);
-            if (res.status === 429) { await sleep(1500 * (i + 1)); continue; } // límite de peticiones: esperar y reintentar
-            if (!res.ok) throw new Error('HTTP ' + res.status);
-            return await res.json();
-        } catch (e) {
-            if (i === tries - 1) throw e;
-            await sleep(700);
-        }
-    }
-    throw new Error('RATE_LIMIT');
-}
-const LAST_PRICES_KEY = 'last_live_prices_v1';
-function loadLastPrices() { try { return JSON.parse(localStorage.getItem(LAST_PRICES_KEY) || '{}'); } catch (e) { return {}; } }
-
 async function fetchCryptoPrices() {
     const ids = [...new Set(Object.values(assets).filter(a => a.type === 'crypto').map(a => a.coingeckoId))];
     if (!ids.length) return;
-    const got = {};
     try {
-        const data = await fetchJSON(`https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=eur`, 2);
-        ids.forEach(id => { if (data[id] && data[id].eur) got[id] = data[id].eur; });
-    } catch (e) { /* se prueba la fuente de respaldo */ }
-    const missing = ids.filter(id => !got[id]);
-    const syms = missing.map(ccSymbol).filter(Boolean);
-    if (syms.length) {
-        try {
-            const data = await fetchJSON(`https://min-api.cryptocompare.com/data/pricemulti?fsyms=${syms.join(',')}&tsyms=EUR`, 2);
-            missing.forEach(id => { const s = ccSymbol(id); if (s && data[s] && data[s].EUR) got[id] = data[s].EUR; });
-        } catch (e) { /* último recurso: precio guardado */ }
+        const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=eur`);
+        if (!res.ok) throw new Error('CoinGecko respondió ' + res.status);
+        const data = await res.json();
+        ids.forEach(id => { if (data[id]) livePrices[id] = data[id].eur; });
+    } catch (e) {
+        console.error('fetchCryptoPrices error (se mantienen los últimos precios conocidos)', e);
     }
-    Object.assign(livePrices, got);
-    if (Object.keys(got).length) localStorage.setItem(LAST_PRICES_KEY, JSON.stringify({ ...loadLastPrices(), ...got }));
-    const last = loadLastPrices();
-    ids.forEach(id => { if (!livePrices[id] && last[id]) livePrices[id] = last[id]; });
 }
 
 function renderAssetsList() {
@@ -669,12 +665,16 @@ function updateAnnualChart() {
 }
 
 async function updateAll() {
+    await fetchCryptoPrices();
     try {
-        await fetchCryptoPrices();
         renderAssetsList();
         renderPromedioCompra();
+    } catch(e) { console.error('Error renderizando activos', e); }
+
+    let total = 0;
+    try {
         const totalInvertido = Object.values(assets).reduce((s, a) => s + a.invested, 0);
-        const total = Object.keys(assets).reduce((s, k) => s + getAssetValue(k), 0);
+        total = Object.keys(assets).reduce((s, k) => s + getAssetValue(k), 0);
         animateNumber(document.getElementById('total-value'), total);
         document.getElementById('inv-total-subtitle').textContent = `Sobre inversión total de ${fmtEUR(totalInvertido)}`;
         document.getElementById('promedio-total-invertido').textContent = fmtEUR(totalInvertido);
@@ -682,29 +682,11 @@ async function updateAll() {
         const percEl = document.getElementById('percentage');
         percEl.textContent = (totalPerf >= 0 ? '+' : '') + totalPerf + '%';
         percEl.className = 'text-5xl font-bold ' + (totalPerf >= 0 ? 'text-emerald-400' : 'text-red-400');
-        updatePieChart();
-        updateAnnualChart();
-        checkAndUpdateATH(total);
-    } catch(e) { console.error('Error updateAll', e); }
-}
+    } catch(e) { console.error('Error calculando totales', e); }
 
-function loadATH() {
-    try { return JSON.parse(localStorage.getItem('portfolio_ath_v1') || 'null'); } catch(e) { return null; }
-}
-function renderATH(ath) {
-    if (!ath) { document.getElementById('ath-value').textContent = '—'; document.getElementById('ath-date').textContent = ''; return; }
-    document.getElementById('ath-value').textContent = fmtEUR(ath.value);
-    document.getElementById('ath-date').textContent = '· ' + new Date(ath.date).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-}
-function checkAndUpdateATH(total) {
-    const current = loadATH();
-    if (!current || total > current.value) {
-        const updated = { value: total, date: new Date().toISOString() };
-        localStorage.setItem('portfolio_ath_v1', JSON.stringify(updated));
-        renderATH(updated);
-    } else {
-        renderATH(current);
-    }
+    try { updatePieChart(); } catch(e) { console.error('Error en gráfica de distribución', e); }
+    try { updateAnnualChart(); } catch(e) { console.error('Error en gráfica anual', e); }
+    try { updateATH(total); } catch(e) { console.error('Error actualizando máximo histórico', e); }
 }
 
 async function updateFearGreed() {
@@ -1118,37 +1100,20 @@ function openWalletTx(id) {
 }
 function closeWalletTx() { document.getElementById('wallet-tx-modal').classList.add('hidden'); }
 
-const HIST_KEY = 'hist_prices_v1';
-function loadHistStore() { try { return JSON.parse(localStorage.getItem(HIST_KEY) || '{}'); } catch (e) { return {}; } }
-const histStore = loadHistStore();
-
 async function getHistoricalPrice(coingeckoId, dateObj) {
     const dd = String(dateObj.getUTCDate()).padStart(2,'0');
     const mm = String(dateObj.getUTCMonth()+1).padStart(2,'0');
     const yyyy = dateObj.getUTCFullYear();
     const dateStr = `${dd}-${mm}-${yyyy}`;
     const cacheKey = coingeckoId + '|' + dateStr;
-    if (histStore[cacheKey]) return histStore[cacheKey];
-    let price = 0;
+    if (priceCache[cacheKey] != null) return priceCache[cacheKey];
     try {
-        const data = await fetchJSON(`https://api.coingecko.com/api/v3/coins/${coingeckoId}/history?date=${dateStr}&localization=false`, 2);
-        price = data?.market_data?.current_price?.eur || 0;
-    } catch (e) { /* respaldo */ }
-    if (!price) {
-        const sym = ccSymbol(coingeckoId);
-        if (sym) {
-            try {
-                const ts = Math.floor(Date.UTC(yyyy, dateObj.getUTCMonth(), dateObj.getUTCDate(), 12, 0, 0) / 1000);
-                const data = await fetchJSON(`https://min-api.cryptocompare.com/data/pricehistorical?fsym=${sym}&tsyms=EUR&ts=${ts}`, 2);
-                price = data?.[sym]?.EUR || 0;
-            } catch (e) { /* sin precio */ }
-        }
-    }
-    if (price > 0) { // solo se guardan precios válidos; un fallo nunca queda como 0 permanente
-        histStore[cacheKey] = price;
-        try { localStorage.setItem(HIST_KEY, JSON.stringify(histStore)); } catch (e) {}
-    }
-    return price;
+        const res = await fetch(`https://api.coingecko.com/api/v3/coins/${coingeckoId}/history?date=${dateStr}&localization=false`);
+        const data = await res.json();
+        const price = data?.market_data?.current_price?.eur || 0;
+        priceCache[cacheKey] = price;
+        return price;
+    } catch(e) { return 0; }
 }
 
 // ── BTC via Blockstream (sin API key) ──────────────────────────────────────
@@ -1221,11 +1186,11 @@ async function fetchSOLTxsHelius(address, fromDate, toDate, apiKey) {
                             nativeTransfers.find(t => t.fromUserAccount === address);
             if (outLeg) {
                 const isNative = !outLeg.mint;
-                const resolved = isNative ? { symbol: 'SOL', coingeckoId: 'solana' } : resolveMint(outLeg.mint);
                 results.push({
                     date, hash: tx.signature, direction: 'out',
                     amount: isNative ? outLeg.amount / 1e9 : outLeg.tokenAmount,
-                    asset: resolved.symbol, coingeckoId: resolved.coingeckoId,
+                    asset: isNative ? 'SOL' : (outLeg.mint ? outLeg.mint.slice(0,4) : '?'),
+                    coingeckoId: isNative ? 'solana' : null,
                     category: 'permuta', note: 'Swap' + (isOrca ? ' (Orca)' : '')
                 });
             }
@@ -1236,11 +1201,10 @@ async function fetchSOLTxsHelius(address, fromDate, toDate, apiKey) {
             // aportación/retirada de liquidez en pool Orca: varias piernas de tokens
             tokenTransfers.forEach(t => {
                 if (t.fromUserAccount !== address && t.toUserAccount !== address) return;
-                const resolved = resolveMint(t.mint);
                 results.push({
                     date, hash: tx.signature, direction: t.fromUserAccount === address ? 'out' : 'in',
-                    amount: t.tokenAmount, asset: resolved.symbol,
-                    coingeckoId: resolved.coingeckoId, category: 'permuta', note: 'Pool Orca (revisar)'
+                    amount: t.tokenAmount, asset: t.mint ? t.mint.slice(0,4) : '?',
+                    coingeckoId: null, category: 'permuta', note: 'Pool Orca (revisar)'
                 });
             });
             return;
@@ -1258,10 +1222,9 @@ async function fetchSOLTxsHelius(address, fromDate, toDate, apiKey) {
         });
         tokenTransfers.forEach(t => {
             if (t.fromUserAccount !== address && t.toUserAccount !== address) return;
-            const resolved = resolveMint(t.mint);
             results.push({
                 date, hash: tx.signature, direction: t.fromUserAccount === address ? 'out' : 'in',
-                amount: t.tokenAmount, asset: resolved.symbol, coingeckoId: resolved.coingeckoId,
+                amount: t.tokenAmount, asset: t.mint ? t.mint.slice(0,4) : '?', coingeckoId: null,
                 counterparty: t.fromUserAccount === address ? t.toUserAccount : t.fromUserAccount
             });
         });
@@ -1378,7 +1341,6 @@ async function loadWalletTransactions() {
                 tx.eurValue = tx.coingeckoId ? await getHistoricalPrice(tx.coingeckoId, tx.date) * tx.amount : 0;
             }
             tx.category = suggestCategory(tx, w);
-            applyOverrides(tx);
         }
         rawTxs.sort((a,b) => b.date - a.date);
         currentTxList = rawTxs;
@@ -1388,10 +1350,10 @@ async function loadWalletTransactions() {
             document.getElementById('tx-warning').classList.remove('hidden');
             document.getElementById('tx-warning').textContent = 'Sin API key de Helius solo se detectan transferencias nativas de SOL, no swaps ni pools de Orca. Edita esta wallet y añade una key gratuita de helius.dev.';
         }
-        const noPrice = rawTxs.some(t => t.eurValue === 0 && t.amount > 0 && t.category !== 'interna');
+        const noPrice = rawTxs.some(t => !t.coingeckoId && t.eurValue === 0);
         if (noPrice) {
             document.getElementById('tx-warning').classList.remove('hidden');
-            document.getElementById('tx-warning').textContent += (document.getElementById('tx-warning').textContent ? ' ' : '') + 'Algunos movimientos aparecen con 0,00 €: son tokens sin precio automático o las fuentes de precios están limitadas ahora mismo. Pulsa "✎" junto al importe para ponerlo a mano, o vuelve a buscar en un minuto.';
+            document.getElementById('tx-warning').textContent += (document.getElementById('tx-warning').textContent ? ' ' : '') + 'Algunos tokens (SPL/ERC20 minoritarios) no tienen precio automático — revisa e introduce su valor manualmente antes de exportar si aplica.';
         }
     } catch(e) {
         console.error(e);
@@ -1417,7 +1379,7 @@ function renderTxList() {
             <div class="text-left">
                 <div class="text-xs text-zinc-400">${dateStr}</div>
                 <div class="text-sm font-semibold">${tx.direction === 'in' ? '↓' : '↑'} ${tx.amount.toFixed(6)} ${tx.asset}</div>
-                <div class="text-xs text-zinc-500">${fmtEUR(tx.eurValue)}${tx.manualValue ? ' (manual)' : ''} <button onclick="editTxValue(${i})" class="text-amber-400 hover:text-amber-300 ml-1">✎</button></div>
+                <div class="text-xs text-zinc-500">${fmtEUR(tx.eurValue)}</div>
             </div>
             <select class="cat-select" onchange="changeTxCategory(${i}, this.value)">
                 <option value="compra" ${tx.category==='compra'?'selected':''}>Compra</option>
@@ -1430,34 +1392,7 @@ function renderTxList() {
     document.getElementById('tx-totals').classList.remove('hidden');
 }
 
-function changeTxCategory(i, val) { currentTxList[i].category = val; saveOverride(currentTxList[i], { category: val }); computeTotals(); }
-
-// ── Correcciones manuales persistentes (categoría y valor €) ────────────────
-const OVERRIDES_KEY = 'tx_overrides_v1';
-function loadOverrides() { try { return JSON.parse(localStorage.getItem(OVERRIDES_KEY) || '{}'); } catch (e) { return {}; } }
-function txKey(tx) { return [tx.hash, tx.asset, tx.direction, tx.amount.toFixed(8)].join('|'); }
-function applyOverrides(tx) {
-    const o = loadOverrides()[txKey(tx)];
-    if (!o) return;
-    if (o.category) tx.category = o.category;
-    if (o.eurValue != null) { tx.eurValue = o.eurValue; tx.manualValue = true; }
-}
-function saveOverride(tx, patch) {
-    const all = loadOverrides();
-    const k = txKey(tx);
-    all[k] = { ...(all[k] || {}), ...patch };
-    try { localStorage.setItem(OVERRIDES_KEY, JSON.stringify(all)); } catch (e) {}
-}
-function editTxValue(i) {
-    const tx = currentTxList[i];
-    const input = prompt(`Valor en € de este movimiento (${tx.amount.toFixed(6)} ${tx.asset}).\nActual: ${fmtEUR(tx.eurValue)}\n\nIntroduce el importe correcto:`);
-    if (input === null) return;
-    const v = parseFloat(input.replace(',', '.'));
-    if (isNaN(v) || v < 0) { alert('Importe no válido.'); return; }
-    tx.eurValue = v; tx.manualValue = true;
-    saveOverride(tx, { eurValue: v });
-    renderTxList(); computeTotals();
-}
+function changeTxCategory(i, val) { currentTxList[i].category = val; computeTotals(); }
 
 function computeTotals() {
     const tot = { compra: 0, venta: 0, permuta: 0, interna: 0 };
@@ -1564,7 +1499,6 @@ async function runFiscalPanel() {
             for (const tx of raw) {
                 if (tx.eurValue == null) tx.eurValue = tx.coingeckoId ? await getHistoricalPrice(tx.coingeckoId, tx.date) * tx.amount : 0;
                 tx.category = suggestCategory(tx, w);
-                applyOverrides(tx);
                 tx.walletAlias = w.alias || meta.label;
                 tx.walletId = id;
             }
@@ -1619,8 +1553,6 @@ async function runFiscalPanel() {
     if (errors.length) warnMsg += 'Algunas wallets fallaron: ' + errors.join(' · ') + '. ';
     if (usedEstimatedCost) warnMsg += 'Para parte del coste base se usó el precio medio estimado de "Mis Activos" (historial de compra anterior no importado desde ninguna wallet) — revísalo antes de enviarlo a tu gestor. ';
     if (allTxs.some(t => t.noCostData)) warnMsg += 'Algunas ventas no tienen suficiente historial de compra registrado para calcular su coste — aparecen marcadas, complétalas manualmente. ';
-    const zeroCount = allTxs.filter(t => t.eurValue === 0 && t.amount > 0 && t.category !== 'interna').length;
-    if (zeroCount) warnMsg += `${zeroCount} movimientos tienen valor 0,00 € (token sin precio o fuentes limitadas). Ponles el importe a mano desde su clave con "✎" o repite el cálculo en un minuto: con valor 0 el resultado fiscal no es fiable. `;
     if (warnMsg) { document.getElementById('fiscal-warning').classList.remove('hidden'); document.getElementById('fiscal-warning').textContent = warnMsg; }
     document.getElementById('fiscal-loading').classList.add('hidden');
 }
@@ -1710,41 +1642,152 @@ function exportFiscalPDF() {
 }
 
 // ══════════════════════════════════════════════════════════════════════════
-// ── RIESGO / BENEFICIO: Sharpe, Sortino, drawdown, diversificación ─────────
+// ── RATIO RIESGO/BENEFICIO (SHARPE) ──────────────────────────────────────────
 // ══════════════════════════════════════════════════════════════════════════
-const riskCache = {}; // "id|days" -> { ts, series: {YYYY-MM-DD: precioEUR} }
-const sleep = (ms) => new Promise(r => setTimeout(r, ms));
 
-async function fetchDailyPriceSeries(coingeckoId, days) {
-    const key = coingeckoId + '|' + days;
-    const cached = riskCache[key];
-    if (cached && Date.now() - cached.ts < 6 * 3600 * 1000) return { series: cached.series, fromCache: true, source: cached.source };
-    const series = {};
-    let source = null;
-    const sym = ccSymbol(coingeckoId);
-    if (sym) {
-        try {
-            const data = await fetchJSON(`https://min-api.cryptocompare.com/data/v2/histoday?fsym=${sym}&tsym=EUR&limit=${days}`, 2);
-            (data?.Data?.Data || []).forEach(p => { if (p.close > 0) series[new Date(p.time * 1000).toISOString().slice(0, 10)] = p.close; });
-            if (Object.keys(series).length >= 10) source = 'cryptocompare';
-        } catch (e) { /* respaldo */ }
+function pearsonCorrelation(a, b) {
+    const n = Math.min(a.length, b.length);
+    if (n < 2) return 0;
+    const av = a.slice(-n), bv = b.slice(-n);
+    const ma = av.reduce((x, y) => x + y, 0) / n;
+    const mb = bv.reduce((x, y) => x + y, 0) / n;
+    let cov = 0, va = 0, vb = 0;
+    for (let i = 0; i < n; i++) {
+        cov += (av[i] - ma) * (bv[i] - mb);
+        va += (av[i] - ma) ** 2;
+        vb += (bv[i] - mb) ** 2;
     }
-    if (!source) {
-        const data = await fetchJSON(`https://api.coingecko.com/api/v3/coins/${coingeckoId}/market_chart?vs_currency=eur&days=${days}&interval=daily`, 3);
-        (data.prices || []).forEach(p => { series[new Date(p[0]).toISOString().slice(0, 10)] = p[1]; });
-        if (Object.keys(series).length < 10) throw new Error('SIN_DATOS_' + coingeckoId);
-        source = 'coingecko';
-    }
-    riskCache[key] = { ts: Date.now(), series, source };
-    return { series, fromCache: false, source };
+    if (va === 0 || vb === 0) return 0;
+    return cov / Math.sqrt(va * vb);
 }
 
-const rMean = (a) => a.reduce((s, x) => s + x, 0) / a.length;
-const rStd = (a) => { const m = rMean(a); return Math.sqrt(a.reduce((s, x) => s + (x - m) * (x - m), 0) / Math.max(1, a.length - 1)); };
-function rCorr(a, b) {
-    const ma = rMean(a), mb = rMean(b);
-    let num = 0, da = 0, db = 0;
-    for (let i = 0; i < a.length; i++) { num += (a[i] - ma) * (b[i] - mb); da += (a[i] - ma) ** 2; db += (b[i] - mb) ** 2; }
-    return (da > 0 && db > 0) ? num / Math.sqrt(da * db) : 0;
+async function fetchDailyLogReturns(coingeckoId) {
+    const res = await fetch(`https://api.coingecko.com/api/v3/coins/${coingeckoId}/market_chart?vs_currency=eur&days=90&interval=daily`);
+    const data = await res.json();
+    const prices = data.prices.map(p => p[1]);
+    const rets = [];
+    for (let i = 1; i < prices.length; i++) {
+        if (prices[i - 1] > 0 && prices[i] > 0) rets.push(Math.log(prices[i] / prices[i - 1]));
+    }
+    return rets;
 }
-const toRets = 
+
+function sharpeLabel(sharpe) {
+    if (sharpe < 0) return { text: 'Por debajo del activo libre de riesgo', color: 'text-red-400' };
+    if (sharpe < 1) return { text: 'Débil', color: 'text-orange-400' };
+    if (sharpe < 2) return { text: 'Aceptable', color: 'text-yellow-400' };
+    if (sharpe < 3) return { text: 'Muy bueno', color: 'text-lime-400' };
+    return { text: 'Excelente', color: 'text-emerald-400' };
+}
+
+async function runRiskAnalysis() {
+    document.getElementById('risk-loading').classList.remove('hidden');
+    document.getElementById('risk-summary').classList.add('hidden');
+    document.getElementById('risk-warning').classList.add('hidden');
+
+    try {
+        const keys = Object.keys(assets);
+        const total = keys.reduce((s, k) => s + getAssetValue(k), 0);
+        if (!total) { throw new Error('Añade al menos un activo para poder analizar el riesgo.'); }
+
+        const weights = {};
+        keys.forEach(k => { weights[k] = getAssetValue(k) / total; });
+
+        const returnsByKey = {};
+        const volByKey = {};
+        const fetchErrors = [];
+
+        for (const k of keys) {
+            const a = assets[k];
+            const isStable = a.type === 'crypto' && a.coingeckoId === 'usd-coin';
+            if (a.type === 'crypto' && !isStable) {
+                try {
+                    const rets = await fetchDailyLogReturns(a.coingeckoId);
+                    if (rets.length >= 10) {
+                        returnsByKey[k] = rets;
+                        const mean = rets.reduce((x, y) => x + y, 0) / rets.length;
+                        const variance = rets.reduce((x, y) => x + Math.pow(y - mean, 2), 0) / (rets.length - 1);
+                        volByKey[k] = Math.sqrt(variance) * Math.sqrt(365);
+                    } else {
+                        volByKey[k] = MANUAL_VOL_ESTIMATES[k] ?? 0.5;
+                        fetchErrors.push(a.name);
+                    }
+                } catch (e) {
+                    volByKey[k] = MANUAL_VOL_ESTIMATES[k] ?? 0.5;
+                    fetchErrors.push(a.name);
+                }
+            } else if (isStable) {
+                volByKey[k] = STABLE_VOL;
+            } else {
+                volByKey[k] = MANUAL_VOL_ESTIMATES[k] ?? 0.15;
+            }
+        }
+
+        let undiversifiedVol = 0;
+        keys.forEach(k => { undiversifiedVol += weights[k] * volByKey[k]; });
+
+        let portfolioVariance = 0;
+        const mcrRaw = {};
+        keys.forEach(i => {
+            let crossSum = 0;
+            keys.forEach(j => {
+                let corr;
+                if (i === j) corr = 1;
+                else if (returnsByKey[i] && returnsByKey[j]) corr = pearsonCorrelation(returnsByKey[i], returnsByKey[j]);
+                else corr = 0;
+                const term = weights[i] * weights[j] * volByKey[i] * volByKey[j] * corr;
+                portfolioVariance += term;
+                crossSum += weights[j] * volByKey[i] * volByKey[j] * corr;
+            });
+            mcrRaw[i] = weights[i] * crossSum;
+        });
+        const portfolioVol = Math.sqrt(Math.max(portfolioVariance, 0));
+
+        const totalInvertido = Object.values(assets).reduce((s, a) => s + a.invested, 0);
+        const daysSinceStart = Math.max(1, (new Date() - PORTFOLIO_START) / (1000 * 60 * 60 * 24));
+        const yearsFraction = daysSinceStart / 365.25;
+        const annualizedReturn = Math.pow(total / totalInvertido, 1 / yearsFraction) - 1;
+
+        const riskFreeInput = parseFloat(document.getElementById('risk-free-input').value);
+        const riskFree = (isNaN(riskFreeInput) ? 2.5 : riskFreeInput) / 100;
+
+        const sharpe = portfolioVol > 0 ? (annualizedReturn - riskFree) / portfolioVol : 0;
+
+        document.getElementById('sharpe-value').textContent = sharpe.toFixed(2);
+        const label = sharpeLabel(sharpe);
+        document.getElementById('sharpe-value').className = 'text-4xl font-bold ' + label.color;
+        document.getElementById('sharpe-label').textContent = label.text;
+        document.getElementById('sharpe-label').className = 'text-sm font-semibold mt-1 ' + label.color;
+
+        const retEl = document.getElementById('risk-return');
+        retEl.textContent = (annualizedReturn >= 0 ? '+' : '') + (annualizedReturn * 100).toFixed(2) + '%';
+        retEl.className = 'font-bold ' + (annualizedReturn >= 0 ? 'text-emerald-400' : 'text-red-400');
+        document.getElementById('risk-vol').textContent = (portfolioVol * 100).toFixed(2) + '%';
+
+        document.getElementById('risk-vol-undiversified').textContent = (undiversifiedVol * 100).toFixed(2) + '%';
+        const reduction = undiversifiedVol > 0 ? (1 - portfolioVol / undiversifiedVol) * 100 : 0;
+        document.getElementById('risk-diversification-benefit').textContent = '-' + reduction.toFixed(1) + '%';
+
+        const breakdown = document.getElementById('risk-breakdown');
+        breakdown.innerHTML = '';
+        const sumMcr = portfolioVol || 1;
+        keys.sort((a, b) => mcrRaw[b] - mcrRaw[a]).forEach(k => {
+            const a = assets[k];
+            const pctRisk = sumMcr > 0 ? (mcrRaw[k] / sumMcr) * 100 : 0;
+            const row = document.createElement('div');
+            row.className = 'bg-black/40 rounded-xl px-4 py-2 flex justify-between items-center';
+            row.innerHTML = `
+                <div class="flex items-center gap-2 text-left">
+                    <span>${a.icon}</span>
+                    <div>
+                        <div class="text-sm font-semibold" style="color:${a.color}">${a.name}</div>
+                        <div class="text-xs text-zinc-500">Peso: ${(weights[k]*100).toFixed(1)}% · Vol: ${(volByKey[k]*100).toFixed(1)}%</div>
+                    </div>
+                </div>
+                <div class="text-sm font-bold text-white">${pctRisk.toFixed(1)}%</div>`;
+            breakdown.appendChild(row);
+        });
+
+        if (fetchErrors.length) {
+            document.getElementById('risk-warning').classList.remove('hidden');
+            document.getElementById('ris
