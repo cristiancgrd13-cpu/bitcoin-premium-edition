@@ -1,156 +1,283 @@
 <!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoinLink BTC Edition #009</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', system-ui, sans-serif; }
-        .countdown { font-variant-numeric: tabular-nums; }
-    </style>
-</head>
-<body class="bg-black text-white min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-md w-full text-center">
-        <h1 class="text-5xl font-bold text-amber-400 mb-1">CoinLink BTC Edition</h1>
-        <p class="text-4xl text-amber-300 mb-10 font-bold">#009</p>
+<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Portafolio</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0c0d24;--line:rgba(255,255,255,.09);--coral:#ff7a59;--dim:#9a9cc0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ink);color:#f3f3ff;font-family:'DM Sans',system-ui,sans-serif;min-height:100vh}
+body::before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(600px 420px at 88% -5%,rgba(255,122,89,.30),transparent),radial-gradient(720px 520px at -10% 35%,rgba(124,92,255,.32),transparent),radial-gradient(520px 420px at 60% 110%,rgba(45,212,191,.16),transparent)}
+.d{font-family:'Bricolage Grotesque',sans-serif}
+.g{display:grid;gap:1rem;max-width:1100px;margin:auto;padding:1.2rem}
+.g>*{min-width:0}
+@media(min-width:820px){.g{grid-template-columns:repeat(6,1fr)}.s2{grid-column:span 2}.s3{grid-column:span 3}.s4{grid-column:span 4}.all{grid-column:1/-1}}
+.c{background:linear-gradient(160deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border:1px solid var(--line);border-radius:28px;padding:1.4rem;backdrop-filter:blur(16px);position:relative;overflow:hidden}
+.k{font-size:.82rem;color:var(--dim);font-weight:500;margin-bottom:.9rem}
+.dim{font-size:.75rem;color:var(--dim)}
+.up{color:#5eead4;font-size:.78rem;font-weight:700}.dn{color:#ff7a8a;font-size:.78rem;font-weight:700}
+.row{background:rgba(255,255,255,.045);border-radius:18px;padding:.85rem 1rem;display:flex;justify-content:space-between;align-items:center;gap:.75rem;margin-bottom:.6rem}
+.fx{display:flex;align-items:center;gap:.75rem}
+.ic{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;font-size:1.2rem}
+.btn{border-radius:999px;padding:.65rem 1.1rem;font:700 .85rem 'DM Sans';border:1px solid var(--line);background:rgba(255,255,255,.07);color:#fff;cursor:pointer}
+.btn:hover{background:rgba(255,255,255,.14)}
+.btn.p{background:linear-gradient(90deg,var(--coral),#ff5c8a);border:0}
+.btn.r{background:rgba(255,90,110,.25)}
+.lk{color:var(--coral);text-decoration:none}
+.hero{min-height:320px;display:flex;flex-direction:column}
+.big{font-size:clamp(3rem,11vw,6rem);font-weight:800;letter-spacing:-.04em;line-height:1}
+.big i{font-style:normal;color:var(--coral);margin-left:.1em}
+.hero>*{position:relative;z-index:1}
+.spark{position:absolute!important;left:0;right:0;bottom:0;height:48%;z-index:0!important;opacity:.95}
+#ath-box{margin-top:1rem;min-height:30px;display:flex;align-items:center;gap:.7rem;flex-wrap:wrap}
+.ath{display:inline-flex;gap:.4rem;padding:.35rem .85rem;border-radius:999px;background:linear-gradient(90deg,#ffd166,#ff7a59);color:#2a1300;font-weight:800;font-size:.82rem;animation:glow 2.4s ease-in-out infinite}
+@keyframes glow{50%{box-shadow:0 0 24px rgba(255,180,80,.65)}}
+@media(prefers-reduced-motion:reduce){.ath{animation:none}}
+.perf{font-size:clamp(2.6rem,8vw,3.6rem);font-weight:800;letter-spacing:-.03em;line-height:1}
+.pe{font-size:1.5rem;font-weight:700;margin:.35rem 0 .8rem}
+.split{display:flex;justify-content:space-around;text-align:center;margin-bottom:1rem}
+.gw{position:relative;width:200px;height:104px;margin:.5rem auto}
+.gb{width:200px;height:100px;border-radius:100px 100px 0 0;background:conic-gradient(from 270deg at 50% 100%,#ef4444 0 36deg,#f97316 36deg 72deg,#eab308 72deg 108deg,#84cc16 108deg 144deg,#22c55e 144deg 180deg);-webkit-mask:radial-gradient(circle at 50% 100%,transparent 66px,#000 67px);mask:radial-gradient(circle at 50% 100%,transparent 66px,#000 67px)}
+.gn{position:absolute;bottom:4px;left:50%;width:3px;height:86px;background:#fff;border-radius:3px;transform-origin:bottom center;transform:translateX(-50%) rotate(-90deg);transition:transform 1s ease}
+.gv{position:absolute;bottom:14px;left:0;right:0;text-align:center;font-size:1.8rem;font-weight:800}
+.m{position:fixed;inset:0;background:rgba(5,5,20,.82);display:flex;align-items:center;justify-content:center;z-index:50;padding:1rem}
+.m.h{display:none}
+.mb{background:#12132e;border:1px solid var(--line);border-radius:28px;padding:1.4rem;width:100%;max-width:380px;max-height:88vh;overflow-y:auto}
+.mb .row{cursor:pointer}
+.i{width:100%;background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:14px;padding:.65rem .9rem;color:#fff;margin:.25rem 0 .8rem;outline:0;font:inherit}
+option{color:#000}
+.box{background:rgba(255,255,255,.04);border-radius:20px;padding:1rem;margin-bottom:.8rem}
+.x{float:right;background:0;border:0;color:var(--dim);font-size:1.6rem;cursor:pointer;line-height:1}
+.hd{display:flex;justify-content:space-between;align-items:baseline}
+.hd h1{margin:0;font-size:1.7rem;letter-spacing:-.03em}
+</style></head>
+<body><main class="g">
+<header class="all hd"><h1 class="d">Mi portafolio</h1><span id="clock" class="dim"></span></header>
 
-        <!-- VALOR DEL NFC -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-amber-500/30">
-            <p class="text-amber-400 text-lg tracking-widest mb-3">VALOR DEL NFC</p>
-            <div class="flex items-baseline justify-center gap-3">
-                <div id="nominal" class="text-6xl font-bold text-white">100.00</div>
-                <div class="text-5xl font-bold text-amber-400">€</div>
-            </div>
-            <div id="sats" class="text-4xl font-mono text-emerald-400 mt-2">182.500 sats</div>
-        </div>
+<section class="c s4 hero">
+  <div class="k">Valor total</div>
+  <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
+  <div id="ath-box"></div>
+  <div class="spark"><canvas id="spark"></canvas></div>
+</section>
 
-        <!-- PRECIO BTC -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-8">
-            <p class="text-zinc-400 text-sm mb-3">PRECIO DE BITCOIN</p>
-            <div id="btc-price" class="text-4xl font-mono text-amber-300">-- €</div>
-        </div>
+<section class="c s2">
+  <div class="k">Rendimiento total</div>
+  <div id="percentage" class="d perf">—</div>
+  <div id="perf-eur" class="d pe">—</div>
+  <div id="inv-sub" class="dim">Sobre inversión de —</div>
+</section>
 
-        <!-- PRECIO DE COMPRA + CUENTA ATRÁS -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-emerald-500/30">
-            <p class="text-emerald-400 text-sm mb-2">PRECIO PROMEDIO DE COMPRA</p>
-            <div class="flex items-baseline justify-center gap-3">
-                <div id="avg-buy-price" class="text-5xl font-mono text-white">100.00</div>
-                <div class="text-4xl font-bold text-amber-400">€</div>
-            </div>
-            <p id="btc-buy-price" class="text-zinc-400 text-sm mt-2">≈ -- €/BTC</p>
-            <p id="buy-date" class="text-xs text-zinc-500 mt-4">Fecha de adquisición: 19/06/2026</p>
-            
-            <!-- Cuenta atrás -->
-            <div class="mt-6 pt-6 border-t border-zinc-700">
-                <p class="text-amber-400 text-sm mb-3">PLAZO DE VENCIMIENTO</p>
-                <div id="countdown" class="countdown text-3xl font-mono text-white grid grid-cols-4 gap-2 text-center">
-                    <div><span id="years" class="text-4xl">3</span><br><span class="text-xs text-zinc-500">AÑOS</span></div>
-                    <div><span id="days" class="text-4xl">00</span><br><span class="text-xs text-zinc-500">DÍAS</span></div>
-                    <div><span id="hours" class="text-4xl">00</span><br><span class="text-xs text-zinc-500">HRS</span></div>
-                    <div><span id="minutes" class="text-4xl">00</span><br><span class="text-xs text-zinc-500">MIN</span></div>
-                </div>
-                <p class="text-red-400 text-xs mt-4">* Penalización del 30% si se vende antes de los 3 años</p>
-            </div>
-        </div>
+<section class="c s4">
+  <div class="hd"><div class="k">Mis activos</div><div style="display:flex;gap:.5rem"><button class="btn p" onclick="openAdd()">+ Añadir</button><button class="btn" onclick="openManage()">Modificar</button></div></div>
+  <div id="assets-list"></div>
+</section>
 
-        <!-- RENDIMIENTO -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-amber-500/30">
-            <p class="text-zinc-400 text-sm mb-3">RENDIMIENTO</p>
-            <div id="percentage" class="text-5xl font-bold">+0.00%</div>
-        </div>
+<section class="c s2">
+  <div class="k">Distribución</div>
+  <div style="height:280px"><canvas id="pie"></canvas></div>
+</section>
 
-        <a href="#" id="main-link"
-           class="block w-full py-6 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-black font-bold text-2xl rounded-3xl transition-all mb-8">
-            Acceso a la Web
-        </a>
+<section class="c s3">
+  <div class="k">Bitcoin vs. resto</div>
+  <div class="split"><div><div id="btc-dom" class="d" style="font-size:2.2rem;font-weight:800;color:var(--coral)">—</div><div class="dim">Bitcoin</div></div><div><div id="rest-dom" class="d" style="font-size:2.2rem;font-weight:800">—</div><div class="dim">Resto</div></div></div>
+  <div class="row"><span class="dim">Cap. Bitcoin</span><b id="btc-cap">—</b></div>
+  <div class="row"><span class="dim">Cap. resto</span><b id="rest-cap">—</b></div>
+</section>
 
-        <p class="text-amber-400 text-lg font-medium mb-6">"Invertir nunca fue tan fácil"</p>
+<section class="c s3" style="text-align:center">
+  <div class="k" style="text-align:left">Miedo y codicia</div>
+  <div class="gw"><div class="gb"></div><div id="gn" class="gn"></div><div id="fear-value" class="gv d">—</div></div>
+  <div id="fear-label" class="d" style="font-size:1.4rem;font-weight:800;margin-top:.6rem">—</div>
+  <div class="dim">Se actualiza a diario</div>
+</section>
 
-        <!-- FAQ -->
-        <div class="bg-zinc-900 rounded-3xl p-8 text-left">
-            <p class="text-amber-400 text-xl font-semibold mb-6">FAQ</p>
-            <p class="text-emerald-400 font-medium mb-4">¿Por qué invertir con nosotros?</p>
-            <ul class="space-y-4 text-zinc-300 text-sm">
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> Tu liquidez 24/7 cuando lo necesites.</li>
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> Transparencia, seriedad y confianza.</li>
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> Respaldado con BTC real en la blockchain.</li>
-            </ul>
-        </div>
+<section class="c s3">
+  <div class="hd"><div class="k">Rendimiento anual</div><div class="dim">Anualizado <b id="ann">—</b></div></div>
+  <div style="height:240px"><canvas id="annual"></canvas></div>
+</section>
 
-        <p class="text-xs text-zinc-500 mt-8">El Valor del NFC se actualiza cada 10 segundos según el precio real de Bitcoin</p>
-    </div>
+<section class="c s3">
+  <div class="k">Promedio de compra</div>
+  <div class="row"><div><div class="dim">Inversión total</div><b id="inv-total" class="d" style="font-size:1.4rem">—</b></div></div>
+  <div class="row"><div><div class="dim">DCA mensual</div><b class="d" style="font-size:1.4rem">300,00 €</b></div></div>
+  <div id="avg-list"></div>
+</section>
+</main>
 
-    <script>
-        let fixedSats = 182500;
-        let initialInvestment = 100.00;
-        let acquisitionDate = new Date("2026-06-19T00:00:00");
-        let initialBtcPrice = 54800;
+<div id="m-detail" class="m h"><div class="mb"><button class="x" onclick="hide('m-detail')">&times;</button><b id="dt" class="d" style="font-size:1.2rem"></b>
+  <div id="dt-chart"><div style="height:220px;margin-top:1rem"><canvas id="dt-cv"></canvas></div><div class="dim" style="text-align:center">Precio en € · últimos 30 días</div></div>
+  <div id="dt-man" style="margin-top:1rem"><label class="dim">Valor actual (€)</label><input id="man-val" type="number" step="0.01" class="i"><input type="hidden" id="man-key"><button class="btn p" style="width:100%" onclick="saveManual()">Guardar valor</button></div>
+</div></div>
 
-        async function updatePrice() {
-            try {
-                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
-                const data = await res.json();
-                const btcEur = data.bitcoin.eur || initialBtcPrice;
-                
-                const nominalEur = (fixedSats / 100000000 * btcEur).toFixed(2);
-                
-                document.getElementById('nominal').textContent = nominalEur;
-                document.getElementById('sats').textContent = fixedSats.toLocaleString('es-ES') + ' sats';
-                document.getElementById('btc-price').textContent = btcEur.toLocaleString('es-ES') + ' €';
+<div id="m-add" class="m h"><div class="mb"><button class="x" onclick="hide('m-add')">&times;</button><b class="d" style="font-size:1.2rem">Añadir activo</b>
+  <div style="margin-top:1rem"><label class="dim">Tipo</label><select id="add-type" class="i"></select>
+  <label class="dim">Cantidad</label><input id="add-qty" type="number" step="any" class="i" placeholder="0.005">
+  <label class="dim">€ invertidos</label><input id="add-inv" type="number" step="0.01" class="i" placeholder="300">
+  <button class="btn p" style="width:100%" onclick="submitAdd()">Añadir al portafolio</button></div>
+</div></div>
 
-                document.getElementById('avg-buy-price').textContent = initialInvestment.toFixed(2);
-                document.getElementById('btc-buy-price').textContent = `≈ ${initialBtcPrice.toLocaleString('es-ES')} €/BTC`;
+<div id="m-manage" class="m h"><div class="mb"><button class="x" onclick="hide('m-manage')">&times;</button><b class="d" style="font-size:1.2rem">Modificar activo</b>
+  <p class="dim">Elige un activo para actualizar su cantidad, registrar una venta o eliminarlo.</p><div id="manage-list"></div>
+</div></div>
 
-                const percentageChange = ((parseFloat(nominalEur) - initialInvestment) / initialInvestment * 100).toFixed(2);
-                const percElement = document.getElementById('percentage');
-                percElement.textContent = (percentageChange >= 0 ? '+' : '') + percentageChange + '%';
-                
-                if (percentageChange >= 0) {
-                    percElement.classList.add('text-emerald-400');
-                    percElement.classList.remove('text-red-400');
-                } else {
-                    percElement.classList.add('text-red-400');
-                    percElement.classList.remove('text-emerald-400');
-                }
-            } catch(e) {
-                console.error("Error fetching price", e);
-            }
-        }
+<div id="m-mod" class="m h"><div class="mb"><button class="x" onclick="hide('m-mod')">&times;</button><b id="mod-title" class="d" style="font-size:1.2rem"></b>
+  <div id="mod-info" class="dim" style="margin:.3rem 0 1rem"></div><input type="hidden" id="mod-key">
+  <div class="box"><b>Actualizar cantidad</b><div class="dim" style="margin:.3rem 0">Ideal para pools o staking: pon la cantidad exacta que tienes ahora.</div><input id="upd-qty" type="number" step="any" class="i"><button class="btn p" style="width:100%" onclick="updQty()">Actualizar y recalcular</button></div>
+  <div class="box"><b>Venta parcial</b><input id="sell-qty" type="number" step="any" class="i" placeholder="Cantidad vendida"><input id="sell-rec" type="number" step="0.01" class="i" placeholder="€ recibidos"><button class="btn" style="width:100%" onclick="sell()">Registrar venta</button></div>
+  <div class="box"><b>Eliminar activo</b><div class="dim" style="margin:.3rem 0.6rem">Úsalo si lo has vendido todo.</div><button class="btn r" style="width:100%" onclick="del()">Eliminar del portafolio</button></div>
+</div></div>
 
-        function updateCountdown() {
-            const now = new Date();
-            const maturityDate = new Date(acquisitionDate);
-            maturityDate.setFullYear(maturityDate.getFullYear() + 3);
+<script>
+const $=id=>document.getElementById(id);
+const nf={minimumFractionDigits:2,maximumFractionDigits:2};
+const fmt=n=>(n||0).toLocaleString('es-ES',nf)+' €';
+const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const show=id=>$(id).classList.remove('h'),hide=id=>$(id).classList.add('h');
+Chart.defaults.color='#9a9cc0';Chart.defaults.font.family='DM Sans';
 
-            let diff = maturityDate - now;
+const META={
+ btc:{t:'c',id:'bitcoin',name:'Bitcoin',sym:'BTC',icon:'₿',color:'#f7931a'},
+ eth:{t:'c',id:'ethereum',name:'Ethereum',sym:'ETH',icon:'Ξ',color:'#8c9eff'},
+ sol:{t:'c',id:'solana',name:'Solana',sym:'SOL',icon:'◎',color:'#b57bff'},
+ usdc_sol:{t:'c',id:'usd-coin',name:'USDC-SOL',sym:'USDC',icon:'💵',color:'#2775ca'},
+ bittensor:{t:'c',id:'bittensor',name:'Bittensor',sym:'TAO',icon:'🧠',color:'#facc15'},
+ hyperliquid:{t:'c',id:'hyperliquid',name:'Hyperliquid',sym:'HYPE',icon:'⚡',color:'#22d3ee'},
+ aave:{t:'c',id:'aave',name:'Aave',sym:'AAVE',icon:'👻',color:'#b6509e'},
+ etf_gold:{t:'m',name:'ETF Oro Físico',icon:'🥇',color:'#eab308'},
+ etf_nasdaq:{t:'m',name:'ETF Nasdaq',icon:'📈',color:'#38bdf8'},
+ etf_sp500:{t:'m',name:'ETF S&P 500',icon:'📊',color:'#4ade80'},
+ etf_acwi:{t:'m',name:'ETF ACWI',icon:'🌍',color:'#60a5fa'},
+ etf_msci_world:{t:'m',name:'ETF MSCI World',icon:'🌐',color:'#34d399'},
+ rental:{t:'m',name:'Inmobiliario (Rental)',icon:'🏠',color:'#f472b6'},
+ spacex:{t:'m',name:'SpaceX',icon:'🚀',color:'#94a3b8'}
+};
+const cry=(k,amount,invested)=>{const m=META[k];return{type:'crypto',coingeckoId:m.id,name:m.name,symbol:m.sym,icon:m.icon,color:m.color,amount,invested}};
+let assets=load('portfolio_assets_v2',null)||{btc:cry('btc',0.15653971,11324.09),eth:cry('eth',1.14482,2868.77),sol:cry('sol',6.24,601.29),usdc_sol:cry('usdc_sol',11.44,21.20)};
+const sv=()=>save('portfolio_assets_v2',assets);
+const live={},START=new Date('2026-01-01');
+let pie,annual,spark,detail;
 
-            if (diff <= 0) {
-                document.getElementById('countdown').innerHTML = `<span class="text-emerald-400">¡Madura!</span>`;
-                return;
-            }
+const val=k=>{const a=assets[k];return a.type==='crypto'?a.amount*(live[a.coingeckoId]||0):(a.currentValue??a.invested)};
+const tot=()=>Object.keys(assets).reduce((s,k)=>s+val(k),0);
+const inv=()=>Object.values(assets).reduce((s,a)=>s+a.invested,0);
+const qtyL=a=>a.type==='crypto'?`${a.amount} ${a.symbol}`:`${a.amount} ud.`;
 
-            const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
-            diff -= years * (1000 * 60 * 60 * 24 * 365.25);
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            diff -= days * (1000 * 60 * 60 * 24);
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            diff -= hours * (1000 * 60 * 60);
-            const minutes = Math.floor(diff / (1000 * 60));
+function anim(el,t){const s=parseFloat(el.dataset.v||0),t0=performance.now();(function f(n){const p=Math.min((n-t0)/800,1),e=1-Math.pow(1-p,3);el.textContent=(s+(t-s)*e).toLocaleString('es-ES',nf);if(p<1)requestAnimationFrame(f);else el.dataset.v=t})(t0)}
 
-            document.getElementById('years').textContent = years;
-            document.getElementById('days').textContent = days.toString().padStart(2, '0');
-            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-        }
+async function prices(){
+ const ids=[...new Set(Object.values(assets).filter(a=>a.type==='crypto').map(a=>a.coingeckoId))];
+ if(!ids.length)return;
+ try{const d=await(await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur`)).json();ids.forEach(i=>{if(d[i])live[i]=d[i].eur})}catch(e){console.error(e)}
+}
 
-        window.onload = () => {
-            updatePrice();
-            updateCountdown();
-            setInterval(updatePrice, 10000);
-            setInterval(updateCountdown, 30000); // cada 30 segundos para ver progreso
-        };
-    </script>
-</body>
-</html>
+function renderAssets(){
+ $('assets-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k],v=val(k),p=a.invested?(v-a.invested)/a.invested*100:0;
+  return `<div class="row" style="cursor:pointer" onclick="openDetail('${k}')"><div class="fx"><span class="ic" style="background:${a.color}26;color:${a.color}">${a.icon}</span><div><b>${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div style="text-align:right"><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div></div>`}).join('');
+}
+function renderAvg(){
+ $('avg-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];
+  return `<div class="row" style="cursor:default"><div><b style="color:${a.color}">${a.name}</b><div class="dim">Invertido ${fmt(a.invested)} · <a href="#" class="lk" onclick="editInv('${k}');return false">editar</a></div></div><div style="text-align:right"><div class="dim">${a.type==='crypto'?'Precio medio':'Valor actual'}</div><b>${fmt(a.type==='crypto'?a.invested/a.amount:val(k))}</b></div></div>`}).join('');
+}
+function editInv(k){const a=assets[k],n=parseFloat((prompt(`Inversión real en € para ${a.name}\nActual: ${fmt(a.invested)}`)||'').replace(',','.'));if(n>0){a.invested=n;sv();updateAll()}}
+
+function updatePie(){
+ const ks=Object.keys(assets),t=tot(),labels=ks.map(k=>`${assets[k].symbol||assets[k].name} ${t?(val(k)/t*100).toFixed(1):0}%`),data=ks.map(val),colors=ks.map(k=>assets[k].color);
+ if(pie){pie.data.labels=labels;pie.data.datasets[0].data=data;pie.data.datasets[0].backgroundColor=colors;pie.update()}
+ else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#12132e',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
+}
+
+function updateAnnual(t,i){
+ const now=new Date(),y0=START.getFullYear(),y1=now.getFullYear(),years=[];for(let y=y0;y<=y1;y++)years.push(y);
+ const perf=i?(t-i)/i*100:0,data=years.map(y=>y===y1?+perf.toFixed(2):0);
+ const yf=Math.max(1,(now-START)/864e5)/365.25,cagr=i&&t>0?(Math.pow(t/i,1/yf)-1)*100:0;
+ $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#5eead4':'#ff7a8a';
+ const bg=data.map(v=>v>=0?'rgba(94,234,212,.8)':'rgba(255,122,138,.8)');
+ if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.update('none')}
+ else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(2)}%`}}},scales:{x:{grid:{display:false}},y:{min:-100,max:100,ticks:{stepSize:50,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#6b7280':'rgba(255,255,255,.06)'}}}}});
+}
+
+// ── Máximo histórico + sparkline ──
+let ath=load('portfolio_ath_v1',null),hist=load('portfolio_hist_v1',[]);
+function updateATH(t){
+ if(!(t>0))return;
+ if(!ath||t>ath.value){ath={value:t,date:new Date().toISOString()};save('portfolio_ath_v1',ath)}
+ const d=new Date(ath.date).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'});
+ $('ath-box').innerHTML=t>=ath.value-.005
+  ?`<span class="ath">🏆 Máximo Histórico</span><span class="dim" style="font-size:.9rem">${d}</span>`
+  :`<span class="dim" style="font-size:.85rem">Máx. histórico ${fmt(ath.value)} · ${d} · <span class="dn">${((t/ath.value-1)*100).toFixed(2)}%</span></span>`;
+}
+function updateSpark(t){
+ if(!(t>0))return;const n=Date.now();
+ if(!hist.length||n-hist[hist.length-1][0]>6e4){hist.push([n,t]);if(hist.length>600)hist.shift();save('portfolio_hist_v1',hist)}
+ const pts=hist.length>1?hist:[[n-1,t],[n,t]],labels=pts.map(p=>p[0]),data=pts.map(p=>p[1]);
+ if(spark){spark.data.labels=labels;spark.data.datasets[0].data=data;spark.update('none');return}
+ const cx=$('spark').getContext('2d'),gr=cx.createLinearGradient(0,0,0,160);gr.addColorStop(0,'rgba(255,122,89,.45)');gr.addColorStop(1,'rgba(255,122,89,0)');
+ spark=new Chart(cx,{type:'line',data:{labels,datasets:[{data,borderColor:'#ff9b7a',backgroundColor:gr,fill:true,tension:.35,pointRadius:0,borderWidth:2}]},options:{maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},layout:{padding:{top:10}}}});
+}
+
+async function updateAll(){
+ await prices();
+ renderAssets();renderAvg();
+ const t=tot(),i=inv(),p=i?(t-i)/i*100:0,g=t-i;
+ anim($('total-value'),t);
+ $('inv-sub').textContent=`Sobre inversión de ${fmt(i)}`;$('inv-total').textContent=fmt(i);
+ $('percentage').textContent=(p>=0?'+':'')+p.toFixed(2)+'%';$('percentage').style.color=p>=0?'#5eead4':'#ff7a8a';
+ $('perf-eur').textContent=(g>=0?'+':'')+fmt(g);$('perf-eur').style.color=p>=0?'#5eead4':'#ff7a8a';
+ updatePie();updateAnnual(t,i);updateATH(t);updateSpark(t);
+}
+
+async function fear(){
+ try{const d=(await(await fetch('https://api.alternative.me/fng/?limit=1')).json()).data[0],v=+d.value;
+  const L={'Extreme Fear':['Miedo extremo','#ef4444'],'Fear':['Miedo','#fb923c'],'Neutral':['Neutral','#facc15'],'Greed':['Codicia','#a3e635'],'Extreme Greed':['Codicia extrema','#4ade80']}[d.value_classification]||[d.value_classification,'#fff'];
+  $('fear-value').textContent=v;$('fear-label').textContent=L[0];$('fear-label').style.color=L[1];
+  $('gn').style.transform=`translateX(-50%) rotate(${v/100*180-90}deg)`}catch(e){console.error(e)}
+}
+const cmp=n=>n>=1e12?(n/1e12).toFixed(2)+' Bill. €':n>=1e9?(n/1e9).toFixed(2)+' MM €':(n/1e6).toFixed(2)+' M €';
+async function dominance(){
+ try{const d=(await(await fetch('https://api.coingecko.com/api/v3/global')).json()).data,b=d.market_cap_percentage.btc,c=d.total_market_cap.eur;
+  $('btc-dom').textContent=b.toFixed(1)+'%';$('rest-dom').textContent=(100-b).toFixed(1)+'%';$('btc-cap').textContent=cmp(c*b/100);$('rest-cap').textContent=cmp(c*(1-b/100))}catch(e){console.error(e)}
+}
+
+// ── Detalle ──
+async function openDetail(k){
+ const a=assets[k];$('dt').textContent=a.name;show('m-detail');
+ if(a.type==='crypto'){$('dt-chart').style.display='block';$('dt-man').style.display='none';
+  try{const d=await(await fetch(`https://api.coingecko.com/api/v3/coins/${a.coingeckoId}/market_chart?vs_currency=eur&days=30&interval=daily`)).json();
+   if(detail)detail.destroy();
+   detail=new Chart($('dt-cv'),{type:'line',data:{labels:d.prices.map(p=>new Date(p[0]).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})),datasets:[{data:d.prices.map(p=>p[1]),borderColor:a.color,backgroundColor:a.color+'22',fill:true,tension:.3,pointRadius:0}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:6},grid:{display:false}},y:{grid:{color:'rgba(255,255,255,.06)'}}}}})}catch(e){console.error(e)}
+ }else{$('dt-chart').style.display='none';$('dt-man').style.display='block';$('man-val').value=a.currentValue??a.invested;$('man-key').value=k}
+}
+function saveManual(){const v=parseFloat($('man-val').value);if(v>=0){assets[$('man-key').value].currentValue=v;sv();hide('m-detail');updateAll()}}
+
+// ── Añadir / modificar ──
+function openAdd(){$('add-type').innerHTML=Object.keys(META).map(k=>`<option value="${k}">${META[k].name}${META[k].sym?' ('+META[k].sym+')':''}</option>`).join('');show('m-add')}
+function submitAdd(){
+ const k=$('add-type').value,q=parseFloat($('add-qty').value),v=parseFloat($('add-inv').value);
+ if(!(q>0&&v>0)){alert('Introduce una cantidad y un importe válidos.');return}
+ const a=assets[k];
+ if(a){if(a.type!=='crypto')a.currentValue=(a.currentValue??a.invested)+v;a.amount+=q;a.invested+=v}
+ else{const m=META[k];assets[k]=m.t==='c'?cry(k,q,v):{type:'manual',name:m.name,icon:m.icon,color:m.color,amount:q,invested:v,currentValue:v}}
+ sv();$('add-qty').value=$('add-inv').value='';hide('m-add');updateAll();
+}
+function openManage(){
+ $('manage-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];return `<div class="row" onclick="openMod('${k}')"><div class="fx"><span class="ic" style="background:${a.color}26;color:${a.color}">${a.icon}</span><div><b>${a.name}</b><div class="dim">${qtyL(a)} · ${fmt(val(k))}</div></div></div><span class="dim">›</span></div>`}).join('');
+ show('m-manage');
+}
+function openMod(k){const a=assets[k];$('mod-key').value=k;$('mod-title').textContent=a.name;$('mod-info').textContent=`Tienes ${qtyL(a)} · Invertido ${fmt(a.invested)}`;['upd-qty','sell-qty','sell-rec'].forEach(i=>$(i).value='');show('m-mod')}
+function done(){hide('m-mod');hide('m-manage');updateAll()}
+function updQty(){const a=assets[$('mod-key').value],q=parseFloat($('upd-qty').value);if(!(q>0)){alert('Introduce una cantidad válida.');return}a.amount=+q.toFixed(8);sv();done()}
+function sell(){
+ const a=assets[$('mod-key').value],q=parseFloat($('sell-qty').value),r=parseFloat($('sell-rec').value);
+ if(!(q>0)||!(r>=0)){alert('Introduce una cantidad y un importe válidos.');return}
+ if(q>=a.amount){alert('Has indicado todo el total: usa "Eliminar activo".');return}
+ const ratio=q/a.amount;a.invested*=1-ratio;if(a.currentValue!=null)a.currentValue*=1-ratio;a.amount=+(a.amount-q).toFixed(8);sv();done();
+}
+function del(){const k=$('mod-key').value;if(!confirm(`¿Eliminar ${assets[k].name} del portafolio?`))return;delete assets[k];sv();done()}
+
+const tick=()=>$('clock').textContent=new Date().toLocaleString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+tick();setInterval(tick,3e4);
+updateAll();fear();dominance();
+setInterval(updateAll,15e3);setInterval(fear,36e5);setInterval(dominance,6e4);
+</script></body></html>
