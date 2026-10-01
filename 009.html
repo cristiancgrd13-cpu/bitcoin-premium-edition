@@ -78,6 +78,13 @@ body::before{display:none}
 #avg-list{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}#avg-list .row{margin:0}
 @media(prefers-reduced-motion:reduce){.hint{animation:none}}
 </style>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+.hud .big{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:clamp(2.3rem,10.5vw,4.8rem);line-height:1.08;letter-spacing:-.025em;white-space:nowrap;font-variant-numeric:tabular-nums;text-shadow:none}
+.hud #total-value{background:linear-gradient(180deg,#fff 10%,#ffd98a 58%,#ffb02e);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 0 22px rgba(255,176,46,.45))}
+.hud .big i{font-style:normal;font-size:.68em;margin-left:.14em;color:#ffb02e;-webkit-text-fill-color:#ffb02e}
+.pr .perf{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:1.8rem}
+</style>
 </head>
 <body><section id="scene"><canvas id="sky"></canvas>
 <div class="hud"><div class="dim">Valor total del sistema</div>
@@ -313,7 +320,7 @@ const tick=()=>$('clock').textContent=new Date().toLocaleString('es-ES',{day:'2-
  (function f(now){
   const dt=RM?0:Math.min((now-last)/1e3,.05);last=now;
   const ks=Object.keys(assets),vs=ks.map(val),T=vs.reduce((a,b)=>a+b,0)||1,I=inv(),p=I?(T-I)/I:0,n=ks.length;
-  const cx=W/2,cy=H*.66,sr=Math.min(W,H)*.075+10,q=.34,lo=sr*2.3,hi=Math.max(lo+30,Math.min(W*.47,H*.8)),sc=Math.min(1.15,Math.max(.7,W/900));
+  const sc=Math.min(1.15,Math.max(.7,W/900)),cx=W/2,cy=H*.66,sr=Math.min(W,H)*.06+8,q=Math.min(.75,Math.max(.4,H/W*.4)),lo=Math.max(sr*2.4,(sr*1.45+30*sc)/q),hi=Math.max(lo+40,Math.min(W*.47,H*.8));
   sunH+=((p>=0?42:6)-sunH)*.03;nova=Math.max(0,nova-dt*.45);
   x.fillStyle='#04050c';x.fillRect(0,0,W,H);
   let g=x.createRadialGradient(cx,cy,0,cx,cy,Math.max(W,H)*.75);g.addColorStop(0,`hsla(${mood*1.3},85%,48%,.22)`);g.addColorStop(1,'transparent');x.fillStyle=g;x.fillRect(0,0,W,H);
@@ -325,7 +332,7 @@ const tick=()=>$('clock').textContent=new Date().toLocaleString('es-ES',{day:'2-
    x.beginPath();x.ellipse(cx,cy,rx,rx*q,0,0,7);x.strokeStyle='rgba(255,255,255,.09)';x.lineWidth=1;x.stroke();
    if(vs[i]>vs[big])big=i;P.push({k,a,i,px,py,r,v:vs[i]})});
   P.sort((a,b)=>a.py-b.py);
-  const dp=o=>{const{a,px,py,r}=o,c=a.color,ux=cx-px,uy=cy-py,l=Math.hypot(ux,uy)||1,pc=a.invested?(o.v-a.invested)/a.invested*100:0;
+  const dp=o=>{x.globalAlpha=o.py<cy?.8:1;const{a,px,py,r}=o,c=a.color,ux=cx-px,uy=cy-py,l=Math.hypot(ux,uy)||1,pc=a.invested?(o.v-a.invested)/a.invested*100:0;
    if(o.i===big){x.beginPath();x.ellipse(px,py,r*1.9,r*.55,-.35,Math.PI,6.2832);x.strokeStyle=c+'bb';x.lineWidth=2;x.stroke()}
    x.shadowColor=c;x.shadowBlur=hov===o.k?34:16;
    const gr=x.createRadialGradient(px+ux/l*r*.45,py+uy/l*r*.45,r*.08,px,py,r*1.05);gr.addColorStop(0,'rgba(255,255,255,.92)');gr.addColorStop(.2,c);gr.addColorStop(1,'rgba(4,5,12,.96)');
@@ -334,13 +341,12 @@ const tick=()=>$('clock').textContent=new Date().toLocaleString('es-ES',{day:'2-
    x.textAlign='center';x.font='600 11px "IBM Plex Mono",monospace';x.fillStyle='rgba(255,255,255,.88)';x.fillText(a.symbol||a.name,px,py+r+15);
    x.fillStyle=pc>=0?'#5eead4':'#ff7a8a';x.fillText((pc>=0?'+':'')+pc.toFixed(1)+'%',px,py+r+28);
    if(hov===o.k){x.fillStyle='#fff';x.fillText(fmt(o.v),px,py-r-10)}
-   hit.push({k:o.k,x:px,y:py,r})};
-  P.filter(o=>o.py<cy).forEach(dp);
-  const pu=1+.035*Math.sin(now/650)+nova*.5;
+   hit.push({k:o.k,x:px,y:py,r});x.globalAlpha=1};
+    const pu=1+.035*Math.sin(now/650)+nova*.5;
   g=x.createRadialGradient(cx,cy,sr*.4,cx,cy,sr*4.2*(1+nova));g.addColorStop(0,`hsla(${sunH},100%,58%,.5)`);g.addColorStop(1,'transparent');x.fillStyle=g;x.beginPath();x.arc(cx,cy,sr*4.2*(1+nova),0,7);x.fill();
   g=x.createRadialGradient(cx,cy,0,cx,cy,sr*pu);g.addColorStop(0,'#fff');g.addColorStop(.35,`hsl(${sunH},100%,66%)`);g.addColorStop(1,`hsl(${sunH-10},100%,46%)`);x.fillStyle=g;x.beginPath();x.arc(cx,cy,sr*pu,0,7);x.fill();
   if(nova>0){x.beginPath();x.arc(cx,cy,(1-nova)*Math.max(W,H),0,7);x.strokeStyle=`hsla(${sunH},100%,70%,${nova})`;x.lineWidth=8*nova;x.stroke()}
-  P.filter(o=>o.py>=cy).forEach(dp);
+  P.forEach(dp);
   requestAnimationFrame(f)})(last)})();
 tick();setInterval(tick,3e4);
 updateAll();fear();dominance();
