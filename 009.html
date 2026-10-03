@@ -2,6 +2,7 @@
 <html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Portafolio</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#0c0d24;--line:rgba(255,255,255,.09);--coral:#ff7a59;--dim:#8a8a93}
@@ -90,6 +91,12 @@ body::before{display:none}
 @keyframes mq{to{transform:translateX(-50%)}}
 .tk{font-size:.95rem;padding:.8rem 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}.ti b{font-size:1rem}.sep{color:var(--bt);font-size:.6rem;margin:0 .6rem}
 #blk{padding:0 .3rem;border-radius:3px}#blk a{color:inherit;text-decoration:none}.flash{animation:fl 1.8s ease-out}@keyframes fl{0%,45%{background:var(--bt);color:#000}100%{background:transparent}}
+.hidden{display:none!important}
+.cat-select{background:#0b0b0e;border:1px solid #34343c;border-radius:6px;font:inherit;font-size:.72rem;padding:.3rem .4rem;color:#ececef}
+.spinner{border:3px solid #34343c;border-top-color:var(--bt);border-radius:50%;width:28px;height:28px;margin:0 auto .6rem;animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
+.warn{font-size:.75rem;color:#f7c06a;background:rgba(247,147,26,.1);border:1px solid rgba(247,147,26,.35);border-radius:8px;padding:.7rem;margin:.6rem 0;line-height:1.45}
+.sr{display:flex;justify-content:space-between;padding:.25rem 0;font-size:.85rem}
+.flex{display:flex}.justify-between{justify-content:space-between}.items-center{align-items:center}.gap-2{gap:.5rem}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.min-w-0{min-width:0}.text-xs{font-size:.72rem}.text-sm{font-size:.85rem}.font-semibold{font-weight:600}.font-bold{font-weight:700}.font-normal{font-weight:400}.text-zinc-500{color:#8a8a93}.text-emerald-400{color:#22d68a}.text-red-400{color:#ff5a5a}.mt-1{margin-top:.25rem}.py-4{padding:1rem 0}.px-3{padding-left:.75rem;padding-right:.75rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.rounded-xl{border-radius:12px}.bg-black\/40{background:#16161a;border:1px solid #2a2a30;margin-bottom:.5rem}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -146,7 +153,44 @@ body::before{display:none}
   <div class="row"><div><div class="dim">DCA mensual</div><b class="d" style="font-size:1.4rem">300,00 €</b></div></div>
   <div id="avg-list"></div>
 </section>
+<section class="c all"><div class="k">Mis claves públicas</div><p class="dim">Consulta transacciones y genera el extracto fiscal en PDF.</p><div id="wallets-list"></div><button class="btn p" style="width:100%;margin-top:.8rem" onclick="openAddWalletModal()">+ Añadir clave pública</button></section>
+<section class="c all"><div class="k">Panel fiscal</div><p class="dim">Todas tus wallets y Kraken juntas · ganancia real por FIFO.</p>
+<div class="fx" style="margin:.8rem 0"><select id="fiscal-year" class="i" style="margin:0"></select><button class="btn p" style="white-space:nowrap" onclick="runFiscalPanel()">Calcular año</button></div>
+<div id="fiscal-loading" class="hidden" style="text-align:center;padding:1.5rem"><div class="spinner"></div><p class="dim">Consultando wallets y calculando FIFO…</p></div>
+<div id="fiscal-warning" class="hidden warn"></div>
+<div id="fiscal-summary" class="hidden box">
+<div class="sr"><span class="dim">Ganancias patrimoniales</span><b id="fis-ganancias" class="up">0,00 €</b></div>
+<div class="sr"><span class="dim">Pérdidas patrimoniales</span><b id="fis-perdidas" class="dn">0,00 €</b></div>
+<div class="sr" style="border-top:1px solid #2a2a30;margin-top:.3rem;padding-top:.5rem"><b>Neto (casilla Modelo 100)</b><b id="fis-neto" style="color:var(--bt);font-size:1.1rem">0,00 €</b></div>
+<div class="sr"><span class="dim">Volumen ventas</span><span id="fis-vol-venta" class="dim">0,00 €</span></div>
+<div class="sr"><span class="dim">Volumen permutas</span><span id="fis-vol-permuta" class="dim">0,00 €</span></div>
+<div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="dim">0,00 €</span></div></div>
+<div id="fiscal-table" style="max-height:480px;overflow-y:auto;margin:.8rem 0"></div>
+<button class="btn p" style="width:100%" onclick="exportFiscalPDF()">📄 Exportar informe fiscal anual (PDF)</button>
+<p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan en este navegador.</p></section>
 </main>
+<div id="m-wallet" class="m h"><div class="mb"><button class="x" onclick="closeAddWalletModal()">&times;</button><b id="wallet-modal-title" class="d" style="font-size:1.2rem">Añadir clave pública</b>
+<div style="margin-top:1rem"><label class="dim">Red</label><select id="wallet-network" class="i" onchange="onWalletNetworkChange()"><option value="btc">Bitcoin (BTC)</option><option value="eth">Ethereum (ETH)</option><option value="sol">Solana (SOL)</option><option value="kraken">Kraken (importar CSV Ledgers)</option></select>
+<div id="wallet-address-wrap"><label class="dim">Dirección / clave pública</label><input id="wallet-address" class="i" placeholder="Pega aquí la dirección"></div>
+<label class="dim">Alias (opcional)</label><input id="wallet-alias" class="i" placeholder="Ej. Ledger BTC / Phantom">
+<label id="wallet-is-mine-wrap" class="dim" style="display:block;margin-bottom:.8rem"><input id="wallet-is-mine" type="checkbox" checked> Es mía (los movimientos entre mis wallets no cuentan como compra/venta)</label>
+<div id="eth-key-wrap" class="hidden"><label class="dim">API key de Etherscan (gratuita, sirve la V2)</label><input id="etherscan-key-input" class="i" placeholder="Pega tu API key"></div>
+<div id="sol-key-wrap" class="hidden"><label class="dim">API key de Helius (gratuita, necesaria para Solana)</label><input id="helius-key-input" class="i" placeholder="Pega tu API key"></div>
+<div id="kraken-csv-wrap" class="hidden"><label class="dim">CSV de Kraken (History → Export → Ledgers)</label><input id="kraken-csv-input" type="file" accept=".csv" class="i"></div>
+<button class="btn p" style="width:100%" onclick="submitAddWallet()">Guardar</button></div></div></div>
+<div id="m-tx" class="m h"><div class="mb" style="max-width:520px"><button class="x" onclick="closeWalletTx()">&times;</button><b id="tx-modal-title" class="d" style="font-size:1.2rem">—</b>
+<div id="tx-modal-address" class="dim" style="word-break:break-all;margin:.3rem 0 1rem"></div>
+<div class="fx"><div style="flex:1"><label class="dim">Desde</label><input id="tx-date-from" type="date" class="i"></div><div style="flex:1"><label class="dim">Hasta</label><input id="tx-date-to" type="date" class="i"></div></div>
+<button class="btn" style="width:100%" onclick="loadWalletTransactions()">🔍 Buscar transacciones</button>
+<div id="tx-loading" class="hidden" style="text-align:center;padding:1.2rem"><div class="spinner"></div><p class="dim">Consultando red y precios históricos…</p></div>
+<div id="tx-warning" class="hidden warn"></div>
+<div id="tx-list" style="max-height:320px;overflow-y:auto;margin:.8rem 0"></div>
+<div id="tx-totals" class="hidden box">
+<div class="sr"><span class="dim">Compras</span><b id="tot-compra" class="up">0,00 €</b></div><div class="sr"><span class="dim">Ventas</span><b id="tot-venta" class="dn">0,00 €</b></div>
+<div class="sr"><span class="dim">Permutas</span><b id="tot-permuta">0,00 €</b></div><div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="tot-interna" class="dim">0,00 €</span></div>
+<div class="sr" style="border-top:1px solid #2a2a30;margin-top:.3rem;padding-top:.5rem"><b>Total a fiscalizar</b><b id="tot-fiscal" style="color:var(--bt)">0,00 €</b></div></div>
+<button class="btn p" style="width:100%" onclick="exportWalletPDF()">📄 Exportar extracto fiscal en PDF</button>
+<p class="dim">Revisa y corrige la categoría de cada movimiento antes de exportar.</p></div></div>
 
 <div id="m-detail" class="m h"><div class="mb"><button class="x" onclick="hide('m-detail')">&times;</button><b id="dt" class="d" style="font-size:1.2rem"></b>
   <div id="dt-chart"><div style="height:220px;margin-top:1rem"><canvas id="dt-cv"></canvas></div><div class="dim" style="text-align:center">Precio en € · últimos 30 días</div></div>
@@ -352,6 +396,251 @@ function ticker(){
  let last=0;(function f(t){if(t-last>70){last=t;x.fillStyle='rgba(9,9,11,.14)';x.fillRect(0,0,W,H);x.font=F+'px "JetBrains Mono",monospace';
   d.forEach((y,i)=>{x.fillStyle=Math.random()<.04?'rgba(255,200,120,.5)':'rgba(247,147,26,.17)';x.fillText('0123456789abcdef'[Math.random()*16|0],i*F,y*F);d[i]=y*F>H&&Math.random()>.975?0:y+1})}
   if(!RM)requestAnimationFrame(f)})(0)})();
+
+// ═══ CLAVES PÚBLICAS ═══
+const fmtEUR=fmt,priceCache={},saveWallets=()=>save('saved_wallets_v1',wallets);
+const NETWORK_META={btc:{label:'Bitcoin',color:'#f7931a'},eth:{label:'Ethereum',color:'#8c9eff'},sol:{label:'Solana',color:'#b57bff'},kraken:{label:'Kraken',color:'#7b61ff'}};
+let wallets=load('saved_wallets_v1',{}),currentTxList=[],currentWalletId=null,editingWalletId=null;
+async function getHistoricalPrice(id,d){const s=`${String(d.getUTCDate()).padStart(2,'0')}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${d.getUTCFullYear()}`,k=id+s;
+ if(priceCache[k]!=null)return priceCache[k];
+ try{const r=await(await fetch(`https://api.coingecko.com/api/v3/coins/${id}/history?date=${s}&localization=false`)).json();const p=(r&&r.market_data&&r.market_data.current_price&&r.market_data.current_price.eur)||0;if(p)priceCache[k]=p;return p}catch(e){return 0}}
+function renderWalletsList(){const ids=Object.keys(wallets);
+ $('wallets-list').innerHTML=ids.length?ids.map(id=>{const w=wallets[id],m=NETWORK_META[w.network],s=w.network==='kraken'?`${(w.ledgerRows||[]).length} movimientos`:w.address.slice(0,6)+'…'+w.address.slice(-4);
+  return `<div class="row" style="cursor:default"><div class="fx" style="cursor:pointer" onclick="openWalletTx('${id}')"><span style="color:${m.color};font-size:1.2rem">●</span><div><b>${w.alias||m.label}${w.network!=='kraken'&&!w.isMine?' (externa)':''}</b><div class="dim">${m.label} · ${s}</div></div></div><div class="fx"><a class="lk" href="#" onclick="openWalletTx('${id}');return false">Ver</a><a class="lk" href="#" onclick="openEditWallet('${id}');return false">Editar</a><a class="lk" href="#" onclick="deleteWallet('${id}');return false">✕</a></div></div>`}).join(''):'<p class="dim">Aún no has añadido ninguna clave pública.</p>'}
+function openAddWalletModal(){editingWalletId=null;$('wallet-modal-title').textContent='Añadir clave pública';$('wallet-network').disabled=false;$('wallet-network').value='btc';['wallet-address','wallet-alias','etherscan-key-input','helius-key-input'].forEach(i=>$(i).value='');$('wallet-is-mine').checked=true;show('m-wallet');onWalletNetworkChange()}
+function openEditWallet(id){const w=wallets[id];editingWalletId=id;$('wallet-modal-title').textContent='Editar clave pública';$('wallet-network').value=w.network;$('wallet-network').disabled=true;$('wallet-address').value=w.address||'';$('wallet-alias').value=w.alias||'';$('wallet-is-mine').checked=!!w.isMine;show('m-wallet');onWalletNetworkChange()}
+function closeAddWalletModal(){hide('m-wallet');editingWalletId=null}
+function onWalletNetworkChange(){const n=$('wallet-network').value;
+ $('eth-key-wrap').classList.toggle('hidden',n!=='eth');$('sol-key-wrap').classList.toggle('hidden',n!=='sol');$('kraken-csv-wrap').classList.toggle('hidden',n!=='kraken');$('wallet-address-wrap').classList.toggle('hidden',n==='kraken');$('wallet-is-mine-wrap').classList.toggle('hidden',n==='kraken');
+ if(n==='eth')$('etherscan-key-input').value=localStorage.getItem('etherscan_api_key')||'';if(n==='sol')$('helius-key-input').value=localStorage.getItem('helius_api_key')||''}
+function submitAddWallet(){
+ const n=$('wallet-network').value,alias=$('wallet-alias').value.trim(),mine=$('wallet-is-mine').checked;
+ if(n==='kraken'){const f=$('kraken-csv-input').files[0],fin=rows=>{const id=editingWalletId||('kraken_'+(alias||'cuenta')+'_'+Date.now());wallets[id]={network:'kraken',address:'',alias:alias||'Kraken',isMine:false,ledgerRows:rows||(editingWalletId&&wallets[editingWalletId].ledgerRows)||[]};saveWallets();closeAddWalletModal();renderWalletsList()};
+  if(!f){if(!editingWalletId){alert('Selecciona el CSV de Kraken.');return}fin(null);return}
+  const r=new FileReader();r.onload=e=>fin(parseKrakenCSV(e.target.result));r.readAsText(f);return}
+ const a=$('wallet-address').value.trim();if(!a){alert('Introduce una dirección válida.');return}
+ const ek=$('etherscan-key-input').value.trim(),hk=$('helius-key-input').value.trim();
+ if(n==='eth'&&ek)localStorage.setItem('etherscan_api_key',ek);if(n==='sol'&&hk)localStorage.setItem('helius_api_key',hk);
+ const id=n+'_'+a;if(editingWalletId&&editingWalletId!==id)delete wallets[editingWalletId];
+ wallets[id]={network:n,address:a,alias,isMine:mine};saveWallets();closeAddWalletModal();renderWalletsList()}
+function deleteWallet(id){if(!confirm('¿Eliminar esta clave pública?'))return;delete wallets[id];saveWallets();renderWalletsList()}
+function openWalletTx(id){currentWalletId=id;const w=wallets[id],m=NETWORK_META[w.network];$('tx-modal-title').textContent=w.alias||m.label;$('tx-modal-address').textContent=w.address||'';
+ $('tx-date-from').value='2025-01-01';$('tx-date-to').value=new Date().toISOString().slice(0,10);$('tx-list').innerHTML='';['tx-totals','tx-warning'].forEach(i=>$(i).classList.add('hidden'));currentTxList=[];show('m-tx')}
+function closeWalletTx(){hide('m-tx')}
+async function fetchSOLTxs(a,f,t){const k=localStorage.getItem('helius_api_key');if(!k)throw new Error('Falta la API key de Helius');return fetchSOLTxsHelius(a,f,t,k)}
+async function fetchRawTxsForWallet(w,f,t){
+ if(w.network==='btc')return fetchBTCTxs(w.address,f,t);if(w.network==='sol')return fetchSOLTxs(w.address,f,t);if(w.network==='eth')return fetchETHTxs(w.address,f,t);
+ return buildKrakenTxs(w.ledgerRows||[]).filter(x=>x.date>=f&&x.date<=t)}
+async function loadWalletTransactions(){
+ const w=wallets[currentWalletId],f=new Date($('tx-date-from').value+'T00:00:00Z'),t=new Date($('tx-date-to').value+'T23:59:59Z'),wn=$('tx-warning');
+ $('tx-loading').classList.remove('hidden');$('tx-list').innerHTML='';['tx-totals','tx-warning'].forEach(i=>$(i).classList.add('hidden'));
+ try{let raw=[];
+  try{raw=await fetchRawTxsForWallet(w,f,t)}catch(e){wn.textContent='No se pudo consultar esta wallet: '+(e.message||'error')+'. Revisa la API key (ETH: Etherscan, SOL: Helius) y vuelve a intentarlo.';wn.classList.remove('hidden')}
+  await fxFill(raw);raw.forEach(x=>x.category=suggestCategory(x,w));raw.sort((a,b)=>b.date-a.date);currentTxList=raw;renderTxList();computeTotals()}
+ finally{$('tx-loading').classList.add('hidden')}}
+function renderTxList(){const c=$('tx-list');
+ if(!currentTxList.length){c.innerHTML='<p class="dim" style="text-align:center">Sin movimientos en ese rango.</p>';return}
+ c.innerHTML=currentTxList.map((t,i)=>`<div class="row" style="cursor:default"><div><div class="dim">${t.date.toLocaleDateString('es-ES')}${t.note?' · '+t.note:''}</div><b>${t.direction==='in'?'↓':'↑'} ${t.amount.toFixed(6)} ${t.asset}</b><div class="dim">${fmtEUR(t.eurValue)}</div></div><select class="cat-select" onchange="changeTxCategory(${i},this.value)">${['compra','venta','permuta','interna'].map(k=>`<option value="${k}" ${t.category===k?'selected':''}>${k[0].toUpperCase()+k.slice(1)}</option>`).join('')}</select></div>`).join('');
+ $('tx-totals').classList.remove('hidden')}
+function computeTotals(){const o={compra:0,venta:0,permuta:0,interna:0};currentTxList.forEach(t=>o[t.category]+=t.eurValue);
+ Object.keys(o).forEach(k=>$('tot-'+k).textContent=fmtEUR(o[k]));$('tot-fiscal').textContent=fmtEUR(o.venta+o.permuta)}
+function exportWalletPDF(){
+ if(!currentTxList.length){alert('Pulsa "Buscar transacciones" primero.');return}
+ const w=wallets[currentWalletId],m=NETWORK_META[w.network],{jsPDF}=window.jspdf,d=new jsPDF(),L={compra:'Compra',venta:'Venta',permuta:'Permuta',interna:'Transf. interna'},fr=$('tx-date-from').value,to=$('tx-date-to').value,X=[14,44,74,114,144];
+ d.setFontSize(16);d.text('Extracto de transacciones cripto',14,18);d.setFontSize(10);d.text(`Clave publica: ${w.alias?w.alias+' - ':''}${w.address}`,14,26);d.text(`Red: ${m.label}   Periodo: ${fr} a ${to}`,14,32);
+ let y=44;d.setFontSize(9);['Fecha','Tipo','Cantidad','Valor EUR','Hash'].forEach((h,i)=>d.text(h,X[i],y));y+=4;d.line(14,y,196,y);y+=5;
+ const o={compra:0,venta:0,permuta:0,interna:0};
+ currentTxList.forEach(t=>{if(y>275){d.addPage();y=20}o[t.category]+=t.eurValue;[t.date.toLocaleDateString('es-ES'),L[t.category],`${t.amount.toFixed(6)} ${t.asset}`,fmtEUR(t.eurValue),t.hash.slice(0,14)+'...'].forEach((s,i)=>d.text(String(s),X[i],y));y+=6});
+ y+=6;if(y>250){d.addPage();y=20}d.line(14,y,196,y);y+=8;d.setFontSize(10);
+ [['Compras',o.compra],['Ventas',o.venta],['Permutas',o.permuta],['Transferencias internas (excluidas)',o.interna]].forEach(([k,v])=>{d.text(`${k}: ${fmtEUR(v)}`,14,y);y+=6});
+ d.setFontSize(12);d.text(`TOTAL A FISCALIZAR (ventas + permutas): ${fmtEUR(o.venta+o.permuta)}`,14,y);d.save(`extracto_${w.network}_${(w.address||'kraken').slice(0,8)}_${fr}_a_${to}.pdf`)}
+/* PARCHE FISCAL v2: Etherscan V2, precios Binance, FIFO con historial completo, categorías editables, CSV/PDF */
+const fxE=id=>document.getElementById(id);
+const fxOv=()=>{try{return JSON.parse(localStorage.getItem('tx_cat_overrides_v1')||'{}')}catch(e){return{}}};
+const fxKey=t=>`${t.hash}|${t.asset}|${t.direction}|${(+t.amount).toFixed(6)}`;
+const FX_ID={XBT:'bitcoin',BTC:'bitcoin',ETH:'ethereum',SOL:'solana',USDC:'usd-coin',USDT:'tether',DAI:'dai'};
+const FX_BIN={bitcoin:'BTCEUR',ethereum:'ETHEUR',solana:'SOLEUR'};
+const FX_MINT={EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:['USDC','usd-coin'],Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB:['USDT','tether'],So11111111111111111111111111111111111111112:['SOL','solana']};
+let FX_RAW=null;
+
+// ── Precios: Binance (hora exacta, sin clave) con respaldo CoinGecko ──
+const fxCG=window.getHistoricalPrice,fxPC={};
+async function fxKl(sym,t){const h=Math.floor(t/36e5)*36e5,k=sym+h;
+ if(!fxPC[k]){const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1h&startTime=${h}&limit=1`)).json();if(!Array.isArray(d)||!d[0])return null;fxPC[k]=[+d[0][1],+d[0][4]]}
+ const[o,c]=fxPC[k];return o+(c-o)*((t-h)/36e5)}
+async function fxPrice(id,date){const t=date.getTime();
+ try{if(FX_BIN[id]){const p=await fxKl(FX_BIN[id],t);if(p)return p}
+  if(id==='usd-coin'||id==='tether'||id==='dai'){const p=await fxKl('EURUSDT',t);if(p)return 1/p}}catch(e){}
+ return fxCG(id,date)}
+window.getHistoricalPrice=fxPrice;
+async function fxFill(txs){
+ const todo=txs.filter(t=>t.eurValue==null&&t.coingeckoId);
+ for(let i=0;i<todo.length;i+=8)await Promise.all(todo.slice(i,i+8).map(async t=>{t.eurValue=(await fxPrice(t.coingeckoId,t.date))*t.amount}));
+ const P={};txs.filter(t=>t.pair).forEach(t=>(P[t.pair]=P[t.pair]||[]).push(t));
+ Object.values(P).forEach(g=>{const v=g.find(t=>t.direction==='out'&&t.eurValue>0)||g.find(t=>t.eurValue>0);if(v)g.forEach(t=>t.eurValue=v.eurValue)});
+ txs.forEach(t=>{if(t.eurValue==null||isNaN(t.eurValue))t.eurValue=0})}
+
+// ── BTC (Blockstream) con contrapartes para detectar transferencias propias ──
+async function fetchBTCTxs(address,from,to){
+ let txs=[],last='';
+ for(let p=0;p<60;p++){const r=await fetch(`https://blockstream.info/api/address/${address}/txs`+(last?`/chain/${last}`:''));
+  if(!r.ok)throw new Error('Blockstream '+r.status);const b=await r.json();if(!b.length)break;txs=txs.concat(b);
+  const l=b[b.length-1];last=l.txid;if(!l.status.confirmed||(l.status.block_time&&l.status.block_time*1000<from.getTime()))break}
+ const seen=new Set(),res=[];
+ for(const tx of txs){if(seen.has(tx.txid)||!tx.status.confirmed)continue;seen.add(tx.txid);
+  const t=tx.status.block_time*1000;if(t<from.getTime()||t>to.getTime())continue;
+  let i=0,o=0;const vi=[],vo=[];
+  tx.vin.forEach(v=>{const a=v.prevout&&v.prevout.scriptpubkey_address;if(a===address)i+=v.prevout.value;else if(a)vi.push(a)});
+  tx.vout.forEach(v=>{if(v.scriptpubkey_address===address)o+=v.value;else if(v.scriptpubkey_address)vo.push(v.scriptpubkey_address)});
+  const n=o-i;if(!n)continue;
+  res.push({date:new Date(t),hash:tx.txid,direction:n>0?'in':'out',amount:Math.abs(n)/1e8,asset:'BTC',coingeckoId:'bitcoin',counterparties:n>0?vi:vo})}
+ return res}
+
+// ── ETH: Etherscan API V2 (transacciones normales + internas) ──
+async function fetchETHTxs(address,from,to){
+ const key=localStorage.getItem('etherscan_api_key');if(!key)throw new Error('NO_ETH_KEY');
+ const get=async act=>{const d=await(await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=${act}&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc&apikey=${key}`)).json();
+  if(Array.isArray(d.result))return d.result;
+  if(/no transactions/i.test(d.message||''))return[];
+  const m=typeof d.result==='string'?d.result:(d.message||'ETHERSCAN');window._fxErr='Etherscan: '+m;throw new Error(m)};
+ const a=await get('txlist');await new Promise(r=>setTimeout(r,450));const b=await get('txlistinternal');
+ const me=address.toLowerCase(),res=[];
+ a.concat(b).forEach(tx=>{if(tx.isError==='1')return;const t=+tx.timeStamp*1000;if(t<from.getTime()||t>to.getTime())return;
+  const v=Number(BigInt(tx.value||'0'))/1e18;if(!v)return;const out=(tx.from||'').toLowerCase()===me;
+  res.push({date:new Date(t),hash:tx.hash,direction:out?'out':'in',amount:v,asset:'ETH',coingeckoId:'ethereum',counterparties:[out?tx.to:tx.from]})});
+ return res}
+
+// ── SOL (Helius): swaps con pierna de entrada y salida ──
+async function fetchSOLTxsHelius(address,from,to,key){
+ let all=[],before;
+ for(let p=0;p<40;p++){const r=await fetch(`https://api.helius.xyz/v0/addresses/${address}/transactions?api-key=${key}&limit=100${before?'&before='+before:''}`);
+  if(!r.ok)throw new Error('HELIUS_ERROR');const b=await r.json();if(!b.length)break;all=all.concat(b);before=b[b.length-1].signature;
+  if(b[b.length-1].timestamp*1000<from.getTime())break}
+ const res=[];
+ all.filter(x=>x.timestamp*1000>=from.getTime()&&x.timestamp*1000<=to.getTime()&&!x.transactionError).forEach(tx=>{
+  const date=new Date(tx.timestamp*1000),orca=(tx.source||'').toUpperCase()==='ORCA',tt=tx.tokenTransfers||[],nt=tx.nativeTransfers||[];
+  const L=(t,n)=>{if(n)return{amount:t.amount/1e9,asset:'SOL',id:'solana'};const k=FX_MINT[t.mint];return{amount:t.tokenAmount,asset:k?k[0]:(t.mint?t.mint.slice(0,4):'?'),id:k?k[1]:null}};
+  const mine=(t,d)=>(d==='out'?t.fromUserAccount:t.toUserAccount)===address;
+  const push=(l,d,x)=>res.push({date,hash:tx.signature,direction:d,amount:l.amount,asset:l.asset,coingeckoId:l.id,...x});
+  if(tx.type==='SWAP'){
+   const pick=d=>{const a=tt.filter(t=>mine(t,d)).map(t=>L(t,0)),b=nt.filter(t=>mine(t,d)&&t.amount>=3e6).sort((x,y)=>y.amount-x.amount).map(t=>L(t,1));return a[0]||b[0]};
+   const o=pick('out'),i=pick('in'),note='Swap'+(orca?' (Orca)':'');
+   if(o)push(o,'out',{category:'permuta',note,pair:tx.signature});if(i)push(i,'in',{category:'permuta',note,pair:tx.signature});return}
+  if(orca&&tt.length>=2){tt.forEach(t=>{if(t.fromUserAccount===address||t.toUserAccount===address)push(L(t,0),t.fromUserAccount===address?'out':'in',{category:'permuta',note:'Pool Orca (revisar)'})});return}
+  nt.forEach(t=>{if(t.amount<1000||(t.fromUserAccount!==address&&t.toUserAccount!==address))return;const o=t.fromUserAccount===address;push(L(t,1),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})});
+  tt.forEach(t=>{if(t.fromUserAccount!==address&&t.toUserAccount!==address)return;const o=t.fromUserAccount===address;push(L(t,0),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})})});
+ return res}
+
+// ── Kraken: CSV robusto, trade/spend/receive, comisiones ──
+function parseKrakenCSV(text){
+ const rows=[];let row=[],f='',q=false;
+ for(let i=0;i<text.length;i++){const c=text[i];
+  if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
+  else if(c==='"')q=true;else if(c===','){row.push(f);f=''}
+  else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(f);f='';if(row.length>1||row[0])rows.push(row);row=[]}
+  else f+=c}
+ if(f||row.length){row.push(f);rows.push(row)}
+ const h=rows.shift().map(x=>x.trim().replace(/^\uFEFF/,''));
+ return rows.map(r=>Object.fromEntries(h.map((k,i)=>[k,r[i]||''])))}
+const fxKA=a=>{a=(a||'').toUpperCase().replace(/\.(S|M|F|B|P)$/,'');return({XXBT:'XBT',XETH:'ETH',ZEUR:'EUR'})[a]||a};
+const fxSym=a=>a==='XBT'?'BTC':a;
+function buildKrakenTxs(rows){
+ const g={};rows.forEach(r=>{if(r.refid)(g[r.refid]=g[r.refid]||[]).push(r)});const res=[];
+ Object.entries(g).forEach(([id,rs])=>{
+  const type=(rs[0].type||'').toLowerCase(),date=new Date((rs[0].time||'').replace(' ','T').replace(/\.\d+$/,'')+'Z'),isE=r=>fxKA(r.asset)==='EUR';
+  if(['trade','spend','receive'].includes(type)){
+   const fi=rs.find(isE),cr=rs.filter(r=>!isE(r));
+   if(fi&&cr.length===1){const c=cr[0],e=Math.abs(+fi.amount),fe=+fi.fee||0,cf=+c.fee||0,q=Math.abs(+c.amount),sale=+fi.amount>0,code=fxKA(c.asset);
+    res.push({date,hash:id,direction:sale?'out':'in',amount:sale?q:q-cf,asset:fxSym(code),coingeckoId:FX_ID[code]||null,eurValue:sale?e-fe-(q?cf*e/q:0):e+fe,category:sale?'venta':'compra'})}
+   else if(cr.length===2){const o=cr.find(r=>+r.amount<0),i=cr.find(r=>+r.amount>0);
+    if(o&&i)[[o,'out',Math.abs(+o.amount)],[i,'in',+i.amount-(+i.fee||0)]].forEach(([r,d,q])=>{const a=fxKA(r.asset);res.push({date,hash:id,direction:d,amount:q,asset:fxSym(a),coingeckoId:FX_ID[a]||null,eurValue:null,category:'permuta',pair:id})})}
+  }else if(type==='deposit'||type==='withdrawal'){
+   rs.forEach(r=>{const a=fxKA(r.asset);if(a==='EUR')return;res.push({date,hash:id,direction:type==='deposit'?'in':'out',amount:Math.abs(+r.amount),asset:fxSym(a),coingeckoId:FX_ID[a]||null,eurValue:null,category:'interna',kraken:true})})}});
+ return res}
+
+// ── Categorías: guardadas en el navegador y reutilizadas en wallet y panel fiscal ──
+function suggestCategory(tx){
+ const o=fxOv()[fxKey(tx)];if(o)return o;if(tx.category)return tx.category;
+ const own=Object.values(wallets).filter(w=>w.network!=='kraken'&&w.isMine).map(w=>w.address.toLowerCase());
+ const cps=(tx.counterparties||(tx.counterparty?[tx.counterparty]:[])).map(x=>(x||'').toLowerCase());
+ if(cps.length&&cps.every(c=>own.includes(c)))return'interna';
+ if(Array.isArray(tx.counterparties)&&!cps.length&&tx.direction==='out')return'interna';
+ return tx.direction==='in'?'compra':'venta'}
+function changeTxCategory(i,val){const t=currentTxList[i];t.category=val;const o=fxOv();o[fxKey(t)]=val;localStorage.setItem('tx_cat_overrides_v1',JSON.stringify(o));computeTotals()}
+const fxLW=loadWalletTransactions;
+window.loadWalletTransactions=async function(){window._fxErr=null;await fxLW();const w=fxE('tx-warning');if(window._fxErr&&!w.classList.contains('hidden'))w.textContent+=' Detalle: '+window._fxErr};
+
+// ── Panel fiscal: historial completo + FIFO + categorías editables ──
+function populateFiscalYearSelect(){const s=fxE('fiscal-year');s.innerHTML='';for(let y=new Date().getFullYear();y>=2017;y--)s.insertAdjacentHTML('beforeend',`<option value="${y}">${y}</option>`)}
+async function runFiscalPanel(){
+ const year=+fxE('fiscal-year').value,now=new Date(),to=year===now.getFullYear()?now:new Date(Date.UTC(year,11,31,23,59,59)),from=new Date(Date.UTC(2015,0,1));
+ fxE('fiscal-loading').classList.remove('hidden');['fiscal-warning','fiscal-summary'].forEach(i=>fxE(i).classList.add('hidden'));fxE('fiscal-table').innerHTML='';
+ const errors=[];let all=[];
+ for(const id of Object.keys(wallets)){const w=wallets[id],m=NETWORK_META[w.network];
+  try{const raw=await fetchRawTxsForWallet(w,from,to);raw.forEach(t=>{t.walletAlias=w.alias||m.label});all=all.concat(raw)}
+  catch(e){errors.push((w.alias||m.label)+': '+(e.message||'error'))}}
+ await fxFill(all);FX_RAW={all,errors,year};fxCompute();fxE('fiscal-loading').classList.add('hidden')}
+function fxCompute(){
+ const{all,errors,year}=FX_RAW,ov=fxOv(),kr=all.filter(t=>t.kraken),el=fxE('fiscal-table'),st=el.scrollTop;
+ all.forEach(t=>{if(t.src===undefined)t.src=t.category||null;const o=ov[fxKey(t)];if(o){t.category=o;return}
+  if(t.src){t.category=t.src;return}
+  let c=suggestCategory({...t,category:null});
+  if(c!=='interna'&&kr.some(k=>k.asset===t.asset&&k.direction!==t.direction&&Math.abs(k.date-t.date)<2592e5&&Math.abs(k.amount-t.amount)<=Math.max(.02*t.amount,5e-4)))c='interna';
+  t.category=c});
+ const lots={},F={est:false,noCost:false};
+ [...all].sort((a,b)=>a.date-b.date).forEach(t=>{t.gain=t.costBasis=null;t.noCost=false;
+  if(!t.coingeckoId||t.category==='interna')return;
+  const L=lots[t.coingeckoId]=lots[t.coingeckoId]||[];
+  if(t.direction==='in'){if(t.category==='compra'||t.category==='permuta')L.push({rem:t.amount,unit:t.amount?t.eurValue/t.amount:0});return}
+  if(t.category!=='venta'&&t.category!=='permuta')return;
+  let need=t.amount,cost=0;
+  for(const l of L){if(need<=1e-9)break;if(l.rem<=0)continue;const k=Math.min(l.rem,need);cost+=k*l.unit;l.rem-=k;need-=k}
+  if(need>1e-9){const a=Object.values(assets).find(x=>x.coingeckoId===t.coingeckoId&&x.amount>0);
+   if(a){cost+=need*(a.invested/a.amount);F.est=true}else{t.noCost=true;F.noCost=true;return}}
+  t.costBasis=cost;t.gain=t.eurValue-cost});
+ const ys=all.filter(t=>t.date.getFullYear()===year).sort((a,b)=>b.date-a.date);
+ window._fiscalTxs=ys;window._fiscalYear=year;fxTable(ys);renderFiscalSummary(ys);el.scrollTop=st;
+ let w='';
+ if(errors.length)w+='Algunas wallets fallaron: '+errors.join(' · ')+'. ';
+ if(F.est)w+='Parte del coste usa el precio medio de "Mis Activos" porque falta historial de compra anterior: revísalo con tu gestor. ';
+ if(F.noCost)w+='Hay ventas sin coste de adquisición (activo sin historial): aparecen marcadas. ';
+ if(all.some(t=>t.eurValue===0&&t.category!=='interna'))w+='Hay movimientos con valor 0 € (token sin precio): corrígelos antes de exportar. ';
+ if(Object.values(wallets).some(x=>x.network==='kraken'&&(x.ledgerRows||[]).some(r=>/stak|earn|reward/i.test(r.type))))w+='Tu ledger de Kraken tiene staking/recompensas: no se calculan aquí (tributan como rendimientos del capital mobiliario). ';
+ w+='FIFO sobre todo el historial importado. Las transferencias propias se detectan por dirección o por importe y fecha con Kraken; corrige con el selector de cada fila.';
+ const wb=fxE('fiscal-warning');wb.textContent=w;wb.classList.remove('hidden')}
+function fxTable(txs){
+ const c=fxE('fiscal-table');
+ if(!txs.length){c.innerHTML='<p class="text-xs text-zinc-500 text-center py-4">Sin movimientos ese año.</p>';return}
+ c.innerHTML=txs.map((t,i)=>{const g=t.gain!=null?(t.gain>=0?'+':'')+fmtEUR(t.gain):(t.noCost?'sin coste':'—');
+  return `<div class="bg-black/40 rounded-xl px-3 py-2"><div class="flex justify-between items-center gap-2"><div class="text-left min-w-0"><div class="text-xs text-zinc-500">${t.date.toLocaleDateString('es-ES')} · ${t.walletAlias}${t.note?' · '+t.note:''}</div><div class="text-sm font-semibold">${t.direction==='in'?'↓':'↑'} ${t.amount.toFixed(6)} ${t.asset} <span class="text-zinc-500 font-normal">(${fmtEUR(t.eurValue)})</span></div>${t.costBasis!=null?`<div class="text-xs text-zinc-500">Coste: ${fmtEUR(t.costBasis)}</div>`:''}</div><div class="text-right"><div class="text-xs font-bold ${t.gain==null?'text-zinc-500':t.gain>=0?'text-emerald-400':'text-red-400'}">${g}</div><select class="cat-select mt-1" onchange="fxSetCat(${i},this.value)">${['compra','venta','permuta','interna'].map(k=>`<option value="${k}" ${t.category===k?'selected':''}>${k[0].toUpperCase()+k.slice(1)}</option>`).join('')}</select></div></div></div>`}).join('')}
+function fxSetCat(i,v){const t=window._fiscalTxs[i],o=fxOv();o[fxKey(t)]=v;localStorage.setItem('tx_cat_overrides_v1',JSON.stringify(o));fxCompute()}
+function renderFiscalSummary(txs){
+ let g=0,p=0,vv=0,vp=0,vi=0;
+ txs.forEach(t=>{if(t.direction==='out'){if(t.category==='venta')vv+=t.eurValue;if(t.category==='permuta')vp+=t.eurValue}if(t.category==='interna')vi+=t.eurValue;if(t.gain!=null){if(t.gain>=0)g+=t.gain;else p-=t.gain}});
+ [['fis-ganancias',g],['fis-perdidas',p],['fis-neto',g-p],['fis-vol-venta',vv],['fis-vol-permuta',vp],['fis-vol-interna',vi]].forEach(([id,v])=>fxE(id).textContent=fmtEUR(v));
+ fxE('fiscal-summary').classList.remove('hidden')}
+
+// ── Exportar: CSV (Excel) y PDF con valor de transmisión, coste y ganancia ──
+function exportFiscalCSV(){
+ const tx=window._fiscalTxs;if(!tx||!tx.length){alert('Pulsa "Calcular año completo" primero.');return}
+ const n=v=>v==null?'':String(+(+v).toFixed(8)).replace('.',','),q=s=>'"'+String(s).replace(/"/g,'""')+'"';
+ const head=['Fecha','Wallet','Categoría','Sentido','Activo','Cantidad','Valor (€)','Coste de adquisición (€)','Ganancia/Pérdida (€)','Hash'];
+ const rows=tx.map(t=>[t.date.toLocaleDateString('es-ES'),q(t.walletAlias),t.category,t.direction==='in'?'Entrada':'Salida',t.asset,n(t.amount),n(t.eurValue),n(t.costBasis),n(t.gain),q(t.hash)]);
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+[head.join(';'),...rows.map(r=>r.join(';'))].join('\r\n')],{type:'text/csv;charset=utf-8'}));a.download=`transacciones_${window._fiscalYear}.csv`;document.body.appendChild(a);a.click();a.remove()}
+function exportFiscalPDF(){
+ const tx=window._fiscalTxs;if(!tx||!tx.length){alert('Pulsa "Calcular año completo" primero.');return}
+ const{jsPDF}=window.jspdf,d=new jsPDF(),yr=window._fiscalYear,L={compra:'Compra',venta:'Venta',permuta:'Permuta',interna:'Interna'},e=v=>v==null?'-':fmtEUR(v),X=[14,32,58,80,120,148,174];
+ d.setFontSize(16);d.text(`Informe fiscal cripto - ${yr}`,14,18);d.setFontSize(8);
+ d.text('Metodo de coste: FIFO sobre todo el historial importado. Intercambios entre criptos = permutas.',14,25);d.text(`Generado: ${new Date().toLocaleString('es-ES')}`,14,30);
+ let y=40;const head=()=>{d.setFontSize(7);['Fecha','Wallet','Tipo','Cantidad','Valor','Coste','Gan./Perd.'].forEach((h,i)=>d.text(h,X[i],y));y+=3;d.line(14,y,196,y);y+=5};head();
+ tx.forEach(t=>{if(y>280){d.addPage();y=20;head()}
+  [t.date.toLocaleDateString('es-ES'),(t.walletAlias||'').slice(0,12),L[t.category]+(t.direction==='in'?' (ent)':' (sal)'),`${t.amount.toFixed(5)} ${t.asset}`,e(t.eurValue),e(t.costBasis),t.gain!=null?e(t.gain):(t.noCost?'sin coste':'-')].forEach((s,i)=>d.text(String(s),X[i],y));y+=5.5});
+ let g=0,p=0;tx.forEach(t=>{if(t.gain!=null){if(t.gain>=0)g+=t.gain;else p-=t.gain}});
+ y+=4;if(y>255){d.addPage();y=20}d.line(14,y,196,y);y+=8;d.setFontSize(12);d.text('Resumen IRPF (ganancias y perdidas patrimoniales)',14,y);y+=8;d.setFontSize(10);
+ d.text(`Ganancias: ${fmtEUR(g)}`,14,y);y+=6;d.text(`Perdidas: ${fmtEUR(p)}`,14,y);y+=6;d.setFontSize(12);d.text(`NETO: ${fmtEUR(g-p)}`,14,y);d.save(`informe_fiscal_${yr}.pdf`)}
+(()=>{const b=document.querySelector('button[onclick="exportFiscalPDF()"]');if(b){const c=document.createElement('button');c.setAttribute('onclick','exportFiscalCSV()');c.textContent='📊 Exportar transacciones (CSV para Excel)';c.className='btn';c.style.cssText='width:100%;margin-top:.6rem';b.after(c)}})();
+
+renderWalletsList();populateFiscalYearSelect();
 tick();setInterval(tick,3e4);
 updateAll();fear();dominance();
 setInterval(updateAll,15e3);setInterval(fear,36e5);setInterval(dominance,6e4);
