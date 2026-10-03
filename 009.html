@@ -97,6 +97,20 @@ body::before{display:none}
 .warn{font-size:.75rem;color:#f7c06a;background:rgba(247,147,26,.1);border:1px solid rgba(247,147,26,.35);border-radius:8px;padding:.7rem;margin:.6rem 0;line-height:1.45}
 .sr{display:flex;justify-content:space-between;padding:.25rem 0;font-size:.85rem}
 .flex{display:flex}.justify-between{justify-content:space-between}.items-center{align-items:center}.gap-2{gap:.5rem}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.min-w-0{min-width:0}.text-xs{font-size:.72rem}.text-sm{font-size:.85rem}.font-semibold{font-weight:600}.font-bold{font-weight:700}.font-normal{font-weight:400}.text-zinc-500{color:#8a8a93}.text-emerald-400{color:#22d68a}.text-red-400{color:#ff5a5a}.mt-1{margin-top:.25rem}.py-4{padding:1rem 0}.px-3{padding-left:.75rem;padding-right:.75rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.rounded-xl{border-radius:12px}.bg-black\/40{background:#16161a;border:1px solid #2a2a30;margin-bottom:.5rem}
+.chain{flex-direction:column;gap:.4rem}
+#ath-box{flex-direction:column;align-items:flex-start;gap:0}
+.hero>*{pointer-events:none}.hero>.spark{pointer-events:auto;height:58%;touch-action:pan-y}.hero #blk a{pointer-events:auto}
+#assets-list .row{gap:.5rem}
+#assets-list .row>.fx{flex:1;min-width:0;gap:.55rem}
+#assets-list .row>.fx>div{min-width:0}
+#assets-list .row>.fx>div>*{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#assets-list .row>div:last-child{flex:none;white-space:nowrap}
+#assets-list .ic{width:30px;height:30px;font-size:1rem;flex:none}
+#assets-list .row b.d{font-size:.92rem}
+#assets-list .dim{font-size:.72rem}#assets-list .hx{font-size:.58rem}
+.hd .btn{white-space:nowrap;padding:.5rem .75rem;font-size:.78rem}.hd .k{white-space:nowrap}
+.avg{display:grid;grid-template-columns:1fr auto;gap:.2rem .8rem;align-items:baseline;cursor:default}
+.avg .al,.avg .ar{white-space:nowrap}.avg .ar{text-align:right}.avg .ar b{font-size:1rem}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -107,7 +121,7 @@ body::before{display:none}
 <section class="c all hero">
   <div class="k">Valor total</div>
   <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
-  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span class="hs">HASH <b id="hash">—</b></span></div><div id="ath-box"></div>
+  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span>BITCOINS MINADOS <b id="mined">—</b></span></div><div id="ath-box"></div>
   <div class="spark"><canvas id="spark"></canvas></div>
 </section>
 
@@ -144,7 +158,7 @@ body::before{display:none}
 
 <section class="c s3">
   <div class="hd"><div class="k">Rendimiento anual</div><div class="dim">Anualizado <b id="ann">—</b></div></div>
-  <div style="height:240px"><canvas id="annual"></canvas></div>
+  <div id="annual-date" class="dim" style="margin-bottom:.6rem">—</div><div style="height:240px"><canvas id="annual"></canvas></div>
 </section>
 
 <section class="c all">
@@ -218,7 +232,7 @@ body::before{display:none}
 <script>
 const $=id=>document.getElementById(id);
 const nf={minimumFractionDigits:2,maximumFractionDigits:2};
-const fmt=n=>(n||0).toLocaleString('es-ES',nf)+' €';
+const fmt=n=>(n||0).toLocaleString('es-ES',nf)+'\u00a0€';
 const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
 const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const show=id=>$(id).classList.remove('h'),hide=id=>$(id).classList.add('h');
@@ -267,7 +281,7 @@ function renderAssets(){
 }
 function renderAvg(){
  $('avg-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];
-  return `<div class="row" style="cursor:default"><div><b style="color:${a.color}">${a.name}</b><div class="dim">Invertido ${fmt(a.invested)} · <a href="#" class="lk" onclick="editInv('${k}');return false">editar</a></div></div><div style="text-align:right"><div class="dim">${a.type==='crypto'?'Precio medio':'Valor actual'}</div><b>${fmt(a.type==='crypto'?a.invested/a.amount:val(k))}</b></div></div>`}).join('');
+  return `<div class="row avg"><div class="al"><b style="color:${a.color}">${a.name}</b> <a href="#" class="lk" onclick="editInv('${k}');return false">editar</a></div><div class="ar"><b>${fmt(a.type==='crypto'?a.invested/a.amount:val(k))}</b></div><div class="al dim">Invertido ${fmt(a.invested)}</div><div class="ar dim">${a.type==='crypto'?'Precio medio':'Valor actual'}</div></div>`}).join('');
 }
 function editInv(k){const a=assets[k],n=parseFloat((prompt(`Inversión real en € para ${a.name}\nActual: ${fmt(a.invested)}`)||'').replace(',','.'));if(n>0){a.invested=n;sv();updateAll()}}
 
@@ -277,14 +291,19 @@ function updatePie(){
  else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
 }
 
+const YR=load('portfolio_years_v1',{});
+function trackYear(t,i){if(!(t>0))return;const y=new Date().getFullYear(),k=String(y);
+ if(!YR[k]){const p=YR[String(y-1)];YR[k]={s:y<=START.getFullYear()?{v:0,i:0}:(p&&p.last?{v:p.last.v,i:p.last.i}:{v:t,i:i})}}
+ YR[k].last={v:t,i:i};save('portfolio_years_v1',YR)}
+function yearPerf(k){const r=YR[k];if(!r||!r.last)return 0;const V=r.last.v,I=r.last.i,V0=r.s.v,I0=r.s.i,b=V0+(I-I0);return b>0?((V-V0)-(I-I0))/b*100:0}
 function updateAnnual(t,i){
+ trackYear(t,i);
  const now=new Date(),y0=START.getFullYear(),y1=now.getFullYear(),years=[];for(let y=y0;y<=y1;y++)years.push(y);
- const perf=i?(t-i)/i*100:0,data=years.map(y=>y===y1?+perf.toFixed(2):0);
- const yf=Math.max(1,(now-START)/864e5)/365.25,cagr=i&&t>0?(Math.pow(t/i,1/yf)-1)*100:0;
+ const data=years.map(y=>+yearPerf(String(y)).toFixed(2)),yf=Math.max(1,(now-START)/864e5)/365.25,cagr=i&&t>0?(Math.pow(t/i,1/yf)-1)*100:0;
  $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#22d68a':'#ff5a5a';
  const bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
  if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.update('none')}
- else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(2)}%`}}},scales:{x:{grid:{display:false}},y:{min:-100,max:100,ticks:{stepSize:50,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#6b7280':'rgba(255,255,255,.06)'}}}}});
+ else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(2)}%`}}},scales:{x:{grid:{display:false}},y:{min:-100,max:100,ticks:{stepSize:50,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
 }
 
 // ── Máximo histórico + sparkline ──
@@ -294,17 +313,34 @@ function updateATH(t){
  if(!ath||t>ath.value){ath={value:t,date:new Date().toISOString()};save('portfolio_ath_v1',ath)}
  const d=new Date(ath.date).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'});
  $('ath-box').innerHTML=t>=ath.value-.005
-  ?`<span class="ath">⛏ Máximo Histórico <small>bloque minado</small></span><span class="dim" style="font-size:.9rem">${d}</span>`
-  :`<span class="dim" style="font-size:.85rem">Máx. histórico ${fmt(ath.value)} · ${d} · <span class="dn">${((t/ath.value-1)*100).toFixed(2)}%</span></span>`;
+  ?`<div><span class="ath">⛏ Máximo Histórico <small>bloque minado</small></span></div><div class="dim" style="font-size:.85rem;margin-top:.35rem">${d}</div>`
+  :`<div class="dim" style="font-size:.85rem">Máx. histórico ${fmt(ath.value)} <span class="dn">${((t/ath.value-1)*100).toFixed(2)}%</span></div><div class="dim" style="font-size:.85rem;margin-top:.2rem">${d}</div>`;
 }
+let daily=null,dailyAt=0;const DSYM={bitcoin:'BTCEUR',ethereum:'ETHEUR',solana:'SOLEUR'};
+async function loadDaily(){
+ if(Date.now()-dailyAt<6e5)return;dailyAt=Date.now();
+ try{const need=[...new Set(Object.values(assets).filter(a=>a.type==='crypto'&&DSYM[a.coingeckoId]).map(a=>a.coingeckoId))],o={};
+  await Promise.all(need.map(async id=>{const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${DSYM[id]}&interval=1d&startTime=${START.getTime()}&limit=1000`)).json();if(!Array.isArray(d))throw 0;d.forEach(k=>{(o[k[0]]=o[k[0]]||{})[id]=+k[4]})}));
+  daily=Object.keys(o).length?o:null}catch(e){daily=null}}
+function seriesNow(t){
+ if(!daily)return null;const days=Object.keys(daily).map(Number).sort((a,b)=>a-b);if(!days.length)return null;
+ const A=Object.values(assets),flat=A.reduce((s,a)=>s+(a.type==='crypto'?(DSYM[a.coingeckoId]?0:a.amount*(live[a.coingeckoId]||0)):(a.currentValue??a.invested)),0);
+ const pts=days.map(d=>{let v=flat;A.forEach(a=>{if(a.type==='crypto'&&DSYM[a.coingeckoId]){const c=daily[d][a.coingeckoId];v+=a.amount*(c!=null?c:(live[a.coingeckoId]||0))}});return[d,v]});
+ pts[pts.length-1][1]=t;return pts}
 function updateSpark(t){
  if(!(t>0))return;const n=Date.now();
  if(!hist.length||n-hist[hist.length-1][0]>6e4){hist.push([n,t]);if(hist.length>600)hist.shift();save('portfolio_hist_v1',hist)}
- const pts=hist.length>1?hist:[[n-1,t],[n,t]],labels=pts.map(p=>p[0]),data=pts.map(p=>p[1]);
- if(spark){spark.data.labels=labels;spark.data.datasets[0].data=data;spark.update('none');return}
- const cx=$('spark').getContext('2d'),gr=cx.createLinearGradient(0,0,0,160);gr.addColorStop(0,'rgba(247,147,26,.35)');gr.addColorStop(1,'rgba(247,147,26,0)');
- spark=new Chart(cx,{type:'line',data:{labels,datasets:[{data,borderColor:'#f7931a',backgroundColor:gr,fill:true,tension:.35,pointRadius:0,borderWidth:2}]},options:{maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{display:false}},layout:{padding:{top:10}}}});
-}
+ drawSpark(t);loadDaily().then(()=>drawSpark(t))}
+function drawSpark(t){
+ const ser=seriesNow(t),pts=ser||(hist.length>1?hist:[[Date.now()-1,t],[Date.now(),t]]),labels=pts.map(p=>p[0]),data=pts.map(p=>p[1]);
+ if(spark){spark.data.labels=labels;spark.data.datasets[0].data=data;spark.$d=!!ser;spark.update('none');return}
+ const cx=$('spark').getContext('2d'),gr=cx.createLinearGradient(0,0,0,200);gr.addColorStop(0,'rgba(247,147,26,.35)');gr.addColorStop(1,'rgba(247,147,26,0)');
+ spark=new Chart(cx,{type:'line',data:{labels,datasets:[{data,borderColor:'#f7931a',backgroundColor:gr,fill:true,tension:.3,pointRadius:0,pointHoverRadius:6,pointHoverBackgroundColor:'#fff',pointHoverBorderColor:'#f7931a',pointHoverBorderWidth:2,borderWidth:2.5}]},
+  options:{maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},layout:{padding:{top:14}},scales:{x:{display:false},y:{display:false}},
+   plugins:{legend:{display:false},tooltip:{displayColors:false,backgroundColor:'rgba(9,9,11,.95)',borderColor:'#f7931a',borderWidth:1,titleColor:'#8a8a93',bodyColor:'#fff',bodyFont:{weight:'700',size:14},padding:10,
+    callbacks:{title:i=>{const d=new Date(+i[0].label);return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})+(spark.$d?'':' '+d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}))},label:c=>fmt(c.parsed.y)}}}},
+  plugins:[{id:'cross',afterDraw(ch){const a=ch.tooltip&&ch.tooltip.getActiveElements();if(a&&a.length){const x=a[0].element.x,{top,bottom}=ch.chartArea,c=ch.ctx;c.save();c.strokeStyle='rgba(247,147,26,.6)';c.setLineDash([4,4]);c.beginPath();c.moveTo(x,top);c.lineTo(x,bottom);c.stroke();c.restore()}}}]});
+ spark.$d=!!ser}
 
 async function updateAll(){
  await prices();
@@ -377,13 +413,12 @@ async function getTip(){
  }
  if(!tip)$('blk').textContent='sin conexión';
 }
+function supplyAt(h){let s=0,sub=5e9,left=h+1;while(left>0&&sub>0){const n=Math.min(left,210000);s+=n*sub;left-=n;sub=Math.floor(sub/2)}return s/1e8}
 function showTip(anim){
- const H=tip.hash,z=Math.min((H.match(/^0*/)[0]).length,18),head=H.slice(0,18),f=`<i>${head.slice(0,z)}</i>${head.slice(z)}…${H.slice(-6)}`,el=$('hash'),bl=$('blk');
- bl.innerHTML=`<a href="https://mempool.space/block/${H}" target="_blank" rel="noopener">#${tip.height.toLocaleString('es-ES')}</a>`;
- if(!anim){el.innerHTML=f;return}
- let n=0;const iv=setInterval(()=>{if(++n>10){clearInterval(iv);el.innerHTML=f;return}el.textContent=Array.from({length:24},()=>'0123456789abcdef'[Math.random()*16|0]).join('')},45);
- bl.classList.remove('flash');void bl.offsetWidth;bl.classList.add('flash');
-}
+ $('blk').innerHTML=`<a href="https://mempool.space/block/${tip.hash}" target="_blank" rel="noopener">#${tip.height.toLocaleString('es-ES')}</a>`;
+ const m=supplyAt(tip.height);
+ $('mined').textContent=`${m.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} BTC (${(m/21e6*100).toFixed(2).replace('.',',')}%)`;
+ if(anim)['blk','mined'].forEach(i=>{const b=$(i);b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash')})}
 function chainTick(){}
 getTip();setInterval(getTip,20000);
 const COINS=[['bitcoin','BTC','₿','#f7931a'],['ethereum','ETH','Ξ','#8c9eff'],['solana','SOL','◎','#b57bff']];
@@ -644,6 +679,7 @@ function exportFiscalPDF(){
 
 renderWalletsList();populateFiscalYearSelect();
 tick();setInterval(tick,3e4);
+const clockY=()=>$('annual-date').textContent=new Date().toLocaleString('es-ES',{weekday:'short',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});clockY();setInterval(clockY,1000);
 updateAll();fear();dominance();
 setInterval(updateAll,15e3);setInterval(fear,36e5);setInterval(dominance,6e4);
 </script></body></html>
