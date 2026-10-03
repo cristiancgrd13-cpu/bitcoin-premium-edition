@@ -448,9 +448,9 @@ function exportWalletPDF(){
  if(!currentTxList.length){alert('Pulsa "Buscar transacciones" primero.');return}
  const w=wallets[currentWalletId],m=NETWORK_META[w.network],{jsPDF}=window.jspdf,d=new jsPDF(),L={compra:'Compra',venta:'Venta',permuta:'Permuta',interna:'Transf. interna'},fr=$('tx-date-from').value,to=$('tx-date-to').value,X=[14,44,74,114,144];
  d.setFontSize(16);d.text('Extracto de transacciones cripto',14,18);d.setFontSize(10);d.text(`Clave publica: ${w.alias?w.alias+' - ':''}${w.address}`,14,26);d.text(`Red: ${m.label}   Periodo: ${fr} a ${to}`,14,32);
- let y=44;d.setFontSize(9);['Fecha','Tipo','Cantidad','Valor EUR','Hash'].forEach((h,i)=>d.text(h,X[i],y));y+=4;d.line(14,y,196,y);y+=5;
+ let y=44;d.setFontSize(9);['Fecha','Tipo','Cantidad','Valor EUR','Hash (linea inferior)'].forEach((h,i)=>d.text(h,X[i],y));y+=4;d.line(14,y,196,y);y+=5;
  const o={compra:0,venta:0,permuta:0,interna:0};
- currentTxList.forEach(t=>{if(y>275){d.addPage();y=20}o[t.category]+=t.eurValue;[t.date.toLocaleDateString('es-ES'),L[t.category],`${t.amount.toFixed(6)} ${t.asset}`,fmtEUR(t.eurValue),t.hash.slice(0,14)+'...'].forEach((s,i)=>d.text(String(s),X[i],y));y+=6});
+ currentTxList.forEach(t=>{if(y>270){d.addPage();y=20}o[t.category]+=t.eurValue;d.setFontSize(9);[t.date.toLocaleDateString('es-ES'),L[t.category],`${t.amount.toFixed(6)} ${t.asset}`,fmtEUR(t.eurValue)].forEach((s,i)=>d.text(String(s),X[i],y));d.setFontSize(6.5);fxHashLine(d,t.hash,14,y+4);y+=10});d.setFontSize(10);
  y+=6;if(y>250){d.addPage();y=20}d.line(14,y,196,y);y+=8;d.setFontSize(10);
  [['Compras',o.compra],['Ventas',o.venta],['Permutas',o.permuta],['Transferencias internas (excluidas)',o.interna]].forEach(([k,v])=>{d.text(`${k}: ${fmtEUR(v)}`,14,y);y+=6});
  d.setFontSize(12);d.text(`TOTAL A FISCALIZAR (ventas + permutas): ${fmtEUR(o.venta+o.permuta)}`,14,y);d.save(`extracto_${w.network}_${(w.address||'kraken').slice(0,8)}_${fr}_a_${to}.pdf`)}
@@ -621,6 +621,8 @@ function renderFiscalSummary(txs){
  fxE('fiscal-summary').classList.remove('hidden')}
 
 // ── Exportar: CSV (Excel) y PDF con valor de transmisión, coste y ganancia ──
+function fxHashLine(d,h,x,y){const u=/^0x[0-9a-f]{64}$/i.test(h)?'https://etherscan.io/tx/'+h:/^[0-9a-f]{64}$/i.test(h)?'https://blockstream.info/tx/'+h:h.length>=80?'https://solscan.io/tx/'+h:null;
+ d.text('Hash: '+h,x,y);if(u)d.link(x,y-3,d.getTextWidth('Hash: '+h),4,{url:u})}
 function exportFiscalCSV(){
  const tx=window._fiscalTxs;if(!tx||!tx.length){alert('Pulsa "Calcular año completo" primero.');return}
  const n=v=>v==null?'':String(+(+v).toFixed(8)).replace('.',','),q=s=>'"'+String(s).replace(/"/g,'""')+'"';
@@ -633,8 +635,8 @@ function exportFiscalPDF(){
  d.setFontSize(16);d.text(`Informe fiscal cripto - ${yr}`,14,18);d.setFontSize(8);
  d.text('Metodo de coste: FIFO sobre todo el historial importado. Intercambios entre criptos = permutas.',14,25);d.text(`Generado: ${new Date().toLocaleString('es-ES')}`,14,30);
  let y=40;const head=()=>{d.setFontSize(7);['Fecha','Wallet','Tipo','Cantidad','Valor','Coste','Gan./Perd.'].forEach((h,i)=>d.text(h,X[i],y));y+=3;d.line(14,y,196,y);y+=5};head();
- tx.forEach(t=>{if(y>280){d.addPage();y=20;head()}
-  [t.date.toLocaleDateString('es-ES'),(t.walletAlias||'').slice(0,12),L[t.category]+(t.direction==='in'?' (ent)':' (sal)'),`${t.amount.toFixed(5)} ${t.asset}`,e(t.eurValue),e(t.costBasis),t.gain!=null?e(t.gain):(t.noCost?'sin coste':'-')].forEach((s,i)=>d.text(String(s),X[i],y));y+=5.5});
+ tx.forEach(t=>{if(y>272){d.addPage();y=20;head()}
+  [t.date.toLocaleDateString('es-ES'),(t.walletAlias||'').slice(0,12),L[t.category]+(t.direction==='in'?' (ent)':' (sal)'),`${t.amount.toFixed(5)} ${t.asset}`,e(t.eurValue),e(t.costBasis),t.gain!=null?e(t.gain):(t.noCost?'sin coste':'-')].forEach((s,i)=>d.text(String(s),X[i],y));d.setFontSize(6);fxHashLine(d,t.hash,14,y+3.6);d.setFontSize(7);y+=9});
  let g=0,p=0;tx.forEach(t=>{if(t.gain!=null){if(t.gain>=0)g+=t.gain;else p-=t.gain}});
  y+=4;if(y>255){d.addPage();y=20}d.line(14,y,196,y);y+=8;d.setFontSize(12);d.text('Resumen IRPF (ganancias y perdidas patrimoniales)',14,y);y+=8;d.setFontSize(10);
  d.text(`Ganancias: ${fmtEUR(g)}`,14,y);y+=6;d.text(`Perdidas: ${fmtEUR(p)}`,14,y);y+=6;d.setFontSize(12);d.text(`NETO: ${fmtEUR(g-p)}`,14,y);d.save(`informe_fiscal_${yr}.pdf`)}
