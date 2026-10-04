@@ -112,11 +112,19 @@ body::before{display:none}
 .avg{display:grid;grid-template-columns:1fr auto;gap:.2rem .8rem;align-items:baseline;cursor:default}
 .avg .al,.avg .ar{white-space:nowrap}.avg .ar{text-align:right}.avg .ar b{font-size:1rem}
 .athl{color:var(--bt);font-weight:800;font-size:.95rem}
-.hero #histbtn{position:absolute;top:.9rem;right:.9rem;z-index:3;pointer-events:auto;padding:.4rem .8rem;font-size:.72rem}
 .avg{grid-template-columns:minmax(0,1fr) auto;padding:.75rem .85rem;gap:.15rem .6rem}
 .avg .al{overflow:hidden;text-overflow:ellipsis}
 .avg .lk{font-size:.68rem;margin-left:.3rem}
 .avg .ar b{font-size:.95rem}.avg .dim{font-size:.68rem}
+.spwrap{margin-top:1.1rem;pointer-events:auto!important;touch-action:pan-y}
+.sp-read{min-height:2.7rem;font-size:.85rem;line-height:1.35}
+.sp-read .rv{color:var(--bt);font-weight:800;font-size:1.15rem;margin-left:.5rem}
+.sp-cv{height:150px;margin-top:.3rem}
+.athv{color:#fff;margin-left:.4rem}
+.rng{display:flex;justify-content:space-between;gap:.15rem;margin-top:.9rem}
+.rng button{flex:1;background:none;border:0;color:#8a8a93;font:600 .82rem 'JetBrains Mono',monospace;padding:.55rem 0;border-radius:999px;cursor:pointer}
+.rng button.on{background:#f2f2f5;color:#111;box-shadow:0 2px 10px rgba(0,0,0,.4)}
+.sp-read .rv2{font-weight:800;font-size:1.15rem}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -124,11 +132,11 @@ body::before{display:none}
 <div id="tk" class="all tk"></div>
 <header class="all hd"><h1 class="d"><span style="color:#f7931a">₿</span> Mi cartera</h1><span id="clock" class="dim"></span></header>
 
-<section class="c all hero"><button class="btn" id="histbtn" onclick="openHist()">✎ Histórico</button>
+<section class="c all hero">
   <div class="k">Valor total</div>
   <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
   <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span>BITCOINS MINADOS <b id="mined">—</b></span></div><div id="ath-box"></div>
-  <div class="spark"><canvas id="spark"></canvas></div>
+  <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
 
 <section class="c s2">
@@ -189,10 +197,6 @@ body::before{display:none}
 <button class="btn p" style="width:100%" onclick="exportFiscalPDF()">📄 Exportar informe fiscal anual (PDF)</button>
 <p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan en este navegador.</p></section>
 </main>
-<div id="m-hist" class="m h"><div class="mb"><button class="x" onclick="hide('m-hist')">&times;</button><b class="d" style="font-size:1.2rem">Histórico semanal</b>
-<p class="dim" style="margin:.5rem 0 .8rem">Una línea por semana: <b>AAAA-MM-DD valor</b>, por ejemplo <b>2026-03-02 12500</b>. Pega tus valores aproximados. La gráfica usa estos valores y, donde falte alguno, muestra una estimación punteada. Desde hoy se guarda sola cada semana.</p>
-<textarea id="hist-text" class="i" rows="10" style="font-family:inherit;resize:vertical"></textarea>
-<div class="fx"><button class="btn p" style="flex:1" onclick="saveHist()">Guardar</button><button class="btn r" onclick="clearHist()">Borrar todo</button></div></div></div>
 <div id="m-wallet" class="m h"><div class="mb"><button class="x" onclick="closeAddWalletModal()">&times;</button><b id="wallet-modal-title" class="d" style="font-size:1.2rem">Añadir clave pública</b>
 <div style="margin-top:1rem"><label class="dim">Red</label><select id="wallet-network" class="i" onchange="onWalletNetworkChange()"><option value="btc">Bitcoin (BTC)</option><option value="eth">Ethereum (ETH)</option><option value="sol">Solana (SOL)</option><option value="kraken">Kraken (importar CSV Ledgers)</option></select>
 <div id="wallet-address-wrap"><label class="dim">Dirección / clave pública</label><input id="wallet-address" class="i" placeholder="Pega aquí la dirección"></div>
@@ -265,9 +269,9 @@ const META={
  spacex:{t:'m',name:'SpaceX',icon:'🚀',color:'#94a3b8'}
 };
 const cry=(k,amount,invested)=>{const m=META[k];return{type:'crypto',coingeckoId:m.id,name:m.name,symbol:m.sym,icon:m.icon,color:m.color,amount,invested}};
-const SEED={btc:cry('btc',0.16098551,11624.09),eth:cry('eth',1.14482,2868.77),sol:cry('sol',12.055,1480.38)};
+const SEED={btc:cry('btc',0.16099571,11624.09),eth:cry('eth',1.14734,2868.77),sol:cry('sol',12.0856,1480.38)};
 let assets=load('portfolio_assets_v2',null)||{...SEED};
-if(!localStorage.getItem('portfolio_seed_v4')){Object.assign(assets,SEED);delete assets.usdc_sol;save('portfolio_assets_v2',assets);localStorage.setItem('portfolio_seed_v4','1')}
+if(!localStorage.getItem('portfolio_seed_v5')){Object.assign(assets,SEED);delete assets.usdc_sol;save('portfolio_assets_v2',assets);localStorage.setItem('portfolio_seed_v5','1');localStorage.removeItem('portfolio_seen_v1');localStorage.removeItem('portfolio_ledger_ext_v1')}
 const sv=()=>save('portfolio_assets_v2',assets);
 const live={},START=new Date('2026-01-01');
 let pie,annual,spark,detail;
@@ -305,11 +309,11 @@ const YR=load('portfolio_years_v1',{});
 function trackYear(t,i){if(!(t>0))return;const y=new Date().getFullYear(),k=String(y);
  if(!YR[k]){const p=YR[String(y-1)];YR[k]={s:y<=START.getFullYear()?{v:0,i:0}:(p&&p.last?{v:p.last.v,i:p.last.i}:{v:t,i:i})}}
  YR[k].last={v:t,i:i};save('portfolio_years_v1',YR)}
-function yearPerf(k){const r=YR[k];if(!r||!r.last)return 0;const V=r.last.v,I=r.last.i,V0=r.s.v,I0=r.s.i,b=V0+(I-I0);return b>0?((V-V0)-(I-I0))/b*100:0}
+function yearPerf(k){const P=fullSer;if(P&&P.length>1){const at=yy=>{let r=null;for(const p of P){if(p.d<=Date.UTC(yy,11,31))r=p;else break}return r},e=at(+k),s=at(+k-1);if(e&&e.inv>0){const V0=s?s.v:0,I0=s?s.inv:0,b=V0+(e.inv-I0);return b>0?((e.v-V0)-(e.inv-I0))/b*100:0}}const r=YR[k];if(!r||!r.last)return 0;const V=r.last.v,I=r.last.i,V0=r.s.v,I0=r.s.i,b=V0+(I-I0);return b>0?((V-V0)-(I-I0))/b*100:0}
 function updateAnnual(t,i){
  trackYear(t,i);
- const now=new Date(),y0=START.getFullYear(),y1=now.getFullYear(),years=[];for(let y=y0;y<=y1;y++)years.push(y);
- const data=years.map(y=>+yearPerf(String(y)).toFixed(2)),yf=Math.max(1,(now-START)/864e5)/365.25,cagr=i&&t>0?(Math.pow(t/i,1/yf)-1)*100:0;
+ const now=new Date(),y0=new Date(L0).getUTCFullYear(),y1=now.getFullYear(),years=[];for(let y=y0;y<=y1;y++)years.push(y);
+ const data=years.map(y=>+yearPerf(String(y)).toFixed(2)),yf=Math.max(1,(now-L0)/864e5)/365.25,cagr=i&&t>0?(Math.pow(t/i,1/yf)-1)*100:0;
  $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#22d68a':'#ff5a5a';
  const bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
  if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.update('none')}
@@ -321,53 +325,87 @@ let ath=load('portfolio_ath_v1',null),hist=load('portfolio_hist_v1',[]);
 function updateATH(t){
  if(!(t>0))return;
  if(!ath||t>ath.value){ath={value:t,date:new Date().toISOString()};save('portfolio_ath_v1',ath)}
- const d=new Date(ath.date).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'});
- $('ath-box').innerHTML=t>=ath.value-.005
-  ?`<div class="athl">⛏ Máximo Histórico</div><div class="dim" style="font-size:.85rem;margin-top:.35rem">${d}</div>`
-  :`<div class="dim" style="font-size:.85rem">Máx. histórico ${fmt(ath.value)} <span class="dn">${((t/ath.value-1)*100).toFixed(2)}%</span></div><div class="dim" style="font-size:.85rem;margin-top:.2rem">${d}</div>`;
-}
-let daily=null,dailyAt=0;const DSYM={bitcoin:'BTCEUR',ethereum:'ETHEUR',solana:'SOLEUR'};
+ const b=athSer&&athSer.value>ath.value?athSer:ath,d=new Date(b.date).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}),top=t>=b.value-.005,df=(t/b.value-1)*100;
+ $('ath-box').innerHTML=`<div class="athl">⛏ Máximo Histórico <span class="athv">${fmt(b.value)}</span></div><div class="dim" style="font-size:.85rem;margin-top:.2rem">${d}</div>`+(top?'':`<div class="dim" style="font-size:.85rem">Ahora <span class="dn">${df.toFixed(2)}%</span> respecto al máximo</div>`)}
+// ═══ HISTORIAL REAL: tus compras (cantidades) × precios diarios de Binance ═══
+const L0=Date.UTC(2025,7,16);   // día previo a la 1ª compra: la gráfica arranca en 0
+const LEDGER={ // [fecha, cantidad, € pagados]; cantidad null = se calcula (venta de SOL para comprar BTC)
+ btc:[['2025-08-17',.00097,100],['2025-08-19',.00103,100],['2025-09-01',.00109,100],['2025-09-25',.00212,200],['2025-10-01',.00031,8.43],['2025-10-16',.00116,109.6],['2025-10-17',.00111,100.01],['2025-11-04',.00166,150],['2025-11-14',.0018,150],['2025-12-04',.01263,1000],['2025-12-05',.01262,1000],['2025-12-06',.01302,1002.5],['2025-12-17',.01552,1143.27],['2025-12-18',.0055,400],['2026-01-02',.00672,510.02],['2026-01-02',.02328,1766.05],['2026-01-21',.00399,300],['2026-01-23',.00259,210.65],['2026-02-03',.00044,30.18],['2026-02-04',.00396,250.03],['2026-02-27',.00422,240.79],['2026-03-08',.004308,250.01],['2026-03-27',.00259,152.65],['2026-04-01',.0043,250],['2026-05-05',.003575,250],['2026-05-05',.00176,125.04],['2026-05-27',.00767,500],['2026-06-08',.00453,250],['2026-07-03',.005525,300],['2026-07-04',.00089,50.27],['2026-07-26',.000434962,24.59],['2026-08-05',.00537,300],['2026-09-03',.00445139,300]],
+ eth:[['2026-01-01',.10653,271.35],['2026-01-01',1,2546.15],['2026-06-10',.00356,50]],
+ sol:[['2025-11-07',1.02646,140],['2025-11-14',1.22895,150],['2025-12-17',1,105.26],['2025-12-20',3,324.9],['2025-12-21',.11272,.7],['2025-12-22',.04714,5.08],['2025-12-31',1.86867,199.7],['2026-01-02',2.66999,295.78],['2026-02-03',null,-30.18],['2026-02-27',null,-240.79],['2026-03-27',null,-152.65],['2026-05-05',-1.655,-125.04],['2026-07-04',-.7038,-50.27],['2026-09-08',10.0203,889.89],['2026-09-08',null,-32]]};
+const LHOLD={btc:.16099571,eth:1.14734,sol:12.0856},LINV={btc:11624.09,eth:2868.77,sol:1480.38};
+const RANGES={'1D':{iv:'15m',n:96,step:9e5},'1S':{iv:'1h',n:168,step:36e5},'1M':{iv:'4h',n:180,step:144e5},'6M':{days:183},'1A':{days:365},'TODO':{days:0}};
+let rng=localStorage.getItem('portfolio_range_v1');if(!RANGES[rng])rng='TODO';
+let daily=null,dailyAt=0,athSer=null,sparkM=[],fullSer=[],sparkStep=864e5,lastT=0,sparkIdx=null,spark2=null;const intra={},intraAt={};const DSYM={bitcoin:'BTCEUR',ethereum:'ETHEUR',solana:'SOLEUR'};
 async function loadDaily(){
  if(Date.now()-dailyAt<6e5)return;dailyAt=Date.now();
  try{const need=[...new Set(Object.values(assets).filter(a=>a.type==='crypto'&&DSYM[a.coingeckoId]).map(a=>a.coingeckoId))],o={};
-  await Promise.all(need.map(async id=>{const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${DSYM[id]}&interval=1d&startTime=${START.getTime()}&limit=1000`)).json();if(!Array.isArray(d))throw 0;d.forEach(k=>{(o[k[0]]=o[k[0]]||{})[id]=+k[4]})}));
+  await Promise.all(need.map(async id=>{const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${DSYM[id]}&interval=1d&startTime=${L0}&limit=1000`)).json();if(!Array.isArray(d))throw 0;d.forEach(k=>{(o[k[0]]=o[k[0]]||{})[id]=+k[4]})}));
   daily=Object.keys(o).length?o:null}catch(e){daily=null}}
-const WK=load('portfolio_weekly_v1',{});
-const wkStart=ms=>{const d=new Date(ms);d.setUTCHours(0,0,0,0);return d.getTime()-((d.getUTCDay()+6)%7)*864e5};
-const wkKey=ms=>new Date(wkStart(ms)).toISOString().slice(0,10);
-function estAt(ms){
- if(!daily)return null;let d=null;for(const x of Object.keys(daily).map(Number).sort((a,b)=>a-b)){if(x<=ms)d=x;else break}if(d==null)return null;
- return Object.values(assets).reduce((s,a)=>{if(a.type!=='crypto')return s+(a.currentValue??a.invested);const c=DSYM[a.coingeckoId]?daily[d][a.coingeckoId]:null;return s+a.amount*(c!=null?c:(live[a.coingeckoId]||0))},0)}
-function weeklySeries(t){
- const kN=wkStart(Date.now()),pts=[];
- for(let w=wkStart(START.getTime());w<=kN;w+=7*864e5){const cur=w===kN;let v=cur?t:WK[new Date(w).toISOString().slice(0,10)],est=false;
-  if(v==null){v=estAt(Math.min(w+6*864e5,Date.now()));est=true}
-  if(v!=null)pts.push({w,end:cur?Date.now():w+6*864e5,v,est})}
- return pts}
+// compras/ventas hechas después desde la web: se detectan solas por el cambio de cantidad
+const EXT=load('portfolio_ledger_ext_v1',{}),SEEN=load('portfolio_seen_v1',null)||{};
+function trackEvents(){
+ Object.keys(SEEN).forEach(k=>{if(!assets[k]){delete SEEN[k];delete EXT[k]}});
+ Object.keys(assets).forEach(k=>{const a=assets[k],b=SEEN[k]||(LHOLD[k]!=null?{q:LHOLD[k],e:LINV[k]}:{q:a.amount,e:a.invested}),dq=a.amount-b.q,de=a.invested-b.e;
+  if(Math.abs(dq)>1e-9||Math.abs(de)>.005)(EXT[k]=EXT[k]||[]).push({t:Date.now(),q:dq,e:de});SEEN[k]={q:a.amount,e:a.invested}});
+ save('portfolio_ledger_ext_v1',EXT);save('portfolio_seen_v1',SEEN)}
+const closeAt=(id,t)=>(daily&&daily[t]&&daily[t][id])||0;
+function resolveBase(k){
+ const L=LEDGER[k],a=assets[k];if(!L||!a)return[];
+ const ev=L.map(([d,q,e])=>({t:Date.parse(d+'T00:00:00Z'),q,e})).sort((x,y)=>x.t-y.t),unk=ev.filter(x=>x.q==null),last=ev[ev.length-1].t,need=ev.reduce((s,x)=>s+(x.q||0),0)-LHOLD[k];
+ if(unk.length){const w=unk.map(x=>Math.abs(x.e)/(closeAt(a.coingeckoId,x.t)||1)),sw=w.reduce((p,c)=>p+c,0);unk.forEach((x,i)=>x.q=-need*w[i]/sw)}
+ else if(Math.abs(need)>1e-9)ev.push({t:last,q:-need,e:0});
+ const ea=LINV[k]-ev.reduce((s,x)=>s+(x.e||0),0);if(Math.abs(ea)>.005)ev.push({t:last,q:0,e:ea});
+ return ev}
+const framesFrom=m=>Object.keys(m).map(Number).sort((a,b)=>a-b).map(d=>({d,px:m[d]}));
+async function loadIntra(r){
+ const c=RANGES[r];if(!c.iv||(intra[r]&&Date.now()-intraAt[r]<12e4))return;
+ try{const ids=[...new Set(Object.values(assets).filter(a=>a.type==='crypto'&&DSYM[a.coingeckoId]).map(a=>a.coingeckoId))],o={};
+  await Promise.all(ids.map(async id=>{const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${DSYM[id]}&interval=${c.iv}&limit=${c.n}`)).json();if(!Array.isArray(d))throw 0;d.forEach(k=>{(o[k[0]]=o[k[0]]||{})[id]=+k[4]})}));
+  intra[r]=o;intraAt[r]=Date.now()}catch(e){intra[r]=null}}
+function currentFrames(){
+ const c=RANGES[rng];
+ if(c.iv)return intra[rng]?{frames:framesFrom(intra[rng]),step:c.step}:null;
+ if(!daily)return null;let fr=framesFrom(daily);if(c.days)fr=fr.slice(-c.days);return{frames:fr,step:864e5}}
+function ledgerSeries(frames,step,t){
+ if(!frames||!frames.length)return null;
+ const A=Object.keys(assets).map(k=>({a:assets[k],ev:resolveBase(k).concat(EXT[k]||[]).sort((x,y)=>x.t-y.t)})),last={};
+ const out=frames.map(({d,px})=>{let v=0,inv=0;
+  A.forEach(({a,ev})=>{let q=0,e=0;for(const x of ev){if(x.t<d+step){q+=x.q||0;e+=x.e||0}else break}
+   inv+=e;
+   if(a.type==='crypto'){const id=a.coingeckoId,c=DSYM[id]?px[id]:null;if(c!=null)last[id]=c;v+=q*(c!=null?c:(last[id]!=null?last[id]:(live[id]||0)))}
+   else if(q>0)v+=a.currentValue??a.invested});
+  return{d,v,inv}});
+ const n=out.length-1;out[n].v=t;out[n].inv=Object.values(assets).reduce((s,a)=>s+a.invested,0);return out}
 function updateSpark(t){
- if(!(t>0))return;WK[wkKey(Date.now())]=t;save('portfolio_weekly_v1',WK);
- drawSpark(t);loadDaily().then(()=>drawSpark(t))}
-let sparkM=[];
-const sparkCross={id:'cross',afterDraw(ch){const a=ch.tooltip&&ch.tooltip.getActiveElements();if(a&&a.length){const x=a[0].element.x,{top,bottom}=ch.chartArea,c=ch.ctx;c.save();c.strokeStyle='rgba(247,147,26,.6)';c.setLineDash([4,4]);c.beginPath();c.moveTo(x,top);c.lineTo(x,bottom);c.stroke();c.restore()}}};
+ if(!(t>0))return;lastT=t;trackEvents();drawSpark(t);loadDaily().then(()=>drawSpark(t));loadIntra(rng).then(()=>drawSpark(t))}
+function setRange(r){
+ rng=r;localStorage.setItem('portfolio_range_v1',r);sparkIdx=null;
+ document.querySelectorAll('#rng button').forEach(b=>b.classList.toggle('on',b.dataset.r===r));
+ drawSpark(lastT);loadIntra(r).then(()=>drawSpark(lastT))}
+document.querySelectorAll('#rng button').forEach(b=>{b.onclick=()=>setRange(b.dataset.r);b.classList.toggle('on',b.dataset.r===rng)});
+function showRead(i){
+ const el=$('sp-read'),p=i!=null?sparkM[i]:null;
+ if(!p){
+  if(!sparkM.length){el.innerHTML=`<span class="dim">${daily===null&&dailyAt?'No se pudo cargar el historial de precios':'Cargando historial…'}</span>`;return}
+  const s=sparkM[0],e=sparkM[sparkM.length-1],g=(e.v-s.v)-(e.inv-s.inv),b=s.v+(e.inv-s.inv),pc=b>0?g/b*100:0;
+  el.innerHTML=`<span class="rv2 ${g>=0?'up':'dn'}">${g>=0?'+':''}${fmt(g)} (${g>=0?'+':''}${pc.toFixed(2)}%)</span><div class="dim">Resultado del periodo · desliza sobre la línea</div>`;return}
+ const g=p.v-p.inv,dt=new Date(p.d);
+ el.innerHTML=`<b>${dt.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})}${sparkStep<864e5?' '+dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}):''}</b><span class="rv">${fmt(p.v)}</span><div class="dim">Invertido ${fmt(p.inv)} · <span class="${g>=0?'up':'dn'}">${g>=0?'+':''}${fmt(g)}</span></div>`}
 function drawSpark(t){
- const pts=weeklySeries(t);sparkM=pts;const labels=pts.map(p=>p.end),data=pts.map(p=>p.v);
- if(spark){spark.data.labels=labels;spark.data.datasets[0].data=data;spark.update('none');return}
- const cx=$('spark').getContext('2d'),gr=cx.createLinearGradient(0,0,0,200),fs=ms=>new Date(ms).toLocaleDateString('es-ES',{day:'2-digit',month:'short'});
- gr.addColorStop(0,'rgba(247,147,26,.35)');gr.addColorStop(1,'rgba(247,147,26,0)');
- spark=new Chart(cx,{type:'line',data:{labels,datasets:[{data,borderColor:'#f7931a',backgroundColor:gr,fill:true,tension:.25,borderWidth:2.5,
-   pointRadius:c=>(sparkM[c.dataIndex]||{}).est?0:3,pointBackgroundColor:'#f7931a',pointHoverRadius:6,pointHoverBackgroundColor:'#fff',pointHoverBorderColor:'#f7931a',pointHoverBorderWidth:2,
-   segment:{borderDash:c=>(sparkM[c.p1DataIndex]||{}).est?[5,5]:undefined}}]},
-  options:{maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},layout:{padding:{top:14,left:6,right:6}},scales:{x:{display:false},y:{display:false}},
-   plugins:{legend:{display:false},tooltip:{displayColors:false,backgroundColor:'rgba(9,9,11,.95)',borderColor:'#f7931a',borderWidth:1,titleColor:'#8a8a93',bodyColor:'#fff',footerColor:'#8a8a93',bodyFont:{weight:'700',size:14},footerFont:{weight:'400',size:10},padding:10,
-    callbacks:{title:i=>{const k=i[0].dataIndex,p=sparkM[k];return k===sparkM.length-1?'Semana actual':'Semana del '+fs(p.w)+' al '+fs(p.w+6*864e5)},label:c=>fmt(c.parsed.y),footer:i=>(sparkM[i[0].dataIndex]||{}).est?'Estimado (precios × tus cantidades actuales)':'Valor registrado'}}}},
-  plugins:[sparkCross]})}
-function parseNum(s){s=s.trim();const c=s.includes(','),d=s.includes('.');if(c&&d)s=s.lastIndexOf(',')>s.lastIndexOf('.')?s.replace(/\\./g,'').replace(',','.'):s.replace(/,/g,'');else if(c)s=s.replace(',','.');else if(d&&/^\\d{1,3}(\\.\\d{3})+$/.test(s))s=s.replace(/\\./g,'');return parseFloat(s)}
-function openHist(){$('hist-text').value=Object.keys(WK).sort().map(k=>`${k} ${WK[k].toFixed(2)}`).join('\\n');show('m-hist')}
-function saveHist(){const n={};let bad=0;
- $('hist-text').value.split('\\n').forEach(l=>{if(!l.trim())return;const m=l.match(/(\\d{4})-(\\d{2})-(\\d{2})[^\\d-]+([\\d.,]+)/),v=m&&parseNum(m[4]),ms=m&&Date.UTC(+m[1],m[2]-1,+m[3]);if(m&&v>0&&!isNaN(ms))n[wkKey(ms)]=v;else bad++});
- if(bad&&!confirm(bad+' línea(s) no válidas se ignorarán. ¿Continuar?'))return;
- Object.keys(WK).forEach(k=>delete WK[k]);Object.assign(WK,n);save('portfolio_weekly_v1',WK);hide('m-hist');updateAll()}
-function clearHist(){if(!confirm('¿Borrar todo el histórico registrado?'))return;Object.keys(WK).forEach(k=>delete WK[k]);save('portfolio_weekly_v1',WK);hide('m-hist');updateAll()}
+ const full=daily?ledgerSeries(framesFrom(daily),864e5,t):null;fullSer=full||[];
+ if(full){const m=full.slice(0,-1).reduce((a,p)=>p.v>a.v?p:a,{v:0});athSer=m.v>0?{value:m.v,date:new Date(m.d).toISOString()}:null}
+ const cf=currentFrames(),ser=cf?ledgerSeries(cf.frames,cf.step,t):null;sparkM=ser||[];sparkStep=cf?cf.step:864e5;
+ const labels=sparkM.map(p=>p.d),data=sparkM.map(p=>p.v);
+ if(spark2){spark2.data.labels=labels;spark2.data.datasets[0].data=data;spark2.update('none');if(sparkIdx==null||sparkIdx>=sparkM.length)showRead(sparkIdx=null);updateATH(t);return}
+ const cx=$('spark').getContext('2d'),gr=cx.createLinearGradient(0,0,0,150);gr.addColorStop(0,'rgba(247,147,26,.35)');gr.addColorStop(1,'rgba(247,147,26,0)');
+ spark2=new Chart(cx,{type:'line',data:{labels,datasets:[{data,borderColor:'#f7931a',backgroundColor:gr,fill:true,tension:.2,borderWidth:2.2,pointRadius:0,pointHoverRadius:0}]},
+  options:{maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},layout:{padding:{top:8,left:4,right:4}},scales:{x:{display:false},y:{display:false}},plugins:{legend:{display:false},tooltip:{enabled:false}}},
+  plugins:[{id:'scrub',
+   afterEvent(ch,args){const e=args.event;if(e.type==='mouseout')sparkIdx=null;else{const a=ch.getElementsAtEventForMode(e,'index',{intersect:false},false);sparkIdx=a.length?a[0].index:null}showRead(sparkIdx);args.changed=true},
+   afterDraw(ch){if(sparkIdx==null)return;const p=ch.getDatasetMeta(0).data[sparkIdx];if(!p)return;const{top,bottom}=ch.chartArea,c=ch.ctx;
+    c.save();c.strokeStyle='rgba(247,147,26,.7)';c.setLineDash([4,4]);c.beginPath();c.moveTo(p.x,top);c.lineTo(p.x,bottom);c.stroke();c.setLineDash([]);c.fillStyle='#fff';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y,5,0,7);c.fill();c.stroke();c.restore()}}]});
+ showRead(null);updateATH(t)}
 
 async function updateAll(){
  await prices();
