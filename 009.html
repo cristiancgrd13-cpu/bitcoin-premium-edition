@@ -322,7 +322,7 @@ function yearPerf(k){const P=fullSer;if(P&&P.length>1){const at=yy=>{let r=null;
 function updateAnnual(t,i){
  trackYear(t,i);
  const now=new Date(),y0=new Date(L0).getUTCFullYear(),y1=now.getFullYear(),years=[];for(let y=y0;y<=y1;y++)years.push(y);
- const data=years.map(y=>+yearPerf(String(y)).toFixed(2)),yf=Math.max(1,(now-L0)/864e5)/365.25,cagr=i&&t>0?(Math.pow(t/i,1/yf)-1)*100:0;
+ const data=years.map(y=>+yearPerf(String(y)).toFixed(2)),yf=Math.max(1,(now-L0)/864e5)/365.25,cagr=xirr()??0;
  $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#22d68a':'#ff5a5a';
  const bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
  if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.update('none')}
@@ -376,6 +376,12 @@ function currentFrames(){
  const c=RANGES[rng];
  if(c.iv)return intra[rng]?{frames:framesFrom(intra[rng]),step:c.step}:null;
  if(!daily)return null;let fr=framesFrom(daily);if(c.days)fr=fr.slice(-c.days);return{frames:fr,step:864e5}}
+function xirr(){ // rentabilidad anualizada real: tiene en cuenta la fecha de cada compra/venta
+ const cf=[];Object.keys(assets).forEach(k=>resolveBase(k).concat(EXT[k]||[]).forEach(x=>{if(x.e)cf.push([x.t,-x.e])}));
+ const V=Object.keys(assets).reduce((s,k)=>s+val(k),0);if(!cf.length||!(V>0))return null;cf.push([Date.now(),V]);
+ const t0=Math.min(...cf.map(c=>c[0])),f=r=>cf.reduce((s,[t,a])=>s+a/Math.pow(1+r,(t-t0)/315576e5),0);
+ let lo=-.99,hi=20;if(f(lo)<=0||f(hi)>=0)return null;
+ for(let n=0;n<100;n++){const m=(lo+hi)/2;if(f(m)>0)lo=m;else hi=m}return(lo+hi)/2*100}
 function ledgerSeries(frames,step,t){
  if(!frames||!frames.length)return null;
  const A=Object.keys(assets).map(k=>({a:assets[k],ev:resolveBase(k).concat(EXT[k]||[]).sort((x,y)=>x.t-y.t)})),last={};
