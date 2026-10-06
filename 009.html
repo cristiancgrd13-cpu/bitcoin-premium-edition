@@ -190,7 +190,7 @@ body::before{display:none}
   <div class="row"><div><div class="dim">DCA mensual</div><b class="d" style="font-size:1.4rem">300,00 €</b></div></div>
   <div id="avg-list"></div>
 </section>
-<section class="c all"><div class="k">Mis claves públicas</div><p class="dim">Consulta transacciones y genera el extracto fiscal en PDF.</p><div id="wallets-list"></div><button class="btn p" style="width:100%;margin-top:.8rem" onclick="openAddWalletModal()">+ Añadir clave pública</button></section>
+<section class="c all"><div class="k">Mis claves públicas</div><p class="dim">Consulta transacciones y genera el extracto fiscal en PDF.</p><div id="wallets-list"></div><button class="btn p" style="width:100%;margin-top:.8rem" onclick="openAddWalletModal()">+ Añadir clave pública</button><button class="btn" style="width:100%;margin-top:.6rem" onclick="$('kr-quick').click()">⬆ Importar CSV de Kraken (Ledgers)</button><input id="kr-quick" type="file" accept=".csv,text/csv" class="hidden" onchange="importKraken(this.files[0]);this.value=''"></section>
 <section class="c all"><div class="k">Panel fiscal</div><p class="dim">Todas tus wallets y Kraken juntas · ganancia real por FIFO.</p>
 <div class="fx" style="margin:.8rem 0"><select id="fiscal-year" class="i" style="margin:0"></select><button class="btn p" style="white-space:nowrap" onclick="runFiscalPanel()">Calcular año</button></div>
 <div id="fiscal-loading" class="hidden" style="text-align:center;padding:1.5rem"><div class="spinner"></div><p class="dim">Consultando wallets y calculando FIFO…</p></div>
@@ -530,7 +530,7 @@ function onWalletNetworkChange(){const n=$('wallet-network').value;
  if(n==='eth')$('etherscan-key-input').value=localStorage.getItem('etherscan_api_key')||'';if(n==='sol')$('helius-key-input').value=localStorage.getItem('helius_api_key')||''}
 function submitAddWallet(){
  const n=$('wallet-network').value,alias=$('wallet-alias').value.trim(),kind=$('wallet-kind').value,mine=kind!=='externa';
- if(n==='kraken'){const f=$('kraken-csv-input').files[0],fin=rows=>{const id=editingWalletId||('kraken_'+(alias||'cuenta')+'_'+Date.now());wallets[id]={network:'kraken',address:'',alias:alias||'Kraken',isMine:false,ledgerRows:rows||(editingWalletId&&wallets[editingWalletId].ledgerRows)||[],addresses:$('kraken-addr-input').value.split(/[\s,;]+/).filter(Boolean)};saveWallets();closeAddWalletModal();renderWalletsList()};
+ if(n==='kraken'){const f=$('kraken-csv-input').files[0],fin=rows=>{const id=editingWalletId||('kraken_'+(alias||'cuenta')+'_'+Date.now());wallets[id]={network:'kraken',address:'',alias:alias||'Kraken',isMine:false,ledgerRows:rows?krMerge(editingWalletId&&wallets[editingWalletId].ledgerRows,rows).all:((editingWalletId&&wallets[editingWalletId].ledgerRows)||[]),addresses:$('kraken-addr-input').value.split(/[\s,;]+/).filter(Boolean)};saveWallets();closeAddWalletModal();renderWalletsList()};
   if(!f){if(!editingWalletId){alert('Selecciona el CSV de Kraken.');return}fin(null);return}
   const r=new FileReader();r.onload=e=>fin(parseKrakenCSV(e.target.result));r.readAsText(f);return}
  const a=$('wallet-address').value.trim();if(!a){alert('Introduce una dirección válida.');return}
@@ -686,6 +686,21 @@ const fxLW=loadWalletTransactions;
 window.loadWalletTransactions=async function(){window._fxErr=null;await fxLW();const w=fxE('tx-warning');if(window._fxErr&&!w.classList.contains('hidden'))w.textContent+=' Detalle: '+window._fxErr};
 
 // ── Panel fiscal: historial completo + FIFO + categorías editables ──
+const krKey=r=>r.txid||[r.refid,r.time,r.type,r.asset,r.amount].join('|');
+function krMerge(old,rows){const s=new Set((old||[]).map(krKey)),add=(rows||[]).filter(r=>!s.has(krKey(r)));return{all:(old||[]).concat(add),added:add.length,dup:(rows||[]).length-add.length}}
+function importKraken(f){
+ if(!f)return;
+ if(/\.zip$/i.test(f.name)){alert('Es un .zip: descomprímelo y elige el archivo ledgers.csv que hay dentro.');return}
+ const r=new FileReader();r.onload=e=>{
+  let rows;try{rows=parseKrakenCSV(e.target.result)}catch(x){rows=[]}
+  const h=rows[0]||{};
+  if(!rows.length||!('refid' in h)||!('asset' in h)||!('amount' in h)){alert(rows.length&&('pair' in h)?'Este CSV es de Trades. Necesito el export de tipo Ledgers.':'No parece un CSV de Ledgers de Kraken (faltan columnas). Pide un export de tipo Ledgers en formato CSV.');return}
+  let id=Object.keys(wallets).find(k=>wallets[k].network==='kraken');
+  if(!id){id='kraken_cuenta_'+Date.now();wallets[id]={network:'kraken',address:'',alias:'Kraken',isMine:false,ledgerRows:[],addresses:[]}}
+  const m=krMerge(wallets[id].ledgerRows,rows);wallets[id].ledgerRows=m.all;saveWallets();renderWalletsList();
+  const ts=rows.map(x=>new Date((x.time||'').replace(' ','T').replace(/\.\d+$/,'')+'Z').getTime()).filter(x=>x),d1=d=>new Date(d).toLocaleDateString('es-ES');
+  alert(`Kraken importado: ${m.added} movimientos nuevos (${m.dup} ya estaban). Periodo del archivo: ${d1(Math.min(...ts))} - ${d1(Math.max(...ts))}. Total guardado: ${m.all.length}.`)};
+ r.readAsText(f)}
 function kindTag(w){return w.network==='kraken'?'':({kraken:' · Kraken',aave:' · Aave',externa:' · externa'})[w.kind||(w.isMine?'mia':'externa')]||''}
 function fxOwnName(t){
  const nm={};Object.values(wallets).forEach(w=>{const k=w.kind||(w.isMine?'mia':'externa');
@@ -722,7 +737,8 @@ function fxCompute(){
   t.costBasis=cost;t.gain=t.eurValue-cost});
  const ys=all.filter(t=>t.date.getFullYear()===year).sort((a,b)=>b.date-a.date);
  window._fiscalTxs=ys;window._fiscalYear=year;fxTable(ys);renderFiscalSummary(ys);el.scrollTop=st;
- let w='';
+ const src={};ys.forEach(t=>src[t.walletAlias]=(src[t.walletAlias]||0)+1);
+ let w='Incluido en el cálculo: '+(Object.keys(src).map(k=>`${k} (${src[k]})`).join(' · ')||'ninguna fuente con movimientos en ese año')+'. Traspasos entre tus cuentas (excluidos): '+ys.filter(t=>t.category==='interna').length+'. ';
  if(errors.length)w+='Algunas wallets fallaron: '+errors.join(' · ')+'. ';
  if(F.est)w+='Parte del coste usa el precio medio de "Mis Activos" porque falta historial de compra anterior: revísalo con tu gestor. ';
  if(F.noCost)w+='Hay ventas sin coste de adquisición (activo sin historial): aparecen marcadas. ';
