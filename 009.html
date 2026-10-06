@@ -210,10 +210,10 @@ body::before{display:none}
 <div style="margin-top:1rem"><label class="dim">Red</label><select id="wallet-network" class="i" onchange="onWalletNetworkChange()"><option value="btc">Bitcoin (BTC)</option><option value="eth">Ethereum (ETH)</option><option value="sol">Solana (SOL)</option><option value="kraken">Kraken (importar CSV Ledgers)</option></select>
 <div id="wallet-address-wrap"><label class="dim">Dirección / clave pública</label><input id="wallet-address" class="i" placeholder="Pega aquí la dirección"></div>
 <label class="dim">Alias (opcional)</label><input id="wallet-alias" class="i" placeholder="Ej. Ledger BTC / Phantom">
-<label id="wallet-is-mine-wrap" class="dim" style="display:block;margin-bottom:.8rem"><input id="wallet-is-mine" type="checkbox" checked> Es mía (los movimientos entre mis wallets no cuentan como compra/venta)</label>
+<div id="wallet-kind-wrap"><label class="dim">Tipo de clave</label><select id="wallet-kind" class="i"><option value="mia">Mía (Ledger, Trezor, Phantom…)</option><option value="kraken">Kraken (dirección de depósito)</option><option value="aave">Aave (protocolo)</option><option value="externa">De otra persona (cuenta como compra/venta)</option></select><p class="dim" style="margin:-.4rem 0 .8rem">Los envíos entre claves mías, Kraken y Aave son traspasos: no cuentan como venta ni permuta. Ponles un alias (Ledger, Trezor…) para reconocerlas.</p></div>
 <div id="eth-key-wrap" class="hidden"><label class="dim">API key de Etherscan (gratuita, sirve la V2)</label><input id="etherscan-key-input" class="i" placeholder="Pega tu API key"></div>
 <div id="sol-key-wrap" class="hidden"><label class="dim">API key de Helius (gratuita, necesaria para Solana)</label><input id="helius-key-input" class="i" placeholder="Pega tu API key"></div>
-<div id="kraken-csv-wrap" class="hidden"><label class="dim">CSV de Kraken (History → Export → Ledgers)</label><input id="kraken-csv-input" type="file" accept=".csv" class="i"></div>
+<div id="kraken-csv-wrap" class="hidden"><label class="dim">CSV de Kraken (Documents → Exports → Create Export → Ledgers → CSV; si baja en .zip, descomprímelo)</label><input id="kraken-csv-input" type="file" accept=".csv" class="i"><label class="dim">Direcciones de depósito de Kraken (BTC, ETH, SOL…), una por línea. Los envíos a ellas cuentan como traspaso, no como venta.</label><textarea id="kraken-addr-input" class="i" rows="3" style="font-family:inherit"></textarea></div>
 <button class="btn p" style="width:100%" onclick="submitAddWallet()">Guardar</button></div></div></div>
 <div id="m-tx" class="m h"><div class="mb" style="max-width:520px"><button class="x" onclick="closeWalletTx()">&times;</button><b id="tx-modal-title" class="d" style="font-size:1.2rem">—</b>
 <div id="tx-modal-address" class="dim" style="word-break:break-all;margin:.3rem 0 1rem"></div>
@@ -520,24 +520,24 @@ async function getHistoricalPrice(id,d){const s=`${String(d.getUTCDate()).padSta
  if(priceCache[k]!=null)return priceCache[k];
  try{const r=await(await fetch(`https://api.coingecko.com/api/v3/coins/${id}/history?date=${s}&localization=false`)).json();const p=(r&&r.market_data&&r.market_data.current_price&&r.market_data.current_price.eur)||0;if(p)priceCache[k]=p;return p}catch(e){return 0}}
 function renderWalletsList(){const ids=Object.keys(wallets);
- $('wallets-list').innerHTML=ids.length?ids.map(id=>{const w=wallets[id],m=NETWORK_META[w.network],s=w.network==='kraken'?`${(w.ledgerRows||[]).length} movimientos`:w.address.slice(0,6)+'…'+w.address.slice(-4);
-  return `<div class="row" style="cursor:default"><div class="fx" style="cursor:pointer" onclick="openWalletTx('${id}')"><span style="color:${m.color};font-size:1.2rem">●</span><div><b>${w.alias||m.label}${w.network!=='kraken'&&!w.isMine?' (externa)':''}</b><div class="dim">${m.label} · ${s}</div></div></div><div class="fx"><a class="lk" href="#" onclick="openWalletTx('${id}');return false">Ver</a><a class="lk" href="#" onclick="openEditWallet('${id}');return false">Editar</a><a class="lk" href="#" onclick="deleteWallet('${id}');return false">✕</a></div></div>`}).join(''):'<p class="dim">Aún no has añadido ninguna clave pública.</p>'}
-function openAddWalletModal(){editingWalletId=null;$('wallet-modal-title').textContent='Añadir clave pública';$('wallet-network').disabled=false;$('wallet-network').value='btc';['wallet-address','wallet-alias','etherscan-key-input','helius-key-input'].forEach(i=>$(i).value='');$('wallet-is-mine').checked=true;show('m-wallet');onWalletNetworkChange()}
-function openEditWallet(id){const w=wallets[id];editingWalletId=id;$('wallet-modal-title').textContent='Editar clave pública';$('wallet-network').value=w.network;$('wallet-network').disabled=true;$('wallet-address').value=w.address||'';$('wallet-alias').value=w.alias||'';$('wallet-is-mine').checked=!!w.isMine;show('m-wallet');onWalletNetworkChange()}
+ $('wallets-list').innerHTML=ids.length?ids.map(id=>{const w=wallets[id],m=NETWORK_META[w.network],s=w.network==='kraken'?`${(w.ledgerRows||[]).length} movimientos${(w.addresses||[]).length?' · '+w.addresses.length+' dir.':''}`:w.address.slice(0,6)+'…'+w.address.slice(-4);
+  return `<div class="row" style="cursor:default"><div class="fx" style="cursor:pointer" onclick="openWalletTx('${id}')"><span style="color:${m.color};font-size:1.2rem">●</span><div><b>${w.alias||m.label}${kindTag(w)}</b><div class="dim">${m.label} · ${s}</div></div></div><div class="fx"><a class="lk" href="#" onclick="openWalletTx('${id}');return false">Ver</a><a class="lk" href="#" onclick="openEditWallet('${id}');return false">Editar</a><a class="lk" href="#" onclick="deleteWallet('${id}');return false">✕</a></div></div>`}).join(''):'<p class="dim">Aún no has añadido ninguna clave pública.</p>'}
+function openAddWalletModal(){editingWalletId=null;$('wallet-modal-title').textContent='Añadir clave pública';$('wallet-network').disabled=false;$('wallet-network').value='btc';['wallet-address','wallet-alias','etherscan-key-input','helius-key-input','kraken-addr-input'].forEach(i=>$(i).value='');$('wallet-kind').value='mia';show('m-wallet');onWalletNetworkChange()}
+function openEditWallet(id){const w=wallets[id];editingWalletId=id;$('wallet-modal-title').textContent='Editar clave pública';$('wallet-network').value=w.network;$('wallet-network').disabled=true;$('wallet-address').value=w.address||'';$('wallet-alias').value=w.alias||'';$('wallet-kind').value=w.kind||(w.isMine?'mia':'externa');$('kraken-addr-input').value=(w.addresses||[]).join('\n');show('m-wallet');onWalletNetworkChange()}
 function closeAddWalletModal(){hide('m-wallet');editingWalletId=null}
 function onWalletNetworkChange(){const n=$('wallet-network').value;
- $('eth-key-wrap').classList.toggle('hidden',n!=='eth');$('sol-key-wrap').classList.toggle('hidden',n!=='sol');$('kraken-csv-wrap').classList.toggle('hidden',n!=='kraken');$('wallet-address-wrap').classList.toggle('hidden',n==='kraken');$('wallet-is-mine-wrap').classList.toggle('hidden',n==='kraken');
+ $('eth-key-wrap').classList.toggle('hidden',n!=='eth');$('sol-key-wrap').classList.toggle('hidden',n!=='sol');$('kraken-csv-wrap').classList.toggle('hidden',n!=='kraken');$('wallet-address-wrap').classList.toggle('hidden',n==='kraken');$('wallet-kind-wrap').classList.toggle('hidden',n==='kraken');
  if(n==='eth')$('etherscan-key-input').value=localStorage.getItem('etherscan_api_key')||'';if(n==='sol')$('helius-key-input').value=localStorage.getItem('helius_api_key')||''}
 function submitAddWallet(){
- const n=$('wallet-network').value,alias=$('wallet-alias').value.trim(),mine=$('wallet-is-mine').checked;
- if(n==='kraken'){const f=$('kraken-csv-input').files[0],fin=rows=>{const id=editingWalletId||('kraken_'+(alias||'cuenta')+'_'+Date.now());wallets[id]={network:'kraken',address:'',alias:alias||'Kraken',isMine:false,ledgerRows:rows||(editingWalletId&&wallets[editingWalletId].ledgerRows)||[]};saveWallets();closeAddWalletModal();renderWalletsList()};
+ const n=$('wallet-network').value,alias=$('wallet-alias').value.trim(),kind=$('wallet-kind').value,mine=kind!=='externa';
+ if(n==='kraken'){const f=$('kraken-csv-input').files[0],fin=rows=>{const id=editingWalletId||('kraken_'+(alias||'cuenta')+'_'+Date.now());wallets[id]={network:'kraken',address:'',alias:alias||'Kraken',isMine:false,ledgerRows:rows||(editingWalletId&&wallets[editingWalletId].ledgerRows)||[],addresses:$('kraken-addr-input').value.split(/[\s,;]+/).filter(Boolean)};saveWallets();closeAddWalletModal();renderWalletsList()};
   if(!f){if(!editingWalletId){alert('Selecciona el CSV de Kraken.');return}fin(null);return}
   const r=new FileReader();r.onload=e=>fin(parseKrakenCSV(e.target.result));r.readAsText(f);return}
  const a=$('wallet-address').value.trim();if(!a){alert('Introduce una dirección válida.');return}
  const ek=$('etherscan-key-input').value.trim(),hk=$('helius-key-input').value.trim();
  if(n==='eth'&&ek)localStorage.setItem('etherscan_api_key',ek);if(n==='sol'&&hk)localStorage.setItem('helius_api_key',hk);
  const id=n+'_'+a;if(editingWalletId&&editingWalletId!==id)delete wallets[editingWalletId];
- wallets[id]={network:n,address:a,alias,isMine:mine};saveWallets();closeAddWalletModal();renderWalletsList()}
+ wallets[id]={network:n,address:a,alias,isMine:mine,kind};saveWallets();closeAddWalletModal();renderWalletsList()}
 function deleteWallet(id){if(!confirm('¿Eliminar esta clave pública?'))return;delete wallets[id];saveWallets();renderWalletsList()}
 function openWalletTx(id){currentWalletId=id;const w=wallets[id],m=NETWORK_META[w.network];$('tx-modal-title').textContent=w.alias||m.label;$('tx-modal-address').textContent=w.address||'';
  $('tx-date-from').value='2025-01-01';$('tx-date-to').value=new Date().toISOString().slice(0,10);$('tx-list').innerHTML='';['tx-totals','tx-warning'].forEach(i=>$(i).classList.add('hidden'));currentTxList=[];show('m-tx')}
@@ -555,7 +555,7 @@ async function loadWalletTransactions(){
  finally{$('tx-loading').classList.add('hidden')}}
 function renderTxList(){const c=$('tx-list');
  if(!currentTxList.length){c.innerHTML='<p class="dim" style="text-align:center">Sin movimientos en ese rango.</p>';return}
- c.innerHTML=currentTxList.map((t,i)=>`<div class="row" style="cursor:default"><div><div class="dim">${t.date.toLocaleDateString('es-ES')}${t.note?' · '+t.note:''}</div><b>${t.direction==='in'?'↓':'↑'} ${t.amount.toFixed(6)} ${t.asset}</b><div class="dim">${fmtEUR(t.eurValue)}</div></div><select class="cat-select" onchange="changeTxCategory(${i},this.value)">${['compra','venta','permuta','interna'].map(k=>`<option value="${k}" ${t.category===k?'selected':''}>${k[0].toUpperCase()+k.slice(1)}</option>`).join('')}</select></div>`).join('');
+ c.innerHTML=currentTxList.map((t,i)=>`<div class="row" style="cursor:default"><div><div class="dim">${t.date.toLocaleDateString('es-ES')}${t.note?' · '+t.note:''}${fxOwnName(t)}</div><b>${t.direction==='in'?'↓':'↑'} ${t.amount.toFixed(6)} ${t.asset}</b><div class="dim">${fmtEUR(t.eurValue)}</div></div><select class="cat-select" onchange="changeTxCategory(${i},this.value)">${['compra','venta','permuta','interna'].map(k=>`<option value="${k}" ${t.category===k?'selected':''}>${k[0].toUpperCase()+k.slice(1)}</option>`).join('')}</select></div>`).join('');
  $('tx-totals').classList.remove('hidden')}
 function computeTotals(){const o={compra:0,venta:0,permuta:0,interna:0};currentTxList.forEach(t=>o[t.category]+=t.eurValue);
  Object.keys(o).forEach(k=>$('tot-'+k).textContent=fmtEUR(o[k]));$('tot-fiscal').textContent=fmtEUR(o.venta+o.permuta)}
@@ -676,7 +676,7 @@ function buildKrakenTxs(rows){
 // ── Categorías: guardadas en el navegador y reutilizadas en wallet y panel fiscal ──
 function suggestCategory(tx){
  const o=fxOv()[fxKey(tx)];if(o)return o;if(tx.category)return tx.category;
- const own=Object.values(wallets).filter(w=>w.network!=='kraken'&&w.isMine).map(w=>w.address.toLowerCase());
+ const own=Object.values(wallets).flatMap(w=>w.network==='kraken'?(w.addresses||[]):(w.isMine?[w.address]:[])).map(x=>x.toLowerCase());
  const cps=(tx.counterparties||(tx.counterparty?[tx.counterparty]:[])).map(x=>(x||'').toLowerCase());
  if(cps.length&&cps.every(c=>own.includes(c)))return'interna';
  if(Array.isArray(tx.counterparties)&&!cps.length&&tx.direction==='out')return'interna';
@@ -686,12 +686,19 @@ const fxLW=loadWalletTransactions;
 window.loadWalletTransactions=async function(){window._fxErr=null;await fxLW();const w=fxE('tx-warning');if(window._fxErr&&!w.classList.contains('hidden'))w.textContent+=' Detalle: '+window._fxErr};
 
 // ── Panel fiscal: historial completo + FIFO + categorías editables ──
+function kindTag(w){return w.network==='kraken'?'':({kraken:' · Kraken',aave:' · Aave',externa:' · externa'})[w.kind||(w.isMine?'mia':'externa')]||''}
+function fxOwnName(t){
+ const nm={};Object.values(wallets).forEach(w=>{const k=w.kind||(w.isMine?'mia':'externa');
+  if(w.network==='kraken')(w.addresses||[]).forEach(a=>nm[a.toLowerCase()]=w.alias||'Kraken');
+  else if(k!=='externa')nm[w.address.toLowerCase()]=w.alias||(k==='kraken'?'Kraken':k==='aave'?'Aave':NETWORK_META[w.network].label)});
+ const c=[...new Set((t.counterparties||[]).map(x=>nm[(x||'').toLowerCase()]).filter(Boolean))];
+ return c.length?` · ${t.direction==='out'?'a':'de'} ${c.join(', ')}`:''}
 function populateFiscalYearSelect(){const s=fxE('fiscal-year');s.innerHTML='';for(let y=new Date().getFullYear();y>=2017;y--)s.insertAdjacentHTML('beforeend',`<option value="${y}">${y}</option>`)}
 async function runFiscalPanel(){
  const year=+fxE('fiscal-year').value,now=new Date(),to=year===now.getFullYear()?now:new Date(Date.UTC(year,11,31,23,59,59)),from=new Date(Date.UTC(2015,0,1));
  fxE('fiscal-loading').classList.remove('hidden');['fiscal-warning','fiscal-summary'].forEach(i=>fxE(i).classList.add('hidden'));fxE('fiscal-table').innerHTML='';
  const errors=[];let all=[];
- for(const id of Object.keys(wallets)){const w=wallets[id],m=NETWORK_META[w.network];
+ for(const id of Object.keys(wallets)){const w=wallets[id],m=NETWORK_META[w.network];if(w.kind==='kraken'||w.kind==='aave')continue;
   try{const raw=await fetchRawTxsForWallet(w,from,to);raw.forEach(t=>{t.walletAlias=w.alias||m.label});all=all.concat(raw)}
   catch(e){errors.push((w.alias||m.label)+': '+(e.message||'error'))}}
  await fxFill(all);FX_RAW={all,errors,year};fxCompute();fxE('fiscal-loading').classList.add('hidden')}
@@ -721,13 +728,14 @@ function fxCompute(){
  if(F.noCost)w+='Hay ventas sin coste de adquisición (activo sin historial): aparecen marcadas. ';
  if(all.some(t=>t.eurValue===0&&t.category!=='interna'))w+='Hay movimientos con valor 0 € (token sin precio): corrígelos antes de exportar. ';
  if(Object.values(wallets).some(x=>x.network==='kraken'&&(x.ledgerRows||[]).some(r=>/stak|earn|reward/i.test(r.type))))w+='Tu ledger de Kraken tiene staking/recompensas: no se calculan aquí (tributan como rendimientos del capital mobiliario). ';
+ if(Object.values(wallets).some(x=>x.network==='kraken'&&(x.addresses||[]).length&&!(x.ledgerRows||[]).length))w+='Tienes direcciones de Kraken pero ningún CSV de Ledgers importado: los envíos cuentan como traspaso y las ventas hechas en Kraken NO se calculan hasta que lo importes. ';
  w+='FIFO sobre todo el historial importado. Las transferencias propias se detectan por dirección o por importe y fecha con Kraken; corrige con el selector de cada fila.';
  const wb=fxE('fiscal-warning');wb.textContent=w;wb.classList.remove('hidden')}
 function fxTable(txs){
  const c=fxE('fiscal-table');
  if(!txs.length){c.innerHTML='<p class="text-xs text-zinc-500 text-center py-4">Sin movimientos ese año.</p>';return}
  c.innerHTML=txs.map((t,i)=>{const g=t.gain!=null?(t.gain>=0?'+':'')+fmtEUR(t.gain):(t.noCost?'sin coste':'—');
-  return `<div class="bg-black/40 rounded-xl px-3 py-2"><div class="flex justify-between items-center gap-2"><div class="text-left min-w-0"><div class="text-xs text-zinc-500">${t.date.toLocaleDateString('es-ES')} · ${t.walletAlias}${t.note?' · '+t.note:''}</div><div class="text-sm font-semibold">${t.direction==='in'?'↓':'↑'} ${t.amount.toFixed(6)} ${t.asset} <span class="text-zinc-500 font-normal">(${fmtEUR(t.eurValue)})</span></div>${t.costBasis!=null?`<div class="text-xs text-zinc-500">Coste: ${fmtEUR(t.costBasis)}</div>`:''}</div><div class="text-right"><div class="text-xs font-bold ${t.gain==null?'text-zinc-500':t.gain>=0?'text-emerald-400':'text-red-400'}">${g}</div><select class="cat-select mt-1" onchange="fxSetCat(${i},this.value)">${['compra','venta','permuta','interna'].map(k=>`<option value="${k}" ${t.category===k?'selected':''}>${k[0].toUpperCase()+k.slice(1)}</option>`).join('')}</select></div></div></div>`}).join('')}
+  return `<div class="bg-black/40 rounded-xl px-3 py-2"><div class="flex justify-between items-center gap-2"><div class="text-left min-w-0"><div class="text-xs text-zinc-500">${t.date.toLocaleDateString('es-ES')} · ${t.walletAlias}${t.note?' · '+t.note:''}${fxOwnName(t)}</div><div class="text-sm font-semibold">${t.direction==='in'?'↓':'↑'} ${t.amount.toFixed(6)} ${t.asset} <span class="text-zinc-500 font-normal">(${fmtEUR(t.eurValue)})</span></div>${t.costBasis!=null?`<div class="text-xs text-zinc-500">Coste: ${fmtEUR(t.costBasis)}</div>`:''}</div><div class="text-right"><div class="text-xs font-bold ${t.gain==null?'text-zinc-500':t.gain>=0?'text-emerald-400':'text-red-400'}">${g}</div><select class="cat-select mt-1" onchange="fxSetCat(${i},this.value)">${['compra','venta','permuta','interna'].map(k=>`<option value="${k}" ${t.category===k?'selected':''}>${k[0].toUpperCase()+k.slice(1)}</option>`).join('')}</select></div></div></div>`}).join('')}
 function fxSetCat(i,v){const t=window._fiscalTxs[i],o=fxOv();o[fxKey(t)]=v;localStorage.setItem('tx_cat_overrides_v1',JSON.stringify(o));fxCompute()}
 function renderFiscalSummary(txs){
  let g=0,p=0,vv=0,vp=0,vi=0;
