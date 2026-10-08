@@ -134,6 +134,7 @@ body::before{display:none}
 #assets-list .row{padding:1.05rem .9rem}
 #assets-list .row>.fx>div>.dim{margin-top:.5rem;font-size:.75rem}
 #assets-list .row>div:last-child{display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
+.tt{animation:none!important;will-change:transform}.tk{touch-action:pan-y}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -505,7 +506,12 @@ const COINS=[['bitcoin','BTC','₿','#f7931a'],['ethereum','ETH','Ξ','#8c9eff']
 function ticker(){
  const one=COINS.map(([id,sy,ic,c])=>{const p=live[id],ch=chg[id];return `<span class="ti"><b style="color:${c}">${ic} ${sy}</b> ${p!=null?fmt(p):'…'}${ch!=null?` <em class="${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'} ${Math.abs(ch).toFixed(2)}%</em>`:''}</span>`}).join('<span class="sep">◆</span>')+'<span class="sep">◆</span>';
  const h=one.repeat(3);
- $('tk').innerHTML=`<div class="tt" style="animation-delay:-${(performance.now()/1000)%40}s">${h+h}</div>`}
+ $('tk').innerHTML=`<div class="tt" style="transform:translateX(${-tkX}px)">${h+h}</div>`}
+let tkX=0,tkLast=0;
+function tkLoop(n){const tt=$('tk').firstElementChild;if(!tkLast)tkLast=n;
+ if(tt&&tt.scrollWidth>20){tkX=(tkX+Math.min(n-tkLast,100)*.045)%(tt.scrollWidth/2);tt.style.transform=`translateX(${-tkX}px)`}
+ tkLast=n;requestAnimationFrame(tkLoop)}
+requestAnimationFrame(tkLoop);
 (()=>{const c=$('bg'),x=c.getContext('2d'),RM=matchMedia('(prefers-reduced-motion:reduce)').matches,F=14;let W,H,d;
  const rs=()=>{W=c.width=innerWidth;H=c.height=innerHeight;d=Array.from({length:Math.ceil(W/F)},()=>Math.random()*H/F)};rs();addEventListener('resize',rs);
  let last=0;(function f(t){if(t-last>70){last=t;x.fillStyle='rgba(9,9,11,.14)';x.fillRect(0,0,W,H);x.font=F+'px "JetBrains Mono",monospace';
