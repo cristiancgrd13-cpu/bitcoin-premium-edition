@@ -503,13 +503,16 @@ function showTip(anim){
 function chainTick(){}
 getTip();setInterval(getTip,20000);
 const COINS=[['bitcoin','BTC','₿','#f7931a'],['ethereum','ETH','Ξ','#8c9eff'],['solana','SOL','◎','#b57bff']];
-function ticker(){
+function tkRender(){
  const one=COINS.map(([id,sy,ic,c])=>{const p=live[id],ch=chg[id];return `<span class="ti"><b style="color:${c}">${ic} ${sy}</b> ${p!=null?fmt(p):'…'}${ch!=null?` <em class="${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'} ${Math.abs(ch).toFixed(2)}%</em>`:''}</span>`}).join('<span class="sep">◆</span>')+'<span class="sep">◆</span>';
- const h=one.repeat(3);
- $('tk').innerHTML=`<div class="tt" style="transform:translateX(${-tkX}px)">${h+h}</div>`}
+ const box=$('tk');box.innerHTML=`<div class="tt">${one}</div>`;
+ const n=Math.max(1,Math.ceil(box.clientWidth/(box.firstElementChild.scrollWidth||1))),h=one.repeat(n);   // copias suficientes para llenar el ancho
+ box.innerHTML=`<div class="tt" style="transform:translateX(${-tkX}px)">${h+h}</div>`}
 let tkX=0,tkLast=0;
+function ticker(){const b=$('tk');if(!b.firstElementChild||b.textContent.includes('…'))tkRender()}   // los precios se refrescan al completar cada vuelta
 function tkLoop(n){const tt=$('tk').firstElementChild;if(!tkLast)tkLast=n;
- if(tt&&tt.scrollWidth>20){tkX=(tkX+Math.min(n-tkLast,100)*.045)%(tt.scrollWidth/2);tt.style.transform=`translateX(${-tkX}px)`}
+ if(tt&&tt.scrollWidth>20){const half=tt.scrollWidth/2,nx=tkX+Math.min(n-tkLast,100)*.045;
+  if(nx>=half){tkX=nx%half;tkRender()}else{tkX=nx;tt.style.transform=`translateX(${-tkX}px)`}}
  tkLast=n;requestAnimationFrame(tkLoop)}
 requestAnimationFrame(tkLoop);
 (()=>{const c=$('bg'),x=c.getContext('2d'),RM=matchMedia('(prefers-reduced-motion:reduce)').matches,F=14;let W,H,d;
