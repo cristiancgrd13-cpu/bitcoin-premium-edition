@@ -294,8 +294,14 @@ const qtyL=a=>a.type==='crypto'?`${a.amount} ${a.symbol}`:`${a.amount} ud.`;
 function anim(el,t){const s=parseFloat(el.dataset.v||0),t0=performance.now();(function f(n){const p=Math.min((n-t0)/800,1),e=1-Math.pow(1-p,3);el.textContent=(s+(t-s)*e).toLocaleString('es-ES',nf);if(p<1)requestAnimationFrame(f);else el.dataset.v=t})(t0)}
 
 const chg={};
+async function binPrices(){
+ const M={BTCEUR:'bitcoin',ETHEUR:'ethereum',SOLEUR:'solana'};
+ try{const d=await(await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols='+encodeURIComponent(JSON.stringify(Object.keys(M))))).json();
+  if(!Array.isArray(d))return false;d.forEach(x=>{const id=M[x.symbol];if(id){live[id]=+x.lastPrice;chg[id]=+x.priceChangePercent}});return true}catch(e){return false}}
 async function prices(){
- const ids=[...new Set(['bitcoin','ethereum','solana',...Object.values(assets).filter(a=>a.type==='crypto').map(a=>a.coingeckoId)])];
+ const okB=await binPrices(),B=['bitcoin','ethereum','solana'];
+ const ids=[...new Set([...B,...Object.values(assets).filter(a=>a.type==='crypto').map(a=>a.coingeckoId)])].filter(i=>!(okB&&B.includes(i)));
+ if(!ids.length)return;
  try{const d=await(await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`)).json();ids.forEach(i=>{if(d[i]){live[i]=d[i].eur;chg[i]=d[i].eur_24h_change}})}catch(e){console.error(e)}
 }
 
@@ -794,5 +800,5 @@ renderWalletsList();populateFiscalYearSelect();
 tick();setInterval(tick,3e4);
 const clockY=()=>$('annual-date').textContent=new Date().toLocaleString('es-ES',{weekday:'short',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});clockY();setInterval(clockY,1000);
 updateAll();fear();dominance();
-setInterval(updateAll,15e3);setInterval(fear,36e5);setInterval(dominance,6e4);
+setInterval(updateAll,15e3);setInterval(binPrices,5e3);setInterval(fear,36e5);setInterval(dominance,6e4);
 </script></body></html>
