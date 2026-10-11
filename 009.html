@@ -196,11 +196,7 @@ body::before{display:none}
   <div id="annual-date" class="dim" style="margin-bottom:.6rem">—</div><div style="height:240px"><canvas id="annual"></canvas></div>
 </section>
 
-<section class="c all">
-  <div class="k">Promedio de compra</div>
-  <div class="row"><div><div class="dim">Inversión total</div><b id="inv-total" class="d" style="font-size:1.4rem">—</b></div></div>
-    <div id="avg-list"></div>
-</section>
+<section class="c all"><div class="k">Inversión total</div><div class="row" style="cursor:default"><b id="inv-total" class="d" style="font-size:1.6rem">—</b></div></section>
 <section class="c all"><div class="k">Mis claves públicas</div><p class="dim">Consulta transacciones y genera el extracto fiscal en PDF.</p><div id="wallets-list"></div><button class="btn p" style="width:100%;margin-top:.8rem" onclick="openAddWalletModal()">+ Añadir clave pública</button><button class="btn" style="width:100%;margin-top:.6rem" onclick="$('kr-quick').click()">⬆ Importar CSV de Kraken (Ledgers)</button><input id="kr-quick" type="file" accept=".csv,text/csv" class="hidden" onchange="importKraken(this.files[0]);this.value=''"></section>
 <section class="c all"><div class="k">Panel fiscal</div><p class="dim">Todas tus wallets y Kraken juntas · ganancia real por FIFO.</p>
 <div class="fx" style="margin:.8rem 0"><select id="fiscal-year" class="i" style="margin:0"></select><button class="btn p" style="white-space:nowrap" onclick="runFiscalPanel()">Calcular año</button></div>
@@ -323,10 +319,6 @@ function renderAssets(){
   el.querySelector('.front').innerHTML=`<div class="fx"><span class="ic" style="background:${a.color}26;color:${a.color}">${a.icon}</span><div><b>${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`;
   el.querySelector('.back').innerHTML=`<div class="a1"><span><b style="color:${a.color}">${a.name}</b> <a href="#" class="lk" onclick="event.stopPropagation();editInv('${k}');return false">editar</a> <a href="#" class="lk" onclick="event.stopPropagation();openDetail('${k}');return false">${cr?'gráfica':'valor'}</a></span><b>${fmt(cr?a.invested/a.amount:v)}</b></div><div class="a2"><span class="dim">Invertido ${fmt(a.invested)}</span><span class="dim">${cr?'Precio medio':'Valor actual'}</span></div>`})}
 function flipCube(k){const el=$('assets-list').querySelector(`[data-k="${k}"]`);if(!el)return;el.classList.toggle('flip');flipped[el.classList.contains('flip')?'add':'delete'](k)}
-function renderAvg(){
- $('avg-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];
-  return `<div class="row avg"><div class="a1"><span><b style="color:${a.color}">${a.name}</b> <a href="#" class="lk" onclick="editInv('${k}');return false">editar</a></span><b>${fmt(a.type==='crypto'?a.invested/a.amount:val(k))}</b></div><div class="a2"><span class="dim">Invertido ${fmt(a.invested)}</span><span class="dim">${a.type==='crypto'?'Precio medio':'Valor actual'}</span></div></div>`}).join('');
-}
 function editInv(k){const a=assets[k],n=parseFloat((prompt(`Inversión real en € para ${a.name}\nActual: ${fmt(a.invested)}`)||'').replace(',','.'));if(n>0){a.invested=n;sv();updateAll()}}
 
 function updatePie(){
@@ -345,9 +337,9 @@ function updateAnnual(t,i){
  const now=new Date(),y0=new Date(L0).getUTCFullYear(),y1=now.getFullYear(),years=[];for(let y=y0;y<=y1;y++)years.push(y);
  const data=years.map(y=>+yearPerf(String(y)).toFixed(2)),yf=Math.max(1,(now-L0)/864e5)/365.25,cagr=xirr()??0;
  $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#22d68a':'#ff5a5a';
- const bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
- if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.update('none')}
- else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(2)}%`}}},scales:{x:{grid:{display:false}},y:{min:-100,max:100,ticks:{stepSize:50,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
+ const lim=Math.max(50,Math.ceil(Math.max(...data.map(Math.abs))/25)*25),bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
+ if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.options.scales.y.min=-lim;annual.options.scales.y.max=lim;annual.options.scales.y.ticks.stepSize=lim/2;annual.update('none')}
+ else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(2)}%`}}},scales:{x:{grid:{display:false}},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
 }
 
 // ── Máximo histórico + sparkline ──
@@ -445,7 +437,7 @@ function drawSpark(t){
 
 async function updateAll(){
  await prices();
- renderAssets();renderAvg();
+ renderAssets();
  const t=tot(),i=inv(),p=i?(t-i)/i*100:0,g=t-i;
  anim($('total-value'),t);
  $('inv-sub').textContent=`Sobre inversión de ${fmt(i)}`;$('inv-total').textContent=fmt(i);
