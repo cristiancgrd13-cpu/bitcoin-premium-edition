@@ -146,6 +146,8 @@ body::before{display:none}
 .cube .a1,.cube .a2{display:flex;justify-content:space-between;align-items:baseline;gap:.2rem .6rem;flex-wrap:wrap}
 .cube .a1>span,.cube .a2>span{white-space:nowrap}.cube .a1>b{margin-left:auto;white-space:nowrap;font-size:.95rem}
 .cube .a2>span:last-child{margin-left:auto}.cube .back .dim{font-size:.68rem}.cube .back .lk{font-size:.68rem;margin-left:.3rem}
+.chain span{white-space:nowrap}
+.cube .back{align-items:center;text-align:center;gap:.15rem}.cube .back .bp{font-size:1rem}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -156,7 +158,7 @@ body::before{display:none}
 <section class="c all hero">
   <div class="k">Valor total</div>
   <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
-  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span>BITCOINS MINADOS <b id="mined">—</b></span></div><div id="ath-box"></div>
+  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span>BTC MINADOS <b id="mined">—</b></span></div><div id="ath-box"></div>
   <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
 
@@ -254,7 +256,8 @@ body::before{display:none}
 
 <div id="m-mod" class="m h"><div class="mb"><button class="x" onclick="hide('m-mod')">&times;</button><b id="mod-title" class="d" style="font-size:1.2rem"></b>
   <div id="mod-info" class="dim" style="margin:.3rem 0 1rem"></div><input type="hidden" id="mod-key">
-  <div class="box"><b>Actualizar cantidad</b><div class="dim" style="margin:.3rem 0">Ideal para pools o staking: pon la cantidad exacta que tienes ahora.</div><input id="upd-qty" type="number" step="any" class="i"><button class="btn p" style="width:100%" onclick="updQty()">Actualizar y recalcular</button></div>
+  <div class="box"><b>Inversión (€)</b><div class="dim" style="margin:.3rem 0">Lo invertido en este activo. Sale en la cara trasera de su tarjeta y en Inversión total.</div><input id="edit-inv" type="number" step="0.01" class="i"><button class="btn p" style="width:100%" onclick="saveInv()">Guardar inversión</button></div>
+<div class="box"><b>Actualizar cantidad</b><div class="dim" style="margin:.3rem 0">Ideal para pools o staking: pon la cantidad exacta que tienes ahora.</div><input id="upd-qty" type="number" step="any" class="i"><button class="btn p" style="width:100%" onclick="updQty()">Actualizar y recalcular</button></div>
   <div class="box"><b>Venta parcial</b><input id="sell-qty" type="number" step="any" class="i" placeholder="Cantidad vendida"><input id="sell-rec" type="number" step="0.01" class="i" placeholder="€ recibidos"><button class="btn" style="width:100%" onclick="sell()">Registrar venta</button></div>
   <div class="box"><b>Eliminar activo</b><div class="dim" style="margin:.3rem 0.6rem">Úsalo si lo has vendido todo.</div><button class="btn r" style="width:100%" onclick="del()">Eliminar del portafolio</button></div>
 </div></div>
@@ -317,7 +320,7 @@ function renderAssets(){
  if(box.dataset.sig!==sig){box.dataset.sig=sig;box.innerHTML=keys.map(k=>`<div class="cube${flipped.has(k)?' flip':''}" data-k="${k}" onclick="flipCube('${k}')"><div class="cube-in"><div class="face front row"></div><div class="face back"></div></div></div>`).join('')}
  keys.forEach(k=>{const a=assets[k],v=val(k),p=a.invested?(v-a.invested)/a.invested*100:0,el=box.querySelector(`[data-k="${k}"]`),cr=a.type==='crypto';
   el.querySelector('.front').innerHTML=`<div class="fx"><span class="ic" style="background:${a.color}26;color:${a.color}">${a.icon}</span><div><b>${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`;
-  el.querySelector('.back').innerHTML=`<div class="a1"><span><b style="color:${a.color}">${a.name}</b> <a href="#" class="lk" onclick="event.stopPropagation();editInv('${k}');return false">editar</a> <a href="#" class="lk" onclick="event.stopPropagation();openDetail('${k}');return false">${cr?'gráfica':'valor'}</a></span><b>${fmt(cr?a.invested/a.amount:v)}</b></div><div class="a2"><span class="dim">Invertido ${fmt(a.invested)}</span><span class="dim">${cr?'Precio medio':'Valor actual'}</span></div>`})}
+  el.querySelector('.back').innerHTML=`<span><b style="color:${a.color};font-size:.78rem">${a.name}</b>${cr?'':` <a href="#" class="lk" onclick="event.stopPropagation();openDetail('${k}');return false">valor</a>`}</span><b class="bp">${fmt(cr?a.invested/a.amount:v)}</b><span class="dim">Invertido ${fmt(a.invested)}</span>`})}
 function flipCube(k){const el=$('assets-list').querySelector(`[data-k="${k}"]`);if(!el)return;el.classList.toggle('flip');flipped[el.classList.contains('flip')?'add':'delete'](k)}
 function editInv(k){const a=assets[k],n=parseFloat((prompt(`Inversión real en € para ${a.name}\nActual: ${fmt(a.invested)}`)||'').replace(',','.'));if(n>0){a.invested=n;sv();updateAll()}}
 
@@ -483,7 +486,8 @@ function openManage(){
  $('manage-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];return `<div class="row" onclick="openMod('${k}')"><div class="fx"><span class="ic" style="background:${a.color}26;color:${a.color}">${a.icon}</span><div><b>${a.name}</b><div class="dim">${qtyL(a)} · ${fmt(val(k))}</div></div></div><span class="dim">›</span></div>`}).join('');
  show('m-manage');
 }
-function openMod(k){const a=assets[k];$('mod-key').value=k;$('mod-title').textContent=a.name;$('mod-info').textContent=`Tienes ${qtyL(a)} · Invertido ${fmt(a.invested)}`;['upd-qty','sell-qty','sell-rec'].forEach(i=>$(i).value='');show('m-mod')}
+function openMod(k){const a=assets[k];$('mod-key').value=k;$('mod-title').textContent=a.name;$('edit-inv').value=a.invested.toFixed(2);$('mod-info').textContent=`Tienes ${qtyL(a)} · Invertido ${fmt(a.invested)}`;['upd-qty','sell-qty','sell-rec'].forEach(i=>$(i).value='');show('m-mod')}
+function saveInv(){const k=$('mod-key').value,v=parseFloat(String($('edit-inv').value).replace(',','.'));if(!(v>0)){alert('Introduce un importe válido.');return}assets[k].invested=v;sv();done()}
 function done(){hide('m-mod');hide('m-manage');updateAll()}
 function updQty(){const a=assets[$('mod-key').value],q=parseFloat($('upd-qty').value);if(!(q>0)){alert('Introduce una cantidad válida.');return}a.amount=+q.toFixed(8);sv();done()}
 function sell(){
@@ -510,7 +514,7 @@ function supplyAt(h){let s=0,sub=5e9,left=h+1;while(left>0&&sub>0){const n=Math.
 function showTip(anim){
  $('blk').innerHTML=`<a href="https://mempool.space/block/${tip.hash}" target="_blank" rel="noopener">#${tip.height.toLocaleString('es-ES')}</a>`;
  const m=supplyAt(tip.height);
- $('mined').textContent=`${m.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} BTC (${(m/21e6*100).toFixed(2).replace('.',',')}%)`;
+ $('mined').innerHTML=`${m.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-weight:400;color:#8a8a93">(${(m/21e6*100).toFixed(2).replace('.',',')}%)</span>`;
  if(anim)['blk','mined'].forEach(i=>{const b=$(i);b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash')})}
 function chainTick(){}
 getTip();setInterval(getTip,20000);
