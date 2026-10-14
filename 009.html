@@ -148,6 +148,13 @@ body::before{display:none}
 .cube .a2>span:last-child{margin-left:auto}.cube .back .dim{font-size:.68rem}.cube .back .lk{font-size:.68rem;margin-left:.3rem}
 .chain span{white-space:nowrap}
 .cube .back{align-items:center;text-align:center;gap:.15rem}.cube .back .bp{font-size:1rem}
+.bigcube{position:relative;height:130px;perspective:900px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.bigcube .cube-in{transform:translateZ(-65px)}
+.bigcube.flip .cube-in{transform:translateZ(-65px) rotateX(90deg)}
+.bigcube .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.bigcube .front{transform:translateZ(65px)}
+.bigcube .back{transform:rotateX(-90deg) translateZ(65px)}
+.k .fl{float:right;color:#8a8a93;font-weight:400}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -161,12 +168,10 @@ body::before{display:none}
   <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span>BTC MINADOS <b id="mined">—</b></span></div><div id="ath-box"></div>
   <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
-<section class="c s3">
-  <div class="k">Rendimiento total</div>
-  <div id="percentage" class="d perf">—</div>
-  <div id="perf-eur" class="d pe">—</div>
-  </section>
-<section class="c s3"><div class="k">Inversión total</div><div class="row" style="cursor:default"><b id="inv-total" class="d" style="font-size:1.6rem">—</b></div></section>
+<section class="c s3"><div class="bigcube" onclick="this.classList.toggle('flip')"><div class="cube-in">
+<div class="face front"><div class="k">Rendimiento total <span class="fl">↻</span></div><div id="percentage" class="d perf">—</div><div id="perf-eur" class="d pe">—</div></div>
+<div class="face back"><div class="k">Inversión total <span class="fl">↻</span></div><div class="row" style="cursor:default"><b id="inv-total" class="d" style="font-size:1.6rem">—</b></div></div>
+</div></div></section>
 <section class="c s3">
   <div class="hd"><div class="k">Mis activos</div><div style="display:flex;gap:.5rem"><button class="btn p" onclick="openAdd()">+ Añadir</button><button class="btn" onclick="openManage()">Modificar</button></div></div>
   <div id="assets-list"></div>
@@ -179,12 +184,9 @@ body::before{display:none}
   <div class="k">Distribución</div>
   <div style="height:280px"><canvas id="pie"></canvas></div>
 </section>
-<section class="c s3">
-  <div class="k">Bitcoin vs. resto</div>
-  <div class="split"><div><div id="btc-dom" class="d" style="font-size:2.2rem;font-weight:800;color:var(--coral)">—</div><div class="dim">Bitcoin</div></div><div><div id="rest-dom" class="d" style="font-size:2.2rem;font-weight:800">—</div><div class="dim">Resto</div></div></div>
-  <div class="row"><span class="dim">Cap. Bitcoin</span><b id="btc-cap">—</b></div>
-  <div class="row"><span class="dim">Cap. resto</span><b id="rest-cap">—</b></div>
-</section>
+<section class="c s3"><div class="k">Capitalización crypto</div>
+<div class="row" style="cursor:default;flex-direction:column;align-items:flex-start;gap:.2rem"><span class="dim">Bitcoin</span><b id="btc-cap" class="d" style="font-size:1.3rem">—</b></div>
+<div class="row" style="cursor:default;flex-direction:column;align-items:flex-start;gap:.2rem"><span class="dim">Total cripto (incluye BTC)</span><b id="tot-cap" class="d" style="font-size:1.3rem">—</b></div></section>
 <section class="c all" style="text-align:center">
   <div class="k" style="text-align:left">Miedo y codicia</div>
   <div class="gw"><div class="gb"></div><div id="gn" class="gn"></div><div id="fear-value" class="gv d">—</div></div>
@@ -451,10 +453,11 @@ async function fear(){
   $('fear-value').textContent=v;$('fear-label').textContent=L[0];$('fear-label').style.color=L[1];
   $('gn').style.transform=`translateX(-50%) rotate(${v/100*180-90}deg)`}catch(e){console.error(e)}
 }
-const cmp=n=>n>=1e12?(n/1e12).toFixed(2)+' Bill. €':n>=1e9?(n/1e9).toFixed(2)+' MM €':(n/1e6).toFixed(2)+' M €';
+const cmp=n=>{const f=(x,d)=>x.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});return n>=1e12?f(n/1e12,3)+' Bill. €':n>=1e9?f(n/1e9,2)+' MM €':f(n/1e6,2)+' M €'};
 async function dominance(){
- try{const d=(await(await fetch('https://api.coingecko.com/api/v3/global')).json()).data,b=d.market_cap_percentage.btc,c=d.total_market_cap.eur;
-  $('btc-dom').textContent=b.toFixed(1)+'%';$('rest-dom').textContent=(100-b).toFixed(1)+'%';$('btc-cap').textContent=cmp(c*b/100);$('rest-cap').textContent=cmp(c*(1-b/100))}catch(e){console.error(e)}
+ try{const d=(await(await fetch('https://api.coingecko.com/api/v3/global')).json()).data,c=d.total_market_cap.eur,b=d.market_cap_percentage.btc;
+  const btc=(live.bitcoin&&tip)?live.bitcoin*supplyAt(tip.height):c*b/100;
+  $('btc-cap').textContent=cmp(btc);$('tot-cap').textContent=cmp(Math.max(c,btc))}catch(e){console.error(e)}
 }
 
 // ── Detalle ──
