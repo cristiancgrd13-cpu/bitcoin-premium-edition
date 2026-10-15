@@ -120,7 +120,7 @@ body::before{display:none}
 .sp-read{min-height:2.7rem;font-size:.85rem;line-height:1.35}
 .sp-read .rv{color:var(--bt);font-weight:800;font-size:1.15rem;margin-left:.5rem}
 .sp-cv{height:150px;margin-top:.3rem}
-.athv{color:#fff;margin-left:.4rem}.athd{color:#8a8a93;font-weight:400;margin-left:.3rem}
+.athv{color:#fff;margin-left:.4rem}.athd{color:#8a8a93;font-weight:400;margin-left:.3rem}.athl.one .athv,.athl.one .athd{margin-left:0}
 .rng{display:flex;justify-content:space-between;gap:.15rem;margin-top:.9rem}
 .rng button{flex:1;background:none;border:0;color:#8a8a93;font:600 .82rem 'JetBrains Mono',monospace;padding:.55rem 0;border-radius:999px;cursor:pointer}
 .rng button.on{background:#f2f2f5;color:#111;box-shadow:0 2px 10px rgba(0,0,0,.4)}
@@ -353,9 +353,10 @@ function updateATH(t){
  const b=athSer&&athSer.value>ath.value?athSer:ath,d=new Date(b.date).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}),top=t>=b.value-.005,df=(t/b.value-1)*100;
  const box=$('ath-box'),ds=new Date(b.date).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit'});
  box.innerHTML=`<div class="athl" style="white-space:nowrap">⛏ Máximo Histórico <span class="athv">${fmt(b.value)}</span> <span class="athd">${ds}</span></div>`+(top?'':`<div class="dim" style="font-size:.85rem;margin-top:.25rem">Ahora <span class="dn">${df.toFixed(2)}%</span> respecto al máximo</div>`);
- const el=box.firstElementChild;let fit=false;
- for(const z of [.95,.88,.82,.76,.72]){el.style.fontSize=z+'rem';if(el.scrollWidth<=box.clientWidth){fit=true;break}}
- if(!fit){el.style.fontSize='.85rem';el.innerHTML=`⛏ Máximo Histórico <span class="athv">${fmt(b.value)}</span>`;el.insertAdjacentHTML('afterend',`<div class="dim" style="font-size:.85rem">${ds}</div>`)}}
+ const el=box.firstElementChild;el.classList.add('one');let fit=false;
+ const html=ic=>`${ic?'⛏ ':''}Máximo Histórico <span class="athv">${fmt(b.value)}</span> <span class="athd">${ds}</span>`;
+ for(const [ic,zs] of [[true,[.95,.88,.82,.78]],[false,[.95,.88,.82,.78,.74,.7,.66]]]){el.innerHTML=html(ic);for(const z of zs){el.style.fontSize=z+'rem';if(el.scrollWidth<=box.clientWidth-1){fit=true;break}}if(fit)break}
+ if(!fit){el.classList.remove('one');el.style.fontSize='.85rem';el.innerHTML=`⛏ Máximo Histórico <span class="athv">${fmt(b.value)}</span>`;el.insertAdjacentHTML('afterend',`<div class="dim" style="font-size:.85rem">${ds}</div>`)}}
 // ═══ HISTORIAL REAL: tus compras (cantidades) × precios diarios de Binance ═══
 const L0=Date.UTC(2025,7,16);   // día previo a la 1ª compra: la gráfica arranca en 0
 const LEDGER={ // [fecha, cantidad, € pagados]; cantidad null = se calcula (venta de SOL para comprar BTC)
