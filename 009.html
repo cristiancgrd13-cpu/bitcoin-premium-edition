@@ -319,6 +319,7 @@ function renderAssets(){
  const box=$('assets-list'),keys=Object.keys(assets),sig=keys.join(',');
  if(box.dataset.sig!==sig){box.dataset.sig=sig;box.innerHTML=keys.map(k=>`<div class="cube${flipped.has(k)?' flip':''}" data-k="${k}" onclick="flipCube('${k}')"><div class="cube-in"><div class="face front row"></div><div class="face back"></div></div></div>`).join('')}
  keys.forEach(k=>{const a=assets[k],v=val(k),p=a.invested?(v-a.invested)/a.invested*100:0,el=box.querySelector(`[data-k="${k}"]`),cr=a.type==='crypto';
+  el.querySelector('.front').style.borderLeftColor=el.querySelector('.back').style.borderLeftColor=a.color;
   el.querySelector('.front').innerHTML=`<div class="fx"><span class="ic" style="background:${a.color}26;color:${a.color}">${a.icon}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`;
   el.querySelector('.back').innerHTML=`<span><b style="color:${a.color};font-size:.78rem">${a.name}</b>${cr?'':` <a href="#" class="lk" onclick="event.stopPropagation();openDetail('${k}');return false">valor</a>`}</span><b class="bp">${fmt(cr?a.invested/a.amount:v)}</b><span class="dim">Invertido ${fmt(a.invested)}</span>`})}
 function flipCube(k){const el=$('assets-list').querySelector(`[data-k="${k}"]`);if(!el)return;el.classList.toggle('flip');flipped[el.classList.contains('flip')?'add':'delete'](k)}
