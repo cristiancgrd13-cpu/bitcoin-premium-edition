@@ -171,7 +171,7 @@ body::before{display:none}
 <section class="c all hero">
   <div class="k">Valor total</div>
   <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
-  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span>BTC MINADOS <b id="mined">—</b></span></div><div id="ath-box"></div>
+  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span></div><div id="ath-box"></div>
   <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
 <section class="c s3"><div class="bigcube" onclick="this.classList.toggle('flip')"><div class="cube-in">
@@ -475,7 +475,7 @@ async function goldEur(){
 async function goldCap(){const g=await goldEur();if(g)$('gold-cap').textContent=cmp(GOLD_T*32150.7466*g)}
 async function dominance(){
  try{const d=(await(await fetch('https://api.coingecko.com/api/v3/global')).json()).data,c=d.total_market_cap.eur,b=d.market_cap_percentage.btc;
-  const btc=(live.bitcoin&&tip)?live.bitcoin*supplyAt(tip.height):c*b/100;
+  const btc=(live.bitcoin&&tip)?live.bitcoin*supplyNow():c*b/100;
   $('btc-cap').textContent=cmp(btc);$('tot-cap').textContent=cmp(Math.max(c,btc))}catch(e){console.error(e)}
 }
 
@@ -529,10 +529,20 @@ async function getTip(){
  if(!tip)$('blk').textContent='sin conexión';
 }
 function supplyAt(h){let s=0,sub=5e9,left=h+1;while(left>0&&sub>0){const n=Math.min(left,210000);s+=n*sub;left-=n;sub=Math.floor(sub/2)}return s/1e8}
+let realSup=null,supAt=0;
+const supplyNow=()=>realSup?realSup.btc+supplyAt(tip.height)-supplyAt(realSup.h):supplyAt(tip.height);
+function showSupply(){
+ if(!tip)return;const m=supplyNow();
+ $('lblmined').textContent=realSup?'BTC MINADOS':'BTC MINADOS ≈';
+ $('mined').innerHTML=`${m.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-weight:400;color:#8a8a93">(${(m/21e6*100).toFixed(2).replace('.',',')}%)</span>`}
+async function loadSupply(){
+ if(Date.now()-supAt<45e3)return;supAt=Date.now();
+ try{const d=(await(await fetch('https://api.blockchair.com/bitcoin/stats')).json()).data,h=d.best_block_height!=null?+d.best_block_height:+d.blocks-1,c=Number(d.circulation)/1e8,th=supplyAt(h);
+  if(c>0&&h>0&&Math.abs(c-th)/th<.001)realSup={btc:c,h}}catch(e){}
+ showSupply()}
 function showTip(anim){
  $('blk').innerHTML=`<a href="https://mempool.space/block/${tip.hash}" target="_blank" rel="noopener">#${tip.height.toLocaleString('es-ES')}</a>`;
- const m=supplyAt(tip.height);
- $('mined').innerHTML=`${m.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-weight:400;color:#8a8a93">(${(m/21e6*100).toFixed(2).replace('.',',')}%)</span>`;
+ showSupply();loadSupply();
  if(anim)['blk','mined'].forEach(i=>{const b=$(i);b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash')})}
 function chainTick(){}
 getTip();setInterval(getTip,20000);
