@@ -160,10 +160,11 @@ body::before{display:none}
 .bigcube.h2.flip .cube-in{transform:translateZ(-105px) rotateX(90deg)}
 .bigcube.h2 .front{transform:translateZ(105px)}
 .bigcube.h2 .back{transform:rotateX(-90deg) translateZ(105px)}
+.lg{display:block;width:100%;height:100%}.lg-t{display:inline-block;width:1.2em;height:1.2em;vertical-align:-.25em;margin-right:.1rem}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
-<body><canvas id="bg"></canvas><main class="g">
+<body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="solg" x1="8" y1="22" x2="25" y2="9" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9945FF"/><stop offset="1" stop-color="#14F195"/></linearGradient></defs></svg><canvas id="bg"></canvas><main class="g">
 <div id="tk" class="all tk"></div>
 <header class="all hd"><h1 class="d"><span style="color:#f7931a">₿</span> Mi cartera</h1><span id="clock" class="dim"></span></header>
 
@@ -314,13 +315,17 @@ async function prices(){
  try{const d=await(await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`)).json();ids.forEach(i=>{if(d[i]){live[i]=d[i].eur;chg[i]=d[i].eur_24h_change}})}catch(e){console.error(e)}
 }
 
+const LG={btc: `<circle cx="16" cy="16" r="16" fill="#F7931A"/><g fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.6 9.8v12.4M12.6 9.8h4.6a2.9 2.9 0 0 1 0 5.8h-4.6m0 0h5.2a3.2 3.2 0 0 1 0 6.4h-5.2M15.4 7.6v2.2M18.4 7.6v2.2M15.4 22.2v2.2M18.4 22.2v2.2"/></g>`, eth: `<circle cx="16" cy="16" r="16" fill="#627EEA"/><g fill="#fff"><path fill-opacity=".6" d="M16.5 4v8.87l7.5 3.35z"/><path d="M16.5 4L9 16.22l7.5-3.35z"/><path fill-opacity=".6" d="M16.5 21.97V28L24 17.62z"/><path d="M16.5 28v-6.03L9 17.62z"/><path fill-opacity=".2" d="M16.5 20.57l7.5-4.35-7.5-3.35z"/><path fill-opacity=".6" d="M9 16.22l7.5 4.35v-7.7z"/></g>`, sol: `<circle cx="16" cy="16" r="16" fill="#0b0b0f"/><g fill="url(#solg)"><path d="M8.6 12.6l2.8-3.2h13.2l-2.8 3.2z"/><path d="M8.6 14.2h13.2l2.8 3.2H11.4z"/><path d="M8.6 22.2l2.8-3.2h13.2l-2.8 3.2z"/></g>`};
+const LGID={btc:'btc',eth:'eth',sol:'sol',bitcoin:'btc',ethereum:'eth',solana:'sol'};
+const svgLogo=(k,c)=>LG[LGID[k]]?`<svg class="${c||'lg'}" viewBox="0 0 32 32" aria-hidden="true">${LG[LGID[k]]}</svg>`:'';
+const logo=(k,a)=>svgLogo(k)||a.icon;
 const flipped=new Set();
 function renderAssets(){
  const box=$('assets-list'),keys=Object.keys(assets),sig=keys.join(',');
  if(box.dataset.sig!==sig){box.dataset.sig=sig;box.innerHTML=keys.map(k=>`<div class="cube${flipped.has(k)?' flip':''}" data-k="${k}" onclick="flipCube('${k}')"><div class="cube-in"><div class="face front row"></div><div class="face back"></div></div></div>`).join('')}
  keys.forEach(k=>{const a=assets[k],v=val(k),p=a.invested?(v-a.invested)/a.invested*100:0,el=box.querySelector(`[data-k="${k}"]`),cr=a.type==='crypto';
   el.querySelector('.front').style.borderLeftColor=el.querySelector('.back').style.borderLeftColor=a.color;
-  el.querySelector('.front').innerHTML=`<div class="fx"><span class="ic" style="background:${a.color}26;color:${a.color}">${a.icon}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`;
+  el.querySelector('.front').innerHTML=`<div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`;
   el.querySelector('.back').innerHTML=`<span><b style="color:${a.color};font-size:.78rem">${a.name}</b>${cr?'':` <a href="#" class="lk" onclick="event.stopPropagation();openDetail('${k}');return false">valor</a>`}</span><b class="bp">${fmt(cr?a.invested/a.amount:v)}</b><span class="dim">Invertido ${fmt(a.invested)}</span>`})}
 function flipCube(k){const el=$('assets-list').querySelector(`[data-k="${k}"]`);if(!el)return;el.classList.toggle('flip');flipped[el.classList.contains('flip')?'add':'delete'](k)}
 function editInv(k){const a=assets[k],n=parseFloat((prompt(`Inversión real en € para ${a.name}\nActual: ${fmt(a.invested)}`)||'').replace(',','.'));if(n>0){a.invested=n;sv();updateAll()}}
@@ -490,7 +495,7 @@ function submitAdd(){
  sv();$('add-qty').value=$('add-inv').value='';hide('m-add');updateAll();
 }
 function openManage(){
- $('manage-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];return `<div class="row" onclick="openMod('${k}')"><div class="fx"><span class="ic" style="background:${a.color}26;color:${a.color}">${a.icon}</span><div><b>${a.name}</b><div class="dim">${qtyL(a)} · ${fmt(val(k))}</div></div></div><span class="dim">›</span></div>`}).join('');
+ $('manage-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];return `<div class="row" onclick="openMod('${k}')"><div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b>${a.name}</b><div class="dim">${qtyL(a)} · ${fmt(val(k))}</div></div></div><span class="dim">›</span></div>`}).join('');
  show('m-manage');
 }
 function openMod(k){const a=assets[k];$('mod-key').value=k;$('mod-title').textContent=a.name;$('edit-inv').value=a.invested.toFixed(2);$('mod-info').textContent=`Tienes ${qtyL(a)} · Invertido ${fmt(a.invested)}`;['upd-qty','sell-qty','sell-rec'].forEach(i=>$(i).value='');show('m-mod')}
@@ -527,7 +532,7 @@ function chainTick(){}
 getTip();setInterval(getTip,20000);
 const COINS=[['bitcoin','BTC','₿','#f7931a'],['ethereum','ETH','Ξ','#8c9eff'],['solana','SOL','◎','#b57bff']];
 function tkRender(){
- const one=COINS.map(([id,sy,ic,c])=>{const p=live[id],ch=chg[id];return `<span class="ti"><b style="color:${c}">${ic} ${sy}</b> ${p!=null?fmt(p):'…'}${ch!=null?` <em class="${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'} ${Math.abs(ch).toFixed(2)}%</em>`:''}</span>`}).join('<span class="sep">◆</span>')+'<span class="sep">◆</span>';
+ const one=COINS.map(([id,sy,ic,c])=>{const p=live[id],ch=chg[id];return `<span class="ti"><b style="color:${c}">${svgLogo(id,'lg lg-t')||ic} ${sy}</b> ${p!=null?fmt(p):'…'}${ch!=null?` <em class="${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'} ${Math.abs(ch).toFixed(2)}%</em>`:''}</span>`}).join('<span class="sep">◆</span>')+'<span class="sep">◆</span>';
  const box=$('tk');box.innerHTML=`<div class="tt">${one}</div>`;
  const n=Math.max(1,Math.ceil(box.clientWidth/(box.firstElementChild.scrollWidth||1))),h=one.repeat(n);   // copias suficientes para llenar el ancho
  box.innerHTML=`<div class="tt" style="transform:translateX(${-tkX}px)">${h+h}</div>`}
