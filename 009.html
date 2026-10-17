@@ -161,6 +161,10 @@ body::before{display:none}
 .bigcube.h2 .back{transform:rotateX(-90deg) translateZ(125px)}
 .lg{display:block;width:100%;height:100%}.lg-t{display:inline-block;width:1.2em;height:1.2em;vertical-align:-.25em;margin-right:.1rem}
 .bigcube.h2 .front .row{padding:.6rem .85rem;margin-bottom:.5rem}
+#assets-list .cube .face{overflow:hidden}
+#assets-list .cube .wm{position:absolute;right:-12px;top:50%;width:92px;height:92px;transform:translateY(-50%);opacity:.12;pointer-events:none;z-index:-1}
+#assets-list .cube .wm svg{width:100%;height:100%;display:block}
+#assets-list .cube .back .bk{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);width:30px;height:30px}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -324,10 +328,10 @@ const flipped=new Set();
 function renderAssets(){
  const box=$('assets-list'),keys=Object.keys(assets),sig=keys.join(',');
  if(box.dataset.sig!==sig){box.dataset.sig=sig;box.innerHTML=keys.map(k=>`<div class="cube${flipped.has(k)?' flip':''}" data-k="${k}" onclick="flipCube('${k}')"><div class="cube-in"><div class="face front row"></div><div class="face back"></div></div></div>`).join('')}
- keys.forEach(k=>{const a=assets[k],v=val(k),p=a.invested?(v-a.invested)/a.invested*100:0,el=box.querySelector(`[data-k="${k}"]`),cr=a.type==='crypto';
-  el.querySelector('.front').style.borderLeftColor=el.querySelector('.back').style.borderLeftColor=a.color;
-  el.querySelector('.front').innerHTML=`<div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`;
-  el.querySelector('.back').innerHTML=`<span><b style="color:${a.color};font-size:.78rem">${a.name}</b>${cr?'':` <a href="#" class="lk" onclick="event.stopPropagation();openDetail('${k}');return false">valor</a>`}</span><b class="bp">${fmt(cr?a.invested/a.amount:v)}</b><span class="dim">Invertido ${fmt(a.invested)}</span>`})}
+ keys.forEach(k=>{const a=assets[k],v=val(k),p=a.invested?(v-a.invested)/a.invested*100:0,el=box.querySelector(`[data-k="${k}"]`),cr=a.type==='crypto',wm=svgLogo(k)?`<span class="wm">${svgLogo(k)}</span>`:'';
+  [el.querySelector('.front'),el.querySelector('.back')].forEach(fc=>{fc.style.background=`linear-gradient(100deg,${a.color}30 0%,#16161a 58%)`;fc.style.borderColor=`${a.color}55`;fc.style.borderLeftColor=a.color;fc.style.boxShadow=`0 0 18px ${a.color}24`});
+  el.querySelector('.front').innerHTML=`${wm}<div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`;
+  el.querySelector('.back').innerHTML=`<span class="ic bk" style="background:none">${logo(k,a)}</span>${wm}<span><b style="color:${a.color};font-size:.78rem">${a.name}</b>${cr?'':` <a href="#" class="lk" onclick="event.stopPropagation();openDetail('${k}');return false">valor</a>`}</span><b class="bp">${fmt(cr?a.invested/a.amount:v)}</b><span class="dim">Invertido ${fmt(a.invested)}</span>`})}
 function flipCube(k){const el=$('assets-list').querySelector(`[data-k="${k}"]`);if(!el)return;el.classList.toggle('flip');flipped[el.classList.contains('flip')?'add':'delete'](k)}
 function editInv(k){const a=assets[k],n=parseFloat((prompt(`Inversión real en € para ${a.name}\nActual: ${fmt(a.invested)}`)||'').replace(',','.'));if(n>0){a.invested=n;sv();updateAll()}}
 
