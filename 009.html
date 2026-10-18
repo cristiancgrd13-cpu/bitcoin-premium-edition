@@ -154,11 +154,11 @@ body::before{display:none}
 .bigcube .front{transform:translateZ(65px)}
 .bigcube .back{transform:rotateX(-90deg) translateZ(65px)}
 .k .fl{float:right;color:#8a8a93;font-weight:400}
-.bigcube.h2{height:250px}
-.bigcube.h2 .cube-in{transform:translateZ(-125px)}
-.bigcube.h2.flip .cube-in{transform:translateZ(-125px) rotateX(90deg)}
-.bigcube.h2 .front{transform:translateZ(125px)}
-.bigcube.h2 .back{transform:rotateX(-90deg) translateZ(125px)}
+.bigcube.h2{height:206px}
+.bigcube.h2 .cube-in{transform:translateZ(-103px)}
+.bigcube.h2.flip .cube-in{transform:translateZ(-103px) rotateX(90deg)}
+.bigcube.h2 .front{transform:translateZ(103px)}
+.bigcube.h2 .back{transform:rotateX(-90deg) translateZ(103px)}
 .lg{display:block;width:100%;height:100%}.lg-t{display:inline-block;width:1.2em;height:1.2em;vertical-align:-.25em;margin-right:.1rem}
 .bigcube.h2 .front .row{padding:.6rem .85rem;margin-bottom:.5rem}
 #assets-list .cube .face{overflow:hidden}
@@ -166,6 +166,18 @@ body::before{display:none}
 #assets-list .cube .front .wm{position:absolute;right:12px;left:auto;top:50%;bottom:auto;width:74px;height:74px;min-width:74px;min-height:74px;max-width:74px;max-height:74px;margin:0;padding:0;transform:translateY(-50%);opacity:.12;pointer-events:none;z-index:-1}
 #assets-list .cube .wm svg{width:100%;height:100%;display:block}
 #assets-list .cube .back .bk{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);width:30px;height:30px}
+.prism{--ph:124px;--pa:35.8px;position:relative;height:var(--ph);perspective:700px}
+.prism-in{--n:0;position:absolute;inset:0;transform-style:preserve-3d;transform:translateZ(calc(var(--pa)*-1)) rotateX(calc(var(--n)*120deg));transition:transform .9s cubic-bezier(.45,.05,.2,1)}
+.pf{position:absolute;inset:0;display:flex;align-items:center;gap:.9rem;padding:0 1rem;box-sizing:border-box;border:1px solid;border-left-width:3px;border-radius:8px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.pf:nth-child(1){transform:translateZ(var(--pa))}
+.pf:nth-child(2){transform:rotateX(-120deg) translateZ(var(--pa))}
+.pf:nth-child(3){transform:rotateX(-240deg) translateZ(var(--pa))}
+.pic{width:42px;height:42px;flex:none}.pic svg{width:100%;height:100%;display:block}
+.ptx{display:flex;flex-direction:column;gap:.3rem;min-width:0}.ptx .dim{font-size:.75rem}
+.pv{font-family:'JetBrains Mono',monospace;font-size:1.3rem;white-space:nowrap}
+.dots{display:flex;justify-content:center;gap:.4rem;margin-top:.8rem}
+.dots i{width:6px;height:6px;border-radius:50%;background:#34343c;transition:all .3s}
+.dots i.on{background:var(--bt);width:18px;border-radius:4px}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -197,9 +209,13 @@ body::before{display:none}
 </section>
 <section class="c s3"><div class="bigcube h2" onclick="this.classList.toggle('flip')"><div class="cube-in">
 <div class="face front"><div class="k">Capitalización</div>
-<div class="row" style="cursor:default;flex-direction:column;align-items:flex-start;gap:.2rem"><span class="dim">Bitcoin</span><b id="btc-cap" class="d" style="font-size:1.3rem">—</b></div>
-<div class="row" style="cursor:default;flex-direction:column;align-items:flex-start;gap:.2rem"><span class="dim">Total cripto (incluye BTC)</span><b id="tot-cap" class="d" style="font-size:1.3rem">—</b></div>
-<div class="row" style="cursor:default;flex-direction:column;align-items:flex-start;gap:.2rem"><span class="dim">Oro</span><b id="gold-cap" class="d" style="font-size:1.3rem">—</b></div></div>
+<div class="prism" id="prism"><div class="prism-in" id="prism-in">
+<div class="pf" style="background:linear-gradient(100deg,#f7931a30 0%,#16161a 62%);border-color:#f7931a55;border-left-color:#f7931a"><span class="pic" id="pi0"></span><div class="ptx"><span class="dim">Bitcoin</span><b id="btc-cap" class="pv">—</b></div></div>
+<div class="pf" style="background:linear-gradient(100deg,#8c9eff30 0%,#16161a 62%);border-color:#8c9eff55;border-left-color:#8c9eff"><span class="pic" id="pi1"></span><div class="ptx"><span class="dim">Total cripto (incluye BTC)</span><b id="tot-cap" class="pv">—</b></div></div>
+<div class="pf" style="background:linear-gradient(100deg,#f5c54230 0%,#16161a 62%);border-color:#f5c54255;border-left-color:#f5c542"><span class="pic" id="pi2"></span><div class="ptx"><span class="dim">Oro</span><b id="gold-cap" class="pv">—</b></div></div>
+</div></div>
+<div class="dots" id="dots"><i class="on"></i><i></i><i></i></div>
+</div>
 <div class="face back" style="text-align:center">
   <div class="k" style="text-align:left">Miedo y codicia</div>
   <div class="gw"><div class="gb"></div><div id="gn" class="gn"></div><div id="fear-value" class="gv d">—</div></div>
@@ -478,6 +494,14 @@ async function goldEur(){
  try{const d=await(await fetch('https://api.binance.com/api/v3/ticker/price?symbols='+encodeURIComponent('["PAXGUSDT","EURUSDT"]'))).json(),g=+d.find(x=>x.symbol==='PAXGUSDT').price,e=+d.find(x=>x.symbol==='EURUSDT').price;if(g&&e)return g/e}catch(e){}
  try{const d=await(await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=eur')).json();return d['pax-gold'].eur}catch(e){return null}}
 async function goldCap(){const g=await goldEur();if(g)$('gold-cap').textContent=cmp(GOLD_T*32150.7466*g)}
+const GLOBE='<svg class="lg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#3a49b8"/><g fill="none" stroke="#dfe5ff" stroke-width="1.5" stroke-linecap="round"><circle cx="16" cy="16" r="8.6"/><ellipse cx="16" cy="16" rx="3.8" ry="8.6"/><path d="M7.5 16h17M9 11.4h14M9 20.6h14"/></g></svg>';
+const GOLDI='<svg class="lg" viewBox="0 0 32 32"><defs><linearGradient id="gldg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE08A"/><stop offset="1" stop-color="#C58A12"/></linearGradient></defs><circle cx="16" cy="16" r="16" fill="url(#gldg)"/><path d="M8.2 21.5l2.6-7.2h10.4l2.6 7.2z" fill="#fff" fill-opacity=".92"/><path d="M10.8 14.3l1.4-3.4h7.6l1.4 3.4z" fill="#fff" fill-opacity=".6"/></svg>';
+$('pi0').innerHTML=svgLogo('btc');$('pi1').innerHTML=GLOBE;$('pi2').innerHTML=GOLDI;
+let pN=0,pT=null;
+function prismStep(){pN++;$('prism-in').style.setProperty('--n',pN);[...$('dots').children].forEach((d,i)=>d.classList.toggle('on',i===pN%3))}
+function prismAuto(){clearInterval(pT);pT=setInterval(prismStep,4500)}
+$('prism').addEventListener('click',e=>{e.stopPropagation();prismStep();prismAuto()});
+prismAuto();
 async function dominance(){
  try{const d=(await(await fetch('https://api.coingecko.com/api/v3/global')).json()).data,c=d.total_market_cap.eur,b=d.market_cap_percentage.btc;
   const btc=(live.bitcoin&&tip)?live.bitcoin*supplyNow():c*b/100;
