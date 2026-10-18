@@ -1,193 +1,85 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CoinLink BTC Edition #015</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-        body { font-family: 'Inter', system-ui, sans-serif; }
-        .countdown { font-variant-numeric: tabular-nums; }
-    </style>
-</head>
-<body class="bg-black text-white min-h-screen flex items-center justify-center p-4">
-    <div class="max-w-md w-full text-center">
-        <h1 class="text-5xl font-bold text-amber-400 mb-1">CoinLink BTC Edition</h1>
-        <p class="text-5xl font-bold text-amber-400 mb-10">#015</p>
+<!-- ═══ PARCHE TIEMPO REAL (WebSocket de Binance) ═══
+     Pégalo justo antes de </body>, es decir, después del último </script> de tu archivo.
+     No cambia nada del diseño ni de tus datos: solo añade las actualizaciones en directo. -->
+<style>
+#total-value{display:inline-flex;vertical-align:bottom}
+#total-value .od,#total-value .oc{display:block;width:.55em;height:1em;overflow:hidden;text-align:center}
+#total-value .od span{display:block;transition:transform 1s cubic-bezier(.2,.9,.2,1)}
+#total-value .od em{display:block;height:1em;font-style:normal}
+</style>
+<script>
+(()=>{
+const WS='wss://stream.binance.com:9443/stream?streams=btceur@miniTicker/etheur@miniTicker/soleur@miniTicker';
+const MAP={BTCEUR:'bitcoin',ETHEUR:'ethereum',SOLEUR:'solana'},B=['bitcoin','ethereum','solana'];
+let ws=null,wsOk=false,last=0,dirty=true,retry=0,lastP=0,busy=false;
+const _bin=window.binPrices,_pr=window.prices,_an=window.anim,_f=window.fetch.bind(window);
 
-        <!-- VALOR DEL NFC -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-amber-500/30">
-            <p class="text-amber-400 text-lg tracking-widest mb-3">VALOR DEL NFC</p>
-            <div class="flex items-baseline justify-center gap-3">
-                <div id="nominal" class="text-6xl font-bold text-white">100.00</div>
-                <div class="text-5xl font-bold text-amber-400">€</div>
-            </div>
-            <div id="sats" class="text-4xl font-mono text-emerald-400 mt-2">182.500 sats</div>
-        </div>
+// 1) Con el WebSocket abierto no se consulta la API; si se corta, vuelve la API normal de Binance
+window.fetch=(u,o)=>(wsOk&&typeof u==='string'&&u.includes('/api/v3/ticker/24hr'))?Promise.reject(new Error('ws')):_f(u,o);
+window.binPrices=async()=>wsOk?true:_bin();
+window.prices=async()=>{
+ const more=Object.values(assets).some(a=>a.type==='crypto'&&!B.includes(a.coingeckoId));
+ if(wsOk&&!more)return;
+ const now=Date.now();if(now-lastP<(wsOk?2e4:3e3))return;
+ lastP=now;return _pr();
+};
 
-        <!-- PRECIO BTC -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-8">
-            <p class="text-zinc-400 text-sm mb-3">PRECIO DE BITCOIN</p>
-            <div id="btc-price" class="text-4xl font-mono text-amber-300">-- €</div>
-        </div>
+// 2) WebSocket: precio de cierre (c) y apertura (o) -> % de 24 h. Reconecta solo.
+function reconnect(){if(reconnect.t)return;reconnect.t=setTimeout(()=>{reconnect.t=0;connect()},Math.min(3e4,1e3*Math.pow(2,retry++)))}
+function connect(){
+ clearTimeout(reconnect.t);reconnect.t=0;if(ws&&ws.readyState<2)return;
+ try{ws=new WebSocket(WS)}catch(e){return reconnect()}
+ ws.onopen=()=>{retry=0};
+ ws.onmessage=e=>{try{const d=JSON.parse(e.data).data,id=MAP[d.s];if(!id)return;live[id]=+d.c;chg[id]=(+d.c/+d.o-1)*100;wsOk=true;last=Date.now();dirty=true}catch(x){}};
+ ws.onclose=()=>{wsOk=false;dirty=true;reconnect()};
+ ws.onerror=()=>{try{ws.close()}catch(e){}};
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden&&(!ws||ws.readyState>1)){retry=0;connect()}});
 
-        <!-- PRECIO DE COMPRA + CUENTA ATRÁS -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-emerald-500/30">
-            <p class="text-emerald-400 text-sm mb-2">PRECIO PROMEDIO DE COMPRA</p>
-            <div class="flex items-baseline justify-center gap-3">
-                <div id="avg-buy-price" class="text-5xl font-mono text-white">100.00</div>
-                <div class="text-4xl font-bold text-amber-400">€</div>
-            </div>
-            <p id="btc-buy-price" class="text-zinc-400 text-sm mt-2">≈ -- €/BTC</p>
-            <p id="buy-date" class="text-xs text-zinc-500 mt-4">Fecha de adquisición: 19/06/2026</p>
-            
-            <!-- Cuenta atrás -->
-            <div class="mt-6 pt-6 border-t border-zinc-700">
-                <p class="text-amber-400 text-sm mb-3">Plazo de Vencimiento (3 AÑOS)</p>
-                <div id="countdown" class="countdown text-3xl font-mono text-white grid grid-cols-4 gap-2 text-center">
-                    <div><span id="years" class="text-4xl">3</span><br><span class="text-xs text-zinc-500">AÑOS</span></div>
-                    <div><span id="days" class="text-4xl">00</span><br><span class="text-xs text-zinc-500">DÍAS</span></div>
-                    <div><span id="hours" class="text-4xl">00</span><br><span class="text-xs text-zinc-500">HRS</span></div>
-                    <div><span id="minutes" class="text-4xl">00</span><br><span class="text-xs text-zinc-500">MIN</span></div>
-                </div>
-                <p class="text-red-400 text-xs mt-4">* Penalización del 30% si se vende antes de los 3 años</p>
-            </div>
-        </div>
+// 3) Parpadeo verde/rojo solo en lo que cambia
+const snap={};
+const num=t=>{const s=String(t).replace(/[^\d.,-]/g,'');return +(s.includes(',')?s.replace(/\./g,'').replace(',','.'):s)||0};
+const flash=(el,up)=>el.animate([{background:up?'rgba(34,214,138,.4)':'rgba(255,90,90,.4)'},{background:'transparent'}],{duration:900});
+function fl(el,key){if(!el)return;const t=el.textContent,o=snap[key];snap[key]=t;if(o!==undefined&&o!==t)flash(el,num(t)>=num(o))}
 
-        <!-- RENDIMIENTO -->
-        <div class="bg-zinc-900 rounded-3xl p-8 mb-8 border border-amber-500/30">
-            <p class="text-zinc-400 text-sm mb-3">RENDIMIENTO</p>
-            <div id="percentage" class="text-5xl font-bold">+0.00%</div>
-        </div>
+// 4) Total con cifras que giran (odómetro)
+window.anim=function(el,t){
+ if(el.id!=='total-value')return _an(el,t);
+ const s=t.toLocaleString('es-ES',nf);
+ if(el.dataset.l!==String(s.length)){
+  el.dataset.l=s.length;
+  el.innerHTML=[...s].map(c=>/\d/.test(c)?'<b class="od"><span>'+[0,1,2,3,4,5,6,7,8,9].map(n=>'<em>'+n+'</em>').join('')+'</span></b>':'<b class="oc">'+c+'</b>').join('');
+  void el.offsetWidth;
+ }
+ [...s].forEach((c,i)=>{if(/\d/.test(c))el.children[i].firstChild.style.transform='translateY('+(-c*10)+'%)'});
+ if(el._p!=null&&Math.abs(t-el._p)>=.005)el.animate([{color:t>el._p?'#22d68a':'#ff5a5a'},{color:'#fff'}],{duration:1000});
+ el._p=t;
+};
 
-        <a href="#" id="main-link"
-           class="block w-full py-6 bg-amber-500 hover:bg-amber-600 active:bg-amber-700 text-black font-bold text-2xl rounded-3xl transition-all mb-8">
-            Acceso a la Web
-        </a>
+// 5) Cinta de precios de arriba: se actualiza cada segundo sin reconstruirla
+function tk(){
+ document.querySelectorAll('#tk .ti').forEach((e,i)=>{
+  const c=COINS[i%COINS.length],p=live[c[0]],ch=chg[c[0]],n=e.childNodes[1],em=e.querySelector('em');
+  if(p==null||!n)return;
+  const old=n.nodeValue;n.nodeValue=' '+fmt(p)+(em?' ':'');
+  if(em&&ch!=null){em.textContent=(ch>=0?'▲ ':'▼ ')+Math.abs(ch).toFixed(2)+'%';em.className=ch>=0?'up':'dn'}
+  if(old&&old.indexOf('…')<0&&old!==n.nodeValue)flash(e,num(n.nodeValue)>=num(old));
+ });
+}
+function after(){
+ fl(document.getElementById('percentage'),'pct');fl(document.getElementById('perf-eur'),'pe');
+ document.querySelectorAll('#assets-list [data-k]').forEach(c=>{const k=c.dataset.k,v=c.querySelector('.front>div:last-child');if(v){fl(v.firstElementChild,k+'v');fl(v.lastElementChild,k+'p')}});
+ tk();
+}
 
-        <p class="text-amber-400 text-lg font-medium mb-6">"Invertir nunca fue tan fácil"</p>
+// 6) Cada segundo: refresca precios, % de 24 h, valor de cada activo y total
+setInterval(async()=>{
+ if(wsOk&&Date.now()-last>15e3){wsOk=false;try{ws.close()}catch(e){}}
+ if(busy||(wsOk&&!dirty))return;
+ busy=true;dirty=false;
+ try{await updateAll();after()}catch(e){}finally{busy=false}
+},1000);
 
-        <!-- FAQ -->
-        <div class="bg-zinc-900 rounded-3xl p-8 text-left">
-            <p class="text-amber-400 text-xl font-semibold mb-6">FAQ</p>
-            <p class="text-emerald-400 font-medium mb-4">¿Por qué invertir con nosotros?</p>
-            <ul class="space-y-4 text-zinc-300 text-sm">
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> Tu liquidez 24/7 cuando lo necesites.</li>
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> Transparencia, seriedad y confianza.</li>
-                <li class="flex gap-3"><span class="text-emerald-400">•</span> Respaldado con BTC real en la blockchain.</li>
-            </ul>
-        </div>
-
-        <p class="text-xs text-zinc-500 mt-8">El Valor del NFC se actualiza cada 1 segundo según el precio real de Bitcoin</p>
-
-        <!-- GRÁFICA BITCOIN TRADINGVIEW -->
-        <div class="mt-8 bg-zinc-900 rounded-3xl p-4 border border-amber-500/30">
-            <p class="text-amber-400 text-sm mb-3 text-center">GRÁFICA BITCOIN (TradingView)</p>
-            <div class="tradingview-widget-container">
-                <div id="tradingview-chart" style="height: 400px;"></div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        let fixedSats = 182500;
-        let initialInvestment = 100.00;
-        let acquisitionDate = new Date("2026-06-19T00:00:00");
-        let initialBtcPrice = 54800;
-
-        async function updatePrice() {
-            try {
-                const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=eur');
-                const data = await res.json();
-                const btcEur = data.bitcoin.eur || initialBtcPrice;
-                
-                const nominalEur = (fixedSats / 100000000 * btcEur).toFixed(2);
-                
-                document.getElementById('nominal').textContent = nominalEur;
-                document.getElementById('sats').textContent = fixedSats.toLocaleString('es-ES') + ' sats';
-                document.getElementById('btc-price').textContent = btcEur.toLocaleString('es-ES') + ' €';
-
-                document.getElementById('avg-buy-price').textContent = initialInvestment.toFixed(2);
-                document.getElementById('btc-buy-price').textContent = `≈ ${initialBtcPrice.toLocaleString('es-ES')} €/BTC`;
-
-                const percentageChange = ((parseFloat(nominalEur) - initialInvestment) / initialInvestment * 100).toFixed(2);
-                const percElement = document.getElementById('percentage');
-                percElement.textContent = (percentageChange >= 0 ? '+' : '') + percentageChange + '%';
-                
-                if (percentageChange >= 0) {
-                    percElement.classList.add('text-emerald-400');
-                    percElement.classList.remove('text-red-400');
-                } else {
-                    percElement.classList.add('text-red-400');
-                    percElement.classList.remove('text-emerald-400');
-                }
-            } catch(e) {
-                console.error("Error fetching price", e);
-            }
-        }
-
-        function updateCountdown() {
-            const now = new Date();
-            const maturityDate = new Date(acquisitionDate);
-            maturityDate.setFullYear(maturityDate.getFullYear() + 3);
-
-            let diff = maturityDate - now;
-
-            if (diff <= 0) {
-                document.getElementById('countdown').innerHTML = `<span class="text-emerald-400">¡Madura!</span>`;
-                return;
-            }
-
-            const years = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
-            diff -= years * (1000 * 60 * 60 * 24 * 365);
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            diff -= days * (1000 * 60 * 60 * 24);
-            const hours = Math.floor(diff / (1000 * 60 * 60));
-            diff -= hours * (1000 * 60 * 60);
-            const minutes = Math.floor(diff / (1000 * 60));
-
-            document.getElementById('years').textContent = years;
-            document.getElementById('days').textContent = days.toString().padStart(2, '0');
-            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
-            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
-        }
-
-        // TradingView Chart
-        function loadTradingView() {
-            const script = document.createElement('script');
-            script.src = 'https://s3.tradingview.com/tv.js';
-            script.async = true;
-            script.onload = function() {
-                new TradingView.widget(
-                {
-                    "width": "100%",
-                    "height": "400",
-                    "symbol": "BINANCE:BTCUSDT",
-                    "interval": "60",
-                    "timezone": "Etc/UTC",
-                    "theme": "dark",
-                    "style": "1",
-                    "locale": "es",
-                    "toolbar_bg": "#1f2937",
-                    "enable_publishing": false,
-                    "hide_top_toolbar": false,
-                    "hide_legend": true,
-                    "save_image": false,
-                    "container_id": "tradingview-chart"
-                }
-                );
-            };
-            document.head.appendChild(script);
-        }
-
-        window.onload = () => {
-            updatePrice();
-            updateCountdown();
-            loadTradingView();
-            setInterval(updatePrice, 1000); // Cada 1 segundo
-            setInterval(updateCountdown, 30000);
-        };
-    </script>
-</body>
-</html>
+connect();
+})();
+</script>
