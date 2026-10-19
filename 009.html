@@ -574,13 +574,20 @@ const tick=()=>$('clock').textContent=new Date().toLocaleString('es-ES',{day:'2-
 
 const hx=s=>{let h=0x811c9dc5,o='';for(let r=0;r<4;r++){for(let i=0;i<s.length;i++){h^=s.charCodeAt(i)+r;h=Math.imul(h,16777619)>>>0}o+=h.toString(16).padStart(8,'0')}return o};
 let tip=null;
-async function getTip(){
- for(const b of ['https://mempool.space/api','https://blockstream.info/api']){
-  try{const [h,x]=await Promise.all([fetch(b+'/blocks/tip/height').then(r=>r.text()),fetch(b+'/blocks/tip/hash').then(r=>r.text())]);
-   const height=parseInt(h);if(!height||x.trim().length!==64)continue;
-   if(!tip||tip.height!==height){const first=!tip;tip={height,hash:x.trim()};showTip(!first)}return}catch(e){}
- }
- if(!tip)$('blk').textContent='sin conexión';
+const TIP_TO=7000,withTO=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
+async function tipFrom(b){
+ const [h,x]=await Promise.all([withTO(fetch(b+'/blocks/tip/height').then(r=>r.text()),TIP_TO),withTO(fetch(b+'/blocks/tip/hash').then(r=>r.text()),TIP_TO)]);
+ const height=parseInt(h);if(!height||x.trim().length!==64)throw new Error('dato no válido');return{height,hash:x.trim()}}
+async function tipBlockchair(){
+ const d=(await withTO(fetch('https://api.blockchair.com/bitcoin/stats').then(r=>r.json()),TIP_TO)).data,height=+d.best_block_height;
+ if(!height||!d.best_block_hash)throw new Error('dato no válido');return{height,hash:d.best_block_hash}}
+let getting=false;
+async function getTip(){ // consulta las 3 fuentes a la vez y se queda con la primera que responda bien
+ if(getting)return;getting=true;
+ try{const t=await Promise.any([tipFrom('https://mempool.space/api'),tipFrom('https://blockstream.info/api'),tipBlockchair()]);
+  if(!tip||t.height>tip.height||(t.height===tip.height&&t.hash!==tip.hash)){const first=!tip;tip=t;showTip(!first)}}
+ catch(e){if(!tip)$('blk').textContent='sin conexión'}
+ finally{getting=false;if(!tip)setTimeout(getTip,4000)}   // sin dato aún: reintenta enseguida
 }
 function supplyAt(h){let s=0,sub=5e9,left=h+1;while(left>0&&sub>0){const n=Math.min(left,210000);s+=n*sub;left-=n;sub=Math.floor(sub/2)}return s/1e8}
 let realSup=null,supAt=0;
