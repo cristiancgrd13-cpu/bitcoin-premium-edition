@@ -178,12 +178,13 @@ body::before{display:none}
 .dots{display:flex;justify-content:center;gap:.4rem;margin-top:.8rem}
 .dots i{width:6px;height:6px;border-radius:50%;background:#34343c;transition:all .3s}
 .dots i.on{background:var(--bt);width:18px;border-radius:4px}
+.wsd{display:inline-block;width:7px;height:7px;border-radius:50%;background:#555;margin-right:.45rem;vertical-align:middle}.wsd.on{background:#22d68a;box-shadow:0 0 6px #22d68a}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
 <body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="solg" x1="8" y1="22" x2="25" y2="9" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9945FF"/><stop offset="1" stop-color="#14F195"/></linearGradient></defs></svg><canvas id="bg"></canvas><main class="g">
 <div id="tk" class="all tk"></div>
-<header class="all hd"><h1 class="d"><span style="color:#f7931a">₿</span> Mi cartera</h1><span id="clock" class="dim"></span></header>
+<header class="all hd"><h1 class="d"><span style="color:#f7931a">₿</span> Mi cartera</h1><span class="dim"><i id="wsdot" class="wsd"></i><span id="clock"></span></span></header>
 
 <section class="c all hero">
   <div class="k">Valor total</div>
@@ -331,7 +332,7 @@ async function binPrices(){
  try{const d=await(await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols='+encodeURIComponent(JSON.stringify(Object.keys(M))))).json();
   if(!Array.isArray(d))return false;d.forEach(x=>{const id=M[x.symbol];if(id){live[id]=+x.lastPrice;chg[id]=+x.priceChangePercent}});return true}catch(e){return false}}
 async function prices(){
- const okB=await binPrices(),B=['bitcoin','ethereum','solana'];
+ const okB=(Date.now()-wsAlive<10000)||await binPrices(),B=['bitcoin','ethereum','solana'];
  const ids=[...new Set([...B,...Object.values(assets).filter(a=>a.type==='crypto').map(a=>a.coingeckoId)])].filter(i=>!(okB&&B.includes(i)));
  if(!ids.length)return;
  try{const d=await(await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`)).json();ids.forEach(i=>{if(d[i]){live[i]=d[i].eur;chg[i]=d[i].eur_24h_change}})}catch(e){console.error(e)}
@@ -471,6 +472,30 @@ function drawSpark(t){
     c.save();c.strokeStyle='rgba(247,147,26,.7)';c.setLineDash([4,4]);c.beginPath();c.moveTo(p.x,top);c.lineTo(p.x,bottom);c.stroke();c.setLineDash([]);c.fillStyle='#fff';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y,5,0,7);c.fill();c.stroke();c.restore()}}]});
  showRead(null);updateATH(t)}
 
+// ═══ PRECIOS EN TIEMPO REAL: WebSocket de Binance (BTC, ETH, SOL) ═══
+let ws=null,wsAlive=0,wsRetry=0,wsHost=0,wsDirty=false,wsFull=0,wsPie=0;
+const WS_MAP={btceur:'bitcoin',etheur:'ethereum',soleur:'solana'},WS_HOSTS=['wss://stream.binance.com:9443','wss://data-stream.binance.vision'];
+function wsConnect(){
+ try{ws=new WebSocket(WS_HOSTS[wsHost%WS_HOSTS.length]+'/stream?streams='+Object.keys(WS_MAP).map(k=>k+'@ticker').join('/'))}catch(e){setTimeout(wsConnect,5000);return}
+ ws.onopen=()=>{wsRetry=0};
+ ws.onmessage=e=>{try{const d=JSON.parse(e.data).data,id=d&&WS_MAP[String(d.s).toLowerCase()];if(id){live[id]=+d.c;chg[id]=+d.P;wsAlive=Date.now();wsDirty=true}}catch(x){}};
+ ws.onclose=()=>{wsHost++;setTimeout(wsConnect,Math.min(30000,1000*2**Math.min(wsRetry++,5)))};
+ ws.onerror=()=>{try{ws.close()}catch(x){}}}
+function fastRender(){ // se repite cada segundo con los precios que llegan por el socket
+ const t=tot(),i=inv();if(!(t>0)||!i)return;
+ const p=(t-i)/i*100,g=t-i,col=p>=0?'#22d68a':'#ff5a5a';
+ anim($('total-value'),t);
+ $('percentage').textContent=(p>=0?'+':'')+p.toFixed(2)+'%';$('percentage').style.color=col;
+ $('perf-eur').textContent=(g>=0?'+':'')+fmt(g);$('perf-eur').style.color=col;
+ renderAssets();lastT=t;
+ if(tip&&live.bitcoin)$('btc-cap').textContent=cmp(live.bitcoin*supplyNow());
+ const n=Date.now();
+ if(n-wsFull>2000){wsFull=n;drawSpark(t)}
+ if(n-wsPie>5000){wsPie=n;updatePie()}}
+function wsTick(){
+ if(ws&&ws.readyState===1&&Date.now()-wsAlive>20000)try{ws.close()}catch(x){}   // conexión muda: reconectar
+ $('wsdot').className='wsd'+(Date.now()-wsAlive<8000?' on':'');
+ if(wsDirty){wsDirty=false;fastRender()}}
 async function updateAll(){
  await prices();
  renderAssets();
@@ -867,5 +892,5 @@ renderWalletsList();populateFiscalYearSelect();
 tick();setInterval(tick,3e4);
 const clockY=()=>$('annual-date').textContent=new Date().toLocaleString('es-ES',{weekday:'short',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});clockY();setInterval(clockY,1000);
 updateAll();fear();dominance();goldCap();
-setInterval(updateAll,15e3);setInterval(binPrices,5e3);setInterval(fear,36e5);setInterval(dominance,6e4);setInterval(goldCap,6e4);
+setInterval(updateAll,15e3);setInterval(()=>{if(Date.now()-wsAlive>10000)binPrices()},5e3);wsConnect();setInterval(wsTick,1000);setInterval(fear,36e5);setInterval(dominance,6e4);setInterval(goldCap,6e4);
 </script></body></html>
