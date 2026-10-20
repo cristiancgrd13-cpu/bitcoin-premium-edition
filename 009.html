@@ -178,13 +178,22 @@ body::before{display:none}
 .dots{display:flex;justify-content:center;gap:.4rem;margin-top:.8rem}
 .dots i{width:6px;height:6px;border-radius:50%;background:#34343c;transition:all .3s}
 .dots i.on{background:var(--bt);width:18px;border-radius:4px}
-.wsd{display:inline-block;width:7px;height:7px;border-radius:50%;background:#555;margin-right:.45rem;vertical-align:middle}.wsd.on{background:#22d68a;box-shadow:0 0 6px #22d68a}
+#manage-list .mcard{position:relative;isolation:isolate;height:84px;margin-bottom:.8rem;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.7rem .9rem;border:1px solid;border-left-width:3px;border-radius:6px;overflow:hidden;cursor:pointer}
+#manage-list .mcard>.fx{flex:1;min-width:0;gap:.55rem}
+#manage-list .mcard>.fx>div{min-width:0}
+#manage-list .mcard>.fx>div>*{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#manage-list .mcard>.fx>div>.dim{margin-top:.5rem;font-size:.75rem}
+#manage-list .mcard>div:last-child{flex:none;white-space:nowrap;display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
+#manage-list .mcard .ic{width:30px;height:30px;flex:none}
+#manage-list .mcard b.d{font-size:.92rem}
+#manage-list .mcard .wm{position:absolute;right:12px;top:50%;width:74px;height:74px;transform:translateY(-50%);opacity:.12;pointer-events:none;z-index:-1}
+#manage-list .mcard .wm svg{width:100%;height:100%;display:block}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
 <body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="solg" x1="8" y1="22" x2="25" y2="9" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9945FF"/><stop offset="1" stop-color="#14F195"/></linearGradient></defs></svg><canvas id="bg"></canvas><main class="g">
 <div id="tk" class="all tk"></div>
-<header class="all hd"><h1 class="d"><span style="color:#f7931a">₿</span> Mi cartera</h1><span class="dim"><i id="wsdot" class="wsd"></i><span id="clock"></span></span></header>
+<header class="all hd"><h1 class="d"><span style="color:#f7931a">₿</span> Mi cartera</h1><span id="clock" class="dim"></span></header>
 
 <section class="c all hero">
   <div class="k">Valor total</div>
@@ -332,7 +341,7 @@ async function binPrices(){
  try{const d=await(await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols='+encodeURIComponent(JSON.stringify(Object.keys(M))))).json();
   if(!Array.isArray(d))return false;d.forEach(x=>{const id=M[x.symbol];if(id){live[id]=+x.lastPrice;chg[id]=+x.priceChangePercent}});return true}catch(e){return false}}
 async function prices(){
- const okB=(Date.now()-wsAlive<10000)||await binPrices(),B=['bitcoin','ethereum','solana'];
+ const okB=await binPrices(),B=['bitcoin','ethereum','solana'];
  const ids=[...new Set([...B,...Object.values(assets).filter(a=>a.type==='crypto').map(a=>a.coingeckoId)])].filter(i=>!(okB&&B.includes(i)));
  if(!ids.length)return;
  try{const d=await(await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`)).json();ids.forEach(i=>{if(d[i]){live[i]=d[i].eur;chg[i]=d[i].eur_24h_change}})}catch(e){console.error(e)}
@@ -472,30 +481,6 @@ function drawSpark(t){
     c.save();c.strokeStyle='rgba(247,147,26,.7)';c.setLineDash([4,4]);c.beginPath();c.moveTo(p.x,top);c.lineTo(p.x,bottom);c.stroke();c.setLineDash([]);c.fillStyle='#fff';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y,5,0,7);c.fill();c.stroke();c.restore()}}]});
  showRead(null);updateATH(t)}
 
-// ═══ PRECIOS EN TIEMPO REAL: WebSocket de Binance (BTC, ETH, SOL) ═══
-let ws=null,wsAlive=0,wsRetry=0,wsHost=0,wsDirty=false,wsFull=0,wsPie=0;
-const WS_MAP={btceur:'bitcoin',etheur:'ethereum',soleur:'solana'},WS_HOSTS=['wss://stream.binance.com:9443','wss://data-stream.binance.vision'];
-function wsConnect(){
- try{ws=new WebSocket(WS_HOSTS[wsHost%WS_HOSTS.length]+'/stream?streams='+Object.keys(WS_MAP).map(k=>k+'@ticker').join('/'))}catch(e){setTimeout(wsConnect,5000);return}
- ws.onopen=()=>{wsRetry=0};
- ws.onmessage=e=>{try{const d=JSON.parse(e.data).data,id=d&&WS_MAP[String(d.s).toLowerCase()];if(id){live[id]=+d.c;chg[id]=+d.P;wsAlive=Date.now();wsDirty=true}}catch(x){}};
- ws.onclose=()=>{wsHost++;setTimeout(wsConnect,Math.min(30000,1000*2**Math.min(wsRetry++,5)))};
- ws.onerror=()=>{try{ws.close()}catch(x){}}}
-function fastRender(){ // se repite cada segundo con los precios que llegan por el socket
- const t=tot(),i=inv();if(!(t>0)||!i)return;
- const p=(t-i)/i*100,g=t-i,col=p>=0?'#22d68a':'#ff5a5a';
- anim($('total-value'),t);
- $('percentage').textContent=(p>=0?'+':'')+p.toFixed(2)+'%';$('percentage').style.color=col;
- $('perf-eur').textContent=(g>=0?'+':'')+fmt(g);$('perf-eur').style.color=col;
- renderAssets();lastT=t;
- if(tip&&live.bitcoin)$('btc-cap').textContent=cmp(live.bitcoin*supplyNow());
- const n=Date.now();
- if(n-wsFull>2000){wsFull=n;drawSpark(t)}
- if(n-wsPie>5000){wsPie=n;updatePie()}}
-function wsTick(){
- if(ws&&ws.readyState===1&&Date.now()-wsAlive>20000)try{ws.close()}catch(x){}   // conexión muda: reconectar
- $('wsdot').className='wsd'+(Date.now()-wsAlive<8000?' on':'');
- if(wsDirty){wsDirty=false;fastRender()}}
 async function updateAll(){
  await prices();
  renderAssets();
@@ -554,8 +539,11 @@ function submitAdd(){
  else{const m=META[k];assets[k]=m.t==='c'?cry(k,q,v):{type:'manual',name:m.name,icon:m.icon,color:m.color,amount:q,invested:v,currentValue:v}}
  sv();$('add-qty').value=$('add-inv').value='';hide('m-add');updateAll();
 }
+function cardFront(k){ // mismo contenido que la cara delantera de Mis activos
+ const a=assets[k],v=val(k),p=a.invested?(v-a.invested)/a.invested*100:0,wm=svgLogo(k)?`<span class="wm">${svgLogo(k)}</span>`:'';
+ return `${wm}<div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`}
 function openManage(){
- $('manage-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];return `<div class="row" onclick="openMod('${k}')"><div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b>${a.name}</b><div class="dim">${qtyL(a)} · ${fmt(val(k))}</div></div></div><span class="dim">›</span></div>`}).join('');
+ $('manage-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];return `<div class="mcard" onclick="openMod('${k}')" style="background:linear-gradient(100deg,${a.color}30 0%,#16161a 58%);border-color:${a.color}55;border-left-color:${a.color};box-shadow:0 0 18px ${a.color}24">${cardFront(k)}</div>`}).join('');
  show('m-manage');
 }
 function openMod(k){const a=assets[k];$('mod-key').value=k;$('mod-title').textContent=a.name;$('edit-inv').value=a.invested.toFixed(2);$('mod-info').textContent=`Tienes ${qtyL(a)} · Invertido ${fmt(a.invested)}`;['upd-qty','sell-qty','sell-rec'].forEach(i=>$(i).value='');show('m-mod')}
@@ -899,5 +887,5 @@ renderWalletsList();populateFiscalYearSelect();
 tick();setInterval(tick,3e4);
 const clockY=()=>$('annual-date').textContent=new Date().toLocaleString('es-ES',{weekday:'short',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});clockY();setInterval(clockY,1000);
 updateAll();fear();dominance();goldCap();
-setInterval(updateAll,15e3);setInterval(()=>{if(Date.now()-wsAlive>10000)binPrices()},5e3);wsConnect();setInterval(wsTick,1000);setInterval(fear,36e5);setInterval(dominance,6e4);setInterval(goldCap,6e4);
+setInterval(updateAll,15e3);setInterval(binPrices,5e3);setInterval(fear,36e5);setInterval(dominance,6e4);setInterval(goldCap,6e4);
 </script></body></html>
