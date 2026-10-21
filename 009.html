@@ -188,7 +188,7 @@ body::before{display:none}
 #manage-list .mcard b.d{font-size:.92rem}
 #manage-list .mcard .wm{position:absolute;right:12px;top:50%;width:74px;height:74px;transform:translateY(-50%);opacity:.12;pointer-events:none;z-index:-1}
 #manage-list .mcard .wm svg{width:100%;height:100%;display:block}
-.c.hero{background-image:linear-gradient(180deg,rgba(247,147,26,.26) 0%,rgba(247,147,26,.08) 45%,rgba(247,147,26,0) 78%),linear-gradient(rgba(247,147,26,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(247,147,26,.035) 1px,transparent 1px);background-size:100% 100%,26px 26px,26px 26px;border-color:rgba(247,147,26,.38);border-top-color:var(--bt);box-shadow:0 0 26px rgba(247,147,26,.14)}
+.c.tint{background-image:linear-gradient(180deg,rgba(var(--tc),.26) 0%,rgba(var(--tc),.08) 45%,rgba(var(--tc),0) 78%),linear-gradient(rgba(var(--tc),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--tc),.04) 1px,transparent 1px);background-size:100% 100%,26px 26px,26px 26px;border-color:rgba(var(--tc),.38);border-top-color:rgb(var(--tc));box-shadow:0 0 26px rgba(var(--tc),.14);transition:border-color .6s,box-shadow .6s}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -196,29 +196,29 @@ body::before{display:none}
 <div id="tk" class="all tk"></div>
 <header class="all hd"><h1 class="d"><span style="color:#f7931a">₿</span> Mi cartera</h1><span id="clock" class="dim"></span></header>
 
-<section class="c all hero">
+<section class="c all hero tint" style="--tc:247,147,26">
   <div class="k">Valor total</div>
   <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
   <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span></div><div id="ath-box"></div>
   <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
-<section class="c s3"><div class="bigcube" onclick="this.classList.toggle('flip')"><div class="cube-in">
+<section class="c s3 tint" data-front="34,214,138" data-back="150,165,200" style="--tc:34,214,138"><div class="bigcube" onclick="flipTint(this)"><div class="cube-in">
 <div class="face front"><div class="k">Rendimiento total</div><div id="percentage" class="d perf">—</div><div id="perf-eur" class="d pe">—</div></div>
 <div class="face back"><div class="k">Inversión total</div><div class="row" style="cursor:default"><b id="inv-total" class="d" style="font-size:1.6rem">—</b></div></div>
 </div></div></section>
-<section class="c s3">
+<section class="c s3 tint" style="--tc:150,160,185">
   <div class="hd"><div class="k">Mis activos</div><div style="display:flex;gap:.5rem"><button class="btn p" onclick="openAdd()">+ Añadir</button><button class="btn" onclick="openManage()">Modificar</button></div></div>
   <div id="assets-list"></div>
 </section>
-<section class="c s3">
+<section class="c s3 tint" style="--tc:45,212,191">
   <div class="k" style="margin-bottom:.3rem">Rendimiento anual</div><div class="dim" style="margin-bottom:.4rem;white-space:nowrap">Anualizado: <b id="ann" style="font-size:1rem">—</b></div>
   <div id="annual-date" class="dim" style="margin-bottom:.6rem">—</div><div style="height:240px"><canvas id="annual"></canvas></div>
 </section>
-<section class="c s3">
+<section class="c s3 tint" style="--tc:139,92,246">
   <div class="k">Distribución</div>
   <div style="height:280px"><canvas id="pie"></canvas></div>
 </section>
-<section class="c s3"><div class="bigcube h2" onclick="this.classList.toggle('flip')"><div class="cube-in">
+<section class="c s3 tint" data-front="80,140,255" data-back="250,204,21" style="--tc:80,140,255"><div class="bigcube h2" onclick="flipTint(this)"><div class="cube-in">
 <div class="face front"><div class="k">Capitalización</div>
 <div class="prism" id="prism"><div class="prism-in" id="prism-in">
 <div class="pf" style="background:linear-gradient(100deg,#f7931a30 0%,#16161a 62%);border-color:#f7931a55;border-left-color:#f7931a"><span class="pic" id="pi0"></span><div class="ptx"><span class="dim">Bitcoin</span><b id="btc-cap" class="pv">—</b></div></div>
@@ -233,8 +233,8 @@ body::before{display:none}
   <div id="fear-label" class="d" style="font-size:1.4rem;font-weight:800;margin-top:.6rem">—</div>
   </div>
 </div></div></section>
-<section class="c all"><div class="k">Mis claves públicas</div><p class="dim">Consulta transacciones y genera el extracto fiscal en PDF.</p><div id="wallets-list"></div><button class="btn p" style="width:100%;margin-top:.8rem" onclick="openAddWalletModal()">+ Añadir clave pública</button><button class="btn" style="width:100%;margin-top:.6rem" onclick="$('kr-quick').click()">⬆ Importar CSV de Kraken (Ledgers)</button><input id="kr-quick" type="file" accept=".csv,text/csv" class="hidden" onchange="importKraken(this.files[0]);this.value=''"></section>
-<section class="c all"><div class="k">Panel fiscal</div><p class="dim">Todas tus wallets y Kraken juntas · ganancia real por FIFO.</p>
+<section class="c all tint" style="--tc:247,147,26"><div class="k">Mis claves públicas</div><p class="dim">Consulta transacciones y genera el extracto fiscal en PDF.</p><div id="wallets-list"></div><button class="btn p" style="width:100%;margin-top:.8rem" onclick="openAddWalletModal()">+ Añadir clave pública</button><button class="btn" style="width:100%;margin-top:.6rem" onclick="$('kr-quick').click()">⬆ Importar CSV de Kraken (Ledgers)</button><input id="kr-quick" type="file" accept=".csv,text/csv" class="hidden" onchange="importKraken(this.files[0]);this.value=''"></section>
+<section class="c all tint" style="--tc:245,196,66"><div class="k">Panel fiscal</div><p class="dim">Todas tus wallets y Kraken juntas · ganancia real por FIFO.</p>
 <div class="fx" style="margin:.8rem 0"><select id="fiscal-year" class="i" style="margin:0"></select><button class="btn p" style="white-space:nowrap" onclick="runFiscalPanel()">Calcular año</button></div>
 <div id="fiscal-loading" class="hidden" style="text-align:center;padding:1.5rem"><div class="spinner"></div><p class="dim">Consultando wallets y calculando FIFO…</p></div>
 <div id="fiscal-warning" class="hidden warn"></div>
@@ -482,6 +482,9 @@ function drawSpark(t){
     c.save();c.strokeStyle='rgba(247,147,26,.7)';c.setLineDash([4,4]);c.beginPath();c.moveTo(p.x,top);c.lineTo(p.x,bottom);c.stroke();c.setLineDash([]);c.fillStyle='#fff';c.lineWidth=2;c.beginPath();c.arc(p.x,p.y,5,0,7);c.fill();c.stroke();c.restore()}}]});
  showRead(null);updateATH(t)}
 
+function applyTint(sec){sec.style.setProperty('--tc',sec.querySelector('.bigcube.flip')?sec.dataset.back:sec.dataset.front)}
+function flipTint(cube){cube.classList.toggle('flip');applyTint(cube.closest('section'))}
+const moodRGB=v=>v<25?'239,68,68':v<45?'251,146,60':v<55?'250,204,21':v<75?'163,230,53':'74,222,128';
 async function updateAll(){
  await prices();
  renderAssets();
@@ -489,7 +492,7 @@ async function updateAll(){
  anim($('total-value'),t);
  $('inv-total').textContent=fmt(i);
  $('percentage').textContent=(p>=0?'+':'')+p.toFixed(2)+'%';$('percentage').style.color=p>=0?'#22d68a':'#ff5a5a';
- $('perf-eur').textContent=(g>=0?'+':'')+fmt(g);$('perf-eur').style.color=p>=0?'#22d68a':'#ff5a5a';
+ $('perf-eur').textContent=(g>=0?'+':'')+fmt(g);$('perf-eur').style.color=p>=0?'#22d68a':'#ff5a5a';{const ps=$('percentage').closest('section');ps.dataset.front=p>=0?'34,214,138':'255,90,90';applyTint(ps)}
  updatePie();updateAnnual(t,i);updateATH(t);updateSpark(t);chainTick(t);ticker();
 }
 
@@ -497,7 +500,7 @@ async function fear(){
  try{const d=(await(await fetch('https://api.alternative.me/fng/?limit=1')).json()).data[0],v=+d.value;
   const L={'Extreme Fear':['Miedo extremo','#ef4444'],'Fear':['Miedo','#fb923c'],'Neutral':['Neutral','#facc15'],'Greed':['Codicia','#a3e635'],'Extreme Greed':['Codicia extrema','#4ade80']}[d.value_classification]||[d.value_classification,'#fff'];
   $('fear-value').textContent=v;$('fear-label').textContent=L[0];$('fear-label').style.color=L[1];
-  $('gn').style.transform=`translateX(-50%) rotate(${v/100*180-90}deg)`}catch(e){console.error(e)}
+  $('gn').style.transform=`translateX(-50%) rotate(${v/100*180-90}deg)`;{const fs=$('fear-value').closest('section');fs.dataset.back=moodRGB(v);applyTint(fs)}}catch(e){console.error(e)}
 }
 const cmp=n=>{const f=(x,d)=>x.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});return n>=1e12?f(n/1e12,3)+' Bill. €':n>=1e9?f(n/1e9,2)+' MM €':f(n/1e6,2)+' M €'};
 const GOLD_T=220700; // toneladas de oro sobre la tierra (World Gold Council, fin de 2025)
