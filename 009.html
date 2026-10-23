@@ -192,6 +192,7 @@ body::before{display:none}
 .c.tint{isolation:isolate}
 .wmk{position:absolute;right:-24px;bottom:-30px;width:190px;height:190px;color:rgb(var(--tc));opacity:.09;transform:rotate(-12deg);pointer-events:none;z-index:-1;transition:color .6s}
 .wmk svg{width:100%;height:100%;display:block}
+.mb.tint{background-image:linear-gradient(180deg,rgba(var(--tc),.26) 0%,rgba(var(--tc),.08) 45%,rgba(var(--tc),0) 78%),linear-gradient(rgba(var(--tc),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--tc),.04) 1px,transparent 1px);background-size:100% 100%,26px 26px,26px 26px;border-color:rgba(var(--tc),.38);border-top-color:rgb(var(--tc));box-shadow:0 0 26px rgba(var(--tc),.14)}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -210,8 +211,9 @@ body::before{display:none}
 <div class="face back"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"><ellipse cx="50" cy="30" rx="30" ry="10" fill="currentColor"/><path d="M20 30v14c0 5.5 13.4 10 30 10s30-4.5 30-10V30M20 44v14c0 5.5 13.4 10 30 10s30-4.5 30-10V44M20 58v14c0 5.5 13.4 10 30 10s30-4.5 30-10V58"/></g></svg></span><div class="k">Inversión total</div><div class="row" style="cursor:default"><b id="inv-total" class="d" style="font-size:1.6rem">—</b></div></div>
 </div></div></section>
 <section class="c s3 tint" style="--tc:150,160,185"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 30a10 10 0 0 1 10-10h44v14"/><rect x="14" y="30" width="72" height="52" rx="10"/><path d="M86 48H68a8 8 0 0 0 0 16h18"/></g><circle cx="69" cy="56" r="3.5" fill="currentColor"/></svg></span>
-  <div class="hd"><div class="k">Mis activos</div><div style="display:flex;gap:.5rem"><button class="btn p" onclick="openAdd()">+ Añadir</button><button class="btn" onclick="openManage()">Modificar</button></div></div>
+  <div class="k">Mis activos</div>
   <div id="assets-list"></div>
+  <div style="text-align:center;margin-top:.9rem"><button class="btn" onclick="openManage()">Modificar</button></div>
 </section>
 <section class="c s3 tint" style="--tc:45,212,191"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="18" width="80" height="72" rx="10"/><path d="M10 40h80M32 8v18M68 8v18"/></g><g fill="currentColor"><rect x="22" y="52" width="12" height="10" rx="2"/><rect x="44" y="52" width="12" height="10" rx="2"/><rect x="66" y="52" width="12" height="10" rx="2"/><rect x="22" y="70" width="12" height="10" rx="2"/><rect x="44" y="70" width="12" height="10" rx="2"/></g></svg></span>
   <div class="k" style="margin-bottom:.3rem">Rendimiento anual</div><div class="dim" style="margin-bottom:.4rem;white-space:nowrap">Anualizado: <b id="ann" style="font-size:1rem">—</b></div>
@@ -280,18 +282,19 @@ body::before{display:none}
   <div id="dt-man" style="margin-top:1rem"><label class="dim">Valor actual (€)</label><input id="man-val" type="number" step="0.01" class="i"><input type="hidden" id="man-key"><button class="btn p" style="width:100%" onclick="saveManual()">Guardar valor</button></div>
 </div></div>
 
-<div id="m-add" class="m h"><div class="mb"><button class="x" onclick="hide('m-add')">&times;</button><b class="d" style="font-size:1.2rem">Añadir activo</b>
+<div id="m-add" class="m h"><div class="mb tint" style="--tc:150,160,185"><button class="x" onclick="hide('m-add')">&times;</button><b class="d" style="font-size:1.2rem">Añadir activo</b>
   <div style="margin-top:1rem"><label class="dim">Tipo</label><select id="add-type" class="i"></select>
   <label class="dim">Cantidad</label><input id="add-qty" type="number" step="any" class="i" placeholder="0.005">
   <label class="dim">€ invertidos</label><input id="add-inv" type="number" step="0.01" class="i" placeholder="300">
   <button class="btn p" style="width:100%" onclick="submitAdd()">Añadir al portafolio</button></div>
 </div></div>
 
-<div id="m-manage" class="m h"><div class="mb"><button class="x" onclick="hide('m-manage')">&times;</button><b class="d" style="font-size:1.2rem">Modificar activo</b>
+<div id="m-manage" class="m h"><div class="mb tint" style="--tc:150,160,185"><button class="x" onclick="hide('m-manage')">&times;</button><b class="d" style="font-size:1.2rem">Modificar activo</b>
   <p class="dim">Elige un activo para actualizar su cantidad, registrar una venta o eliminarlo.</p><div id="manage-list"></div>
+<button class="btn p" style="width:100%;margin-top:.2rem" onclick="hide('m-manage');openAdd()">+ Añadir</button>
 </div></div>
 
-<div id="m-mod" class="m h"><div class="mb"><button class="x" onclick="hide('m-mod')">&times;</button><b id="mod-title" class="d" style="font-size:1.2rem"></b>
+<div id="m-mod" class="m h"><div class="mb tint" style="--tc:150,160,185"><button class="x" onclick="hide('m-mod')">&times;</button><b id="mod-title" class="d" style="font-size:1.2rem"></b>
   <div id="mod-info" class="dim" style="margin:.3rem 0 1rem"></div><input type="hidden" id="mod-key">
   <div class="box"><b>Inversión (€)</b><div class="dim" style="margin:.3rem 0">Lo invertido en este activo. Sale en la cara trasera de su tarjeta y en Inversión total.</div><input id="edit-inv" type="number" step="0.01" class="i"><button class="btn p" style="width:100%" onclick="saveInv()">Guardar inversión</button></div>
 <div class="box"><b>Actualizar cantidad</b><div class="dim" style="margin:.3rem 0">Ideal para pools o staking: pon la cantidad exacta que tienes ahora.</div><input id="upd-qty" type="number" step="any" class="i"><button class="btn p" style="width:100%" onclick="updQty()">Actualizar y recalcular</button></div>
@@ -372,6 +375,11 @@ function updatePie(){
  else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
 }
 
+const annualTap={id:'annualTap',afterEvent(ch,args){
+ const e=args.event;if(e.type!=='click'&&e.type!=='mousedown')return;
+ const a=ch.chartArea;if(!a||e.y<=a.bottom||e.x<a.left||e.x>a.right)return;   // toque en las etiquetas de año
+ let best=0,bd=1e9;for(let i=0;i<ch.data.labels.length;i++){const d=Math.abs(ch.scales.x.getPixelForValue(i)-e.x);if(d<bd){bd=d;best=i}}
+ const el=[{datasetIndex:0,index:best}];ch.setActiveElements(el);ch.tooltip.setActiveElements(el,{x:ch.scales.x.getPixelForValue(best),y:a.bottom-20});ch.update();args.changed=true}};
 const YR=load('portfolio_years_v1',{});
 function trackYear(t,i){if(!(t>0))return;const y=new Date().getFullYear(),k=String(y);
  if(!YR[k]){const p=YR[String(y-1)];YR[k]={s:y<=START.getFullYear()?{v:0,i:0}:(p&&p.last?{v:p.last.v,i:p.last.i}:{v:t,i:i})}}
@@ -384,7 +392,7 @@ function updateAnnual(t,i){
  $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#22d68a':'#ff5a5a';
  const lim=Math.max(50,Math.ceil(Math.max(...data.map(Math.abs))/25)*25),bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
  if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.options.scales.y.min=-lim;annual.options.scales.y.max=lim;annual.options.scales.y.ticks.stepSize=lim/2;annual.update('none')}
- else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(2)}%`}}},scales:{x:{grid:{display:false}},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
+ else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(2)}%`}}},scales:{x:{grid:{display:false}},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}},plugins:[annualTap]});
 }
 
 // ── Máximo histórico + sparkline ──
@@ -394,7 +402,7 @@ function updateATH(t){
  if(!ath||t>ath.value){ath={value:t,date:new Date().toISOString()};save('portfolio_ath_v1',ath)}
  const b=athSer&&athSer.value>ath.value?athSer:ath,d=new Date(b.date).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}),top=t>=b.value-.005,df=(t/b.value-1)*100;
  const box=$('ath-box'),ds=new Date(b.date).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit'});
- box.innerHTML=`<div class="athl" style="white-space:nowrap">⛏ Máximo Histórico <span class="athv">${fmt(b.value)}</span> <span class="athd">${ds}</span></div>`+(top?'':`<div class="dim" style="font-size:.85rem;margin-top:.25rem">Ahora <span class="dn">${df.toFixed(2)}%</span> respecto al máximo</div>`);
+ box.innerHTML=`<div class="athl" style="white-space:nowrap">⛏ Máximo Histórico <span class="athv">${fmt(b.value)}</span> <span class="athd">${ds}</span></div>`;
  const el=box.firstElementChild;el.classList.add('one');let fit=false;
  const html=ic=>`${ic?'⛏ ':''}Máximo Histórico <span class="athv">${fmt(b.value)}</span> <span class="athd">${ds}</span>`;
  for(const [ic,zs] of [[true,[.95,.88,.82,.78]],[false,[.95,.88,.82,.78,.74,.7,.66]]]){el.innerHTML=html(ic);for(const z of zs){el.style.fontSize=z+'rem';if(el.scrollWidth<=box.clientWidth-1){fit=true;break}}if(fit)break}
@@ -466,8 +474,7 @@ function showRead(i){
  const el=$('sp-read'),p=i!=null?sparkM[i]:null;
  if(!p){
   if(!sparkM.length){el.innerHTML=`<span class="dim">${daily===null&&dailyAt?'No se pudo cargar el historial de precios':'Cargando historial…'}</span>`;return}
-  const s=sparkM[0],e=sparkM[sparkM.length-1],g=(e.v-s.v)-(e.inv-s.inv),b=s.v+(e.inv-s.inv),pc=b>0?g/b*100:0;
-  el.innerHTML=`<span class="rv2 ${g>=0?'up':'dn'}">${g>=0?'+':''}${fmt(g)} (${g>=0?'+':''}${pc.toFixed(2)}%)</span>`;return}
+  el.innerHTML='';return}
  const g=p.v-p.inv,dt=new Date(p.d);
  el.innerHTML=`<b>${dt.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})}${sparkStep<864e5?' '+dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}):''}</b><span class="rv">${fmt(p.v)}</span><div class="dim">Invertido ${fmt(p.inv)} · <span class="${g>=0?'up':'dn'}">${g>=0?'+':''}${fmt(g)}</span></div>`}
 function drawSpark(t){
@@ -894,5 +901,4 @@ renderWalletsList();populateFiscalYearSelect();
 tick();setInterval(tick,3e4);
 const clockY=()=>$('annual-date').textContent=new Date().toLocaleString('es-ES',{weekday:'short',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});clockY();setInterval(clockY,1000);
 updateAll();fear();dominance();goldCap();
-setInterval(updateAll,15e3);setInterval(binPrices,5e3);setInterval(fear,36e5);setInterval(dominance,6e4);setInterval(goldCap,6e4);
-</script></body></html>
+setInterval(updateAl
