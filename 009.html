@@ -1,7 +1,9 @@
 <!DOCTYPE html>
 <html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Portafolio</title>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script>window.Chart||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>')</script>
+<script>window.Chart||document.write('<script src="https://unpkg.com/chart.js@4.4.1/dist/chart.umd.js"><\/script>')</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -309,7 +311,13 @@ const fmt=n=>(n||0).toLocaleString('es-ES',nf)+'\u00a0€';
 const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
 const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const show=id=>$(id).classList.remove('h'),hide=id=>$(id).classList.add('h');
-Chart.defaults.color='#8a8a93';Chart.defaults.font.family='DM Sans';
+const chartDefaults=()=>{if(window.Chart){Chart.defaults.color='#8a8a93';Chart.defaults.font.family='DM Sans'}};chartDefaults();
+let chartTries=0;
+function chartRetry(){ // si Chart.js no cargó, lo reintenta desde otras fuentes y repinta al llegar
+ if(window.Chart||chartTries>12)return;
+ const U=['https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js','https://unpkg.com/chart.js@4.4.1/dist/chart.umd.js','https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'],sc=document.createElement('script');
+ sc.src=U[chartTries++%U.length];sc.onload=()=>{chartDefaults();updateAll()};sc.onerror=()=>setTimeout(chartRetry,4000);document.head.appendChild(sc)}
+if(!window.Chart)chartRetry();
 
 const META={
  btc:{t:'c',id:'bitcoin',name:'Bitcoin',sym:'BTC',icon:'₿',color:'#f7931a'},
@@ -370,6 +378,7 @@ function flipCube(k){const el=$('assets-list').querySelector(`[data-k="${k}"]`);
 function editInv(k){const a=assets[k],n=parseFloat((prompt(`Inversión real en € para ${a.name}\nActual: ${fmt(a.invested)}`)||'').replace(',','.'));if(n>0){a.invested=n;sv();updateAll()}}
 
 function updatePie(){
+ if(!window.Chart)return;
  const ks=Object.keys(assets),t=tot(),labels=ks.map(k=>`${assets[k].symbol||assets[k].name} ${t?(val(k)/t*100).toFixed(1):0}%`),data=ks.map(val),colors=ks.map(k=>assets[k].color);
  if(pie){pie.data.labels=labels;pie.data.datasets[0].data=data;pie.data.datasets[0].backgroundColor=colors;pie.update()}
  else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
@@ -391,6 +400,7 @@ function updateAnnual(t,i){
  const data=years.map(y=>+yearPerf(String(y)).toFixed(2)),yf=Math.max(1,(now-L0)/864e5)/365.25,cagr=xirr()??0;
  $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#22d68a':'#ff5a5a';
  const lim=Math.max(50,Math.ceil(Math.max(...data.map(Math.abs))/25)*25),bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
+ if(!window.Chart)return;
  if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.options.scales.y.min=-lim;annual.options.scales.y.max=lim;annual.options.scales.y.ticks.stepSize=lim/2;annual.update('none')}
  else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(2)}%`}}},scales:{x:{grid:{display:false}},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}},plugins:[annualTap]});
 }
@@ -482,6 +492,7 @@ function drawSpark(t){
  if(full){const m=full.slice(0,-1).reduce((a,p)=>p.v>a.v?p:a,{v:0});athSer=m.v>0?{value:m.v,date:new Date(m.d).toISOString()}:null}
  const cf=currentFrames(),ser=cf?ledgerSeries(cf.frames,cf.step,t):null;sparkM=ser||[];sparkStep=cf?cf.step:864e5;
  const labels=sparkM.map(p=>p.d),data=sparkM.map(p=>p.v);
+ if(!window.Chart){updateATH(t);return}
  if(spark2){spark2.data.labels=labels;spark2.data.datasets[0].data=data;spark2.update('none');if(sparkIdx==null||sparkIdx>=sparkM.length)showRead(sparkIdx=null);updateATH(t);return}
  const cx=$('spark').getContext('2d'),gr=cx.createLinearGradient(0,0,0,150);gr.addColorStop(0,'rgba(247,147,26,.35)');gr.addColorStop(1,'rgba(247,147,26,0)');
  spark2=new Chart(cx,{type:'line',data:{labels,datasets:[{data,borderColor:'#f7931a',backgroundColor:gr,fill:true,tension:.2,borderWidth:2.2,pointRadius:0,pointHoverRadius:0}]},
@@ -892,13 +903,4 @@ function exportFiscalPDF(){
  let y=40;const head=()=>{d.setFontSize(7);['Fecha','Wallet','Tipo','Cantidad','Valor','Coste','Gan./Perd.'].forEach((h,i)=>d.text(h,X[i],y));y+=3;d.line(14,y,196,y);y+=5};head();
  tx.forEach(t=>{if(y>272){d.addPage();y=20;head()}
   [t.date.toLocaleDateString('es-ES'),(t.walletAlias||'').slice(0,12),L[t.category]+(t.direction==='in'?' (ent)':' (sal)'),`${t.amount.toFixed(5)} ${t.asset}`,e(t.eurValue),e(t.costBasis),t.gain!=null?e(t.gain):(t.noCost?'sin coste':'-')].forEach((s,i)=>d.text(String(s),X[i],y));d.setFontSize(6);fxHashLine(d,t.hash,14,y+3.6);d.setFontSize(7);y+=9});
- let g=0,p=0;tx.forEach(t=>{if(t.gain!=null){if(t.gain>=0)g+=t.gain;else p-=t.gain}});
- y+=4;if(y>255){d.addPage();y=20}d.line(14,y,196,y);y+=8;d.setFontSize(12);d.text('Resumen IRPF (ganancias y perdidas patrimoniales)',14,y);y+=8;d.setFontSize(10);
- d.text(`Ganancias: ${fmtEUR(g)}`,14,y);y+=6;d.text(`Perdidas: ${fmtEUR(p)}`,14,y);y+=6;d.setFontSize(12);d.text(`NETO: ${fmtEUR(g-p)}`,14,y);d.save(`informe_fiscal_${yr}.pdf`)}
-(()=>{const b=document.querySelector('button[onclick="exportFiscalPDF()"]');if(b){const c=document.createElement('button');c.setAttribute('onclick','exportFiscalCSV()');c.textContent='📊 Exportar transacciones (CSV para Excel)';c.className='btn';c.style.cssText='width:100%;margin-top:.6rem';b.after(c)}})();
-
-renderWalletsList();populateFiscalYearSelect();
-tick();setInterval(tick,3e4);
-const clockY=()=>$('annual-date').textContent=new Date().toLocaleString('es-ES',{weekday:'short',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'});clockY();setInterval(clockY,1000);
-updateAll();fear();dominance();goldCap();
-setInterval(updateAl
+ let g=0,p=0;tx.forEach(t=>{if(t.gain!=null){if(t.gain>=0)g+=t.gain;els
