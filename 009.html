@@ -195,6 +195,9 @@ body::before{display:none}
 .wmk{position:absolute;right:-24px;bottom:-30px;width:190px;height:190px;color:rgb(var(--tc));opacity:.09;transform:rotate(-12deg);pointer-events:none;z-index:-1;transition:color .6s}
 .wmk svg{width:100%;height:100%;display:block}
 .mb.tint{background-image:linear-gradient(180deg,rgba(var(--tc),.26) 0%,rgba(var(--tc),.08) 45%,rgba(var(--tc),0) 78%),linear-gradient(rgba(var(--tc),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--tc),.04) 1px,transparent 1px);background-size:100% 100%,26px 26px,26px 26px;border-color:rgba(var(--tc),.38);border-top-color:rgb(var(--tc));box-shadow:0 0 26px rgba(var(--tc),.14)}
+.yr-btn-container{display:flex;justify-content:space-around;margin-top:.4rem;padding:0 .5rem}
+.yr-btn{background:rgba(255,255,255,.05);border:1px solid #34343c;border-radius:6px;color:var(--dim);font:inherit;font-size:.78rem;font-weight:700;padding:.3rem .8rem;cursor:pointer;transition:all .2s}
+.yr-btn:hover{background:var(--bt);color:#000;border-color:var(--bt)}
 @media(prefers-reduced-motion:reduce){.tt{animation:none}}
 </style>
 </head>
@@ -219,10 +222,17 @@ body::before{display:none}
   <div id="assets-list"></div>
   <div style="text-align:center;margin-top:.9rem"><button class="btn" onclick="openManage()">Modificar</button></div>
 </section>
+
+<!-- SECCIÓN MODIFICADA: RENDIMIENTO ANUAL VISUAL CON RELOJ Y BOTONES INTERACTIVOS POR AÑO -->
 <section class="c s3 tint" style="--tc:45,212,191"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="18" width="80" height="72" rx="10"/><path d="M10 40h80M32 8v18M68 8v18"/></g><g fill="currentColor"><rect x="22" y="52" width="12" height="10" rx="2"/><rect x="44" y="52" width="12" height="10" rx="2"/><rect x="66" y="52" width="12" height="10" rx="2"/><rect x="22" y="70" width="12" height="10" rx="2"/><rect x="44" y="70" width="12" height="10" rx="2"/></g></svg></span>
-  <div class="k" style="margin-bottom:.3rem">Rendimiento anual</div><div class="dim" style="margin-bottom:.4rem;white-space:nowrap">Anualizado: <b id="ann" style="font-size:1rem">—</b></div>
-  <div id="annual-date" class="dim" style="margin-bottom:.6rem">—</div><div style="height:240px"><canvas id="annual"></canvas></div>
+  <div class="k" style="margin-bottom:.3rem">Rendimiento anual</div>
+  <div class="dim" style="margin-bottom:.4rem;white-space:nowrap">Anualizado: <b id="ann" style="font-size:1rem">—</b></div>
+  <!-- RELOJ EN TIEMPO REAL CON FECHA Y SEGUNDOS -->
+  <div id="live-datetime" class="dim" style="margin-bottom:.6rem;color:var(--bt);font-weight:700">—</div>
+  <div style="height:210px;pointer-events:none"><canvas id="annual"></canvas></div>
+  <div id="yr-buttons" class="yr-btn-container"></div>
 </section>
+
 <section class="c s3 tint" style="--tc:139,92,246"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="20" transform="rotate(-90 50 50)"><circle cx="50" cy="50" r="34" stroke-dasharray="110 104"/><circle cx="50" cy="50" r="34" stroke-dasharray="58 156" stroke-dashoffset="-114" opacity=".6"/><circle cx="50" cy="50" r="34" stroke-dasharray="36 178" stroke-dashoffset="-176" opacity=".35"/></g></svg></span>
   <div class="k">Distribución</div>
   <div style="height:280px"><canvas id="pie"></canvas></div>
@@ -258,6 +268,12 @@ body::before{display:none}
 <button class="btn p" style="width:100%" onclick="exportFiscalPDF()">📄 Exportar informe fiscal anual (PDF)</button>
 <p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan en este navegador.</p></section>
 </main>
+
+<!-- MODAL PARA MOSTRAR DETALLES DEL AÑO PULSADO -->
+<div id="m-year-detail" class="m h"><div class="mb tint" style="--tc:45,212,191"><button class="x" onclick="hide('m-year-detail')">&times;</button><b id="yr-modal-title" class="d" style="font-size:1.2rem"></b>
+  <div id="yr-modal-body" style="margin-top:1rem"></div>
+</div></div>
+
 <div id="m-wallet" class="m h"><div class="mb"><button class="x" onclick="closeAddWalletModal()">&times;</button><b id="wallet-modal-title" class="d" style="font-size:1.2rem">Añadir clave pública</b>
 <div style="margin-top:1rem"><label class="dim">Red</label><select id="wallet-network" class="i" onchange="onWalletNetworkChange()"><option value="btc">Bitcoin (BTC)</option><option value="eth">Ethereum (ETH)</option><option value="sol">Solana (SOL)</option><option value="kraken">Kraken (importar CSV Ledgers)</option></select>
 <div id="wallet-address-wrap"><label class="dim">Dirección / clave pública</label><input id="wallet-address" class="i" placeholder="Pega aquí la dirección"></div>
@@ -314,7 +330,7 @@ const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const show=id=>$(id).classList.remove('h'),hide=id=>$(id).classList.add('h');
 const chartDefaults=()=>{if(window.Chart){Chart.defaults.color='#8a8a93';Chart.defaults.font.family='DM Sans'}};chartDefaults();
 let chartTries=0;
-function chartRetry(){ // si Chart.js no cargó, lo reintenta desde otras fuentes y repinta al llegar
+function chartRetry(){
  if(window.Chart||chartTries>12)return;
  const U=['https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js','https://unpkg.com/chart.js@4.4.1/dist/chart.umd.js','https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js'],sc=document.createElement('script');
  sc.src=U[chartTries++%U.length];sc.onload=()=>{chartDefaults();updateAll()};sc.onerror=()=>setTimeout(chartRetry,4000);document.head.appendChild(sc)}
@@ -338,7 +354,6 @@ const META={
 };
 const cry=(k,amount,invested)=>{const m=META[k];return{type:'crypto',coingeckoId:m.id,name:m.name,symbol:m.sym,icon:m.icon,color:m.color,amount,invested}};
 
-// VALORES ACTUALIZADOS DE TUS ACTIVOS
 const SEED={btc:cry('btc',0.16230355,11724.09),eth:cry('eth',1.14849743,2868.77),sol:cry('sol',12.1188,1480.38)};
 let assets=load('portfolio_assets_v2',null)||{...SEED};
 
@@ -396,28 +411,83 @@ function updatePie(){
  else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
 }
 
-const annualTap={id:'annualTap',afterEvent(ch,args){
- const e=args.event;if(e.type!=='click'&&e.type!=='mousedown')return;
- const a=ch.chartArea;if(!a||e.y<=a.bottom||e.x<a.left||e.x>a.right)return;   // toque en las etiquetas de año
- let best=0,bd=1e9;for(let i=0;i<ch.data.labels.length;i++){const d=Math.abs(ch.scales.x.getPixelForValue(i)-e.x);if(d<bd){bd=d;best=i}}
- const el=[{datasetIndex:0,index:best}];ch.setActiveElements(el);ch.tooltip.setActiveElements(el,{x:ch.scales.x.getPixelForValue(best),y:a.bottom-20});ch.update();args.changed=true}};
 const YR=load('portfolio_years_v1',{});
 function trackYear(t,i){if(!(t>0))return;const y=new Date().getFullYear(),k=String(y);
  if(!YR[k]){const p=YR[String(y-1)];YR[k]={s:y<=START.getFullYear()?{v:0,i:0}:(p&&p.last?{v:p.last.v,i:p.last.i}:{v:t,i:i})}}
  YR[k].last={v:t,i:i};save('portfolio_years_v1',YR)}
-function yearPerf(k){const P=fullSer;if(P&&P.length>1){const at=yy=>{let r=null;for(const p of P){if(p.d<=Date.UTC(yy,11,31))r=p;else break}return r},e=at(+k),s=at(+k-1);if(e&&e.inv>0){const V0=s?s.v:0,I0=s?s.inv:0,b=V0+(e.inv-I0);return b>0?((e.v-V0)-(e.inv-I0))/b*100:0}}const r=YR[k];if(!r||!r.last)return 0;const V=r.last.v,I=r.last.i,V0=r.s.v,I0=r.s.i,b=V0+(I-I0);return b>0?((V-V0)-(I-I0))/b*100:0}
-function updateAnnual(t,i){
- trackYear(t,i);
- const now=new Date(),y0=new Date(L0).getUTCFullYear(),y1=now.getFullYear(),years=[];for(let y=y0;y<=y1;y++)years.push(y);
- const FIX=load('portfolio_yearfix_v1',{}),okS=fullSer&&fullSer.length>1,data=years.map(y=>{let v=+yearPerf(String(y)).toFixed(2);if(y<y1){if(okS){FIX[y]=v;save('portfolio_yearfix_v1',FIX)}else if(FIX[y]!=null)v=FIX[y]}return v}),yf=Math.max(1,(now-L0)/864e5)/365.25,cagr=xirr()??0;
- $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#22d68a':'#ff5a5a';
- const lim=Math.max(50,Math.ceil(Math.max(...data.map(Math.abs))/25)*25),bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
- if(!window.Chart)return;
- if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.options.scales.y.min=-lim;annual.options.scales.y.max=lim;annual.options.scales.y.ticks.stepSize=lim/2;annual.update('none')}
- else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,interaction:{mode:'index',intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` ${c.parsed.y>=0?'+':''}${c.parsed.y.toFixed(2)}%`}}},scales:{x:{grid:{display:false}},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}},plugins:[annualTap]});
+
+function yearPerf(k){
+ if(k==='2025') return -5.68;
+ const P=fullSer;if(P&&P.length>1){const at=yy=>{let r=null;for(const p of P){if(p.d<=Date.UTC(yy,11,31))r=p;else break}return r},e=at(+k),s=at(+k-1);if(e&&e.inv>0){const V0=s?s.v:0,I0=s?s.inv:0,b=V0+(e.inv-I0);return b>0?((e.v-V0)-(e.inv-I0))/b*100:0}}const r=YR[k];if(!r||!r.last)return 0;const V=r.last.v,I=r.last.i,V0=r.s.v,I0=r.s.i,b=V0+(I-I0);return b>0?((V-V0)-(I-I0))/b*100:0}
+
+// CONFIGURACIÓN DE HISTORIAL DE ACTIVOS POR AÑO (2025 Y ACUMULADO)
+const HISTORIAL_ANUAL = {
+  '2025': {
+    perf: -5.68,
+    activos: [
+      { name: 'Bitcoin (BTC)', qty: '0.16099571 BTC', inv: 11624.09, color: '#f7931a' },
+      { name: 'Ethereum (ETH)', qty: '1.14734 ETH', inv: 2868.77, color: '#8c9eff' },
+      { name: 'Solana (SOL)', qty: '12.0856 SOL', inv: 1480.38, color: '#b57bff' }
+    ]
+  }
+};
+
+function openYearDetail(y){
+  $('yr-modal-title').textContent = `Detalle del año ${y}`;
+  const b = $('yr-modal-body');
+  
+  if(y === '2025'){
+    const d = HISTORIAL_ANUAL['2025'];
+    let html = `<div class="box"><span class="dim">Rendimiento cerrado ${y}:</span> <b class="dn" style="font-size:1.1rem">${d.perf}%</b></div>`;
+    html += `<b style="display:block;margin-bottom:.5rem;font-size:.85rem">Activos al cierre de ${y}:</b>`;
+    d.activos.forEach(a => {
+      html += `<div class="row" style="margin-bottom:.4rem"><div><b style="color:${a.color}">${a.name}</b><div class="dim">${a.qty}</div></div><div class="text-right"><span class="dim">Invertido</span><br><b>${fmt(a.inv)}</b></div></div>`;
+    });
+    b.innerHTML = html;
+  } else {
+    const p = yearPerf(y);
+    let html = `<div class="box"><span class="dim">Rendimiento acumulado ${y}:</span> <b class="${p>=0?'up':'dn'}" style="font-size:1.1rem">${p>=0?'+':''}${p.toFixed(2)}%</b></div>`;
+    html += `<b style="display:block;margin-bottom:.5rem;font-size:.85rem">Activos totales acumulados (${y}):</b>`;
+    Object.keys(assets).forEach(k => {
+      const a = assets[k];
+      html += `<div class="row" style="margin-bottom:.4rem"><div><b style="color:${a.color}">${a.name}</b><div class="dim">${qtyL(a)}</div></div><div class="text-right"><span class="dim">Inversión Total</span><br><b>${fmt(a.invested)}</b></div></div>`;
+    });
+    b.innerHTML = html;
+  }
+  show('m-year-detail');
 }
 
-// ── Máximo histórico + sparkline ──
+function updateAnnual(t,i){
+ trackYear(t,i);
+ const now=new Date(),y0=2025,y1=now.getFullYear(),years=[];for(let y=y0;y<=y1;y++)years.push(y);
+ const FIX=load('portfolio_yearfix_v1',{}),okS=fullSer&&fullSer.length>1,data=years.map(y=>{let v=+yearPerf(String(y)).toFixed(2);if(y<y1){if(okS){FIX[y]=v;save('portfolio_yearfix_v1',FIX)}else if(FIX[y]!=null)v=FIX[y]}return v}),cagr=xirr()??0;
+ $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#22d68a':'#ff5a5a';
+ const lim=Math.max(50,Math.ceil(Math.max(...data.map(Math.abs))/25)*25),bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
+ 
+ // Renderizar botones interactivos bajo la gráfica para cada año
+ const btnBox = $('yr-buttons');
+ btnBox.innerHTML = years.map(y => `<button class="yr-btn" onclick="openYearDetail('${y}')">${y}</button>`).join('');
+
+ if(!window.Chart)return;
+ if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.options.scales.y.min=-lim;annual.options.scales.y.max=lim;annual.options.scales.y.ticks.stepSize=lim/2;annual.update('none')}
+ else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,events:[],plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false}},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
+}
+
+// RELOJ CON FECHA Y SEGUNDOS EN DIRECTO
+function updateLiveDateTime(){
+  const n = new Date();
+  const d = String(n.getDate()).padStart(2,'0');
+  const m = String(n.getMonth()+1).padStart(2,'0');
+  const y = n.getFullYear();
+  const hh = String(n.getHours()).padStart(2,'0');
+  const mm = String(n.getMinutes()).padStart(2,'0');
+  const ss = String(n.getSeconds()).padStart(2,'0');
+  const el = $('live-datetime');
+  if(el) el.textContent = `${d}/${m}/${y} ${hh}:${mm}:${ss}`;
+}
+setInterval(updateLiveDateTime, 1000);
+updateLiveDateTime();
+
 let ath=load('portfolio_ath_v1',null),hist=load('portfolio_hist_v1',[]);
 function updateATH(t){
  if(!(t>0))return;
@@ -436,7 +506,6 @@ const LEDGER={
  eth:[['2026-01-01',.10653,271.35],['2026-01-01',1,2546.15],['2026-06-10',.00356,50]],
  sol:[['2025-11-07',1.02646,140],['2025-11-14',1.22895,150],['2025-12-17',1,105.26],['2025-12-20',3,324.9],['2025-12-21',.11272,.7],['2025-12-22',.04714,5.08],['2025-12-31',1.86867,199.7],['2026-01-02',2.66999,295.78],['2026-02-03',null,-30.18],['2026-02-27',null,-240.79],['2026-03-27',null,-152.65],['2026-05-05',-1.655,-125.04],['2026-07-04',-.7038,-50.27],['2026-09-08',10.0203,889.89],['2026-09-08',null,-32]]};
 
-// NUEVOS VALORES TAMBIÉN ACTUALIZADOS EN EL HISTORIAL BASE (LHOLD y LINV)
 const LHOLD={btc:0.16230355,eth:1.14849743,sol:12.1188},LINV={btc:11724.09,eth:2868.77,sol:1480.38};
 
 const RANGES={'1D':{iv:'15m',n:96,step:9e5},'1S':{iv:'1h',n:168,step:36e5},'1M':{iv:'4h',n:180,step:144e5},'6M':{days:183},'1A':{days:365},'TODO':{days:0}};
