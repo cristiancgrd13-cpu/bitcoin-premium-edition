@@ -903,4 +903,20 @@ function exportFiscalPDF(){
  let y=40;const head=()=>{d.setFontSize(7);['Fecha','Wallet','Tipo','Cantidad','Valor','Coste','Gan./Perd.'].forEach((h,i)=>d.text(h,X[i],y));y+=3;d.line(14,y,196,y);y+=5};head();
  tx.forEach(t=>{if(y>272){d.addPage();y=20;head()}
   [t.date.toLocaleDateString('es-ES'),(t.walletAlias||'').slice(0,12),L[t.category]+(t.direction==='in'?' (ent)':' (sal)'),`${t.amount.toFixed(5)} ${t.asset}`,e(t.eurValue),e(t.costBasis),t.gain!=null?e(t.gain):(t.noCost?'sin coste':'-')].forEach((s,i)=>d.text(String(s),X[i],y));d.setFontSize(6);fxHashLine(d,t.hash,14,y+3.6);d.setFontSize(7);y+=9});
- let g=0,p=0;tx.forEach(t=>{if(t.gain!=null){if(t.gain>=0)g+=t.gain;els
+ let g=0,p=0;tx.forEach(t=>{if(t.gain!=null){if(t.gain>=0)g+=t.gain;else p-=t.gain}});
+ y+=4;if(y>245){d.addPage();y=20}d.line(14,y,196,y);y+=8;d.setFontSize(10);
+ [['Ganancias patrimoniales',g],['Perdidas patrimoniales',p]].forEach(([k,v])=>{d.text(`${k}: ${fmtEUR(v)}`,14,y);y+=6});
+ d.setFontSize(12);d.text(`NETO (casilla Modelo 100): ${fmtEUR(g-p)}`,14,y);
+ d.save(`informe_fiscal_${yr}.pdf`)}
+
+// ═══ ARRANQUE ═══
+populateFiscalYearSelect();
+renderWalletsList();
+tick();setInterval(tick,30000);
+updateAll();fear();goldCap();
+setTimeout(dominance,3000);
+setInterval(updateAll,60000);
+setInterval(()=>{fear();dominance();goldCap()},180000);
+</script>
+</body>
+</html>
