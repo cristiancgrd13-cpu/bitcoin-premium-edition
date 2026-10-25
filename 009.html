@@ -298,9 +298,8 @@ body::before{display:none}
 
 <div id="m-mod" class="m h"><div class="mb tint" style="--tc:150,160,185"><button class="x" onclick="hide('m-mod')">&times;</button><b id="mod-title" class="d" style="font-size:1.2rem"></b>
   <div id="mod-info" class="dim" style="margin:.3rem 0 1rem"></div><input type="hidden" id="mod-key">
-  <div class="box"><b>Inversión (€)</b><div class="dim" style="margin:.3rem 0">Lo invertido en este activo. Sale en la cara trasera de su tarjeta y en Inversión total.</div><input id="edit-inv" type="number" step="0.01" class="i"><button class="btn p" style="width:100%" onclick="saveInv()">Guardar inversión</button></div>
-<div class="box"><b>Actualizar cantidad</b><div class="dim" style="margin:.3rem 0">Ideal para pools o staking: pon la cantidad exacta que tienes ahora.</div><input id="upd-qty" type="number" step="any" class="i"><button class="btn p" style="width:100%" onclick="updQty()">Actualizar y recalcular</button></div>
-  <div class="box"><b>Venta parcial</b><input id="sell-qty" type="number" step="any" class="i" placeholder="Cantidad vendida"><input id="sell-rec" type="number" step="0.01" class="i" placeholder="€ recibidos"><button class="btn" style="width:100%" onclick="sell()">Registrar venta</button></div>
+  <div class="box"><b style="display:block;margin-bottom:.4rem">Inversión (€)</b><input id="edit-inv" type="number" step="0.01" class="i"><button class="btn p" style="width:100%" onclick="saveInv()">Guardar inversión</button></div>
+<div class="box"><b style="display:block;margin-bottom:.4rem">Actualizar cantidad</b><input id="upd-qty" type="number" step="any" class="i"><button class="btn p" style="width:100%" onclick="updQty()">Actualizar y recalcular</button></div>
   <div class="box"><b>Eliminar activo</b><div class="dim" style="margin:.3rem 0.6rem">Úsalo si lo has vendido todo.</div><button class="btn r" style="width:100%" onclick="del()">Eliminar del portafolio</button></div>
 </div></div>
 
@@ -397,7 +396,7 @@ function yearPerf(k){const P=fullSer;if(P&&P.length>1){const at=yy=>{let r=null;
 function updateAnnual(t,i){
  trackYear(t,i);
  const now=new Date(),y0=new Date(L0).getUTCFullYear(),y1=now.getFullYear(),years=[];for(let y=y0;y<=y1;y++)years.push(y);
- const data=years.map(y=>+yearPerf(String(y)).toFixed(2)),yf=Math.max(1,(now-L0)/864e5)/365.25,cagr=xirr()??0;
+ const FIX=load('portfolio_yearfix_v1',{}),okS=fullSer&&fullSer.length>1,data=years.map(y=>{let v=+yearPerf(String(y)).toFixed(2);if(y<y1){if(okS){FIX[y]=v;save('portfolio_yearfix_v1',FIX)}else if(FIX[y]!=null)v=FIX[y]}return v}),yf=Math.max(1,(now-L0)/864e5)/365.25,cagr=xirr()??0;
  $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#22d68a':'#ff5a5a';
  const lim=Math.max(50,Math.ceil(Math.max(...data.map(Math.abs))/25)*25),bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
  if(!window.Chart)return;
@@ -489,6 +488,7 @@ function showRead(i){
  el.innerHTML=`<b>${dt.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})}${sparkStep<864e5?' '+dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}):''}</b><span class="rv">${fmt(p.v)}</span><div class="dim">Invertido ${fmt(p.inv)} · <span class="${g>=0?'up':'dn'}">${g>=0?'+':''}${fmt(g)}</span></div>`}
 function drawSpark(t){
  const full=daily?ledgerSeries(framesFrom(daily),864e5,t):null;fullSer=full||[];
+ if(full)updateAnnual(t,inv());   // al llegar el historial diario, repinta Rendimiento anual (2025 incluido)
  if(full){const m=full.slice(0,-1).reduce((a,p)=>p.v>a.v?p:a,{v:0});athSer=m.v>0?{value:m.v,date:new Date(m.d).toISOString()}:null}
  const cf=currentFrames(),ser=cf?ledgerSeries(cf.frames,cf.step,t):null;sparkM=ser||[];sparkStep=cf?cf.step:864e5;
  const labels=sparkM.map(p=>p.d),data=sparkM.map(p=>p.v);
@@ -571,16 +571,10 @@ function openManage(){
  $('manage-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];return `<div class="mcard" onclick="openMod('${k}')" style="background:linear-gradient(100deg,${a.color}30 0%,#16161a 58%);border-color:${a.color}55;border-left-color:${a.color};box-shadow:0 0 18px ${a.color}24">${cardFront(k)}</div>`}).join('');
  show('m-manage');
 }
-function openMod(k){const a=assets[k];$('mod-key').value=k;$('mod-title').textContent=a.name;$('edit-inv').value=a.invested.toFixed(2);$('mod-info').textContent=`Tienes ${qtyL(a)} · Invertido ${fmt(a.invested)}`;['upd-qty','sell-qty','sell-rec'].forEach(i=>$(i).value='');show('m-mod')}
+function openMod(k){const a=assets[k];$('mod-key').value=k;$('mod-title').textContent=a.name;$('edit-inv').value=a.invested.toFixed(2);$('mod-info').innerHTML=`<div style="white-space:nowrap"><b style="color:${a.color}">${a.symbol||a.name}</b> ${a.amount}</div><div style="white-space:nowrap">Invertido ${fmt(a.invested)}</div>`;$('upd-qty').value='';show('m-mod')}
 function saveInv(){const k=$('mod-key').value,v=parseFloat(String($('edit-inv').value).replace(',','.'));if(!(v>0)){alert('Introduce un importe válido.');return}assets[k].invested=v;sv();done()}
 function done(){hide('m-mod');hide('m-manage');updateAll()}
 function updQty(){const a=assets[$('mod-key').value],q=parseFloat($('upd-qty').value);if(!(q>0)){alert('Introduce una cantidad válida.');return}a.amount=+q.toFixed(8);sv();done()}
-function sell(){
- const a=assets[$('mod-key').value],q=parseFloat($('sell-qty').value),r=parseFloat($('sell-rec').value);
- if(!(q>0)||!(r>=0)){alert('Introduce una cantidad y un importe válidos.');return}
- if(q>=a.amount){alert('Has indicado todo el total: usa "Eliminar activo".');return}
- const ratio=q/a.amount;a.invested*=1-ratio;if(a.currentValue!=null)a.currentValue*=1-ratio;a.amount=+(a.amount-q).toFixed(8);sv();done();
-}
 function del(){const k=$('mod-key').value;if(!confirm(`¿Eliminar ${assets[k].name} del portafolio?`))return;delete assets[k];sv();done()}
 
 const tick=()=>$('clock').textContent=new Date().toLocaleString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
@@ -916,7 +910,4 @@ tick();setInterval(tick,30000);
 updateAll();fear();goldCap();
 setTimeout(dominance,3000);
 setInterval(updateAll,60000);
-setInterval(()=>{fear();dominance();goldCap()},180000);
-</script>
-</body>
-</html>
+setInterval(
