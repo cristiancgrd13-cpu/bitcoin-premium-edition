@@ -223,13 +223,11 @@ body::before{display:none}
   <div style="text-align:center;margin-top:.9rem"><button class="btn" onclick="openManage()">Modificar</button></div>
 </section>
 
-<!-- SECCIÓN MODIFICADA: RENDIMIENTO ANUAL VISUAL CON RELOJ Y BOTONES INTERACTIVOS POR AÑO -->
 <section class="c s3 tint" style="--tc:45,212,191"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="18" width="80" height="72" rx="10"/><path d="M10 40h80M32 8v18M68 8v18"/></g><g fill="currentColor"><rect x="22" y="52" width="12" height="10" rx="2"/><rect x="44" y="52" width="12" height="10" rx="2"/><rect x="66" y="52" width="12" height="10" rx="2"/><rect x="22" y="70" width="12" height="10" rx="2"/><rect x="44" y="70" width="12" height="10" rx="2"/></g></svg></span>
   <div class="k" style="margin-bottom:.3rem">Rendimiento anual</div>
   <div class="dim" style="margin-bottom:.4rem;white-space:nowrap">Anualizado: <b id="ann" style="font-size:1rem">—</b></div>
-  <!-- RELOJ EN TIEMPO REAL CON FECHA Y SEGUNDOS -->
   <div id="live-datetime" class="dim" style="margin-bottom:.6rem;color:var(--bt);font-weight:700">—</div>
-  <div style="height:210px;pointer-events:none"><canvas id="annual"></canvas></div>
+  <div style="height:175px;pointer-events:none"><canvas id="annual"></canvas></div>
   <div id="yr-buttons" class="yr-btn-container"></div>
 </section>
 
@@ -269,7 +267,6 @@ body::before{display:none}
 <p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan en este navegador.</p></section>
 </main>
 
-<!-- MODAL PARA MOSTRAR DETALLES DEL AÑO PULSADO -->
 <div id="m-year-detail" class="m h"><div class="mb tint" style="--tc:45,212,191"><button class="x" onclick="hide('m-year-detail')">&times;</button><b id="yr-modal-title" class="d" style="font-size:1.2rem"></b>
   <div id="yr-modal-body" style="margin-top:1rem"></div>
 </div></div>
@@ -278,11 +275,12 @@ body::before{display:none}
 <div style="margin-top:1rem"><label class="dim">Red</label><select id="wallet-network" class="i" onchange="onWalletNetworkChange()"><option value="btc">Bitcoin (BTC)</option><option value="eth">Ethereum (ETH)</option><option value="sol">Solana (SOL)</option><option value="kraken">Kraken (importar CSV Ledgers)</option></select>
 <div id="wallet-address-wrap"><label class="dim">Dirección / clave pública</label><input id="wallet-address" class="i" placeholder="Pega aquí la dirección"></div>
 <label class="dim">Alias (opcional)</label><input id="wallet-alias" class="i" placeholder="Ej. Ledger BTC / Phantom">
-<div id="wallet-kind-wrap"><label class="dim">Tipo de clave</label><select id="wallet-kind" class="i"><option value="mia">Mía (Ledger, Trezor, Phantom…)</option><option value="kraken">Kraken (dirección de depósito)</option><option value="aave">Aave (protocolo)</option><option value="externa">De otra persona (cuenta como compra/venta)</option></select><p class="dim" style="margin:-.4rem 0 .8rem">Los envíos entre claves mías, Kraken y Aave son traspasos: no cuentan como venta ni permuta. Ponles un alias (Ledger, Trezor…) para reconocerlas.</p></div>
-<div id="eth-key-wrap" class="hidden"><label class="dim">API key de Etherscan (gratuita, sirve la V2)</label><input id="etherscan-key-input" class="i" placeholder="Pega tu API key"></div>
-<div id="sol-key-wrap" class="hidden"><label class="dim">API key de Helius (gratuita, necesaria para Solana)</label><input id="helius-key-input" class="i" placeholder="Pega tu API key"></div>
-<div id="kraken-csv-wrap" class="hidden"><label class="dim">CSV de Kraken (Documents → Exports → Create Export → Ledgers → CSV; si baja en .zip, descomprímelo)</label><input id="kraken-csv-input" type="file" accept=".csv" class="i"><label class="dim">Direcciones de depósito de Kraken (BTC, ETH, SOL…), una por línea. Los envíos a ellas cuentan como traspaso, no como venta.</label><textarea id="kraken-addr-input" class="i" rows="3" style="font-family:inherit"></textarea></div>
+<div id="wallet-kind-wrap"><label class="dim">Tipo de clave</label><select id="wallet-kind" class="i"><option value="mia">Mía (Ledger, Trezor, Phantom…)</option><option value="kraken">Kraken (dirección de depósito)</option><option value="aave">Aave (protocolo)</option><option value="externa">De otra persona (cuenta como compra/venta)</option></select><p class="dim" style="margin:-.4rem 0 .8rem">Los envíos entre claves mías, Kraken y Aave son traspasos.</p></div>
+<div id="eth-key-wrap" class="hidden"><label class="dim">API key de Etherscan</label><input id="etherscan-key-input" class="i" placeholder="Pega tu API key"></div>
+<div id="sol-key-wrap" class="hidden"><label class="dim">API key de Helius</label><input id="helius-key-input" class="i" placeholder="Pega tu API key"></div>
+<div id="kraken-csv-wrap" class="hidden"><label class="dim">CSV de Kraken (Ledgers)</label><input id="kraken-csv-input" type="file" accept=".csv" class="i"><label class="dim">Direcciones de depósito de Kraken</label><textarea id="kraken-addr-input" class="i" rows="3" style="font-family:inherit"></textarea></div>
 <button class="btn p" style="width:100%" onclick="submitAddWallet()">Guardar</button></div></div></div>
+
 <div id="m-tx" class="m h"><div class="mb" style="max-width:520px"><button class="x" onclick="closeWalletTx()">&times;</button><b id="tx-modal-title" class="d" style="font-size:1.2rem">—</b>
 <div id="tx-modal-address" class="dim" style="word-break:break-all;margin:.3rem 0 1rem"></div>
 <div class="fx"><div style="flex:1"><label class="dim">Desde</label><input id="tx-date-from" type="date" class="i"></div><div style="flex:1"><label class="dim">Hasta</label><input id="tx-date-to" type="date" class="i"></div></div>
@@ -292,10 +290,9 @@ body::before{display:none}
 <div id="tx-list" style="max-height:320px;overflow-y:auto;margin:.8rem 0"></div>
 <div id="tx-totals" class="hidden box">
 <div class="sr"><span class="dim">Compras</span><b id="tot-compra" class="up">0,00 €</b></div><div class="sr"><span class="dim">Ventas</span><b id="tot-venta" class="dn">0,00 €</b></div>
-<div class="sr"><span class="dim">Permutas</span><b id="tot-permuta">0,00 €</b></div><div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="tot-interna" class="dim">0,00 €</span></div>
+<div class="sr"><span class="dim">Permutas</span><b id="tot-permuta">0,00 €</b></div><div class="sr"><span class="dim">Transferencias internas</span><span id="tot-interna" class="dim">0,00 €</span></div>
 <div class="sr" style="border-top:1px solid #2a2a30;margin-top:.3rem;padding-top:.5rem"><b>Total a fiscalizar</b><b id="tot-fiscal" style="color:var(--bt)">0,00 €</b></div></div>
-<button class="btn p" style="width:100%" onclick="exportWalletPDF()">📄 Exportar extracto fiscal en PDF</button>
-<p class="dim">Revisa y corrige la categoría de cada movimiento antes de exportar.</p></div></div>
+<button class="btn p" style="width:100%" onclick="exportWalletPDF()">📄 Exportar extracto fiscal en PDF</button></div></div>
 
 <div id="m-detail" class="m h"><div class="mb"><button class="x" onclick="hide('m-detail')">&times;</button><b id="dt" class="d" style="font-size:1.2rem"></b>
   <div id="dt-chart"><div style="height:220px;margin-top:1rem"><canvas id="dt-cv"></canvas></div><div class="dim" style="text-align:center">Precio en € · últimos 30 días</div></div>
@@ -420,14 +417,13 @@ function yearPerf(k){
  if(k==='2025') return -5.68;
  const P=fullSer;if(P&&P.length>1){const at=yy=>{let r=null;for(const p of P){if(p.d<=Date.UTC(yy,11,31))r=p;else break}return r},e=at(+k),s=at(+k-1);if(e&&e.inv>0){const V0=s?s.v:0,I0=s?s.inv:0,b=V0+(e.inv-I0);return b>0?((e.v-V0)-(e.inv-I0))/b*100:0}}const r=YR[k];if(!r||!r.last)return 0;const V=r.last.v,I=r.last.i,V0=r.s.v,I0=r.s.i,b=V0+(I-I0);return b>0?((V-V0)-(I-I0))/b*100:0}
 
-// CONFIGURACIÓN DE HISTORIAL DE ACTIVOS POR AÑO (2025 Y ACUMULADO)
+// HISTORIAL 2025 SIN ETHEREUM (SOLO BITCOIN Y SOLANA)
 const HISTORIAL_ANUAL = {
   '2025': {
     perf: -5.68,
     activos: [
-      { name: 'Bitcoin (BTC)', qty: '0.16099571 BTC', inv: 11624.09, color: '#f7931a' },
-      { name: 'Ethereum (ETH)', qty: '1.14734 ETH', inv: 2868.77, color: '#8c9eff' },
-      { name: 'Solana (SOL)', qty: '12.0856 SOL', inv: 1480.38, color: '#b57bff' }
+      { name: 'Bitcoin (BTC)', qty: '0.07154 BTC', inv: 5563.81, color: '#f7931a' },
+      { name: 'Solana (SOL)', qty: '8.28394 SOL', inv: 926.34, color: '#b57bff' }
     ]
   }
 };
@@ -439,7 +435,7 @@ function openYearDetail(y){
   if(y === '2025'){
     const d = HISTORIAL_ANUAL['2025'];
     let html = `<div class="box"><span class="dim">Rendimiento cerrado ${y}:</span> <b class="dn" style="font-size:1.1rem">${d.perf}%</b></div>`;
-    html += `<b style="display:block;margin-bottom:.5rem;font-size:.85rem">Activos al cierre de ${y}:</b>`;
+    html += `<b style="display:block;margin-bottom:.5rem;font-size:.85rem">Activos al cierre de ${y} (según tablas):</b>`;
     d.activos.forEach(a => {
       html += `<div class="row" style="margin-bottom:.4rem"><div><b style="color:${a.color}">${a.name}</b><div class="dim">${a.qty}</div></div><div class="text-right"><span class="dim">Invertido</span><br><b>${fmt(a.inv)}</b></div></div>`;
     });
@@ -464,16 +460,14 @@ function updateAnnual(t,i){
  $('ann').textContent=(cagr>=0?'+':'')+cagr.toFixed(2)+'%';$('ann').style.color=cagr>=0?'#22d68a':'#ff5a5a';
  const lim=Math.max(50,Math.ceil(Math.max(...data.map(Math.abs))/25)*25),bg=data.map(v=>v>=0?'rgba(34,214,138,.85)':'rgba(255,90,90,.85)');
  
- // Renderizar botones interactivos bajo la gráfica para cada año
  const btnBox = $('yr-buttons');
  btnBox.innerHTML = years.map(y => `<button class="yr-btn" onclick="openYearDetail('${y}')">${y}</button>`).join('');
 
  if(!window.Chart)return;
  if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.options.scales.y.min=-lim;annual.options.scales.y.max=lim;annual.options.scales.y.ticks.stepSize=lim/2;annual.update('none')}
- else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,events:[],plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false}},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
+ else annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,events:[],plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
 }
 
-// RELOJ CON FECHA Y SEGUNDOS EN DIRECTO
 function updateLiveDateTime(){
   const n = new Date();
   const d = String(n.getDate()).padStart(2,'0');
@@ -628,7 +622,6 @@ async function dominance(){
   $('btc-cap').textContent=cmp(btc);$('tot-cap').textContent=cmp(Math.max(c,btc))}catch(e){console.error(e)}
 }
 
-// ── Detalle ──
 async function openDetail(k){
  const a=assets[k];$('dt').textContent=a.name;show('m-detail');
  if(a.type==='crypto'){$('dt-chart').style.display='block';$('dt-man').style.display='none';
@@ -639,7 +632,6 @@ async function openDetail(k){
 }
 function saveManual(){const v=parseFloat($('man-val').value);if(v>=0){assets[$('man-key').value].currentValue=v;sv();hide('m-detail');updateAll()}}
 
-// ── Añadir / modificar ──
 function openAdd(){$('add-type').innerHTML=Object.keys(META).map(k=>`<option value="${k}">${META[k].name}${META[k].sym?' ('+META[k].sym+')':''}</option>`).join('');show('m-add')}
 function submitAdd(){
  const k=$('add-type').value,q=parseFloat($('add-qty').value),v=parseFloat($('add-inv').value);
@@ -706,7 +698,6 @@ function tkRender(){
  const n=Math.max(1,Math.ceil(box.clientWidth/(box.firstElementChild.scrollWidth||1))),h=one.repeat(n);   
  box.innerHTML=`<div class="tt" style="transform:translateX(${-tkX}px)">${h+h}</div>`}
 let tkX=0,tkLast=0;
-function ticker(){const b=$('tk');if(!b.firstElementChild||b.textContent.includes('…'))tkRender()}   
 function tkLoop(n){const tt=$('tk').firstElementChild;if(!tkLast)tkLast=n;
  if(tt&&tt.scrollWidth>20){const half=tt.scrollWidth/2,nx=tkX+Math.min(n-tkLast,100)*.045;
   if(nx>=half){tkX=nx%half;tkRender()}else{tkX=nx;tt.style.transform=`translateX(${-tkX}px)`}}
@@ -718,7 +709,6 @@ requestAnimationFrame(tkLoop);
   d.forEach((y,i)=>{x.fillStyle=Math.random()<.04?'rgba(255,200,120,.5)':'rgba(247,147,26,.17)';x.fillText('0123456789abcdef'[Math.random()*16|0],i*F,y*F);d[i]=y*F>H&&Math.random()>.975?0:y+1})}
   if(!RM)requestAnimationFrame(f)})(0)})();
 
-// ═══ CLAVES PÚBLICAS ═══
 const fmtEUR=fmt,priceCache={},saveWallets=()=>save('saved_wallets_v1',wallets);
 const NETWORK_META={btc:{label:'Bitcoin',color:'#f7931a'},eth:{label:'Ethereum',color:'#8c9eff'},sol:{label:'Solana',color:'#b57bff'},kraken:{label:'Kraken',color:'#7b61ff'}};
 let wallets=load('saved_wallets_v1',{}),currentTxList=[],currentWalletId=null,editingWalletId=null;
@@ -934,7 +924,7 @@ function fxCompute(){
   if(need>1e-9){const a=Object.values(assets).find(x=>x.coingeckoId===t.coingeckoId&&x.amount>0);
    if(a){cost+=need*(a.invested/a.amount);F.est=true}else{t.noCost=true;F.noCost=true;return}}
   t.costBasis=cost;t.gain=t.eurValue-cost});
- const ys=all.filter(t=>t.date.getFullYear()===year).sort((a,b)=>b.date-a.date);
+ const ys=all.filter(t=>t.date.getFullYear()===year).sort((a,b)=>b.date-b.date);
  window._fiscalTxs=ys;window._fiscalYear=year;fxTable(ys);renderFiscalSummary(ys);el.scrollTop=st;
  const src={};ys.forEach(t=>src[t.walletAlias]=(src[t.walletAlias]||0)+1);
  let w='Incluido en el cálculo: '+(Object.keys(src).map(k=>`${k} (${src[k]})`).join(' · ')||'ninguna fuente con movimientos en ese año')+'. Traspasos entre tus cuentas (excluidos): '+ys.filter(t=>t.category==='interna').length+'. ';
