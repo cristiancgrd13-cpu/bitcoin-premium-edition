@@ -209,7 +209,6 @@ body::before{display:none}
   <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
 
-<!-- MODIFICADO: Cambiado data-back a un tono azul/índigo (99,102,241) para la cara trasera de inversión -->
 <section class="c s3 tint" data-front="34,214,138" data-back="99,102,241" style="--tc:34,214,138"><div class="bigcube" onclick="flipTint(this)"><div class="cube-in">
 <div class="face front"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M14 22V78M32 30V84M50 8V66M68 20V76M86 4V58" fill="none"/><rect x="8" y="36" width="12" height="28" fill="currentColor"/><rect x="26" y="40" width="12" height="28" fill="none"/><rect x="44" y="20" width="12" height="30" fill="currentColor"/><rect x="62" y="32" width="12" height="26" fill="none"/><rect x="80" y="12" width="12" height="28" fill="currentColor"/></g></svg></span><div class="k">Rendimiento total</div><div id="percentage" class="d perf">—</div><div id="perf-eur" class="d pe">—</div></div>
 <div class="face back"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"><ellipse cx="50" cy="30" rx="30" ry="10" fill="currentColor"/><path d="M20 30v14c0 5.5 13.4 10 30 10s30-4.5 30-10V30M20 44v14c0 5.5 13.4 10 30 10s30-4.5 30-10V44M20 58v14c0 5.5 13.4 10 30 10s30-4.5 30-10V58"/></g></svg></span><div class="k">Inversión total</div><div class="row" style="cursor:default"><b id="inv-total" class="d" style="font-size:1.6rem">—</b></div></div>
@@ -338,9 +337,20 @@ const META={
  spacex:{t:'m',name:'SpaceX',icon:'🚀',color:'#94a3b8'}
 };
 const cry=(k,amount,invested)=>{const m=META[k];return{type:'crypto',coingeckoId:m.id,name:m.name,symbol:m.sym,icon:m.icon,color:m.color,amount,invested}};
-const SEED={btc:cry('btc',0.16099571,11624.09),eth:cry('eth',1.14734,2868.77),sol:cry('sol',12.0856,1480.38)};
+
+// VALORES ACTUALIZADOS DE TUS ACTIVOS
+const SEED={btc:cry('btc',0.16230355,11724.09),eth:cry('eth',1.14849743,2868.77),sol:cry('sol',12.1188,1480.38)};
 let assets=load('portfolio_assets_v2',null)||{...SEED};
-if(!localStorage.getItem('portfolio_seed_v5')){Object.assign(assets,SEED);delete assets.usdc_sol;save('portfolio_assets_v2',assets);localStorage.setItem('portfolio_seed_v5','1');localStorage.removeItem('portfolio_seen_v1');localStorage.removeItem('portfolio_ledger_ext_v1')}
+
+if(!localStorage.getItem('portfolio_seed_v6')){
+  Object.assign(assets,SEED);
+  delete assets.usdc_sol;
+  save('portfolio_assets_v2',assets);
+  localStorage.setItem('portfolio_seed_v6','1');
+  localStorage.removeItem('portfolio_seen_v1');
+  localStorage.removeItem('portfolio_ledger_ext_v1');
+}
+
 const sv=()=>save('portfolio_assets_v2',assets);
 const live={},START=new Date('2026-01-01');
 let pie,annual,spark,detail;
@@ -419,13 +429,16 @@ function updateATH(t){
  const html=ic=>`${ic?'⛏ ':''}Máximo Histórico <span class="athv">${fmt(b.value)}</span> <span class="athd">${ds}</span>`;
  for(const [ic,zs] of [[true,[.95,.88,.82,.78]],[false,[.95,.88,.82,.78,.74,.7,.66]]]){el.innerHTML=html(ic);for(const z of zs){el.style.fontSize=z+'rem';if(el.scrollWidth<=box.clientWidth-1){fit=true;break}}if(fit)break}
  if(!fit){el.classList.remove('one');el.style.fontSize='.85rem';el.innerHTML=`⛏ Máximo Histórico <span class="athv">${fmt(b.value)}</span>`;el.insertAdjacentHTML('afterend',`<div class="dim" style="font-size:.85rem">${ds}</div>`)}}
-// ═══ HISTORIAL REAL: tus compras (cantidades) × precios diarios de Binance ═══
-const L0=Date.UTC(2025,7,16);   // día previo a la 1ª compra: la gráfica arranca en 0
-const LEDGER={ // [fecha, cantidad, € pagados]; cantidad null = se calcula (venta de SOL para comprar BTC)
+
+const L0=Date.UTC(2025,7,16);   
+const LEDGER={ 
  btc:[['2025-08-17',.00097,100],['2025-08-19',.00103,100],['2025-09-01',.00109,100],['2025-09-25',.00212,200],['2025-10-01',.00031,8.43],['2025-10-16',.00116,109.6],['2025-10-17',.00111,100.01],['2025-11-04',.00166,150],['2025-11-14',.0018,150],['2025-12-04',.01263,1000],['2025-12-05',.01262,1000],['2025-12-06',.01302,1002.5],['2025-12-17',.01552,1143.27],['2025-12-18',.0055,400],['2026-01-02',.00672,510.02],['2026-01-02',.02328,1766.05],['2026-01-21',.00399,300],['2026-01-23',.00259,210.65],['2026-02-03',.00044,30.18],['2026-02-04',.00396,250.03],['2026-02-27',.00422,240.79],['2026-03-08',.004308,250.01],['2026-03-27',.00259,152.65],['2026-04-01',.0043,250],['2026-05-05',.003575,250],['2026-05-05',.00176,125.04],['2026-05-27',.00767,500],['2026-06-08',.00453,250],['2026-07-03',.005525,300],['2026-07-04',.00089,50.27],['2026-07-26',.000434962,24.59],['2026-08-05',.00537,300],['2026-09-03',.00445139,300]],
  eth:[['2026-01-01',.10653,271.35],['2026-01-01',1,2546.15],['2026-06-10',.00356,50]],
  sol:[['2025-11-07',1.02646,140],['2025-11-14',1.22895,150],['2025-12-17',1,105.26],['2025-12-20',3,324.9],['2025-12-21',.11272,.7],['2025-12-22',.04714,5.08],['2025-12-31',1.86867,199.7],['2026-01-02',2.66999,295.78],['2026-02-03',null,-30.18],['2026-02-27',null,-240.79],['2026-03-27',null,-152.65],['2026-05-05',-1.655,-125.04],['2026-07-04',-.7038,-50.27],['2026-09-08',10.0203,889.89],['2026-09-08',null,-32]]};
-const LHOLD={btc:.16099571,eth:1.14734,sol:12.0856},LINV={btc:11624.09,eth:2868.77,sol:1480.38};
+
+// NUEVOS VALORES TAMBIÉN ACTUALIZADOS EN EL HISTORIAL BASE (LHOLD y LINV)
+const LHOLD={btc:0.16230355,eth:1.14849743,sol:12.1188},LINV={btc:11724.09,eth:2868.77,sol:1480.38};
+
 const RANGES={'1D':{iv:'15m',n:96,step:9e5},'1S':{iv:'1h',n:168,step:36e5},'1M':{iv:'4h',n:180,step:144e5},'6M':{days:183},'1A':{days:365},'TODO':{days:0}};
 let rng=localStorage.getItem('portfolio_range_v1');if(!RANGES[rng])rng='TODO';
 let daily=null,dailyAt=0,athSer=null,sparkM=[],fullSer=[],sparkStep=864e5,lastT=0,sparkIdx=null,spark2=null;const intra={},intraAt={};const DSYM={bitcoin:'BTCEUR',ethereum:'ETHEUR',solana:'SOLEUR'};
@@ -434,7 +447,7 @@ async function loadDaily(){
  try{const need=[...new Set(Object.values(assets).filter(a=>a.type==='crypto'&&DSYM[a.coingeckoId]).map(a=>a.coingeckoId))],o={};
   await Promise.all(need.map(async id=>{const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${DSYM[id]}&interval=1d&startTime=${L0}&limit=1000`)).json();if(!Array.isArray(d))throw 0;d.forEach(k=>{(o[k[0]]=o[k[0]]||{})[id]=+k[4]})}));
   daily=Object.keys(o).length?o:null}catch(e){daily=null}}
-// compras/ventas hechas después desde la web: se detectan solas por el cambio de cantidad
+
 const EXT=load('portfolio_ledger_ext_v1',{}),SEEN=load('portfolio_seen_v1',null)||{};
 function trackEvents(){
  Object.keys(SEEN).forEach(k=>{if(!assets[k]){delete SEEN[k];delete EXT[k]}});
@@ -459,7 +472,7 @@ function currentFrames(){
  const c=RANGES[rng];
  if(c.iv)return intra[rng]?{frames:framesFrom(intra[rng]),step:c.step}:null;
  if(!daily)return null;let fr=framesFrom(daily);if(c.days)fr=fr.slice(-c.days);return{frames:fr,step:864e5}}
-function xirr(){ // rentabilidad anualizada real: tiene en cuenta la fecha de cada compra/venta
+function xirr(){ 
  const cf=[];Object.keys(assets).forEach(k=>resolveBase(k).concat(EXT[k]||[]).forEach(x=>{if(x.e)cf.push([x.t,-x.e])}));
  const V=Object.keys(assets).reduce((s,k)=>s+val(k),0);if(!cf.length||!(V>0))return null;cf.push([Date.now(),V]);
  const t0=Math.min(...cf.map(c=>c[0])),f=r=>cf.reduce((s,[t,a])=>s+a/Math.pow(1+r,(t-t0)/315576e5),0);
@@ -491,7 +504,7 @@ function showRead(i){
  el.innerHTML=`<b>${dt.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})}${sparkStep<864e5?' '+dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}):''}</b><span class="rv">${fmt(p.v)}</span><div class="dim">Invertido ${fmt(p.inv)} · <span class="${g>=0?'up':'dn'}">${g>=0?'+':''}${fmt(g)}</span></div>`}
 function drawSpark(t){
  const full=daily?ledgerSeries(framesFrom(daily),864e5,t):null;fullSer=full||[];
- if(full)updateAnnual(t,inv());   // al llegar el historial diario, repinta Rendimiento anual (2025 incluido)
+ if(full)updateAnnual(t,inv());   
  if(full){const m=full.slice(0,-1).reduce((a,p)=>p.v>a.v?p:a,{v:0});athSer=m.v>0?{value:m.v,date:new Date(m.d).toISOString()}:null}
  const cf=currentFrames(),ser=cf?ledgerSeries(cf.frames,cf.step,t):null;sparkM=ser||[];sparkStep=cf?cf.step:864e5;
  const labels=sparkM.map(p=>p.d),data=sparkM.map(p=>p.v);
@@ -527,7 +540,7 @@ async function fear(){
   $('gn').style.transform=`translateX(-50%) rotate(${v/100*180-90}deg)`;{const fs=$('fear-value').closest('section');fs.dataset.back=moodRGB(v);applyTint(fs)}}catch(e){console.error(e)}
 }
 const cmp=n=>{const f=(x,d)=>x.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});return n>=1e12?f(n/1e12,3)+' Bill. €':n>=1e9?f(n/1e9,2)+' MM €':f(n/1e6,2)+' M €'};
-const GOLD_T=220700; // toneladas de oro sobre la tierra (World Gold Council, fin de 2025)
+const GOLD_T=220700; 
 async function goldEur(){
  try{const d=await(await fetch('https://api.binance.com/api/v3/ticker/price?symbols='+encodeURIComponent('["PAXGUSDT","EURUSDT"]'))).json(),g=+d.find(x=>x.symbol==='PAXGUSDT').price,e=+d.find(x=>x.symbol==='EURUSDT').price;if(g&&e)return g/e}catch(e){}
  try{const d=await(await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=eur')).json();return d['pax-gold'].eur}catch(e){return null}}
@@ -567,7 +580,7 @@ function submitAdd(){
  else{const m=META[k];assets[k]=m.t==='c'?cry(k,q,v):{type:'manual',name:m.name,icon:m.icon,color:m.color,amount:q,invested:v,currentValue:v}}
  sv();$('add-qty').value=$('add-inv').value='';hide('m-add');updateAll();
 }
-function cardFront(k){ // mismo contenido que la cara delantera de Mis activos
+function cardFront(k){ 
  const a=assets[k],v=val(k),p=a.invested?(v-a.invested)/a.invested*100:0,wm=svgLogo(k)?`<span class="wm">${svgLogo(k)}</span>`:'';
  return `${wm}<div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`}
 function openManage(){
@@ -592,12 +605,12 @@ async function tipBlockchair(){
  const d=(await withTO(fetch('https://api.blockchair.com/bitcoin/stats').then(r=>r.json()),TIP_TO)).data,height=+d.best_block_height;
  if(!height||!d.best_block_hash)throw new Error('dato no válido');return{height,hash:d.best_block_hash}}
 let getting=false;
-async function getTip(){ // consulta las 3 fuentes a la vez y se queda con la primera que responda bien
+async function getTip(){ 
  if(getting)return;getting=true;
  try{const t=await Promise.any([tipFrom('https://mempool.space/api'),tipFrom('https://blockstream.info/api'),tipBlockchair()]);
   if(!tip||t.height>tip.height||(t.height===tip.height&&t.hash!==tip.hash)){const first=!tip;tip=t;showTip(!first)}}
  catch(e){if(!tip)$('blk').textContent='sin conexión'}
- finally{getting=false;if(!tip)setTimeout(getTip,4000)}   // sin dato aún: reintenta enseguida
+ finally{getting=false;if(!tip)setTimeout(getTip,4000)}   
 }
 function supplyAt(h){let s=0,sub=5e9,left=h+1;while(left>0&&sub>0){const n=Math.min(left,210000);s+=n*sub;left-=n;sub=Math.floor(sub/2)}return s/1e8}
 let realSup=null,supAt=0;
@@ -621,10 +634,10 @@ const COINS=[['bitcoin','BTC','₿','#f7931a'],['ethereum','ETH','Ξ','#8c9eff']
 function tkRender(){
  const one=COINS.map(([id,sy,ic,c])=>{const p=live[id],ch=chg[id];return `<span class="ti"><b style="color:${c}">${svgLogo(id,'lg lg-t')||ic} ${sy}</b> ${p!=null?fmt(p):'…'}${ch!=null?` <em class="${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'} ${Math.abs(ch).toFixed(2)}%</em>`:''}</span>`}).join('<span class="sep">◆</span>')+'<span class="sep">◆</span>';
  const box=$('tk');box.innerHTML=`<div class="tt">${one}</div>`;
- const n=Math.max(1,Math.ceil(box.clientWidth/(box.firstElementChild.scrollWidth||1))),h=one.repeat(n);   // copias suficientes para llenar el ancho
+ const n=Math.max(1,Math.ceil(box.clientWidth/(box.firstElementChild.scrollWidth||1))),h=one.repeat(n);   
  box.innerHTML=`<div class="tt" style="transform:translateX(${-tkX}px)">${h+h}</div>`}
 let tkX=0,tkLast=0;
-function ticker(){const b=$('tk');if(!b.firstElementChild||b.textContent.includes('…'))tkRender()}   // los precios se refrescan al completar cada vuelta
+function ticker(){const b=$('tk');if(!b.firstElementChild||b.textContent.includes('…'))tkRender()}   
 function tkLoop(n){const tt=$('tk').firstElementChild;if(!tkLast)tkLast=n;
  if(tt&&tt.scrollWidth>20){const half=tt.scrollWidth/2,nx=tkX+Math.min(n-tkLast,100)*.045;
   if(nx>=half){tkX=nx%half;tkRender()}else{tkX=nx;tt.style.transform=`translateX(${-tkX}px)`}}
@@ -693,7 +706,7 @@ function exportWalletPDF(){
  y+=6;if(y>250){d.addPage();y=20}d.line(14,y,196,y);y+=8;d.setFontSize(10);
  [['Compras',o.compra],['Ventas',o.venta],['Permutas',o.permuta],['Transferencias internas (excluidas)',o.interna]].forEach(([k,v])=>{d.text(`${k}: ${fmtEUR(v)}`,14,y);y+=6});
  d.setFontSize(12);d.text(`TOTAL A FISCALIZAR (ventas + permutas): ${fmtEUR(o.venta+o.permuta)}`,14,y);d.save(`extracto_${w.network}_${(w.address||'kraken').slice(0,8)}_${fr}_a_${to}.pdf`)}
-/* PARCHE FISCAL v2: Etherscan V2, precios Binance, FIFO con historial completo, categorías editables, CSV/PDF */
+
 const fxE=id=>document.getElementById(id);
 const fxOv=()=>{try{return JSON.parse(localStorage.getItem('tx_cat_overrides_v1')||'{}')}catch(e){return{}}};
 const fxKey=t=>`${t.hash}|${t.asset}|${t.direction}|${(+t.amount).toFixed(6)}`;
@@ -702,7 +715,6 @@ const FX_BIN={bitcoin:'BTCEUR',ethereum:'ETHEUR',solana:'SOLEUR'};
 const FX_MINT={EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:['USDC','usd-coin'],Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB:['USDT','tether'],So11111111111111111111111111111111111111112:['SOL','solana']};
 let FX_RAW=null;
 
-// ── Precios: Binance (hora exacta, sin clave) con respaldo CoinGecko ──
 const fxCG=window.getHistoricalPrice,fxPC={};
 async function fxKl(sym,t){const h=Math.floor(t/36e5)*36e5,k=sym+h;
  if(!fxPC[k]){const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1h&startTime=${h}&limit=1`)).json();if(!Array.isArray(d)||!d[0])return null;fxPC[k]=[+d[0][1],+d[0][4]]}
@@ -719,7 +731,6 @@ async function fxFill(txs){
  Object.values(P).forEach(g=>{const v=g.find(t=>t.direction==='out'&&t.eurValue>0)||g.find(t=>t.eurValue>0);if(v)g.forEach(t=>t.eurValue=v.eurValue)});
  txs.forEach(t=>{if(t.eurValue==null||isNaN(t.eurValue))t.eurValue=0})}
 
-// ── BTC (Blockstream) con contrapartes para detectar transferencias propias ──
 async function fetchBTCTxs(address,from,to){
  let txs=[],last='';
  for(let p=0;p<60;p++){const r=await fetch(`https://blockstream.info/api/address/${address}/txs`+(last?`/chain/${last}`:''));
@@ -735,7 +746,6 @@ async function fetchBTCTxs(address,from,to){
   res.push({date:new Date(t),hash:tx.txid,direction:n>0?'in':'out',amount:Math.abs(n)/1e8,asset:'BTC',coingeckoId:'bitcoin',counterparties:n>0?vi:vo})}
  return res}
 
-// ── ETH: Etherscan API V2 (transacciones normales + internas) ──
 async function fetchETHTxs(address,from,to){
  const key=localStorage.getItem('etherscan_api_key');if(!key)throw new Error('NO_ETH_KEY');
  const get=async act=>{const d=await(await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=${act}&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc&apikey=${key}`)).json();
@@ -749,7 +759,6 @@ async function fetchETHTxs(address,from,to){
   res.push({date:new Date(t),hash:tx.hash,direction:out?'out':'in',amount:v,asset:'ETH',coingeckoId:'ethereum',counterparties:[out?tx.to:tx.from]})});
  return res}
 
-// ── SOL (Helius): swaps con pierna de entrada y salida ──
 async function fetchSOLTxsHelius(address,from,to,key){
  let all=[],before;
  for(let p=0;p<40;p++){const r=await fetch(`https://api.helius.xyz/v0/addresses/${address}/transactions?api-key=${key}&limit=100${before?'&before='+before:''}`);
@@ -770,7 +779,6 @@ async function fetchSOLTxsHelius(address,from,to,key){
   tt.forEach(t=>{if(t.fromUserAccount!==address&&t.toUserAccount!==address)return;const o=t.fromUserAccount===address;push(L(t,0),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})})});
  return res}
 
-// ── Kraken: CSV robusto, trade/spend/receive, comisiones ──
 function parseKrakenCSV(text){
  const rows=[];let row=[],f='',q=false;
  for(let i=0;i<text.length;i++){const c=text[i];
@@ -797,7 +805,6 @@ function buildKrakenTxs(rows){
    rs.forEach(r=>{const a=fxKA(r.asset);if(a==='EUR')return;res.push({date,hash:id,direction:type==='deposit'?'in':'out',amount:Math.abs(+r.amount),asset:fxSym(a),coingeckoId:FX_ID[a]||null,eurValue:null,category:'interna',kraken:true})})}});
  return res}
 
-// ── Categorías: guardadas en el navegador y reutilizadas en wallet y panel fiscal ──
 function suggestCategory(tx){
  const o=fxOv()[fxKey(tx)];if(o)return o;if(tx.category)return tx.category;
  const own=Object.values(wallets).flatMap(w=>w.network==='kraken'?(w.addresses||[]):(w.isMine?[w.address]:[])).map(x=>x.toLowerCase());
@@ -809,7 +816,6 @@ function changeTxCategory(i,val){const t=currentTxList[i];t.category=val;const o
 const fxLW=loadWalletTransactions;
 window.loadWalletTransactions=async function(){window._fxErr=null;await fxLW();const w=fxE('tx-warning');if(window._fxErr&&!w.classList.contains('hidden'))w.textContent+=' Detalle: '+window._fxErr};
 
-// ── Panel fiscal: historial completo + FIFO + categorías editables ──
 const krKey=r=>r.txid||[r.refid,r.time,r.type,r.asset,r.amount].join('|');
 function krMerge(old,rows){const s=new Set((old||[]).map(krKey)),add=(rows||[]).filter(r=>!s.has(krKey(r)));return{all:(old||[]).concat(add),added:add.length,dup:(rows||[]).length-add.length}}
 function importKraken(f){
@@ -883,7 +889,6 @@ function renderFiscalSummary(txs){
  [['fis-ganancias',g],['fis-perdidas',p],['fis-neto',g-p],['fis-vol-venta',vv],['fis-vol-permuta',vp],['fis-vol-interna',vi]].forEach(([id,v])=>fxE(id).textContent=fmtEUR(v));
  fxE('fiscal-summary').classList.remove('hidden')}
 
-// ── Exportar: CSV (Excel) y PDF con valor de transmisión, coste y ganancia ──
 function fxHashLine(d,h,x,y){const u=/^0x[0-9a-f]{64}$/i.test(h)?'https://etherscan.io/tx/'+h:/^[0-9a-f]{64}$/i.test(h)?'https://blockstream.info/tx/'+h:h.length>=80?'https://solscan.io/tx/'+h:null;
  d.text('Hash: '+h,x,y);if(u)d.link(x,y-3,d.getTextWidth('Hash: '+h),4,{url:u})}
 function exportFiscalCSV(){
@@ -906,7 +911,6 @@ function exportFiscalPDF(){
  d.setFontSize(12);d.text(`NETO (casilla Modelo 100): ${fmtEUR(g-p)}`,14,y);
  d.save(`informe_fiscal_${yr}.pdf`)}
 
-// ═══ ARRANQUE ═══
 populateFiscalYearSelect();
 renderWalletsList();
 tick();setInterval(tick,30000);
