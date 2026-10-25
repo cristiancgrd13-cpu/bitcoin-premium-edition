@@ -208,10 +208,13 @@ body::before{display:none}
   <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span></div><div id="ath-box"></div>
   <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
-<section class="c s3 tint" data-front="34,214,138" data-back="150,165,200" style="--tc:34,214,138"><div class="bigcube" onclick="flipTint(this)"><div class="cube-in">
+
+<!-- MODIFICADO: Cambiado data-back a un tono azul/índigo (99,102,241) para la cara trasera de inversión -->
+<section class="c s3 tint" data-front="34,214,138" data-back="99,102,241" style="--tc:34,214,138"><div class="bigcube" onclick="flipTint(this)"><div class="cube-in">
 <div class="face front"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M14 22V78M32 30V84M50 8V66M68 20V76M86 4V58" fill="none"/><rect x="8" y="36" width="12" height="28" fill="currentColor"/><rect x="26" y="40" width="12" height="28" fill="none"/><rect x="44" y="20" width="12" height="30" fill="currentColor"/><rect x="62" y="32" width="12" height="26" fill="none"/><rect x="80" y="12" width="12" height="28" fill="currentColor"/></g></svg></span><div class="k">Rendimiento total</div><div id="percentage" class="d perf">—</div><div id="perf-eur" class="d pe">—</div></div>
 <div class="face back"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"><ellipse cx="50" cy="30" rx="30" ry="10" fill="currentColor"/><path d="M20 30v14c0 5.5 13.4 10 30 10s30-4.5 30-10V30M20 44v14c0 5.5 13.4 10 30 10s30-4.5 30-10V44M20 58v14c0 5.5 13.4 10 30 10s30-4.5 30-10V58"/></g></svg></span><div class="k">Inversión total</div><div class="row" style="cursor:default"><b id="inv-total" class="d" style="font-size:1.6rem">—</b></div></div>
 </div></div></section>
+
 <section class="c s3 tint" style="--tc:150,160,185"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 30a10 10 0 0 1 10-10h44v14"/><rect x="14" y="30" width="72" height="52" rx="10"/><path d="M86 48H68a8 8 0 0 0 0 16h18"/></g><circle cx="69" cy="56" r="3.5" fill="currentColor"/></svg></span>
   <div class="k">Mis activos</div>
   <div id="assets-list"></div>
