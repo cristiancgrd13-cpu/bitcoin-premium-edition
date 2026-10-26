@@ -458,11 +458,11 @@ function alignYearButtons(){
  if(!meta||!meta.data||!meta.data.length)return;
  const btnBox=$('yr-buttons');
  const buttons=btnBox.querySelectorAll('.yr-btn');
- const dpr=window.devicePixelRatio||1;
+ const canvasW=annual.canvas.offsetWidth||annual.width||300;
  meta.data.forEach((bar,i)=>{
   if(buttons[i]){
-   const w=bar.width/dpr;
-   const l=(bar.x/dpr)-(w/2);
+   const w=bar.width;
+   const l=bar.x-(w/2);
    buttons[i].style.width=`${w}px`;
    buttons[i].style.left=`${l}px`;
   }
@@ -481,9 +481,9 @@ function updateAnnual(t,i){
  btnBox.innerHTML = years.map(y => `<button class="yr-btn" onclick="openYearDetail('${y}')">${y}</button>`).join('');
 
  if(!window.Chart)return;
- if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.options.scales.y.min=-lim;annual.options.scales.y.max=lim;annual.options.scales.y.ticks.stepSize=lim/2;annual.update('none');alignYearButtons()}
- else{annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.4,categoryPercentage:.6}]},options:{maintainAspectRatio:false,events:[],plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
-  setTimeout(alignYearButtons,50)}
+ if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.options.scales.y.min=-lim;annual.options.scales.y.max=lim;annual.options.scales.y.ticks.stepSize=lim/2;annual.update('none');setTimeout(alignYearButtons,30)}
+ else{annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.5,categoryPercentage:.6}]},options:{maintainAspectRatio:false,events:[],plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
+  setTimeout(alignYearButtons,100)}
 }
 
 function updateLiveDateTime(){
