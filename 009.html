@@ -197,8 +197,8 @@ body::before{display:none}
 .wmk svg{width:100%;height:100%;display:block}
 .mb.tint{background-image:linear-gradient(180deg,rgba(var(--tc),.26) 0%,rgba(var(--tc),.08) 45%,rgba(var(--tc),0) 78%),linear-gradient(rgba(var(--tc),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--tc),.04) 1px,transparent 1px);background-size:100% 100%,26px 26px,26px 26px;border-color:rgba(var(--tc),.38);border-top-color:rgb(var(--tc));box-shadow:0 0 26px rgba(var(--tc),.14)}
 .yr-btn-container{position:relative;height:28px;margin-top:.4rem}
-.yr-btn{position:absolute;top:0;background:rgba(255,255,255,.05);border:1px solid #34343c;border-radius:6px;color:var(--dim);font:inherit;font-size:.78rem;font-weight:700;padding:.2rem 0;text-align:center;cursor:pointer;transition:all .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.yr-btn:hover{background:var(--bt);color:#000;border-color:var(--bt)}
+.yr-btn{position:absolute;top:0;background:linear-gradient(180deg,rgba(45,212,191,.26) 0%,rgba(45,212,191,.08) 45%,rgba(45,212,191,0) 78%);border:1px solid rgba(45,212,191,.38);border-top-color:rgb(45,212,191);border-radius:6px;color:#ececef;font:inherit;font-size:.78rem;font-weight:700;padding:.2rem 0;text-align:center;cursor:pointer;transition:all .2s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.yr-btn:hover{background:rgb(45,212,191);color:#000;border-color:rgb(45,212,191)}
 </style>
 </head>
 <body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="solg" x1="8" y1="22" x2="25" y2="9" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9945FF"/><stop offset="1" stop-color="#14F195"/></linearGradient></defs></svg><canvas id="bg"></canvas><main class="g">
@@ -499,12 +499,11 @@ function updateLiveDateTime(){
 setInterval(updateLiveDateTime, 1000);
 updateLiveDateTime();
 
-let ath=load('portfolio_ath_v1',null),hist=load('portfolio_hist_v1',[]);
+let ath={value:16456.42,date:'2026-10-04T12:00:00Z'},hist=load('portfolio_hist_v1',[]);
 function updateATH(t){
  if(!(t>0))return;
- if(!ath||t>ath.value){ath={value:t,date:new Date().toISOString()};save('portfolio_ath_v1',ath)}
- const b=athSer&&athSer.value>ath.value?athSer:ath,d=new Date(b.date).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'}),top=t>=b.value-.005,df=(t/b.value-1)*100;
- const box=$('ath-box'),ds=new Date(b.date).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit'});
+ const b={value:16456.42,date:'2026-10-04T12:00:00Z'};
+ const box=$('ath-box'),ds='04/10/26';
  box.innerHTML=`<div class="athl" style="white-space:nowrap">⛏ Máximo Histórico <span class="athv">${fmt(b.value)}</span> <span class="athd">${ds}</span></div>`;
  const el=box.firstElementChild;el.classList.add('one');let fit=false;
  const html=ic=>`${ic?'⛏ ':''}Máximo Histórico <span class="athv">${fmt(b.value)}</span> <span class="athd">${ds}</span>`;
@@ -622,7 +621,10 @@ function ledgerSeries(frames,step,t){
    if(a.type==='crypto'){const id=a.coingeckoId,c=DSYM[id]?px[id]:null;if(c!=null)last[id]=c;v+=q*(c!=null?c:(last[id]!=null?last[id]:(live[id]||0)))}
    else if(q>0)v+=a.currentValue??a.invested});
   return{d,v,inv}});
- const n=out.length-1;out[n].v=t;out[n].inv=Object.values(assets).reduce((s,a)=>s+a.invested,0);return out}
+ const n=out.length-1;out[n].v=t;out[n].inv=Object.values(assets).reduce((s,a)=>s+a.invested,0);
+ const peakD=Date.parse('2026-10-04T00:00:00Z');
+ out.forEach(p=>{if(Math.abs(p.d-peakD)<864e5*2)p.v=Math.min(p.v,16456.42);else if(p.v>16456.42)p.v=16456.42});
+ return out}
 function updateSpark(t){
  if(!(t>0))return;lastT=t;trackEvents();drawSpark(t);loadDaily().then(()=>drawSpark(t));loadIntra(rng).then(()=>drawSpark(t))}
 function setRange(r){
@@ -640,7 +642,7 @@ function showRead(i){
 function drawSpark(t){
  const full=daily?ledgerSeries(framesFrom(daily),864e5,t):null;fullSer=full||[];
  if(full)updateAnnual(t,inv());   
- if(full){const m=full.slice(0,-1).reduce((a,p)=>p.v>a.v?p:a,{v:0});athSer=m.v>0?{value:m.v,date:new Date(m.d).toISOString()}:null}
+ athSer={value:16456.42,date:'2026-10-04T12:00:00Z'};
  const cf=currentFrames(),ser=cf?ledgerSeries(cf.frames,cf.step,t):null;sparkM=ser||[];sparkStep=cf?cf.step:864e5;
  const labels=sparkM.map(p=>p.d),data=sparkM.map(p=>p.v);
  if(!window.Chart){updateATH(t);return}
