@@ -938,12 +938,4 @@ function buildKrakenTxs(rows){
   if(['trade','spend','receive'].includes(type)){
    const fi=rs.find(isE),cr=rs.filter(r=>!isE(r));
    if(fi&&cr.length===1){const c=cr[0],e=Math.abs(+fi.amount),fe=+fi.fee||0,cf=+c.fee||0,q=Math.abs(+c.amount),sale=+fi.amount>0,code=fxKA(c.asset);
-    res.push({date,hash:id,direction:sale?'out':'in',amount:sale?q:q-cf,asset:fxSym(code),coingeckoId:FX_ID[code]||null,eurValue:sale?e-fe-(q?cf*e/q:0):e+fe,category:sale?'venta':'compra'})}
-   else if(cr.length===2){const o=cr.find(r=>+r.amount<0),i=cr.find(r=>+r.amount>0);
-    if(o&&i)[[o,'out',Math.abs(+o.amount)],[i,'in',+i.amount-(+i.fee||0)]].forEach(([r,d,q])=>{const a=fxKA(r.asset);res.push({date,hash:id,direction:d,amount:q,asset:fxSym(a),coingeckoId:FX_ID[a]||null,eurValue:null,category:'permuta',pair:id})})}
-  }else if(type==='deposit'||type==='withdrawal'){
-   rs.forEach(r=>{const a=fxKA(r.asset);if(a==='EUR')return;res.push({date,hash:id,direction:type==='deposit'?'in':'out',amount:Math.abs(+r.amount),asset:fxSym(a),coingeckoId:FX_ID[a]||null,eurValue:null,category:'interna',kraken:true})})}});
- return res}
-
-function suggestCategory(tx){
- const o=fxOv()[fxKey(t
+    res.push({date,hash:id,direction:sale?'out':'in',amount:sale?q:q-cf,
