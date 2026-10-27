@@ -352,14 +352,10 @@ const META={
 const cry=(k,amount,invested)=>{const m=META[k];return{type:'crypto',coingeckoId:m.id,name:m.name,symbol:m.sym,icon:m.icon,color:m.color,amount,invested}};
 
 const SEED={btc:cry('btc',0.162508732,11724.09),eth:cry('eth',1.11059,2868.77),sol:cry('sol',23.33303,1480.38)};
-let assets=load('portfolio_assets_v2',null)||{...SEED};
-
-if(!localStorage.getItem('portfolio_seed_v7')){
-  Object.assign(assets,SEED);
+let assets=load('portfolio_assets_v2',null);
+if(!assets){
+  assets={...SEED};
   save('portfolio_assets_v2',assets);
-  localStorage.setItem('portfolio_seed_v7','1');
-  localStorage.removeItem('portfolio_seen_v1');
-  localStorage.removeItem('portfolio_ledger_ext_v1');
 }
 
 const sv=()=>save('portfolio_assets_v2',assets);
