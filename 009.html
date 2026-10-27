@@ -264,7 +264,7 @@ body::before{display:none}
 <div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="dim">0,00 €</span></div></div>
 <div id="fiscal-table" style="max-height:480px;overflow-y:auto;margin:.8rem 0"></div>
 <button class="btn p" style="width:100%" onclick="exportFiscalPDF()">📄 Exportar informe fiscal anual (PDF)</button>
-<p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan en este navegador.</p></section>
+<p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan in este navegador.</p></section>
 </main>
 
 <div id="m-year-detail" class="m h"><div class="mb tint" style="--tc:45,212,191"><button class="x" onclick="hide('m-year-detail')">&times;</button><b id="yr-modal-title" class="d" style="font-size:1.2rem"></b>
@@ -391,8 +391,8 @@ function renderAssets(){
  if(box.dataset.sig!==sig){box.dataset.sig=sig;box.innerHTML=keys.map(k=>`<div class="cube${flipped.has(k)?' flip':''}" data-k="${k}" onclick="flipCube('${k}')"><div class="cube-in"><div class="face front row"></div><div class="face back"></div></div></div>`).join('')}
  keys.forEach(k=>{const a=assets[k],v=val(k),p=a.invested?(v-a.invested)/a.invested*100:0,el=box.querySelector(`[data-k="${k}"]`),cr=a.type==='crypto',wm=svgLogo(k)?`<span class="wm">${svgLogo(k)}</span>`:'';
   [el.querySelector('.front'),el.querySelector('.back')].forEach(fc=>{fc.style.background=`linear-gradient(100deg,${a.color}30 0%,#16161a 58%)`;fc.style.borderColor=`${a.color}55`;fc.style.borderLeftColor=a.color;fc.style.boxShadow=`0 0 18px ${a.color}24`});
-  el.querySelector('.front').innerHTML=`${wm}<div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`;
-  el.querySelector('.back').innerHTML=`<span class="ic bk" style="background:none">${logo(k,a)}</span>${wm}<span><b style="color:${a.color};font-size:.78rem">${a.name}</b>${cr?'':` <a href="#" class="lk" onclick="event.stopPropagation();openDetail('${k}');return false">valor</a>`}</span><b class="bp">${fmt(cr?a.invested/a.amount:v)}</b><span class="dim">Invertido ${fmt(a.invested)}</span>`})}
+  el.querySelector('.front').innerHTML=`${wm}<div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim" style="color:${a.color};opacity:0.85">${qtyL(a)}</div></div></div><div><b class="d" style="color:${a.color}">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`;
+  el.querySelector('.back').innerHTML=`<span class="ic bk" style="background:none">${logo(k,a)}</span>${wm}<span><b style="color:${a.color};font-size:.78rem">${a.name}</b>${cr?'':` <a href="#" class="lk" onclick="event.stopPropagation();openDetail('${k}');return false">valor</a>`}</span><b class="bp" style="color:${a.color}">${fmt(cr?a.invested/a.amount:v)}</b><span class="dim" style="color:${a.color};opacity:0.85">Invertido ${fmt(a.invested)}</span>`})}
 function flipCube(k){const el=$('assets-list').querySelector(`[data-k="${k}"]`);if(!el)return;el.classList.toggle('flip');flipped[el.classList.contains('flip')?'add':'delete'](k)}
 function editInv(k){const a=assets[k],n=parseFloat((prompt(`Inversión real en € para ${a.name}\nActual: ${fmt(a.invested)}`)||'').replace(',','.'));if(n>0){a.invested=n;sv();updateAll()}}
 
@@ -403,10 +403,10 @@ function updatePie(){
   pie.data.labels=labels;
   pie.data.datasets[0].data=data;
   pie.data.datasets[0].backgroundColor=colors;
-  pie.options.plugins.legend.labels.color=ks.map(k=>assets[k].color);
+  pie.options.plugins.legend.labels.color=ctx=>colors[ctx.index];
   pie.update();
  }
- else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11},color:ks.map(k=>assets[k].color)}},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
+ else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11},color:ctx=>colors[ctx.index]}},tooltip:{titleColor:ctx=>{const item=ctx.dataPoints&&ctx.dataPoints[0];return item?colors[item.dataIndex]:'#fff'},bodyColor:ctx=>{const item=ctx.dataPoints&&ctx.dataPoints[0];return item?colors[item.dataIndex]:'#fff'},callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
 }
 
 const YR=load('portfolio_years_v1',{});
@@ -719,7 +719,7 @@ function submitAdd(){
 }
 function cardFront(k){ 
  const a=assets[k],v=val(k),p=a.invested?(v-a.invested)/a.invested*100:0,wm=svgLogo(k)?`<span class="wm">${svgLogo(k)}</span>`:'';
- return `${wm}<div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim">${qtyL(a)}</div></div></div><div><b class="d">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`}
+ return `${wm}<div class="fx"><span class="ic" style="background:none">${logo(k,a)}</span><div><b style="color:${a.color}">${a.name}</b><div class="dim" style="color:${a.color};opacity:0.85">${qtyL(a)}</div></div></div><div><b class="d" style="color:${a.color}">${fmt(v)}</b><div class="${p>=0?'up':'dn'}">${p>=0?'+':''}${p.toFixed(2)}%</div></div>`}
 function openManage(){
  $('manage-list').innerHTML=Object.keys(assets).map(k=>{const a=assets[k];return `<div class="mcard" onclick="openMod('${k}')" style="background:linear-gradient(100deg,${a.color}30 0%,#16161a 58%);border-color:${a.color}55;border-left-color:${a.color};box-shadow:0 0 18px ${a.color}24">${cardFront(k)}</div>`}).join('');
  show('m-manage');
@@ -918,7 +918,7 @@ async function fetchSOLTxsHelius(address,from,to,key){
   if(tx.type==='SWAP'){
    const pick=d=>{const a=tt.filter(t=>mine(t,d)).map(t=>L(t,0)),b=nt.filter(t=>mine(t,d)&&t.amount>=3e6).sort((x,y)=>y.amount-x.amount).map(t=>L(t,1));return a[0]||b[0]};
    const o=pick('out'),i=pick('in'),note='Swap'+(orca?' (Orca)':'');
-   if(o)push(o,'out',{category:'permuta',note,pair:tx.signature});if(i)push(i,'in',{category:'permuta',note,pair:tx.signature});return}
+   if(o)push(o,&quot;out&quot;,{category:&apos;permuta&apos;,note,pair:tx.signature});if(i)push(i,&quot;in&quot;,{category:&apos;permuta&apos;,note,pair:tx.signature});return}
   if(orca&&tt.length>=2){tt.forEach(t=>{if(t.fromUserAccount===address||t.toUserAccount===address)push(L(t,0),t.fromUserAccount===address?'out':'in',{category:'permuta',note:'Pool Orca (revisar)'})});return}
   nt.forEach(t=>{if(t.amount<1000||(t.fromUserAccount!==address&&t.toUserAccount!==address))return;const o=t.fromUserAccount===address;push(L(t,1),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})});
   tt.forEach(t=>{if(t.fromUserAccount!==address&&t.toUserAccount!==address)return;const o=t.fromUserAccount===address;push(L(t,0),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})})});
