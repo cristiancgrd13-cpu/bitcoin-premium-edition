@@ -264,7 +264,7 @@ body::before{display:none}
 <div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="dim">0,00 €</span></div></div>
 <div id="fiscal-table" style="max-height:480px;overflow-y:auto;margin:.8rem 0"></div>
 <button class="btn p" style="width:100%" onclick="exportFiscalPDF()">📄 Exportar informe fiscal anual (PDF)</button>
-<p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan in este navegador.</p></section>
+<p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan en este navegador.</p></section>
 </main>
 
 <div id="m-year-detail" class="m h"><div class="mb tint" style="--tc:45,212,191"><button class="x" onclick="hide('m-year-detail')">&times;</button><b id="yr-modal-title" class="d" style="font-size:1.2rem"></b>
@@ -697,7 +697,7 @@ async function openDetail(k){
  if(a.type==='crypto'){$('dt-chart').style.display='block';$('dt-man').style.display='none';
   try{const res=await fetch(`https://api.coingecko.com/api/v3/coins/${a.coingeckoId}/market_chart?vs_currency=eur&days=30&interval=daily`);if(res.ok){const d=await res.json();
    if(detail)detail.destroy();
-   detail=new Chart($('dt-cv'),{type:'line',data:{labels:d.prices.map(p=>new Date(p[0]).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})),datasets:[{data:d.prices.map(p=>p[1]),borderColor:a.color,backgroundColor:a.color+'22',fill:true,tension:.3,pointRadius:0}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:6},grid:{display:false}},y:{grid:{color:'rgba(255,255,255,.06)'}}}}})}catch(e){}
+   detail=new Chart($('dt-cv'),{type:'line',data:{labels:d.prices.map(p=>new Date(p[0]).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})),datasets:[{data:d.prices.map(p=>p[1]),borderColor:a.color,backgroundColor:a.color+'22',fill:true,tension:.3,pointRadius:0}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:6},grid:{display:false}},y:{grid:{color:'rgba(255,255,255,.06)'}}}}})}}catch(e){}
  }else{$('dt-chart').style.display='none';$('dt-man').style.display='block';$('man-val').value=a.currentValue??a.invested;$('man-key').value=k}
 }
 function saveManual(){const v=parseFloat($('man-val').value);if(v>=0){assets[$('man-key').value].currentValue=v;sv();hide('m-detail');updateAll()}}
@@ -938,4 +938,97 @@ function buildKrakenTxs(rows){
   if(['trade','spend','receive'].includes(type)){
    const fi=rs.find(isE),cr=rs.filter(r=>!isE(r));
    if(fi&&cr.length===1){const c=cr[0],e=Math.abs(+fi.amount),fe=+fi.fee||0,cf=+c.fee||0,q=Math.abs(+c.amount),sale=+fi.amount>0,code=fxKA(c.asset);
-    res.push({date,hash:id,direction:sale?'out':'in',amount:sale?q:q-cf,
+    res.push({date,hash:id,direction:sale?'out':'in',amount:sale?q:q-cf,asset:fxSym(code),coingeckoId:FX_ID[code]||null,eurValue:sale?e-fe:e+fe,category:sale?'venta':'compra',note:'Kraken'})}
+   else if(!fi&&cr.length===2){const o=cr.find(r=>+r.amount<0),i=cr.find(r=>+r.amount>0);
+    if(o&&i)[[o,'out'],[i,'in']].forEach(([r,d])=>{const c=fxKA(r.asset);res.push({date,hash:id,direction:d,amount:Math.abs(+r.amount)-(d==='in'?(+r.fee||0):0),asset:fxSym(c),coingeckoId:FX_ID[c]||null,category:'permuta',note:'Kraken',pair:id})})}
+   return}
+  if(['deposit','withdrawal'].includes(type)){
+   rs.forEach(r=>{const c=fxKA(r.asset);if(c==='EUR')return;const a=+r.amount;
+    res.push({date,hash:id,direction:a>0?'in':'out',amount:Math.abs(a),asset:fxSym(c),coingeckoId:FX_ID[c]||null,category:'interna',note:'Kraken '+type})})}
+ });
+ return res}
+
+function krMerge(old,neu){
+ const key=r=>r.txid||[r.refid,r.asset,r.time,r.amount].join('|'),m=new Map();let added=0;
+ (old||[]).forEach(r=>m.set(key(r),r));
+ neu.forEach(r=>{if(!m.has(key(r))){m.set(key(r),r);added++}});
+ return{all:[...m.values()],added}}
+
+function importKraken(f){
+ if(!f)return;const rd=new FileReader();
+ rd.onload=e=>{try{
+  const rows=parseKrakenCSV(e.target.result);
+  let id=Object.keys(wallets).find(k=>wallets[k].network==='kraken');
+  if(!id){id='kraken_cuenta_'+Date.now();wallets[id]={network:'kraken',address:'',alias:'Kraken',isMine:false,ledgerRows:[],addresses:[]}}
+  const r=krMerge(wallets[id].ledgerRows,rows);wallets[id].ledgerRows=r.all;saveWallets();renderWalletsList();
+  alert(`Kraken: ${r.added} movimientos nuevos importados.`)}catch(err){alert('No se pudo leer el CSV: '+err.message)}};
+ rd.readAsText(f)}
+
+const kindTag=w=>({kraken:' <span class="dim">(Kraken)</span>',aave:' <span class="dim">(Aave)</span>',externa:' <span class="dim">(externa)</span>'})[w.kind]||'';
+const ownAddrs=()=>{const s=new Map();Object.values(wallets).forEach(w=>{if(w.kind==='externa')return;const n=w.alias||NETWORK_META[w.network].label;if(w.address)s.set(w.address.toLowerCase(),n);(w.addresses||[]).forEach(a=>s.set(a.toLowerCase(),n))});return s};
+const fxOwnName=t=>{const s=ownAddrs(),c=(t.counterparties||[]).find(a=>a&&s.has(a.toLowerCase()));return c?' · '+(t.direction==='in'?'de ':'a ')+s.get(c.toLowerCase()):''};
+function suggestCategory(t,w){
+ const ov=fxOv()[fxKey(t)];if(ov)return ov;
+ if(t.category)return t.category;
+ const s=ownAddrs();
+ if((t.counterparties||[]).some(a=>a&&s.has(a.toLowerCase())))return'interna';
+ return t.direction==='in'?'compra':'venta'}
+function changeTxCategory(i,v){const t=currentTxList[i];t.category=v;const o=fxOv();o[fxKey(t)]=v;localStorage.setItem('tx_cat_overrides_v1',JSON.stringify(o));computeTotals()}
+function fxHashLine(d,h,x,y){d.text(String(h||'').slice(0,90),x,y)}
+
+let fiscalRows=[],fiscalSum=null,fiscalYear=null;
+async function runFiscalPanel(){
+ const y=+$('fiscal-year').value,wn=$('fiscal-warning'),errs=[];let all=[];
+ $('fiscal-loading').classList.remove('hidden');['fiscal-summary','fiscal-warning'].forEach(i=>$(i).classList.add('hidden'));$('fiscal-table').innerHTML='';
+ try{
+  for(const id of Object.keys(wallets)){const w=wallets[id];
+   try{const r=await fetchRawTxsForWallet(w,new Date('2015-01-01T00:00:00Z'),new Date(Date.UTC(y,11,31,23,59,59)));r.forEach(x=>x.w=w);all=all.concat(r)}
+   catch(e){errs.push((w.alias||NETWORK_META[w.network].label)+': '+(e.message||'error'))}}
+  await fxFill(all);
+  all.forEach(x=>x.category=suggestCategory(x,x.w));
+  all.sort((a,b)=>a.date-b.date);
+  const lots={},rows=[],S={gan:0,per:0,venta:0,permuta:0,interna:0};let missing=false;
+  all.forEach(x=>{const inY=x.date.getUTCFullYear()===y;
+   if(x.category==='interna'){if(inY)S.interna+=x.eurValue;return}
+   const L=lots[x.asset]=lots[x.asset]||[];
+   if(x.direction==='in'){L.push({q:x.amount,c:x.eurValue});return}
+   let q=x.amount,cost=0;
+   while(q>1e-12&&L.length){const l=L[0],u=Math.min(q,l.q),part=l.c*u/l.q;cost+=part;l.c-=part;l.q-=u;q-=u;if(l.q<=1e-12)L.shift()}
+   if(q>1e-9)missing=true;
+   if(!inY)return;
+   const g=x.eurValue-cost;if(g>=0)S.gan+=g;else S.per+=g;
+   if(x.category==='permuta')S.permuta+=x.eurValue;else S.venta+=x.eurValue;
+   rows.push({date:x.date,asset:x.asset,qty:x.amount,proceeds:x.eurValue,cost,gain:g,cat:x.category})});
+  fiscalRows=rows;fiscalSum=S;fiscalYear=y;
+  $('fis-ganancias').textContent=fmtEUR(S.gan);$('fis-perdidas').textContent=fmtEUR(S.per);$('fis-neto').textContent=fmtEUR(S.gan+S.per);
+  $('fis-vol-venta').textContent=fmtEUR(S.venta);$('fis-vol-permuta').textContent=fmtEUR(S.permuta);$('fis-vol-interna').textContent=fmtEUR(S.interna);
+  $('fiscal-summary').classList.remove('hidden');
+  $('fiscal-table').innerHTML=rows.length?rows.map(r=>`<div class="row" style="cursor:default"><div><div class="dim">${r.date.toLocaleDateString('es-ES')} · ${r.cat}</div><b>${r.qty.toFixed(6)} ${r.asset}</b><div class="dim">Venta ${fmtEUR(r.proceeds)} · Coste ${fmtEUR(r.cost)}</div></div><b class="${r.gain>=0?'up':'dn'}">${r.gain>=0?'+':''}${fmtEUR(r.gain)}</b></div>`).join(''):'<p class="dim" style="text-align:center">Sin ventas ni permutas en ese año.</p>';
+  const msg=[];if(errs.length)msg.push('Errores: '+errs.join(' | '));if(missing)msg.push('Faltan compras previas para algunas ventas (coste 0). Revisa que estén todas tus wallets y el CSV de Kraken.');
+  if(msg.length){wn.textContent=msg.join(' ');wn.classList.remove('hidden')}
+ }finally{$('fiscal-loading').classList.add('hidden')}}
+
+function exportFiscalPDF(){
+ if(!fiscalSum){alert('Pulsa "Calcular año" primero.');return}
+ const{jsPDF}=window.jspdf,d=new jsPDF(),S=fiscalSum;let y=18;
+ d.setFontSize(16);d.text(`Informe fiscal cripto ${fiscalYear} (FIFO)`,14,y);y+=10;d.setFontSize(10);
+ [['Ganancias patrimoniales',S.gan],['Perdidas patrimoniales',S.per],['NETO (Modelo 100)',S.gan+S.per],['Volumen ventas',S.venta],['Volumen permutas',S.permuta],['Transferencias internas (excluidas)',S.interna]].forEach(([k,v])=>{d.text(`${k}: ${fmtEUR(v)}`,14,y);y+=6});
+ y+=4;d.line(14,y,196,y);y+=6;d.setFontSize(9);
+ ['Fecha','Tipo','Cantidad','Venta','Coste','Ganancia'].forEach((h,i)=>d.text(h,[14,38,60,104,132,162][i],y));y+=6;
+ fiscalRows.forEach(r=>{if(y>280){d.addPage();y=20}
+  [r.date.toLocaleDateString('es-ES'),r.cat,`${r.qty.toFixed(6)} ${r.asset}`,fmtEUR(r.proceeds),fmtEUR(r.cost),fmtEUR(r.gain)].forEach((s,i)=>d.text(String(s),[14,38,60,104,132,162][i],y));y+=6});
+ d.save(`informe_fiscal_${fiscalYear}.pdf`)}
+
+(function init(){
+ const sel=$('fiscal-year'),cy=new Date().getFullYear();
+ for(let y=cy;y>=2025;y--)sel.add(new Option(y,y));
+ tick();setInterval(tick,30000);
+ renderWalletsList();
+ updateAll();setInterval(updateAll,60000);
+ fear();setInterval(fear,6e5);
+ dominance();setInterval(dominance,6e5);
+ goldCap();setInterval(goldCap,6e5);
+})();
+</script>
+</body>
+</html>
