@@ -208,7 +208,7 @@ body::before{display:none}
 <section class="c all hero tint" style="--tc:247,147,26">
   <div class="k">Valor total</div>
   <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
-  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">cargando…</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span></div><div id="ath-box"></div>
+  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">#850.000</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span></div><div id="ath-box"></div>
   <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
 
@@ -238,16 +238,16 @@ body::before{display:none}
 <section class="c s3 tint" data-front="80,140,255" data-back="250,204,21" style="--tc:80,140,255"><div class="bigcube h2" onclick="flipTint(this)"><div class="cube-in">
 <div class="face front"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="currentColor"><circle cx="38" cy="56" r="32"/><circle cx="78" cy="30" r="19" opacity=".6"/><circle cx="82" cy="76" r="13" opacity=".4"/></g></svg></span><div class="k">Capitalización</div>
 <div class="prism" id="prism"><div class="prism-in" id="prism-in">
-<div class="pf" style="background:linear-gradient(100deg,#f7931a30 0%,#16161a 62%);border-color:#f7931a55;border-left-color:#f7931a"><span class="pic" id="pi0"></span><div class="ptx"><span class="dim">Bitcoin</span><b id="btc-cap" class="pv">—</b></div></div>
-<div class="pf" style="background:linear-gradient(100deg,#8c9eff30 0%,#16161a 62%);border-color:#8c9eff55;border-left-color:#8c9eff"><span class="pic" id="pi1"></span><div class="ptx"><span class="dim">Total cripto (incluye BTC)</span><b id="tot-cap" class="pv">—</b></div></div>
-<div class="pf" style="background:linear-gradient(100deg,#f5c54230 0%,#16161a 62%);border-color:#f5c54255;border-left-color:#f5c542"><span class="pic" id="pi2"></span><div class="ptx"><span class="dim">Oro</span><b id="gold-cap" class="pv">—</b></div></div>
+<div class="pf" style="background:linear-gradient(100deg,#f7931a30 0%,#16161a 62%);border-color:#f7931a55;border-left-color:#f7931a"><span class="pic" id="pi0"></span><div class="ptx"><span class="dim">Bitcoin</span><b id="btc-cap" class="pv">1.436 Bill. €</b></div></div>
+<div class="pf" style="background:linear-gradient(100deg,#8c9eff30 0%,#16161a 62%);border-color:#8c9eff55;border-left-color:#8c9eff"><span class="pic" id="pi1"></span><div class="ptx"><span class="dim">Total cripto (incluye BTC)</span><b id="tot-cap" class="pv">2.850 Bill. €</b></div></div>
+<div class="pf" style="background:linear-gradient(100deg,#f5c54230 0%,#16161a 62%);border-color:#f5c54255;border-left-color:#f5c542"><span class="pic" id="pi2"></span><div class="ptx"><span class="dim">Oro</span><b id="gold-cap" class="pv">14.200 Bill. €</b></div></div>
 </div></div>
 <div class="dots" id="dots"><i class="on"></i><i></i><i></i></div>
 </div>
 <div class="face back" style="text-align:center"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-linecap="round"><path d="M10 72a40 40 0 0 1 80 0" stroke-width="10"/><path d="M50 72L72 44" stroke-width="6"/></g><circle cx="50" cy="72" r="8" fill="currentColor"/></svg></span>
   <div class="k" style="text-align:left">Miedo y codicia</div>
-  <div class="gw"><div class="gb"></div><div id="gn" class="gn"></div><div id="fear-value" class="gv d">—</div></div>
-  <div id="fear-label" class="d" style="font-size:1.4rem;font-weight:800;margin-top:.6rem">—</div>
+  <div class="gw"><div class="gb"></div><div id="gn" class="gn" style="transform: translateX(-50%) rotate(18deg);"></div><div id="fear-value" class="gv d">60</div></div>
+  <div id="fear-label" class="d" style="font-size:1.4rem;font-weight:800;margin-top:.6rem;color:#a3e635">Codicia</div>
   </div>
 </div></div></section>
 <section class="c all tint" style="--tc:247,147,26"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="50" r="19"/><path d="M49 50h42M78 50v15M65 50v11"/></g><circle cx="30" cy="50" r="6" fill="currentColor"/></svg></span><div class="k">Mis claves públicas</div><p class="dim">Consulta transacciones y genera el extracto fiscal en PDF.</p><div id="wallets-list"></div><button class="btn p" style="width:100%;margin-top:.8rem" onclick="openAddWalletModal()">+ Añadir clave pública</button><button class="btn" style="width:100%;margin-top:.6rem" onclick="$('kr-quick').click()">⬆ Importar CSV de Kraken (Ledgers)</button><input id="kr-quick" type="file" accept=".csv,text/csv" class="hidden" onchange="importKraken(this.files[0]);this.value=''"></section>
@@ -259,9 +259,9 @@ body::before{display:none}
 <div class="sr"><span class="dim">Ganancias patrimoniales</span><b id="fis-ganancias" class="up">0,00 €</b></div>
 <div class="sr"><span class="dim">Pérdidas patrimoniales</span><b id="fis-perdidas" class="dn">0,00 €</b></div>
 <div class="sr" style="border-top:1px solid #2a2a30;margin-top:.3rem;padding-top:.5rem"><b>Neto (casilla Modelo 100)</b><b id="fis-neto" style="color:var(--bt);font-size:1.1rem">0,00 €</b></div>
-<div class="sr"><span class="dim">Volumen ventas</span><span id="fis-vol-venta" class="dim">0,00 €</span></div>
-<div class="sr"><span class="dim">Volumen permutas</span><span id="fis-vol-permuta" class="dim">0,00 €</span></div>
-<div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="dim">0,00 €</span></div></div>
+<div class="sr"><span class="dim">Volumen ventas</span><span id="fis-vol-venta" class="dim">0,00 €</b></div>
+<div class="sr"><span class="dim">Volumen permutas</span><span id="fis-vol-permuta" class="dim">0,00 €</b></div>
+<div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="dim">0,00 €</b></div></div>
 <div id="fiscal-table" style="max-height:480px;overflow-y:auto;margin:.8rem 0"></div>
 <button class="btn p" style="width:100%" onclick="exportFiscalPDF()">📄 Exportar informe fiscal anual (PDF)</button>
 <p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan in este navegador.</p></section>
@@ -359,7 +359,7 @@ if(!assets){
 }
 
 const sv=()=>save('portfolio_assets_v2',assets);
-const live={bitcoin:90000,ethereum:3200,solana:180},START=new Date('2025-01-01');
+const live={bitcoin:71346.00,ethereum:2582.00,solana:102.10},START=new Date('2025-01-01');
 let pie,annual,spark,detail;
 
 const val=k=>{const a=assets[k];return a.type==='crypto'?a.amount*(live[a.coingeckoId]||0):(a.currentValue??a.invested)};
@@ -372,15 +372,33 @@ function anim(el,t){const s=parseFloat(el.dataset.v||0),t0=performance.now();(fu
 const chg={};
 async function binPrices(){
  const M={BTCEUR:'bitcoin',ETHEUR:'ethereum',SOLEUR:'solana'};
- try{const res=await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols='+encodeURIComponent(JSON.stringify(Object.keys(M))));
-  if(!res.ok)return false;const d=await res.json();
-  if(!Array.isArray(d))return false;d.forEach(x=>{const id=M[x.symbol];if(id){live[id]=+x.lastPrice;chg[id]=+x.priceChangePercent}});return true}catch(e){return false}}
+ try{
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), 3000);
+  const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols='+encodeURIComponent(JSON.stringify(Object.keys(M))), {signal: controller.signal});
+  clearTimeout(id);
+  if(!res.ok)return false;
+  const d=await res.json();
+  if(!Array.isArray(d))return false;
+  d.forEach(x=>{const id=M[x.symbol];if(id){live[id]=+x.lastPrice;chg[id]=+x.priceChangePercent}});
+  return true;
+ }catch(e){return false}
+}
+
 async function prices(){
  const okB=await binPrices(),B=['bitcoin','ethereum','solana'];
  const ids=[...new Set([...B,...Object.values(assets).filter(a=>a.type==='crypto').map(a=>a.coingeckoId)])].filter(i=>!(okB&&B.includes(i)));
  if(!ids.length)return;
- try{const res=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`);
-  if(res.ok){const d=await res.json();ids.forEach(i=>{if(d[i]){live[i]=d[i].eur;chg[i]=d[i].eur_24h_change}})}}catch(e){console.error(e)}
+ try{
+  const controller = new AbortController();
+  const id = setTimeout(() => controller.abort(), 3000);
+  const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`, {signal: controller.signal});
+  clearTimeout(id);
+  if(res.ok){
+   const d=await res.json();
+   ids.forEach(i=>{if(d[i]){live[i]=d[i].eur;chg[i]=d[i].eur_24h_change}});
+  }
+ }catch(e){}
 }
 
 const LG={btc: `<circle cx="16" cy="16" r="16" fill="#F7931A"/><g fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.6 9.8v12.4M12.6 9.8h4.6a2.9 2.9 0 0 1 0 5.8h-4.6m0 0h5.2a3.2 3.2 0 0 1 0 6.4h-5.2M15.4 7.6v2.2M18.4 7.6v2.2M15.4 22.2v2.2M18.4 22.2v2.2"/></g>`, eth: `<circle cx="16" cy="16" r="16" fill="#627EEA"/><g fill="#fff"><path fill-opacity=".6" d="M16.5 4v8.87l7.5 3.35z"/><path d="M16.5 4L9 16.22l7.5-3.35z"/><path fill-opacity=".6" d="M16.5 21.97V28L24 17.62z"/><path d="M16.5 28v-6.03L9 17.62z"/><path fill-opacity=".2" d="M16.5 20.57l7.5-4.35-7.5-3.35z"/><path fill-opacity=".6" d="M9 16.22l7.5 4.35v-7.7z"/></g>`, sol: `<circle cx="16" cy="16" r="16" fill="#0b0b0f"/><g fill="url(#solg)"><path d="M8.6 12.6l2.8-3.2h13.2l-2.8 3.2z"/><path d="M8.6 14.2h13.2l2.8 3.2H11.4z"/><path d="M8.6 22.2l2.8-3.2h13.2l-2.8 3.2z"/></g>`};
@@ -663,8 +681,7 @@ function drawSpark(t){
 function applyTint(sec){sec.style.setProperty('--tc',sec.querySelector('.bigcube.flip')?sec.dataset.back:sec.dataset.front)}
 function flipTint(cube){cube.classList.toggle('flip');applyTint(cube.closest('section'))}
 const moodRGB=v=>v<25?'239,68,68':v<45?'251,146,60':v<55?'250,204,21':v<75?'163,230,53':'74,222,128';
-async function updateAll(){
- await prices();
+function renderAllData(){
  renderAssets();
  const t=tot(),i=inv(),p=i?(t-i)/i*100:0,g=t-i;
  anim($('total-value'),t);
@@ -674,11 +691,17 @@ async function updateAll(){
  updatePie();updateAnnual(t,i);updateATH(t);updateSpark(t);chainTick(t);ticker();
 }
 
+async function updateAll(){
+ renderAllData();
+ await prices();
+ renderAllData();
+}
+
 async function fear(){
  try{const res=await fetch('https://api.alternative.me/fng/?limit=1');if(!res.ok)return;const d=(await res.json()).data[0],v=+d.value;
   const L={'Extreme Fear':['Miedo extremo','#ef4444'],'Fear':['Miedo','#fb923c'],'Neutral':['Neutral','#facc15'],'Greed':['Codicia','#a3e635'],'Extreme Greed':['Codicia extrema','#4ade80']}[d.value_classification]||[d.value_classification,'#fff'];
   $('fear-value').textContent=v;$('fear-label').textContent=L[0];$('fear-label').style.color=L[1];
-  $('gn').style.transform=`translateX(-50%) rotate(${v/100*180-90}deg)`;{const fs=$('fear-value').closest('section');fs.dataset.back=moodRGB(v);applyTint(fs)}}catch(e){console.error(e)}
+  $('gn').style.transform=`translateX(-50%) rotate(${v/100*180-90}deg)`;{const fs=$('fear-value').closest('section');fs.dataset.back=moodRGB(v);applyTint(fs)}}catch(e){}
 }
 const cmp=n=>{const f=(x,d)=>x.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});return n>=1e12?f(n/1e12,3)+' Bill. €':n>=1e9?f(n/1e9,2)+' MM €':f(n/1e6,2)+' M €'};
 const GOLD_T=220700; 
@@ -697,7 +720,7 @@ prismAuto();
 async function dominance(){
  try{const res=await fetch('https://api.coingecko.com/api/v3/global');if(!res.ok)return;const d=(await res.json()).data,c=d.total_market_cap.eur,b=d.market_cap_percentage.btc;
   const btc=(live.bitcoin&&tip)?live.bitcoin*supplyNow():c*b/100;
-  $('btc-cap').textContent=cmp(btc);$('tot-cap').textContent=cmp(Math.max(c,btc))}catch(e){console.error(e)}
+  $('btc-cap').textContent=cmp(btc);$('tot-cap').textContent=cmp(Math.max(c,btc))}catch(e){}
 }
 
 async function openDetail(k){
@@ -705,7 +728,7 @@ async function openDetail(k){
  if(a.type==='crypto'){$('dt-chart').style.display='block';$('dt-man').style.display='none';
   try{const res=await fetch(`https://api.coingecko.com/api/v3/coins/${a.coingeckoId}/market_chart?vs_currency=eur&days=30&interval=daily`);if(res.ok){const d=await res.json();
    if(detail)detail.destroy();
-   detail=new Chart($('dt-cv'),{type:'line',data:{labels:d.prices.map(p=>new Date(p[0]).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})),datasets:[{data:d.prices.map(p=>p[1]),borderColor:a.color,backgroundColor:a.color+'22',fill:true,tension:.3,pointRadius:0}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:6},grid:{display:false}},y:{grid:{color:'rgba(255,255,255,.06)'}}}}})}catch(e){console.error(e)}
+   detail=new Chart($('dt-cv'),{type:'line',data:{labels:d.prices.map(p=>new Date(p[0]).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})),datasets:[{data:d.prices.map(p=>p[1]),borderColor:a.color,backgroundColor:a.color+'22',fill:true,tension:.3,pointRadius:0}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:6},grid:{display:false}},y:{grid:{color:'rgba(255,255,255,.06)'}}}}})}catch(e){}
  }else{$('dt-chart').style.display='none';$('dt-man').style.display='block';$('man-val').value=a.currentValue??a.invested;$('man-key').value=k}
 }
 function saveManual(){const v=parseFloat($('man-val').value);if(v>=0){assets[$('man-key').value].currentValue=v;sv();hide('m-detail');updateAll()}}
@@ -736,7 +759,7 @@ const tick=()=>$('clock').textContent=new Date().toLocaleString('es-ES',{day:'2-
 
 const hx=s=>{let h=0x811c9dc5,o='';for(let r=0;r<4;r++){for(let i=0;i<s.length;i++){h^=s.charCodeAt(i)+r;h=Math.imul(h,16777619)>>>0}o+=h.toString(16).padStart(8,'0')}return o};
 let tip={height:850000,hash:'0000000000000000000000000000000000000000000000000000000000000000'};
-const TIP_TO=7000,withTO=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
+const TIP_TO=5000,withTO=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
 async function tipFrom(b){
  const [h,x]=await Promise.all([withTO(fetch(b+'/blocks/tip/height').then(r=>r.text()),TIP_TO),withTO(fetch(b+'/blocks/tip/hash').then(r=>r.text()),TIP_TO)]);
  const height=parseInt(h);if(!height||x.trim().length!==64)throw new Error('dato no válido');return{height,hash:x.trim()}}
