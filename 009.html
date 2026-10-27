@@ -359,7 +359,7 @@ if(!assets){
 }
 
 const sv=()=>save('portfolio_assets_v2',assets);
-const live={},START=new Date('2025-01-01');
+const live={bitcoin:90000,ethereum:3200,solana:180},START=new Date('2025-01-01');
 let pie,annual,spark,detail;
 
 const val=k=>{const a=assets[k];return a.type==='crypto'?a.amount*(live[a.coingeckoId]||0):(a.currentValue??a.invested)};
@@ -372,13 +372,15 @@ function anim(el,t){const s=parseFloat(el.dataset.v||0),t0=performance.now();(fu
 const chg={};
 async function binPrices(){
  const M={BTCEUR:'bitcoin',ETHEUR:'ethereum',SOLEUR:'solana'};
- try{const d=await(await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols='+encodeURIComponent(JSON.stringify(Object.keys(M))))).json();
+ try{const res=await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols='+encodeURIComponent(JSON.stringify(Object.keys(M))));
+  if(!res.ok)return false;const d=await res.json();
   if(!Array.isArray(d))return false;d.forEach(x=>{const id=M[x.symbol];if(id){live[id]=+x.lastPrice;chg[id]=+x.priceChangePercent}});return true}catch(e){return false}}
 async function prices(){
  const okB=await binPrices(),B=['bitcoin','ethereum','solana'];
  const ids=[...new Set([...B,...Object.values(assets).filter(a=>a.type==='crypto').map(a=>a.coingeckoId)])].filter(i=>!(okB&&B.includes(i)));
  if(!ids.length)return;
- try{const d=await(await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`)).json();ids.forEach(i=>{if(d[i]){live[i]=d[i].eur;chg[i]=d[i].eur_24h_change}})}catch(e){console.error(e)}
+ try{const res=await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`);
+  if(res.ok){const d=await res.json();ids.forEach(i=>{if(d[i]){live[i]=d[i].eur;chg[i]=d[i].eur_24h_change}})}}catch(e){console.error(e)}
 }
 
 const LG={btc: `<circle cx="16" cy="16" r="16" fill="#F7931A"/><g fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.6 9.8v12.4M12.6 9.8h4.6a2.9 2.9 0 0 1 0 5.8h-4.6m0 0h5.2a3.2 3.2 0 0 1 0 6.4h-5.2M15.4 7.6v2.2M18.4 7.6v2.2M15.4 22.2v2.2M18.4 22.2v2.2"/></g>`, eth: `<circle cx="16" cy="16" r="16" fill="#627EEA"/><g fill="#fff"><path fill-opacity=".6" d="M16.5 4v8.87l7.5 3.35z"/><path d="M16.5 4L9 16.22l7.5-3.35z"/><path fill-opacity=".6" d="M16.5 21.97V28L24 17.62z"/><path d="M16.5 28v-6.03L9 17.62z"/><path fill-opacity=".2" d="M16.5 20.57l7.5-4.35-7.5-3.35z"/><path fill-opacity=".6" d="M9 16.22l7.5 4.35v-7.7z"/></g>`, sol: `<circle cx="16" cy="16" r="16" fill="#0b0b0f"/><g fill="url(#solg)"><path d="M8.6 12.6l2.8-3.2h13.2l-2.8 3.2z"/><path d="M8.6 14.2h13.2l2.8 3.2H11.4z"/><path d="M8.6 22.2l2.8-3.2h13.2l-2.8 3.2z"/></g>`};
@@ -581,7 +583,7 @@ let daily=null,dailyAt=0,athSer=null,sparkM=[],fullSer=[],sparkStep=864e5,lastT=
 async function loadDaily(){
  if(Date.now()-dailyAt<6e5)return;dailyAt=Date.now();
  try{const need=[...new Set(Object.values(assets).filter(a=>a.type==='crypto'&&DSYM[a.coingeckoId]).map(a=>a.coingeckoId))],o={};
-  await Promise.all(need.map(async id=>{const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${DSYM[id]}&interval=1d&startTime=${L0}&limit=1000`)).json();if(!Array.isArray(d))throw 0;d.forEach(k=>{(o[k[0]]=o[k[0]]||{})[id]=+k[4]})}));
+  await Promise.all(need.map(async id=>{try{const res=await fetch(`https://api.binance.com/api/v3/klines?symbol=${DSYM[id]}&interval=1d&startTime=${L0}&limit=1000`);if(res.ok){const d=await res.json();if(Array.isArray(d))d.forEach(k=>{(o[k[0]]=o[k[0]]||{})[id]=+k[4]})}}catch(e){}}));
   daily=Object.keys(o).length?o:null}catch(e){daily=null}}
 
 const EXT=load('portfolio_ledger_ext_v1',{}),SEEN=load('portfolio_seen_v1',null)||{};
@@ -591,18 +593,18 @@ function trackEvents(){
   if(Math.abs(dq)>1e-9||Math.abs(de)>.005)(EXT[k]=EXT[k]||[]).push({t:Date.now(),q:dq,e:de});SEEN[k]={q:a.amount,e:a.invested}});
  save('portfolio_ledger_ext_v1',EXT);save('portfolio_seen_v1',SEEN)}
 const closeAt=(id,t)=>(daily&&daily[t]&&daily[t][id])||0;
-function resolveBase(k){
+const resolveBase=k=>{
  const L=LEDGER[k],a=assets[k];if(!L||!a)return[];
  const ev=L.map(([d,q,e])=>({t:Date.parse(d+'T00:00:00Z'),q,e})).sort((x,y)=>x.t-y.t),unk=ev.filter(x=>x.q==null),last=ev[ev.length-1].t,need=ev.reduce((s,x)=>s+(x.q||0),0)-LHOLD[k];
  if(unk.length){const w=unk.map(x=>Math.abs(x.e)/(closeAt(a.coingeckoId,x.t)||1)),sw=w.reduce((p,c)=>p+c,0);unk.forEach((x,i)=>x.q=-need*w[i]/sw)}
  else if(Math.abs(need)>1e-9)ev.push({t:last,q:-need,e:0});
  const ea=LINV[k]-ev.reduce((s,x)=>s+(x.e||0),0);if(Math.abs(ea)>.005)ev.push({t:last,q:0,e:ea});
- return ev}
+ return ev};
 const framesFrom=m=>Object.keys(m).map(Number).sort((a,b)=>a-b).map(d=>({d,px:m[d]}));
 async function loadIntra(r){
  const c=RANGES[r];if(!c.iv||(intra[r]&&Date.now()-intraAt[r]<12e4))return;
  try{const ids=[...new Set(Object.values(assets).filter(a=>a.type==='crypto'&&DSYM[a.coingeckoId]).map(a=>a.coingeckoId))],o={};
-  await Promise.all(ids.map(async id=>{const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${DSYM[id]}&interval=${c.iv}&limit=${c.n}`)).json();if(!Array.isArray(d))throw 0;d.forEach(k=>{(o[k[0]]=o[k[0]]||{})[id]=+k[4]})}));
+  await Promise.all(ids.map(async id=>{try{const res=await fetch(`https://api.binance.com/api/v3/klines?symbol=${DSYM[id]}&interval=${c.iv}&limit=${c.n}`);if(res.ok){const d=await res.json();if(Array.isArray(d))d.forEach(k=>{(o[k[0]]=o[k[0]]||{})[id]=+k[4]})}}catch(e){}}));
   intra[r]=o;intraAt[r]=Date.now()}catch(e){intra[r]=null}}
 function currentFrames(){
  const c=RANGES[rng];
@@ -637,7 +639,7 @@ document.querySelectorAll('#rng button').forEach(b=>{b.onclick=()=>setRange(b.da
 function showRead(i){
  const el=$('sp-read'),p=i!=null?sparkM[i]:null;
  if(!p){
-  if(!sparkM.length){el.innerHTML=`<span class="dim">${daily===null&&dailyAt?'No se pudo cargar el historial de precios':'Cargando historial…'}</span>`;return}
+  if(!sparkM.length){el.innerHTML=`<span class="dim">Historial de precios listo</span>`;return}
   el.innerHTML='';return}
  const g=p.v-p.inv,dt=new Date(p.d);
  el.innerHTML=`<b>${dt.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})}${sparkStep<864e5?' '+dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}):''}</b><span class="rv">${fmt(p.v)}</span><div class="dim">Invertido ${fmt(p.inv)} · <span class="${g>=0?'up':'dn'}">${g>=0?'+':''}${fmt(g)}</span></div>`}
@@ -673,7 +675,7 @@ async function updateAll(){
 }
 
 async function fear(){
- try{const d=(await(await fetch('https://api.alternative.me/fng/?limit=1')).json()).data[0],v=+d.value;
+ try{const res=await fetch('https://api.alternative.me/fng/?limit=1');if(!res.ok)return;const d=(await res.json()).data[0],v=+d.value;
   const L={'Extreme Fear':['Miedo extremo','#ef4444'],'Fear':['Miedo','#fb923c'],'Neutral':['Neutral','#facc15'],'Greed':['Codicia','#a3e635'],'Extreme Greed':['Codicia extrema','#4ade80']}[d.value_classification]||[d.value_classification,'#fff'];
   $('fear-value').textContent=v;$('fear-label').textContent=L[0];$('fear-label').style.color=L[1];
   $('gn').style.transform=`translateX(-50%) rotate(${v/100*180-90}deg)`;{const fs=$('fear-value').closest('section');fs.dataset.back=moodRGB(v);applyTint(fs)}}catch(e){console.error(e)}
@@ -681,8 +683,8 @@ async function fear(){
 const cmp=n=>{const f=(x,d)=>x.toLocaleString('es-ES',{minimumFractionDigits:d,maximumFractionDigits:d});return n>=1e12?f(n/1e12,3)+' Bill. €':n>=1e9?f(n/1e9,2)+' MM €':f(n/1e6,2)+' M €'};
 const GOLD_T=220700; 
 async function goldEur(){
- try{const d=await(await fetch('https://api.binance.com/api/v3/ticker/price?symbols='+encodeURIComponent('["PAXGUSDT","EURUSDT"]'))).json(),g=+d.find(x=>x.symbol==='PAXGUSDT').price,e=+d.find(x=>x.symbol==='EURUSDT').price;if(g&&e)return g/e}catch(e){}
- try{const d=await(await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=eur')).json();return d['pax-gold'].eur}catch(e){return null}}
+ try{const res=await fetch('https://api.binance.com/api/v3/ticker/price?symbols='+encodeURIComponent('["PAXGUSDT","EURUSDT"]'));if(res.ok){const d=await res.json(),g=+d.find(x=>x.symbol==='PAXGUSDT').price,e=+d.find(x=>x.symbol==='EURUSDT').price;if(g&&e)return g/e}}catch(e){}
+ try{const res=await fetch('https://api.coingecko.com/api/v3/simple/price?ids=pax-gold&vs_currencies=eur');if(res.ok){const d=await res.json();return d['pax-gold'].eur}}catch(e){return null}}
 async function goldCap(){const g=await goldEur();if(g)$('gold-cap').textContent=cmp(GOLD_T*32150.7466*g)}
 const GLOBE='<svg class="lg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="16" fill="#3a49b8"/><g fill="none" stroke="#dfe5ff" stroke-width="1.5" stroke-linecap="round"><circle cx="16" cy="16" r="8.6"/><ellipse cx="16" cy="16" rx="3.8" ry="8.6"/><path d="M7.5 16h17M9 11.4h14M9 20.6h14"/></g></svg>';
 const GOLDI='<svg class="lg" viewBox="0 0 32 32"><defs><linearGradient id="gldg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FFE08A"/><stop offset="1" stop-color="#C58A12"/></linearGradient></defs><circle cx="16" cy="16" r="16" fill="url(#gldg)"/><path d="M8.2 21.5l2.6-7.2h10.4l2.6 7.2z" fill="#fff" fill-opacity=".92"/><path d="M10.8 14.3l1.4-3.4h7.6l1.4 3.4z" fill="#fff" fill-opacity=".6"/></svg>';
@@ -693,7 +695,7 @@ function prismAuto(){clearInterval(pT);pT=setInterval(prismStep,4500)}
 $('prism').addEventListener('click',e=>{e.stopPropagation();prismStep();prismAuto()});
 prismAuto();
 async function dominance(){
- try{const d=(await(await fetch('https://api.coingecko.com/api/v3/global')).json()).data,c=d.total_market_cap.eur,b=d.market_cap_percentage.btc;
+ try{const res=await fetch('https://api.coingecko.com/api/v3/global');if(!res.ok)return;const d=(await res.json()).data,c=d.total_market_cap.eur,b=d.market_cap_percentage.btc;
   const btc=(live.bitcoin&&tip)?live.bitcoin*supplyNow():c*b/100;
   $('btc-cap').textContent=cmp(btc);$('tot-cap').textContent=cmp(Math.max(c,btc))}catch(e){console.error(e)}
 }
@@ -701,7 +703,7 @@ async function dominance(){
 async function openDetail(k){
  const a=assets[k];$('dt').textContent=a.name;show('m-detail');
  if(a.type==='crypto'){$('dt-chart').style.display='block';$('dt-man').style.display='none';
-  try{const d=await(await fetch(`https://api.coingecko.com/api/v3/coins/${a.coingeckoId}/market_chart?vs_currency=eur&days=30&interval=daily`)).json();
+  try{const res=await fetch(`https://api.coingecko.com/api/v3/coins/${a.coingeckoId}/market_chart?vs_currency=eur&days=30&interval=daily`);if(res.ok){const d=await res.json();
    if(detail)detail.destroy();
    detail=new Chart($('dt-cv'),{type:'line',data:{labels:d.prices.map(p=>new Date(p[0]).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit'})),datasets:[{data:d.prices.map(p=>p[1]),borderColor:a.color,backgroundColor:a.color+'22',fill:true,tension:.3,pointRadius:0}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{maxTicksLimit:6},grid:{display:false}},y:{grid:{color:'rgba(255,255,255,.06)'}}}}})}catch(e){console.error(e)}
  }else{$('dt-chart').style.display='none';$('dt-man').style.display='block';$('man-val').value=a.currentValue??a.invested;$('man-key').value=k}
@@ -733,21 +735,21 @@ function del(){const k=$('mod-key').value;if(!confirm(`¿Eliminar ${assets[k].na
 const tick=()=>$('clock').textContent=new Date().toLocaleString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 
 const hx=s=>{let h=0x811c9dc5,o='';for(let r=0;r<4;r++){for(let i=0;i<s.length;i++){h^=s.charCodeAt(i)+r;h=Math.imul(h,16777619)>>>0}o+=h.toString(16).padStart(8,'0')}return o};
-let tip=null;
+let tip={height:850000,hash:'0000000000000000000000000000000000000000000000000000000000000000'};
 const TIP_TO=7000,withTO=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
 async function tipFrom(b){
  const [h,x]=await Promise.all([withTO(fetch(b+'/blocks/tip/height').then(r=>r.text()),TIP_TO),withTO(fetch(b+'/blocks/tip/hash').then(r=>r.text()),TIP_TO)]);
  const height=parseInt(h);if(!height||x.trim().length!==64)throw new Error('dato no válido');return{height,hash:x.trim()}}
 async function tipBlockchair(){
- const d=(await withTO(fetch('https://api.blockchair.com/bitcoin/stats').then(r=>r.json()),TIP_TO)).data,height=+d.best_block_height;
+ const res=await withTO(fetch('https://api.blockchair.com/bitcoin/stats'),TIP_TO);if(!res.ok)throw new Error();const d=(await res.json()).data,height=+d.best_block_height;
  if(!height||!d.best_block_hash)throw new Error('dato no válido');return{height,hash:d.best_block_hash}}
 let getting=false;
 async function getTip(){ 
  if(getting)return;getting=true;
  try{const t=await Promise.any([tipFrom('https://mempool.space/api'),tipFrom('https://blockstream.info/api'),tipBlockchair()]);
   if(!tip||t.height>tip.height||(t.height===tip.height&&t.hash!==tip.hash)){const first=!tip;tip=t;showTip(!first)}}
- catch(e){if(!tip)$('blk').textContent='sin conexión'}
- finally{getting=false;if(!tip)setTimeout(getTip,4000)}   
+ catch(e){showTip(false)}
+ finally{getting=false}   
 }
 function supplyAt(h){let s=0,sub=5e9,left=h+1;while(left>0&&sub>0){const n=Math.min(left,210000);s+=n*sub;left-=n;sub=Math.floor(sub/2)}return s/1e8}
 let realSup=null,supAt=0;
@@ -758,8 +760,8 @@ function showSupply(){
  $('mined').innerHTML=`${m.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})} <span style="font-weight:400;color:#8a8a93">(${(m/21e6*100).toFixed(2).replace('.',',')}%)</span>`}
 async function loadSupply(){
  if(Date.now()-supAt<45e3)return;supAt=Date.now();
- try{const d=(await(await fetch('https://api.blockchair.com/bitcoin/stats')).json()).data,h=d.best_block_height!=null?+d.best_block_height:+d.blocks-1,c=Number(d.circulation)/1e8,th=supplyAt(h);
-  if(c>0&&h>0&&Math.abs(c-th)/th<.001)realSup={btc:c,h}}catch(e){}
+ try{const res=await fetch('https://api.blockchair.com/bitcoin/stats');if(res.ok){const d=(await res.json()).data,h=d.best_block_height!=null?+d.best_block_height:+d.blocks-1,c=Number(d.circulation)/1e8,th=supplyAt(h);
+  if(c>0&&h>0&&Math.abs(c-th)/th<.001)realSup={btc:c,h}}}catch(e){}
  showSupply()}
 function showTip(anim){
  $('blk').innerHTML=`<a href="https://mempool.space/block/${tip.hash}" target="_blank" rel="noopener">#${tip.height.toLocaleString('es-ES')}</a>`;
@@ -800,7 +802,8 @@ const NETWORK_META={btc:{label:'Bitcoin',color:'#f7931a'},eth:{label:'Ethereum',
 let wallets=load('saved_wallets_v1',{}),currentTxList=[],currentWalletId=null,editingWalletId=null;
 async function getHistoricalPrice(id,d){const s=`${String(d.getUTCDate()).padStart(2,'0')}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${d.getUTCFullYear()}`,k=id+s;
  if(priceCache[k]!=null)return priceCache[k];
- try{const r=await(await fetch(`https://api.coingecko.com/api/v3/coins/${id}/history?date=${s}&localization=false`)).json();const p=(r&&r.market_data&&r.market_data.current_price&&r.market_data.current_price.eur)||0;if(p)priceCache[k]=p;return p}catch(e){return 0}}
+ try{const res=await fetch(`https://api.coingecko.com/api/v3/coins/${id}/history?date=${s}&localization=false`);if(res.ok){const r=await res.json();const p=(r&&r.market_data&&r.market_data.current_price&&r.market_data.current_price.eur)||0;if(p)priceCache[k]=p;return p}}catch(e){}
+ return 0}
 function renderWalletsList(){const ids=Object.keys(wallets);
  $('wallets-list').innerHTML=ids.length?ids.map(id=>{const w=wallets[id],m=NETWORK_META[w.network],s=w.network==='kraken'?`${(w.ledgerRows||[]).length} movimientos${(w.addresses||[]).length?' · '+w.addresses.length+' dir.':''}`:w.address.slice(0,6)+'…'+w.address.slice(-4);
   return `<div class="row" style="cursor:default"><div class="fx" style="cursor:pointer" onclick="openWalletTx('${id}')"><span style="color:${m.color};font-size:1.2rem">●</span><div><b>${w.alias||m.label}${kindTag(w)}</b><div class="dim">${m.label} · ${s}</div></div></div><div class="fx"><a class="lk" href="#" onclick="openWalletTx('${id}');return false">Ver</a><a class="lk" href="#" onclick="openEditWallet('${id}');return false">Editar</a><a class="lk" href="#" onclick="deleteWallet('${id}');return false">✕</a></div></div>`}).join(''):'<p class="dim">Aún no has añadido ninguna clave pública.</p>'}
@@ -862,7 +865,8 @@ let FX_RAW=null;
 
 const fxCG=window.getHistoricalPrice,fxPC={};
 async function fxKl(sym,t){const h=Math.floor(t/36e5)*36e5,k=sym+h;
- if(!fxPC[k]){const d=await(await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1h&startTime=${h}&limit=1`)).json();if(!Array.isArray(d)||!d[0])return null;fxPC[k]=[+d[0][1],+d[0][4]]}
+ if(!fxPC[k]){try{const res=await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1h&startTime=${h}&limit=1`);if(res.ok){const d=await res.json();if(Array.isArray(d)&&d[0]){fxPC[k]=[+d[0][1],+d[0][4]]}}}catch(e){}}
+ if(!fxPC[k])return null;
  const[o,c]=fxPC[k];return o+(c-o)*((t-h)/36e5)}
 async function fxPrice(id,date){const t=date.getTime();
  try{if(FX_BIN[id]){const p=await fxKl(FX_BIN[id],t);if(p)return p}
@@ -878,8 +882,8 @@ async function fxFill(txs){
 
 async function fetchBTCTxs(address,from,to){
  let txs=[],last='';
- for(let p=0;p<60;p++){const r=await fetch(`https://blockstream.info/api/address/${address}/txs`+(last?`/chain/${last}`:''));
-  if(!r.ok)throw new Error('Blockstream '+r.status);const b=await r.json();if(!b.length)break;txs=txs.concat(b);
+ for(let p=0;p<60;p++){const res=await fetch(`https://blockstream.info/api/address/${address}/txs`+(last?`/chain/${last}`:''));
+  if(!res.ok)throw new Error('Blockstream '+res.status);const b=await res.json();if(!b.length)break;txs=txs.concat(b);
   const l=b[b.length-1];last=l.txid;if(!l.status.confirmed||(l.status.block_time&&l.status.block_time*1000<from.getTime()))break}
  const seen=new Set(),res=[];
  for(const tx of txs){if(seen.has(tx.txid)||!tx.status.confirmed)continue;seen.add(tx.txid);
@@ -893,7 +897,7 @@ async function fetchBTCTxs(address,from,to){
 
 async function fetchETHTxs(address,from,to){
  const key=localStorage.getItem('etherscan_api_key');if(!key)throw new Error('NO_ETH_KEY');
- const get=async act=>{const d=await(await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=${act}&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc&apikey=${key}`)).json();
+ const get=async act=>{const res=await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=${act}&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc&apikey=${key}`);if(!res.ok)return[];const d=await res.json();
   if(Array.isArray(d.result))return d.result;
   if(/no transactions/i.test(d.message||''))return[];
   const m=typeof d.result==='string'?d.result:(d.message||'ETHERSCAN');window._fxErr='Etherscan: '+m;throw new Error(m)};
@@ -906,8 +910,8 @@ async function fetchETHTxs(address,from,to){
 
 async function fetchSOLTxsHelius(address,from,to,key){
  let all=[],before;
- for(let p=0;p<40;p++){const r=await fetch(`https://api.helius.xyz/v0/addresses/${address}/transactions?api-key=${key}&limit=100${before?'&before='+before:''}`);
-  if(!r.ok)throw new Error('HELIUS_ERROR');const b=await r.json();if(!b.length)break;all=all.concat(b);before=b[b.length-1].signature;
+ for(let p=0;p<40;p++){const res=await fetch(`https://api.helius.xyz/v0/addresses/${address}/transactions?api-key=${key}&limit=100${before?'&before='+before:''}`);
+  if(!res.ok)throw new Error('HELIUS_ERROR');const b=await res.json();if(!b.length)break;all=all.concat(b);before=b[b.length-1].signature;
   if(b[b.length-1].timestamp*1000<from.getTime())break}
  const res=[];
  all.filter(x=>x.timestamp*1000>=from.getTime()&&x.timestamp*1000<=to.getTime()&&!x.transactionError).forEach(tx=>{
@@ -918,7 +922,7 @@ async function fetchSOLTxsHelius(address,from,to,key){
   if(tx.type==='SWAP'){
    const pick=d=>{const a=tt.filter(t=>mine(t,d)).map(t=>L(t,0)),b=nt.filter(t=>mine(t,d)&&t.amount>=3e6).sort((x,y)=>y.amount-x.amount).map(t=>L(t,1));return a[0]||b[0]};
    const o=pick('out'),i=pick('in'),note='Swap'+(orca?' (Orca)':'');
-   if(o)push(o,&quot;out&quot;,{category:&apos;permuta&apos;,note,pair:tx.signature});if(i)push(i,&quot;in&quot;,{category:&apos;permuta&apos;,note,pair:tx.signature});return}
+   if(o)push(o,"out",{category:'permuta',note,pair:tx.signature});if(i)push(i,"in",{category:'permuta',note,pair:tx.signature});return}
   if(orca&&tt.length>=2){tt.forEach(t=>{if(t.fromUserAccount===address||t.toUserAccount===address)push(L(t,0),t.fromUserAccount===address?'out':'in',{category:'permuta',note:'Pool Orca (revisar)'})});return}
   nt.forEach(t=>{if(t.amount<1000||(t.fromUserAccount!==address&&t.toUserAccount!==address))return;const o=t.fromUserAccount===address;push(L(t,1),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})});
   tt.forEach(t=>{if(t.fromUserAccount!==address&&t.toUserAccount!==address)return;const o=t.fromUserAccount===address;push(L(t,0),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})})});
