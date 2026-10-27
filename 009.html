@@ -226,7 +226,7 @@ body::before{display:none}
 <section class="c s3 tint" style="--tc:45,212,191"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="18" width="80" height="72" rx="10"/><path d="M10 40h80M32 8v18M68 8v18"/></g><g fill="currentColor"><rect x="22" y="52" width="12" height="10" rx="2"/><rect x="44" y="52" width="12" height="10" rx="2"/><rect x="66" y="52" width="12" height="10" rx="2"/><rect x="22" y="70" width="12" height="10" rx="2"/><rect x="44" y="70" width="12" height="10" rx="2"/></g></svg></span>
   <div class="k" style="margin-bottom:.3rem">Rendimiento anual</div>
   <div class="dim" style="margin-bottom:.4rem;white-space:nowrap">Anualizado: <b id="ann" style="font-size:1rem">—</b></div>
-  <div id="live-datetime" class="dim" style="margin-bottom:.6rem;color:var(--bt);font-weight:700">—</div>
+  <div id="live-datetime" class="dim" style="margin-bottom:.6rem;color:rgb(45,212,191);font-weight:700">—</div>
   <div style="height:155px;pointer-events:none"><canvas id="annual"></canvas></div>
   <div id="yr-buttons" class="yr-btn-container"></div>
 </section>
@@ -399,8 +399,14 @@ function editInv(k){const a=assets[k],n=parseFloat((prompt(`Inversión real en �
 function updatePie(){
  if(!window.Chart)return;
  const ks=Object.keys(assets),t=tot(),labels=ks.map(k=>`${assets[k].symbol||assets[k].name} ${t?(val(k)/t*100).toFixed(1):0}%`),data=ks.map(val),colors=ks.map(k=>assets[k].color);
- if(pie){pie.data.labels=labels;pie.data.datasets[0].data=data;pie.data.datasets[0].backgroundColor=colors;pie.update()}
- else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11}}},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
+ if(pie){
+  pie.data.labels=labels;
+  pie.data.datasets[0].data=data;
+  pie.data.datasets[0].backgroundColor=colors;
+  pie.options.plugins.legend.labels.color=ks.map(k=>assets[k].color);
+  pie.update();
+ }
+ else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11},color:ks.map(k=>assets[k].color)}},tooltip:{callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
 }
 
 const YR=load('portfolio_years_v1',{});
