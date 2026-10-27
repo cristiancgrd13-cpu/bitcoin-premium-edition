@@ -259,9 +259,9 @@ body::before{display:none}
 <div class="sr"><span class="dim">Ganancias patrimoniales</span><b id="fis-ganancias" class="up">0,00 €</b></div>
 <div class="sr"><span class="dim">Pérdidas patrimoniales</span><b id="fis-perdidas" class="dn">0,00 €</b></div>
 <div class="sr" style="border-top:1px solid #2a2a30;margin-top:.3rem;padding-top:.5rem"><b>Neto (casilla Modelo 100)</b><b id="fis-neto" style="color:var(--bt);font-size:1.1rem">0,00 €</b></div>
-<div class="sr"><span class="dim">Volumen ventas</span><span id="fis-vol-venta" class="dim">0,00 €</b></div>
-<div class="sr"><span class="dim">Volumen permutas</span><span id="fis-vol-permuta" class="dim">0,00 €</b></div>
-<div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="dim">0,00 €</b></div></div>
+<div class="sr"><span class="dim">Volumen ventas</span><span id="fis-vol-venta" class="dim">0,00 €</span></div>
+<div class="sr"><span class="dim">Volumen permutas</span><span id="fis-vol-permuta" class="dim">0,00 €</span></div>
+<div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="dim">0,00 €</span></div></div>
 <div id="fiscal-table" style="max-height:480px;overflow-y:auto;margin:.8rem 0"></div>
 <button class="btn p" style="width:100%" onclick="exportFiscalPDF()">📄 Exportar informe fiscal anual (PDF)</button>
 <p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan in este navegador.</p></section>
@@ -322,7 +322,7 @@ body::before{display:none}
 const $=id=>document.getElementById(id);
 const nf={minimumFractionDigits:2,maximumFractionDigits:2};
 const fmt=n=>(n||0).toLocaleString('es-ES',nf)+'\u00a0€';
-const load=(k,d)=>{try{return JSON.parse(localStorage.getItem(k))??d}catch(e){return d}};
+const load=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return(v!==null&&v!==undefined)?v:d}catch(e){return d}};
 const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const show=id=>$(id).classList.remove('h'),hide=id=>$(id).classList.add('h');
 const chartDefaults=()=>{if(window.Chart){Chart.defaults.color='#8a8a93';Chart.defaults.font.family='DM Sans'}};chartDefaults();
@@ -353,16 +353,18 @@ const cry=(k,amount,invested)=>{const m=META[k];return{type:'crypto',coingeckoId
 
 const SEED={btc:cry('btc',0.162508732,11724.09),eth:cry('eth',1.11059,2868.77),sol:cry('sol',23.33303,1480.38)};
 let assets=load('portfolio_assets_v2',null);
-if(!assets){
+if(!assets||typeof assets!=='object'||Object.keys(assets).length===0){
   assets={...SEED};
   save('portfolio_assets_v2',assets);
 }
 
 const sv=()=>save('portfolio_assets_v2',assets);
-const live={bitcoin:71346.00,ethereum:2582.00,solana:102.10},START=new Date('2025-01-01');
+
+const FALLBACK_PRICES={bitcoin:88000,ethereum:2800,solana:150,'usd-coin':1,bittensor:400,hyperliquid:15,aave:120};
+const live={bitcoin:88000,ethereum:2800,solana:150},START=new Date('2025-01-01');
 let pie,annual,spark,detail;
 
-const val=k=>{const a=assets[k];return a.type==='crypto'?a.amount*(live[a.coingeckoId]||0):(a.currentValue??a.invested)};
+const val=k=>{const a=assets[k];if(!a)return 0;if(a.type==='crypto'){const p=live[a.coingeckoId]||FALLBACK_PRICES[a.coingeckoId]||100;return a.amount*p}return(a.currentValue??a.invested)};
 const tot=()=>Object.keys(assets).reduce((s,k)=>s+val(k),0);
 const inv=()=>Object.values(assets).reduce((s,a)=>s+a.invested,0);
 const qtyL=a=>a.type==='crypto'?`${a.amount} ${a.symbol}`:`${a.amount} ud.`;
@@ -374,7 +376,7 @@ async function binPrices(){
  const M={BTCEUR:'bitcoin',ETHEUR:'ethereum',SOLEUR:'solana'};
  try{
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), 3000);
+  const id = setTimeout(() => controller.abort(), 2500);
   const res = await fetch('https://api.binance.com/api/v3/ticker/24hr?symbols='+encodeURIComponent(JSON.stringify(Object.keys(M))), {signal: controller.signal});
   clearTimeout(id);
   if(!res.ok)return false;
@@ -391,7 +393,7 @@ async function prices(){
  if(!ids.length)return;
  try{
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), 3000);
+  const id = setTimeout(() => controller.abort(), 2500);
   const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`, {signal: controller.signal});
   clearTimeout(id);
   if(res.ok){
@@ -479,7 +481,6 @@ function alignYearButtons(){
  if(!meta||!meta.data||!meta.data.length)return;
  const btnBox=$('yr-buttons');
  const buttons=btnBox.querySelectorAll('.yr-btn');
- const canvasW=annual.canvas.offsetWidth||annual.width||300;
  meta.data.forEach((bar,i)=>{
   if(buttons[i]){
    const w=bar.width;
@@ -521,7 +522,7 @@ function updateLiveDateTime(){
 setInterval(updateLiveDateTime, 1000);
 updateLiveDateTime();
 
-let ath={value:16456.42,date:'2026-10-04T12:00:00Z'},hist=load('portfolio_hist_v1',[]);
+let ath={value:16456.42,date:'2026-10-04T12:00:00Z'};
 function updateATH(t){
  if(!(t>0))return;
  const b={value:16456.42,date:'2026-10-04T12:00:00Z'};
@@ -535,60 +536,28 @@ function updateATH(t){
 const L0=Date.UTC(2025,7,16);   
 const LEDGER={ 
  btc:[
-  ['2025-08-17',0.00097,100.00],
-  ['2025-08-19',0.00103,100.00],
-  ['2025-09-01',0.00109,100.00],
-  ['2025-09-25',0.00212,200.00],
-  ['2025-10-01',0.00031,8.43],
-  ['2025-10-16',0.00116,109.60],
-  ['2025-10-17',0.00111,100.01],
-  ['2025-11-04',0.00166,150.00],
-  ['2025-11-14',0.00180,150.00],
-  ['2025-12-04',0.01263,1000.00],
-  ['2025-12-05',0.01262,1000.00],
-  ['2025-12-06',0.01302,1002.50],
-  ['2025-12-17',0.01552,1143.27],
-  ['2025-12-18',0.00550,400.00],
-  ['2026-01-02',0.00672,510.02],
-  ['2026-01-02',0.02328,1766.05],
-  ['2026-01-21',0.00399,300.00],
-  ['2026-01-23',0.00259,210.65],
-  ['2026-02-03',0.00044,30.18],
-  ['2026-02-04',0.00396,250.03],
-  ['2026-02-27',0.00422,240.79],
-  ['2026-03-08',0.004308,250.01],
-  ['2026-03-27',0.00259,152.65],
-  ['2026-04-01',0.00430,250.00],
-  ['2026-05-05',0.003575,250.00],
-  ['2026-05-05',0.00176,125.04],
-  ['2026-05-27',0.00767,500.00],
-  ['2026-06-08',0.00453,250.00],
-  ['2026-07-03',0.005525,300.00],
-  ['2026-07-04',0.00089,50.27],
-  ['2026-07-26',0.000434962,24.59],
-  ['2026-08-05',0.00537,300.00],
-  ['2026-09-03',0.00445139,300.00],
+  ['2025-08-17',0.00097,100.00],['2025-08-19',0.00103,100.00],['2025-09-01',0.00109,100.00],
+  ['2025-09-25',0.00212,200.00],['2025-10-01',0.00031,8.43],['2025-10-16',0.00116,109.60],
+  ['2025-10-17',0.00111,100.01],['2025-11-04',0.00166,150.00],['2025-11-14',0.00180,150.00],
+  ['2025-12-04',0.01263,1000.00],['2025-12-05',0.01262,1000.00],['2025-12-06',0.01302,1002.50],
+  ['2025-12-17',0.01552,1143.27],['2025-12-18',0.00550,400.00],['2026-01-02',0.00672,510.02],
+  ['2026-01-02',0.02328,1766.05],['2026-01-21',0.00399,300.00],['2026-01-23',0.00259,210.65],
+  ['2026-02-03',0.00044,30.18],['2026-02-04',0.00396,250.03],['2026-02-27',0.00422,240.79],
+  ['2026-03-08',0.004308,250.01],['2026-03-27',0.00259,152.65],['2026-04-01',0.00430,250.00],
+  ['2026-05-05',0.003575,250.00],['2026-05-05',0.00176,125.04],['2026-05-27',0.00767,500.00],
+  ['2026-06-08',0.00453,250.00],['2026-07-03',0.005525,300.00],['2026-07-04',0.00089,50.27],
+  ['2026-07-26',0.000434962,24.59],['2026-08-05',0.00537,300.00],['2026-09-03',0.00445139,300.00],
   ['2026-10-15',0.00136438,100.00]
  ],
  eth:[
-  ['2026-01-01',0.10653,271.35],
-  ['2026-01-01',1.00000,2546.15],
-  ['2026-06-10',0.00356,50.00],
-  ['2026-06-10',0.00050,1.27]
+  ['2026-01-01',0.10653,271.35],['2026-01-01',1.00000,2546.15],
+  ['2026-06-10',0.00356,50.00],['2026-06-10',0.00050,1.27]
  ],
  sol:[
-  ['2025-11-07',1.02646,140.00],
-  ['2025-11-14',1.22895,150.00],
-  ['2025-12-17',1.00000,105.26],
-  ['2025-12-20',3.00000,324.90],
-  ['2025-12-21',0.11272,0.70],
-  ['2025-12-22',0.04714,5.08],
-  ['2025-12-31',1.86867,199.70],
-  ['2026-01-02',2.66999,295.78],
-  ['2026-04-02',null,-423.62],
-  ['2026-05-05',1.65500,-125.04],
-  ['2026-07-04',0.70380,-50.27],
-  ['2026-09-08',10.02030,889.89],
+  ['2025-11-07',1.02646,140.00],['2025-11-14',1.22895,150.00],['2025-12-17',1.00000,105.26],
+  ['2025-12-20',3.00000,324.90],['2025-12-21',0.11272,0.70],['2025-12-22',0.04714,5.08],
+  ['2025-12-31',1.86867,199.70],['2026-01-02',2.66999,295.78],['2026-04-02',null,-423.62],
+  ['2026-05-05',1.65500,-125.04],['2026-07-04',0.70380,-50.27],['2026-09-08',10.02030,889.89],
   ['2026-09-08',null,-32.00]
  ]
 };
@@ -597,7 +566,7 @@ const LHOLD={btc:0.162508732,eth:1.11059,sol:23.33303},LINV={btc:11724.09,eth:28
 
 const RANGES={'1D':{iv:'15m',n:96,step:9e5},'1S':{iv:'1h',n:168,step:36e5},'1M':{iv:'4h',n:180,step:144e5},'6M':{days:183},'1A':{days:365},'TODO':{days:0}};
 let rng=localStorage.getItem('portfolio_range_v1');if(!RANGES[rng])rng='TODO';
-let daily=null,dailyAt=0,athSer=null,sparkM=[],fullSer=[],sparkStep=864e5,lastT=0,sparkIdx=null,spark2=null;const intra={},intraAt={};const DSYM={bitcoin:'BTCEUR',ethereum:'ETHEUR',solana:'SOLEUR'};
+let daily=null,dailyAt=0,sparkM=[],fullSer=[],sparkStep=864e5,lastT=0,sparkIdx=null,spark2=null;const intra={},intraAt={};const DSYM={bitcoin:'BTCEUR',ethereum:'ETHEUR',solana:'SOLEUR'};
 async function loadDaily(){
  if(Date.now()-dailyAt<6e5)return;dailyAt=Date.now();
  try{const need=[...new Set(Object.values(assets).filter(a=>a.type==='crypto'&&DSYM[a.coingeckoId]).map(a=>a.coingeckoId))],o={};
@@ -640,7 +609,7 @@ function ledgerSeries(frames,step,t){
  const out=frames.map(({d,px})=>{let v=0,inv=0;
   A.forEach(({a,ev})=>{let q=0,e=0;for(const x of ev){if(x.t<d+step){q+=x.q||0;e+=x.e||0}else break}
    inv+=e;
-   if(a.type==='crypto'){const id=a.coingeckoId,c=DSYM[id]?px[id]:null;if(c!=null)last[id]=c;v+=q*(c!=null?c:(last[id]!=null?last[id]:(live[id]||0)))}
+   if(a.type==='crypto'){const id=a.coingeckoId,c=DSYM[id]?px[id]:null;if(c!=null)last[id]=c;v+=q*(c!=null?c:(last[id]!=null?last[id]:(live[id]||FALLBACK_PRICES[id]||100)))}
    else if(q>0)v+=a.currentValue??a.invested});
   return{d,v,inv}});
  const n=out.length-1;out[n].v=t;out[n].inv=Object.values(assets).reduce((s,a)=>s+a.invested,0);
@@ -664,7 +633,6 @@ function showRead(i){
 function drawSpark(t){
  const full=daily?ledgerSeries(framesFrom(daily),864e5,t):null;fullSer=full||[];
  if(full)updateAnnual(t,inv());   
- athSer={value:16456.42,date:'2026-10-04T12:00:00Z'};
  const cf=currentFrames(),ser=cf?ledgerSeries(cf.frames,cf.step,t):null;sparkM=ser||[];sparkStep=cf?cf.step:864e5;
  const labels=sparkM.map(p=>p.d),data=sparkM.map(p=>p.v);
  if(!window.Chart){updateATH(t);return}
@@ -681,6 +649,7 @@ function drawSpark(t){
 function applyTint(sec){sec.style.setProperty('--tc',sec.querySelector('.bigcube.flip')?sec.dataset.back:sec.dataset.front)}
 function flipTint(cube){cube.classList.toggle('flip');applyTint(cube.closest('section'))}
 const moodRGB=v=>v<25?'239,68,68':v<45?'251,146,60':v<55?'250,204,21':v<75?'163,230,53':'74,222,128';
+
 function renderAllData(){
  renderAssets();
  const t=tot(),i=inv(),p=i?(t-i)/i*100:0,g=t-i;
@@ -757,9 +726,8 @@ function del(){const k=$('mod-key').value;if(!confirm(`¿Eliminar ${assets[k].na
 
 const tick=()=>$('clock').textContent=new Date().toLocaleString('es-ES',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
 
-const hx=s=>{let h=0x811c9dc5,o='';for(let r=0;r<4;r++){for(let i=0;i<s.length;i++){h^=s.charCodeAt(i)+r;h=Math.imul(h,16777619)>>>0}o+=h.toString(16).padStart(8,'0')}return o};
 let tip={height:850000,hash:'0000000000000000000000000000000000000000000000000000000000000000'};
-const TIP_TO=5000,withTO=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
+const TIP_TO=4000,withTO=(p,ms)=>Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms))]);
 async function tipFrom(b){
  const [h,x]=await Promise.all([withTO(fetch(b+'/blocks/tip/height').then(r=>r.text()),TIP_TO),withTO(fetch(b+'/blocks/tip/hash').then(r=>r.text()),TIP_TO)]);
  const height=parseInt(h);if(!height||x.trim().length!==64)throw new Error('dato no válido');return{height,hash:x.trim()}}
@@ -795,7 +763,7 @@ getTip();setInterval(getTip,20000);
 
 const COINS=[['bitcoin','BTC','₿','#f7931a'],['ethereum','ETH','Ξ','#8c9eff'],['solana','SOL','◎','#b57bff']];
 function ticker(){
- const one=COINS.map(([id,sy,ic,c])=>{const p=live[id],ch=chg[id];return `<span class="ti"><b style="color:${c}">${svgLogo(id,'lg lg-t')||ic} ${sy}</b> ${p!=null?fmt(p):'…'}${ch!=null?` <em class="${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'} ${Math.abs(ch).toFixed(2)}%</em>`:''}</span>`}).join('<span class="sep">◆</span>')+'<span class="sep">◆</span>';
+ const one=COINS.map(([id,sy,ic,c])=>{const p=live[id]||FALLBACK_PRICES[id],ch=chg[id];return `<span class="ti"><b style="color:${c}">${svgLogo(id,'lg lg-t')||ic} ${sy}</b> ${p!=null?fmt(p):'…'}${ch!=null?` <em class="${ch>=0?'up':'dn'}">${ch>=0?'▲':'▼'} ${Math.abs(ch).toFixed(2)}%</em>`:''}</span>`}).join('<span class="sep">◆</span>')+'<span class="sep">◆</span>';
  const box=$('tk');
  box.innerHTML=`<div class="tt">${one.repeat(4)}</div>`;
 }
@@ -1079,7 +1047,7 @@ function exportFiscalPDF(){
   [t.date.toLocaleDateString('es-ES'),(t.walletAlias||'').slice(0,12),L[t.category]+(t.direction==='in'?' (ent)':' (sal)'),`${t.amount.toFixed(5)} ${t.asset}`,e(t.eurValue),e(t.costBasis),t.gain!=null?e(t.gain):(t.noCost?'sin coste':'-')].forEach((s,i)=>d.text(String(s),X[i],y));d.setFontSize(6);fxHashLine(d,t.hash,14,y+3.6);d.setFontSize(7);y+=9});
  let g=0,p=0;tx.forEach(t=>{if(t.gain!=null){if(t.gain>=0)g+=t.gain;else p-=t.gain}});
  y+=4;if(y>245){d.addPage();y=20}d.line(14,y,196,y);y+=8;d.setFontSize(10);
- [['Ganancias patrimoniales',g],['Perdidas patrimoniales',p]].forEach(([k,v])=>{d.text(`${k}: ${fmtEUR(v)}`,14,y);y+=6});
+ [['Ganancias patrimoniales',g],['Perdidas patrimoniales',p]].forEach(([k,v])=>d.text(`${k}: ${fmtEUR(v)}`,14,y),y+=6));
  d.setFontSize(12);d.text(`NETO (casilla Modelo 100): ${fmtEUR(g-p)}`,14,y);
  d.save(`informe_fiscal_${yr}.pdf`)}
 
