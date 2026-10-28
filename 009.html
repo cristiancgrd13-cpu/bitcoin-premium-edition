@@ -203,7 +203,7 @@ body::before{display:none}
 <section class="c all hero tint" style="--tc:247,147,26">
   <div class="k">Valor total</div>
   <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
-  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">#850.000</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span></div><div id="ath-box"></div>
+  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">#850.000</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span><span style="white-space:normal">PRÓXIMO HALVING <b id="hv-date">—</b> <b id="hv-cd" style="font-variant-numeric:tabular-nums">—</b></span></div><div id="ath-box"></div>
   <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
 
@@ -309,7 +309,8 @@ const META={
 const cry=(k,amount,invested)=>{const m=META[k];return{type:'crypto',coingeckoId:m.id,name:m.name,symbol:m.sym,icon:m.icon,color:m.color,amount,invested}};
 
 const FIXED_QTY={btc:0.16233071,eth:1.14866904,sol:12.1237};
-const SEED={btc:cry('btc',FIXED_QTY.btc,11724.09),eth:cry('eth',FIXED_QTY.eth,2868.77),sol:cry('sol',FIXED_QTY.sol,1480.38)};
+const FIXED_INV={btc:11724.09,eth:2868.77,sol:1480.38};
+const SEED={btc:cry('btc',FIXED_QTY.btc,FIXED_INV.btc),eth:cry('eth',FIXED_QTY.eth,FIXED_INV.eth),sol:cry('sol',FIXED_QTY.sol,FIXED_INV.sol)};
 let assets=load('portfolio_assets_v2',null);
 if(!assets||typeof assets!=='object'||Object.keys(assets).length===0){
   assets={...SEED};
@@ -317,7 +318,7 @@ if(!assets||typeof assets!=='object'||Object.keys(assets).length===0){
 }
 
 const sv=()=>save('portfolio_assets_v2',assets);
-Object.keys(FIXED_QTY).forEach(k=>{if(assets[k])assets[k].amount=FIXED_QTY[k]});sv();
+Object.keys(FIXED_QTY).forEach(k=>{if(assets[k]){assets[k].amount=FIXED_QTY[k];assets[k].invested=FIXED_INV[k]}});sv();
 
 const FALLBACK_PRICES={bitcoin:88000,ethereum:2800,solana:150,'usd-coin':1,bittensor:400,hyperliquid:15,aave:120};
 const live={bitcoin:88000,ethereum:2800,solana:150},START=new Date('2025-01-01');
@@ -480,16 +481,17 @@ function updateLiveDateTime(){
 setInterval(updateLiveDateTime, 1000);
 updateLiveDateTime();
 
-let ath={value:16456.42,date:'2026-10-04T12:00:00Z'};
 function updateATH(t){
  if(!(t>0))return;
- const b={value:16456.42,date:'2026-10-04T12:00:00Z'};
- const box=$('ath-box'),ds='04/10/26';
- box.innerHTML=`<div class="athl" style="white-space:nowrap">⛏ Máximo Histórico <span class="athv">${fmt(b.value)}</span> <span class="athd">${ds}</span></div>`;
+ const box=$('ath-box');let b=null;
+ (fullSer||[]).forEach(p=>{if(!b||p.v>b.v)b={v:p.v,d:p.d}});
+ if(!b){box.innerHTML='';return}
+ const ds=new Date(b.d).toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'2-digit'});
+ box.innerHTML=`<div class="athl" style="white-space:nowrap">⛏ Máximo Histórico <span class="athv">${fmt(b.v)}</span> <span class="athd">${ds}</span></div>`;
  const el=box.firstElementChild;el.classList.add('one');let fit=false;
- const html=ic=>`${ic?'⛏ ':''}Máximo Histórico <span class="athv">${fmt(b.value)}</span> <span class="athd">${ds}</span>`;
+ const html=ic=>`${ic?'⛏ ':''}Máximo Histórico <span class="athv">${fmt(b.v)}</span> <span class="athd">${ds}</span>`;
  for(const [ic,zs] of [[true,[.95,.88,.82,.78]],[false,[.95,.88,.82,.78,.74,.7,.66]]]){el.innerHTML=html(ic);for(const z of zs){el.style.fontSize=z+'rem';if(el.scrollWidth<=box.clientWidth-1){fit=true;break}}if(fit)break}
- if(!fit){el.classList.remove('one');el.style.fontSize='.85rem';el.innerHTML=`⛏ Máximo Histórico <span class="athv">${fmt(b.value)}</span>`;el.insertAdjacentHTML('afterend',`<div class="dim" style="font-size:.85rem">${ds}</div>`)}}
+ if(!fit){el.classList.remove('one');el.style.fontSize='.85rem';el.innerHTML=`⛏ Máximo Histórico <span class="athv">${fmt(b.v)}</span>`;el.insertAdjacentHTML('afterend',`<div class="dim" style="font-size:.85rem">${ds}</div>`)}}
 
 const L0=Date.UTC(2025,7,16);   
 const LEDGER={ 
@@ -514,13 +516,13 @@ const LEDGER={
  sol:[
   ['2025-11-07',1.02646,140.00],['2025-11-14',1.22895,150.00],['2025-12-17',1.00000,105.26],
   ['2025-12-20',3.00000,324.90],['2025-12-21',0.11272,0.70],['2025-12-22',0.04714,5.08],
-  ['2025-12-31',1.86867,199.70],['2026-01-02',2.66999,295.78],['2026-04-02',null,-423.62],
+  ['2025-12-31',1.86867,199.70],['2026-01-02',2.66999,295.78],['2026-02-03',null,-30.18],['2026-02-27',null,-240.79],['2026-03-27',null,-152.65],
   ['2026-05-05',1.65500,-125.04],['2026-07-04',0.70380,-50.27],['2026-09-08',10.02030,889.89],
   ['2026-09-08',null,-32.00]
  ]
 };
 
-const LHOLD={...FIXED_QTY},LINV={btc:11724.09,eth:2868.77,sol:1480.38};
+const LHOLD={...FIXED_QTY},LINV={...FIXED_INV};
 
 const RANGES={'1D':{iv:'15m',n:96,step:9e5},'1S':{iv:'1h',n:168,step:36e5},'1M':{iv:'4h',n:180,step:144e5},'6M':{days:183},'1A':{days:365},'TODO':{days:0}};
 let rng=localStorage.getItem('portfolio_range_v1');if(!RANGES[rng])rng='TODO';
@@ -531,19 +533,18 @@ async function loadDaily(){
   await Promise.all(need.map(async id=>{try{const res=await fetch(`https://api.binance.com/api/v3/klines?symbol=${DSYM[id]}&interval=1d&startTime=${L0}&limit=1000`);if(res.ok){const d=await res.json();if(Array.isArray(d))d.forEach(k=>{(o[k[0]]=o[k[0]]||{})[id]=+k[4]})}}catch(e){}}));
   daily=Object.keys(o).length?o:null}catch(e){daily=null}}
 
-const EXT=load('portfolio_ledger_ext_v1',{}),SEEN=load('portfolio_seen_v1',null)||{};
-Object.keys(FIXED_QTY).forEach(k=>{if(SEEN[k])SEEN[k].q=FIXED_QTY[k]});
-function trackEvents(){
- Object.keys(SEEN).forEach(k=>{if(!assets[k]){delete SEEN[k];delete EXT[k]}});
- Object.keys(assets).forEach(k=>{const a=assets[k],b=SEEN[k]||(LHOLD[k]!=null?{q:LHOLD[k],e:LINV[k]}:{q:a.amount,e:a.invested}),dq=a.amount-b.q,de=a.invested-b.e;
-  if(Math.abs(dq)>1e-9||Math.abs(de)>.005)(EXT[k]=EXT[k]||[]).push({t:Date.now(),q:dq,e:de});SEEN[k]={q:a.amount,e:a.invested}});
- save('portfolio_ledger_ext_v1',EXT);save('portfolio_seen_v1',SEEN)}
+try{localStorage.removeItem('portfolio_ledger_ext_v1');localStorage.removeItem('portfolio_seen_v1')}catch(e){}
 const closeAt=(id,t)=>(daily&&daily[t]&&daily[t][id])||0;
 const resolveBase=k=>{
  const L=LEDGER[k],a=assets[k];if(!L||!a)return[];
- const ev=L.map(([d,q,e])=>({t:Date.parse(d+'T00:00:00Z'),q,e})).sort((x,y)=>x.t-y.t),unk=ev.filter(x=>x.q==null),last=ev[ev.length-1].t,need=ev.reduce((s,x)=>s+(x.q||0),0)-LHOLD[k];
- if(unk.length){const w=unk.map(x=>Math.abs(x.e)/(closeAt(a.coingeckoId,x.t)||1)),sw=w.reduce((p,c)=>p+c,0);unk.forEach((x,i)=>x.q=-need*w[i]/sw)}
- else if(Math.abs(need)>1e-9)ev.push({t:last,q:-need,e:0});
+ const ev=L.map(([d,q,e])=>({t:Date.parse(d+'T00:00:00Z'),q,e})).sort((x,y)=>x.t-y.t),unk=ev.filter(x=>x.q==null),last=ev[ev.length-1].t;
+ if(unk.length){
+  const px=unk.map(x=>closeAt(a.coingeckoId,x.t));
+  if(px.every(p=>p>0))unk.forEach((x,i)=>x.q=-Math.abs(x.e)/px[i]);
+  else{const n0=Math.max(ev.reduce((s,x)=>s+(x.q||0),0)-LHOLD[k],0),w=unk.map(x=>Math.abs(x.e)),sw=w.reduce((p,c)=>p+c,0);unk.forEach((x,i)=>x.q=-n0*w[i]/sw)}
+ }
+ const need=ev.reduce((s,x)=>s+(x.q||0),0)-LHOLD[k];
+ if(Math.abs(need)>1e-9)ev.push({t:last,q:-need,e:0});
  const ea=LINV[k]-ev.reduce((s,x)=>s+(x.e||0),0);if(Math.abs(ea)>.005)ev.push({t:last,q:0,e:ea});
  return ev};
 const framesFrom=m=>Object.keys(m).map(Number).sort((a,b)=>a-b).map(d=>({d,px:m[d]}));
@@ -557,26 +558,24 @@ function currentFrames(){
  if(c.iv)return intra[rng]?{frames:framesFrom(intra[rng]),step:c.step}:null;
  if(!daily)return null;let fr=framesFrom(daily);if(c.days)fr=fr.slice(-c.days);return{frames:fr,step:864e5}}
 function xirr(){ 
- const cf=[];Object.keys(assets).forEach(k=>resolveBase(k).concat(EXT[k]||[]).forEach(x=>{if(x.e)cf.push([x.t,-x.e])}));
+ const cf=[];Object.keys(assets).forEach(k=>resolveBase(k).forEach(x=>{if(x.e)cf.push([x.t,-x.e])}));
  const V=Object.keys(assets).reduce((s,k)=>s+val(k),0);if(!cf.length||!(V>0))return null;cf.push([Date.now(),V]);
  const t0=Math.min(...cf.map(c=>c[0])),f=r=>cf.reduce((s,[t,a])=>s+a/Math.pow(1+r,(t-t0)/315576e5),0);
  let lo=-.99,hi=20;if(f(lo)<=0||f(hi)>=0)return null;
  for(let n=0;n<100;n++){const m=(lo+hi)/2;if(f(m)>0)lo=m;else hi=m}return(lo+hi)/2*100}
 function ledgerSeries(frames,step,t){
  if(!frames||!frames.length)return null;
- const A=Object.keys(assets).map(k=>({a:assets[k],ev:resolveBase(k).concat(EXT[k]||[]).sort((x,y)=>x.t-y.t)})),last={};
+ const A=Object.keys(assets).map(k=>({a:assets[k],ev:resolveBase(k).sort((x,y)=>x.t-y.t)})),last={};
  const out=frames.map(({d,px})=>{let v=0,inv=0;
   A.forEach(({a,ev})=>{let q=0,e=0;for(const x of ev){if(x.t<d+step){q+=x.q||0;e+=x.e||0}else break}
    inv+=e;
-   if(a.type==='crypto'){const id=a.coingeckoId,c=DSYM[id]?px[id]:null;if(c!=null)last[id]=c;v+=q*(c!=null?c:(last[id]!=null?last[id]:(live[id]||FALLBACK_PRICES[id]||100)))}
+   if(a.type==='crypto'){const id=a.coingeckoId,c=DSYM[id]?px[id]:null;if(c!=null)last[id]=c;v+=Math.max(q,0)*(c!=null?c:(last[id]!=null?last[id]:(live[id]||FALLBACK_PRICES[id]||100)))}
    else if(q>0)v+=a.currentValue??a.invested});
   return{d,v,inv}});
  const n=out.length-1;out[n].v=t;out[n].inv=Object.values(assets).reduce((s,a)=>s+a.invested,0);
- const peakD=Date.parse('2026-10-04T00:00:00Z');
- out.forEach(p=>{if(Math.abs(p.d-peakD)<864e5*2)p.v=Math.min(p.v,16456.42);else if(p.v>16456.42)p.v=16456.42});
- return out}
+  return out}
 function updateSpark(t){
- if(!(t>0))return;lastT=t;trackEvents();drawSpark(t);loadDaily().then(()=>drawSpark(t));loadIntra(rng).then(()=>drawSpark(t))}
+ if(!(t>0))return;lastT=t;drawSpark(t);loadDaily().then(()=>drawSpark(t));loadIntra(rng).then(()=>drawSpark(t))}
 function setRange(r){
  rng=r;localStorage.setItem('portfolio_range_v1',r);sparkIdx=null;
  document.querySelectorAll('#rng button').forEach(b=>b.classList.toggle('on',b.dataset.r===r));
@@ -693,11 +692,13 @@ async function tipFrom(b){
 async function tipBlockchair(){
  const res=await withTO(fetch('https://api.blockchair.com/bitcoin/stats'),TIP_TO);if(!res.ok)throw new Error();const d=(await res.json()).data,height=+d.best_block_height;
  if(!height||!d.best_block_hash)throw new Error('dato no válido');return{height,hash:d.best_block_hash}}
-let getting=false;
+let getting=false,tipOk=false,hvTarget=0,blkMs=6e5;const HALV_BLOCK=1050000;
+function setHv(){if(tipOk)hvTarget=Date.now()+Math.max(HALV_BLOCK-tip.height,0)*blkMs}
+async function loadAvg(){try{const r=await withTO(fetch('https://mempool.space/api/v1/difficulty-adjustment').then(x=>x.json()),TIP_TO),m=+r.timeAvg;if(m>48e4&&m<72e4){blkMs=m;setHv()}}catch(e){}}
 async function getTip(){ 
  if(getting)return;getting=true;
  try{const t=await Promise.any([tipFrom('https://mempool.space/api'),tipFrom('https://blockstream.info/api'),tipBlockchair()]);
-  if(!tip||t.height>tip.height||(t.height===tip.height&&t.hash!==tip.hash)){const first=!tip;tip=t;showTip(!first)}}
+  if(!tip||t.height>tip.height||(t.height===tip.height&&t.hash!==tip.hash)){const first=!tip;tip=t;tipOk=true;setHv();loadAvg();showTip(!first)}}
  catch(e){showTip(false)}
  finally{getting=false}   
 }
@@ -718,6 +719,13 @@ function showTip(anim){
  showSupply();loadSupply();
  if(anim)['blk','mined'].forEach(i=>{const b=$(i);b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash')})}
 function chainTick(){}
+function halvTick(){
+ const d=$('hv-date'),c=$('hv-cd');if(!d||!c)return;
+ if(!tipOk||!hvTarget){d.textContent='—';c.textContent='';return}
+ d.textContent='≈ '+new Date(hvTarget).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})+' ·';
+ let ms=Math.max(hvTarget-Date.now(),0),s=Math.floor(ms/1000),dd=Math.floor(s/86400),hh=Math.floor(s%86400/3600),mm=Math.floor(s%3600/60),ss=s%60;
+ c.textContent=`${dd}d ${String(hh).padStart(2,'0')}h ${String(mm).padStart(2,'0')}m ${String(ss).padStart(2,'0')}s`}
+setInterval(halvTick,1000);halvTick();
 getTip();setInterval(getTip,20000);
 
 const COINS=[['bitcoin','BTC','₿','#f7931a'],['ethereum','ETH','Ξ','#8c9eff'],['solana','SOL','◎','#b57bff']];
