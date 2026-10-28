@@ -250,21 +250,6 @@ body::before{display:none}
   <div id="fear-label" class="d" style="font-size:1.4rem;font-weight:800;margin-top:.6rem;color:#a3e635">Codicia</div>
   </div>
 </div></div></section>
-<section class="c all tint" style="--tc:247,147,26"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="50" r="19"/><path d="M49 50h42M78 50v15M65 50v11"/></g><circle cx="30" cy="50" r="6" fill="currentColor"/></svg></span><div class="k">Mis claves públicas</div><p class="dim">Consulta transacciones y genera el extracto fiscal en PDF.</p><div id="wallets-list"></div><button class="btn p" style="width:100%;margin-top:.8rem" onclick="openAddWalletModal()">+ Añadir clave pública</button><button class="btn" style="width:100%;margin-top:.6rem" onclick="$('kr-quick').click()">⬆ Importar CSV de Kraken (Ledgers)</button><input id="kr-quick" type="file" accept=".csv,text/csv" class="hidden" onchange="importKraken(this.files[0]);this.value=''"></section>
-<section class="c all tint" style="--tc:245,196,66"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 8h36l18 18v64H24z"/><path d="M60 8v18h18"/><path d="M34 48h32M34 62h32M34 76h20"/></g></svg></span><div class="k">Panel fiscal</div><p class="dim">Todas tus wallets y Kraken juntas · ganancia real por FIFO.</p>
-<div class="fx" style="margin:.8rem 0"><select id="fiscal-year" class="i" style="margin:0"></select><button class="btn p" style="white-space:nowrap" onclick="runFiscalPanel()">Calcular año</button></div>
-<div id="fiscal-loading" class="hidden" style="text-align:center;padding:1.5rem"><div class="spinner"></div><p class="dim">Consultando wallets y calculando FIFO…</p></div>
-<div id="fiscal-warning" class="hidden warn"></div>
-<div id="fiscal-summary" class="hidden box">
-<div class="sr"><span class="dim">Ganancias patrimoniales</span><b id="fis-ganancias" class="up">0,00 €</b></div>
-<div class="sr"><span class="dim">Pérdidas patrimoniales</span><b id="fis-perdidas" class="dn">0,00 €</b></div>
-<div class="sr" style="border-top:1px solid #2a2a30;margin-top:.3rem;padding-top:.5rem"><b>Neto (casilla Modelo 100)</b><b id="fis-neto" style="color:var(--bt);font-size:1.1rem">0,00 €</b></div>
-<div class="sr"><span class="dim">Volumen ventas</span><span id="fis-vol-venta" class="dim">0,00 €</span></div>
-<div class="sr"><span class="dim">Volumen permutas</span><span id="fis-vol-permuta" class="dim">0,00 €</span></div>
-<div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="dim">0,00 €</span></div></div>
-<div id="fiscal-table" style="max-height:480px;overflow-y:auto;margin:.8rem 0"></div>
-<button class="btn p" style="width:100%" onclick="exportFiscalPDF()">📄 Exportar informe fiscal anual (PDF)</button>
-<p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan en este navegador.</p></section>
 </main>
 
 <div id="m-year-detail" class="m h"><div class="mb tint" style="--tc:45,212,191"><button class="x" onclick="hide('m-year-detail')">&times;</button><b id="yr-modal-title" class="d" style="font-size:1.2rem"></b>
@@ -418,8 +403,6 @@ function renderAssets(){
 function flipCube(k){const el=$('assets-list').querySelector(`[data-k="${k}"]`);if(!el)return;el.classList.toggle('flip');flipped[el.classList.contains('flip')?'add':'delete'](k)}
 function editInv(k){const a=assets[k],n=parseFloat((prompt(`Inversión real en € para ${a.name}\nActual: ${fmt(a.invested)}`)||'').replace(',','.'));if(n>0){a.invested=n;sv();updateAll()}}
 
-// Leyenda del donut: cada texto con el mismo color que su porción
-const pieLabels=ch=>Chart.overrides.doughnut.plugins.legend.labels.generateLabels(ch).map(l=>({...l,fontColor:ch.data.datasets[0].backgroundColor[l.index]}));
 function updatePie(){
  if(!window.Chart)return;
  const ks=Object.keys(assets),t=tot(),labels=ks.map(k=>`${assets[k].symbol||assets[k].name} ${t?(val(k)/t*100).toFixed(1):0}%`),data=ks.map(val),colors=ks.map(k=>assets[k].color);
@@ -427,9 +410,10 @@ function updatePie(){
   pie.data.labels=labels;
   pie.data.datasets[0].data=data;
   pie.data.datasets[0].backgroundColor=colors;
+  pie.options.plugins.legend.labels.color=ctx=>colors[ctx.index];
   pie.update();
  }
- else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11},generateLabels:pieLabels}},tooltip:{titleColor:ctx=>{const item=ctx.dataPoints&&ctx.dataPoints[0];return item?colors[item.dataIndex]:'#fff'},bodyColor:ctx=>{const item=ctx.dataPoints&&ctx.dataPoints[0];return item?colors[item.dataIndex]:'#fff'},callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
+ else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11},color:ctx=>colors[ctx.index]}},tooltip:{titleColor:ctx=>{const item=ctx.dataPoints&&ctx.dataPoints[0];return item?colors[item.dataIndex]:'#fff'},bodyColor:ctx=>{const item=ctx.dataPoints&&ctx.dataPoints[0];return item?colors[item.dataIndex]:'#fff'},callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
 }
 
 const YR=load('portfolio_years_v1',{});
@@ -839,7 +823,7 @@ function computeTotals(){const o={compra:0,venta:0,permuta:0,interna:0};currentT
 function exportWalletPDF(){
  if(!currentTxList.length){alert('Pulsa "Buscar transacciones" primero.');return}
  const w=wallets[currentWalletId],m=NETWORK_META[w.network],{jsPDF}=window.jspdf,d=new jsPDF(),L={compra:'Compra',venta:'Venta',permuta:'Permuta',interna:'Transf. interna'},fr=$('tx-date-from').value,to=$('tx-date-to').value,X=[14,44,74,114,144];
- d.setFontSize(16);d.text('Extracto de transacciones cripto',14,18);d.setFontSize(10);d.text(`Clave publica: ${w.alias?w.alias+' - ':''}${w.address}`,14,26);d.text(`Red: ${m.label} Periodo: ${fr} a ${to}`,14,32);
+ d.setFontSize(16);d.text('Extracto de transacciones cripto',14,18);d.setFontSize(10);d.text(`Clave publica: ${w.alias?w.alias+' - ':''}${w.address}`,14,26);d.text(`Red: ${m.label}   Periodo: ${fr} a ${to}`,14,32);
  let y=44;d.setFontSize(9);['Fecha','Tipo','Cantidad','Valor EUR','Hash (linea inferior)'].forEach((h,i)=>d.text(h,X[i],y));y+=4;d.line(14,y,196,y);y+=5;
  const o={compra:0,venta:0,permuta:0,interna:0};
  currentTxList.forEach(t=>{if(y>270){d.addPage();y=20}o[t.category]+=t.eurValue;d.setFontSize(9);[t.date.toLocaleDateString('es-ES'),L[t.category],`${t.amount.toFixed(6)} ${t.asset}`,fmtEUR(t.eurValue)].forEach((s,i)=>d.text(String(s),X[i],y));d.setFontSize(6.5);fxHashLine(d,t.hash,14,y+4);y+=10});d.setFontSize(10);
@@ -1021,10 +1005,7 @@ function exportFiscalPDF(){
  d.save(`informe_fiscal_${fiscalYear}.pdf`)}
 
 (function init(){
- const sel=$('fiscal-year'),cy=new Date().getFullYear();
- for(let y=cy;y>=2025;y--)sel.add(new Option(y,y));
  tick();setInterval(tick,30000);
- renderWalletsList();
  updateAll();setInterval(updateAll,60000);
  fear();setInterval(fear,6e5);
  dominance();setInterval(dominance,6e5);
