@@ -336,7 +336,8 @@ const META={
 };
 const cry=(k,amount,invested)=>{const m=META[k];return{type:'crypto',coingeckoId:m.id,name:m.name,symbol:m.sym,icon:m.icon,color:m.color,amount,invested}};
 
-const SEED={btc:cry('btc',0.162508732,11724.09),eth:cry('eth',1.11059,2868.77),sol:cry('sol',23.33303,1480.38)};
+const FIXED_QTY={btc:0.16233071,eth:1.14866904,sol:12.1237};
+const SEED={btc:cry('btc',FIXED_QTY.btc,11724.09),eth:cry('eth',FIXED_QTY.eth,2868.77),sol:cry('sol',FIXED_QTY.sol,1480.38)};
 let assets=load('portfolio_assets_v2',null);
 if(!assets||typeof assets!=='object'||Object.keys(assets).length===0){
   assets={...SEED};
@@ -344,6 +345,7 @@ if(!assets||typeof assets!=='object'||Object.keys(assets).length===0){
 }
 
 const sv=()=>save('portfolio_assets_v2',assets);
+Object.keys(FIXED_QTY).forEach(k=>{if(assets[k])assets[k].amount=FIXED_QTY[k]});sv();
 
 const FALLBACK_PRICES={bitcoin:88000,ethereum:2800,solana:150,'usd-coin':1,bittensor:400,hyperliquid:15,aave:120};
 const live={bitcoin:88000,ethereum:2800,solana:150},START=new Date('2025-01-01');
@@ -547,7 +549,7 @@ const LEDGER={
  ]
 };
 
-const LHOLD={btc:0.162508732,eth:1.11059,sol:23.33303},LINV={btc:11724.09,eth:2868.77,sol:1480.38};
+const LHOLD={...FIXED_QTY},LINV={btc:11724.09,eth:2868.77,sol:1480.38};
 
 const RANGES={'1D':{iv:'15m',n:96,step:9e5},'1S':{iv:'1h',n:168,step:36e5},'1M':{iv:'4h',n:180,step:144e5},'6M':{days:183},'1A':{days:365},'TODO':{days:0}};
 let rng=localStorage.getItem('portfolio_range_v1');if(!RANGES[rng])rng='TODO';
@@ -559,6 +561,7 @@ async function loadDaily(){
   daily=Object.keys(o).length?o:null}catch(e){daily=null}}
 
 const EXT=load('portfolio_ledger_ext_v1',{}),SEEN=load('portfolio_seen_v1',null)||{};
+Object.keys(FIXED_QTY).forEach(k=>{if(SEEN[k])SEEN[k].q=FIXED_QTY[k]});
 function trackEvents(){
  Object.keys(SEEN).forEach(k=>{if(!assets[k]){delete SEEN[k];delete EXT[k]}});
  Object.keys(assets).forEach(k=>{const a=assets[k],b=SEEN[k]||(LHOLD[k]!=null?{q:LHOLD[k],e:LINV[k]}:{q:a.amount,e:a.invested}),dq=a.amount-b.q,de=a.invested-b.e;
