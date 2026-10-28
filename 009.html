@@ -4,7 +4,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>window.Chart||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>')</script>
 <script>window.Chart||document.write('<script src="https://unpkg.com/chart.js@4.4.1/dist/chart.umd.js"><\/script>')</script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 :root{--ink:#0c0d24;--line:rgba(255,255,255,.09);--coral:#ff7a59;--dim:#8a8a93}
@@ -96,10 +95,6 @@ body::before{display:none}
 .sep{color:var(--bt);font-size:.6rem;margin:0 .6rem}
 #blk{padding:0 .3rem;border-radius:3px}#blk a{color:inherit;text-decoration:none}.flash{animation:fl 1.8s ease-out}@keyframes fl{0%,45%{background:var(--bt);color:#000}100%{background:transparent}}
 .hidden{display:none!important}
-.cat-select{background:#0b0b0e;border:1px solid #34343c;border-radius:6px;font:inherit;font-size:.72rem;padding:.3rem .4rem;color:#ececef}
-.spinner{border:3px solid #34343c;border-top-color:var(--bt);border-radius:50%;width:28px;height:28px;margin:0 auto .6rem;animation:sp .8s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
-.warn{font-size:.75rem;color:#f7c06a;background:rgba(247,147,26,.1);border:1px solid rgba(247,147,26,.35);border-radius:8px;padding:.7rem;margin:.6rem 0;line-height:1.45}
-.sr{display:flex;justify-content:space-between;padding:.25rem 0;font-size:.85rem}
 .flex{display:flex}.justify-between{justify-content:space-between}.items-center{align-items:center}.gap-2{gap:.5rem}.text-left{text-align:left}.text-right{text-align:right}.text-center{text-align:center}.min-w-0{min-width:0}.text-xs{font-size:.72rem}.text-sm{font-size:.85rem}.font-semibold{font-weight:600}.font-bold{font-weight:700}.font-normal{font-weight:400}.text-zinc-500{color:#8a8a93}.text-emerald-400{color:#22d68a}.text-red-400{color:#ff5a5a}.mt-1{margin-top:.25rem}.py-4{padding:1rem 0}.px-3{padding-left:.75rem;padding-right:.75rem}.py-2{padding-top:.5rem;padding-bottom:.5rem}.rounded-xl{border-radius:12px}.bg-black\/40{background:#16161a;border:1px solid #2a2a30;margin-bottom:.5rem}
 .chain{flex-direction:column;gap:.4rem}
 #ath-box{flex-direction:column;align-items:flex-start;gap:0}
@@ -256,29 +251,6 @@ body::before{display:none}
   <div id="yr-modal-body" style="margin-top:1rem"></div>
 </div></div>
 
-<div id="m-wallet" class="m h"><div class="mb"><button class="x" onclick="closeAddWalletModal()">&times;</button><b id="wallet-modal-title" class="d" style="font-size:1.2rem">Añadir clave pública</b>
-<div style="margin-top:1rem"><label class="dim">Red</label><select id="wallet-network" class="i" onchange="onWalletNetworkChange()"><option value="btc">Bitcoin (BTC)</option><option value="eth">Ethereum (ETH)</option><option value="sol">Solana (SOL)</option><option value="kraken">Kraken (importar CSV Ledgers)</option></select>
-<div id="wallet-address-wrap"><label class="dim">Dirección / clave pública</label><input id="wallet-address" class="i" placeholder="Pega aquí la dirección"></div>
-<label class="dim">Alias (opcional)</label><input id="wallet-alias" class="i" placeholder="Ej. Ledger BTC / Phantom">
-<div id="wallet-kind-wrap"><label class="dim">Tipo de clave</label><select id="wallet-kind" class="i"><option value="mia">Mía (Ledger, Trezor, Phantom…)</option><option value="kraken">Kraken (dirección de depósito)</option><option value="aave">Aave (protocolo)</option><option value="externa">De otra persona (cuenta como compra/venta)</option></select><p class="dim" style="margin:-.4rem 0 .8rem">Los envíos entre claves mías, Kraken y Aave son traspasos.</p></div>
-<div id="eth-key-wrap" class="hidden"><label class="dim">API key de Etherscan</label><input id="etherscan-key-input" class="i" placeholder="Pega tu API key"></div>
-<div id="sol-key-wrap" class="hidden"><label class="dim">API key de Helius</label><input id="helius-key-input" class="i" placeholder="Pega tu API key"></div>
-<div id="kraken-csv-wrap" class="hidden"><label class="dim">CSV de Kraken (Ledgers)</label><input id="kraken-csv-input" type="file" accept=".csv" class="i"><label class="dim">Direcciones de depósito de Kraken</label><textarea id="kraken-addr-input" class="i" rows="3" style="font-family:inherit"></textarea></div>
-<button class="btn p" style="width:100%" onclick="submitAddWallet()">Guardar</button></div></div></div>
-
-<div id="m-tx" class="m h"><div class="mb" style="max-width:520px"><button class="x" onclick="closeWalletTx()">&times;</button><b id="tx-modal-title" class="d" style="font-size:1.2rem">—</b>
-<div id="tx-modal-address" class="dim" style="word-break:break-all;margin:.3rem 0 1rem"></div>
-<div class="fx"><div style="flex:1"><label class="dim">Desde</label><input id="tx-date-from" type="date" class="i"></div><div style="flex:1"><label class="dim">Hasta</label><input id="tx-date-to" type="date" class="i"></div></div>
-<button class="btn" style="width:100%" onclick="loadWalletTransactions()">🔍 Buscar transacciones</button>
-<div id="tx-loading" class="hidden" style="text-align:center;padding:1.2rem"><div class="spinner"></div><p class="dim">Consultando red y precios históricos…</p></div>
-<div id="tx-warning" class="hidden warn"></div>
-<div id="tx-list" style="max-height:320px;overflow-y:auto;margin:.8rem 0"></div>
-<div id="tx-totals" class="hidden box">
-<div class="sr"><span class="dim">Compras</span><b id="tot-compra" class="up">0,00 €</b></div><div class="sr"><span class="dim">Ventas</span><b id="tot-venta" class="dn">0,00 €</b></div>
-<div class="sr"><span class="dim">Permutas</span><b id="tot-permuta">0,00 €</b></div><div class="sr"><span class="dim">Transferencias internas</span><span id="tot-interna" class="dim">0,00 €</span></div>
-<div class="sr" style="border-top:1px solid #2a2a30;margin-top:.3rem;padding-top:.5rem"><b>Total a fiscalizar</b><b id="tot-fiscal" style="color:var(--bt)">0,00 €</b></div></div>
-<button class="btn p" style="width:100%" onclick="exportWalletPDF()">📄 Exportar extracto fiscal en PDF</button></div></div>
-
 <div id="m-detail" class="m h"><div class="mb"><button class="x" onclick="hide('m-detail')">&times;</button><b id="dt" class="d" style="font-size:1.2rem"></b>
   <div id="dt-chart"><div style="height:220px;margin-top:1rem"><canvas id="dt-cv"></canvas></div><div class="dim" style="text-align:center">Precio en € · últimos 30 días</div></div>
   <div id="dt-man" style="margin-top:1rem"><label class="dim">Valor actual (€)</label><input id="man-val" type="number" step="0.01" class="i"><input type="hidden" id="man-key"><button class="btn p" style="width:100%" onclick="saveManual()">Guardar valor</button></div>
@@ -412,10 +384,9 @@ function updatePie(){
   pie.data.labels=labels;
   pie.data.datasets[0].data=data;
   pie.data.datasets[0].backgroundColor=colors;
-  pie.options.plugins.legend.labels.color=ctx=>colors[ctx.index];
-  pie.update();
+    pie.update();
  }
- else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11},color:ctx=>colors[ctx.index]}},tooltip:{titleColor:ctx=>{const item=ctx.dataPoints&&ctx.dataPoints[0];return item?colors[item.dataIndex]:'#fff'},bodyColor:ctx=>{const item=ctx.dataPoints&&ctx.dataPoints[0];return item?colors[item.dataIndex]:'#fff'},callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
+ else pie=new Chart($('pie'),{type:'doughnut',data:{labels,datasets:[{data,backgroundColor:colors,borderColor:'#0f0f12',borderWidth:3}]},options:{maintainAspectRatio:false,cutout:'66%',plugins:{legend:{position:'bottom',labels:{boxWidth:10,padding:10,font:{size:11},generateLabels:ch=>{const L=Chart.overrides.doughnut.plugins.legend.labels.generateLabels(ch);L.forEach(it=>{it.fontColor=ch.data.datasets[0].backgroundColor[it.index]});return L}}},tooltip:{titleColor:ctx=>{const item=ctx.dataPoints&&ctx.dataPoints[0];return item?colors[item.dataIndex]:'#fff'},bodyColor:ctx=>{const item=ctx.dataPoints&&ctx.dataPoints[0];return item?colors[item.dataIndex]:'#fff'},callbacks:{label:c=>' '+fmt(c.parsed)}}}}});
 }
 
 const YR=load('portfolio_years_v1',{});
@@ -775,237 +746,6 @@ requestAnimationFrame(tkLoop);
  let last=0;(function f(t){if(t-last>70){last=t;x.fillStyle='rgba(9,9,11,.14)';x.fillRect(0,0,W,H);x.font=F+'px "JetBrains Mono",monospace';
   d.forEach((y,i)=>{x.fillStyle=Math.random()<.04?'rgba(255,200,120,.5)':'rgba(247,147,26,.17)';x.fillText('0123456789abcdef'[Math.random()*16|0],i*F,y*F);d[i]=y*F>H&&Math.random()>.975?0:y+1})}
   if(!RM)requestAnimationFrame(f)})(0)})();
-
-const fmtEUR=fmt,priceCache={},saveWallets=()=>save('saved_wallets_v1',wallets);
-const NETWORK_META={btc:{label:'Bitcoin',color:'#f7931a'},eth:{label:'Ethereum',color:'#8c9eff'},sol:{label:'Solana',color:'#b57bff'},kraken:{label:'Kraken',color:'#7b61ff'}};
-let wallets=load('saved_wallets_v1',{}),currentTxList=[],currentWalletId=null,editingWalletId=null;
-async function getHistoricalPrice(id,d){const s=`${String(d.getUTCDate()).padStart(2,'0')}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${d.getUTCFullYear()}`,k=id+s;
- if(priceCache[k]!=null)return priceCache[k];
- try{const res=await fetch(`https://api.coingecko.com/api/v3/coins/${id}/history?date=${s}&localization=false`);if(res.ok){const r=await res.json();const p=(r&&r.market_data&&r.market_data.current_price&&r.market_data.current_price.eur)||0;if(p)priceCache[k]=p;return p}}catch(e){}
- return 0}
-function renderWalletsList(){const ids=Object.keys(wallets);
- $('wallets-list').innerHTML=ids.length?ids.map(id=>{const w=wallets[id],m=NETWORK_META[w.network],s=w.network==='kraken'?`${(w.ledgerRows||[]).length} movimientos${(w.addresses||[]).length?' · '+w.addresses.length+' dir.':''}`:w.address.slice(0,6)+'…'+w.address.slice(-4);
-  return `<div class="row" style="cursor:default"><div class="fx" style="cursor:pointer" onclick="openWalletTx('${id}')"><span style="color:${m.color};font-size:1.2rem">●</span><div><b>${w.alias||m.label}${kindTag(w)}</b><div class="dim">${m.label} · ${s}</div></div></div><div class="fx"><a class="lk" href="#" onclick="openWalletTx('${id}');return false">Ver</a><a class="lk" href="#" onclick="openEditWallet('${id}');return false">Editar</a><a class="lk" href="#" onclick="deleteWallet('${id}');return false">✕</a></div></div>`}).join(''):'<p class="dim">Aún no has añadido ninguna clave pública.</p>'}
-function openAddWalletModal(){editingWalletId=null;$('wallet-modal-title').textContent='Añadir clave pública';$('wallet-network').disabled=false;$('wallet-network').value='btc';['wallet-address','wallet-alias','etherscan-key-input','helius-key-input','kraken-addr-input'].forEach(i=>$(i).value='');$('wallet-kind').value='mia';show('m-wallet');onWalletNetworkChange()}
-function openEditWallet(id){const w=wallets[id];editingWalletId=id;$('wallet-modal-title').textContent='Editar clave pública';$('wallet-network').value=w.network;$('wallet-network').disabled=true;$('wallet-address').value=w.address||'';$('wallet-alias').value=w.alias||'';$('wallet-kind').value=w.kind||(w.isMine?'mia':'externa');$('kraken-addr-input').value=(w.addresses||[]).join('\n');show('m-wallet');onWalletNetworkChange()}
-function closeAddWalletModal(){hide('m-wallet');editingWalletId=null}
-function onWalletNetworkChange(){const n=$('wallet-network').value;
- $('eth-key-wrap').classList.toggle('hidden',n!=='eth');$('sol-key-wrap').classList.toggle('hidden',n!=='sol');$('kraken-csv-wrap').classList.toggle('hidden',n!=='kraken');$('wallet-address-wrap').classList.toggle('hidden',n==='kraken');$('wallet-kind-wrap').classList.toggle('hidden',n==='kraken');
- if(n==='eth')$('etherscan-key-input').value=localStorage.getItem('etherscan_api_key')||'';if(n==='sol')$('helius-key-input').value=localStorage.getItem('helius_api_key')||''}
-function submitAddWallet(){
- const n=$('wallet-network').value,alias=$('wallet-alias').value.trim(),kind=$('wallet-kind').value,mine=kind!=='externa';
- if(n==='kraken'){const f=$('kraken-csv-input').files[0],fin=rows=>{const id=editingWalletId||('kraken_'+(alias||'cuenta')+'_'+Date.now());wallets[id]={network:'kraken',address:'',alias:alias||'Kraken',isMine:false,ledgerRows:rows?krMerge(editingWalletId&&wallets[editingWalletId].ledgerRows,rows).all:((editingWalletId&&wallets[editingWalletId].ledgerRows)||[]),addresses:$('kraken-addr-input').value.split(/[\s,;]+/).filter(Boolean)};saveWallets();closeAddWalletModal();renderWalletsList()};
-  if(!f){if(!editingWalletId){alert('Selecciona el CSV de Kraken.');return}fin(null);return}
-  const r=new FileReader();r.onload=e=>fin(parseKrakenCSV(e.target.result));r.readAsText(f);return}
- const a=$('wallet-address').value.trim();if(!a){alert('Introduce una dirección válida.');return}
- const ek=$('etherscan-key-input').value.trim(),hk=$('helius-key-input').value.trim();
- if(n==='eth'&&ek)localStorage.setItem('etherscan_api_key',ek);if(n==='sol'&&hk)localStorage.setItem('helius_api_key',hk);
- const id=n+'_'+a;if(editingWalletId&&editingWalletId!==id)delete wallets[editingWalletId];
- wallets[id]={network:n,address:a,alias,isMine:mine,kind};saveWallets();closeAddWalletModal();renderWalletsList()}
-function deleteWallet(id){if(!confirm('¿Eliminar esta clave pública?'))return;delete wallets[id];saveWallets();renderWalletsList()}
-function openWalletTx(id){currentWalletId=id;const w=wallets[id],m=NETWORK_META[w.network];$('tx-modal-title').textContent=w.alias||m.label;$('tx-modal-address').textContent=w.address||'';
- $('tx-date-from').value='2025-01-01';$('tx-date-to').value=new Date().toISOString().slice(0,10);$('tx-list').innerHTML='';['tx-totals','tx-warning'].forEach(i=>$(i).classList.add('hidden'));currentTxList=[];show('m-tx')}
-function closeWalletTx(){hide('m-tx')}
-async function fetchSOLTxs(a,f,t){const k=localStorage.getItem('helius_api_key');if(!k)throw new Error('Falta la API key de Helius');return fetchSOLTxsHelius(a,f,t,k)}
-async function fetchRawTxsForWallet(w,f,t){
- if(w.network==='btc')return fetchBTCTxs(w.address,f,t);if(w.network==='sol')return fetchSOLTxs(w.address,f,t);if(w.network==='eth')return fetchETHTxs(w.address,f,t);
- return buildKrakenTxs(w.ledgerRows||[]).filter(x=>x.date>=f&&x.date<=t)}
-async function loadWalletTransactions(){
- const w=wallets[currentWalletId],f=new Date($('tx-date-from').value+'T00:00:00Z'),t=new Date($('tx-date-to').value+'T23:59:59Z'),wn=$('tx-warning');
- $('tx-loading').classList.remove('hidden');$('tx-list').innerHTML='';['tx-totals','tx-warning'].forEach(i=>$(i).classList.add('hidden'));
- try{let raw=[];
-  try{raw=await fetchRawTxsForWallet(w,f,t)}catch(e){wn.textContent='No se pudo consultar esta wallet: '+(e.message||'error')+'. Revisa la API key (ETH: Etherscan, SOL: Helius) y vuelve a intentarlo.';wn.classList.remove('hidden')}
-  await fxFill(raw);raw.forEach(x=>x.category=suggestCategory(x,w));raw.sort((a,b)=>b.date-a.date);currentTxList=raw;renderTxList();computeTotals()}
- finally{$('tx-loading').classList.add('hidden')}}
-function renderTxList(){const c=$('tx-list');
- if(!currentTxList.length){c.innerHTML='<p class="dim" style="text-align:center">Sin movimientos en ese rango.</p>';return}
- c.innerHTML=currentTxList.map((t,i)=>`<div class="row" style="cursor:default"><div><div class="dim">${t.date.toLocaleDateString('es-ES')}${t.note?' · '+t.note:''}${fxOwnName(t)}</div><b>${t.direction==='in'?'↓':'↑'} ${t.amount.toFixed(6)} ${t.asset}</b><div class="dim">${fmtEUR(t.eurValue)}</div></div><select class="cat-select" onchange="changeTxCategory(${i},this.value)">${['compra','venta','permuta','interna'].map(k=>`<option value="${k}" ${t.category===k?'selected':''}>${k[0].toUpperCase()+k.slice(1)}</option>`).join('')}</select></div>`).join('');
- $('tx-totals').classList.remove('hidden')}
-function computeTotals(){const o={compra:0,venta:0,permuta:0,interna:0};currentTxList.forEach(t=>o[t.category]+=t.eurValue);
- Object.keys(o).forEach(k=>$('tot-'+k).textContent=fmtEUR(o[k]));$('tot-fiscal').textContent=fmtEUR(o.venta+o.permuta)}
-function exportWalletPDF(){
- if(!currentTxList.length){alert('Pulsa "Buscar transacciones" primero.');return}
- const w=wallets[currentWalletId],m=NETWORK_META[w.network],{jsPDF}=window.jspdf,d=new jsPDF(),L={compra:'Compra',venta:'Venta',permuta:'Permuta',interna:'Transf. interna'},fr=$('tx-date-from').value,to=$('tx-date-to').value,X=[14,44,74,114,144];
- d.setFontSize(16);d.text('Extracto de transacciones cripto',14,18);d.setFontSize(10);d.text(`Clave publica: ${w.alias?w.alias+' - ':''}${w.address}`,14,26);d.text(`Red: ${m.label}   Periodo: ${fr} a ${to}`,14,32);
- let y=44;d.setFontSize(9);['Fecha','Tipo','Cantidad','Valor EUR','Hash (linea inferior)'].forEach((h,i)=>d.text(h,X[i],y));y+=4;d.line(14,y,196,y);y+=5;
- const o={compra:0,venta:0,permuta:0,interna:0};
- currentTxList.forEach(t=>{if(y>270){d.addPage();y=20}o[t.category]+=t.eurValue;d.setFontSize(9);[t.date.toLocaleDateString('es-ES'),L[t.category],`${t.amount.toFixed(6)} ${t.asset}`,fmtEUR(t.eurValue)].forEach((s,i)=>d.text(String(s),X[i],y));d.setFontSize(6.5);fxHashLine(d,t.hash,14,y+4);y+=10});d.setFontSize(10);
- y+=6;if(y>250){d.addPage();y=20}d.line(14,y,196,y);y+=8;d.setFontSize(10);
- [['Compras',o.compra],['Ventas',o.venta],['Permutas',o.permuta],['Transferencias internas (excluidas)',o.interna]].forEach(([k,v])=>{d.text(`${k}: ${fmtEUR(v)}`,14,y);y+=6});
- d.setFontSize(12);d.text(`TOTAL A FISCALIZAR (ventas + permutas): ${fmtEUR(o.venta+o.permuta)}`,14,y);d.save(`extracto_${w.network}_${(w.address||'kraken').slice(0,8)}_${fr}_a_${to}.pdf`)}
-
-const fxE=id=>document.getElementById(id);
-const fxOv=()=>{try{return JSON.parse(localStorage.getItem('tx_cat_overrides_v1')||'{}')}catch(e){return{}}};
-const fxKey=t=>`${t.hash}|${t.asset}|${t.direction}|${(+t.amount).toFixed(6)}`;
-const FX_ID={XBT:'bitcoin',BTC:'bitcoin',ETH:'ethereum',SOL:'solana',USDC:'usd-coin',USDT:'tether',DAI:'dai'};
-const FX_BIN={bitcoin:'BTCEUR',ethereum:'ETHEUR',solana:'SOLEUR'};
-const FX_MINT={EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:['USDC','usd-coin'],Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB:['USDT','tether'],So11111111111111111111111111111111111111112:['SOL','solana']};
-let FX_RAW=null;
-
-const fxCG=window.getHistoricalPrice,fxPC={};
-async function fxKl(sym,t){const h=Math.floor(t/36e5)*36e5,k=sym+h;
- if(!fxPC[k]){try{const res=await fetch(`https://api.binance.com/api/v3/klines?symbol=${sym}&interval=1h&startTime=${h}&limit=1`);if(res.ok){const d=await res.json();if(Array.isArray(d)&&d[0]){fxPC[k]=[+d[0][1],+d[0][4]]}}}catch(e){}}
- if(!fxPC[k])return null;
- const[o,c]=fxPC[k];return o+(c-o)*((t-h)/36e5)}
-async function fxPrice(id,date){const t=date.getTime();
- try{if(FX_BIN[id]){const p=await fxKl(FX_BIN[id],t);if(p)return p}
-  if(id==='usd-coin'||id==='tether'||id==='dai'){const p=await fxKl('EURUSDT',t);if(p)return 1/p}}catch(e){}
- return fxCG(id,date)}
-window.getHistoricalPrice=fxPrice;
-async function fxFill(txs){
- const todo=txs.filter(t=>t.eurValue==null&&t.coingeckoId);
- for(let i=0;i<todo.length;i+=8)await Promise.all(todo.slice(i,i+8).map(async t=>{t.eurValue=(await fxPrice(t.coingeckoId,t.date))*t.amount}));
- const P={};txs.filter(t=>t.pair).forEach(t=>(P[t.pair]=P[t.pair]||[]).push(t));
- Object.values(P).forEach(g=>{const v=g.find(t=>t.direction==='out'&&t.eurValue>0)||g.find(t=>t.eurValue>0);if(v)g.forEach(t=>t.eurValue=v.eurValue)});
- txs.forEach(t=>{if(t.eurValue==null||isNaN(t.eurValue))t.eurValue=0})}
-
-async function fetchBTCTxs(address,from,to){
- let txs=[],last='';
- for(let p=0;p<60;p++){const res=await fetch(`https://blockstream.info/api/address/${address}/txs`+(last?`/chain/${last}`:''));
-  if(!res.ok)throw new Error('Blockstream '+res.status);const b=await res.json();if(!b.length)break;txs=txs.concat(b);
-  const l=b[b.length-1];last=l.txid;if(!l.status.confirmed||(l.status.block_time&&l.status.block_time*1000<from.getTime()))break}
- const seen=new Set(),res=[];
- for(const tx of txs){if(seen.has(tx.txid)||!tx.status.confirmed)continue;seen.add(tx.txid);
-  const t=tx.status.block_time*1000;if(t<from.getTime()||t>to.getTime())continue;
-  let i=0,o=0;const vi=[],vo=[];
-  tx.vin.forEach(v=>{const a=v.prevout&&v.prevout.scriptpubkey_address;if(a===address)i+=v.prevout.value;else if(a)vi.push(a)});
-  tx.vout.forEach(v=>{if(v.scriptpubkey_address===address)o+=v.value;else if(v.scriptpubkey_address)vo.push(v.scriptpubkey_address)});
-  const n=o-i;if(!n)continue;
-  res.push({date:new Date(t),hash:tx.txid,direction:n>0?'in':'out',amount:Math.abs(n)/1e8,asset:'BTC',coingeckoId:'bitcoin',counterparties:n>0?vi:vo})}
- return res}
-
-async function fetchETHTxs(address,from,to){
- const key=localStorage.getItem('etherscan_api_key');if(!key)throw new Error('NO_ETH_KEY');
- const get=async act=>{const res=await fetch(`https://api.etherscan.io/v2/api?chainid=1&module=account&action=${act}&address=${address}&startblock=0&endblock=99999999&page=1&offset=10000&sort=asc&apikey=${key}`);if(!res.ok)return[];const d=await res.json();
-  if(Array.isArray(d.result))return d.result;
-  if(/no transactions/i.test(d.message||''))return[];
-  const m=typeof d.result==='string'?d.result:(d.message||'ETHERSCAN');window._fxErr='Etherscan: '+m;throw new Error(m)};
- const a=await get('txlist');await new Promise(r=>setTimeout(r,450));const b=await get('txlistinternal');
- const me=address.toLowerCase(),res=[];
- a.concat(b).forEach(tx=>{if(tx.isError==='1')return;const t=+tx.timeStamp*1000;if(t<from.getTime()||t>to.getTime())return;
-  const v=Number(BigInt(tx.value||'0'))/1e18;if(!v)return;const out=(tx.from||'').toLowerCase()===me;
-  res.push({date:new Date(t),hash:tx.hash,direction:out?'out':'in',amount:v,asset:'ETH',coingeckoId:'ethereum',counterparties:[out?tx.to:tx.from]})});
- return res}
-
-async function fetchSOLTxsHelius(address,from,to,key){
- let all=[],before;
- for(let p=0;p<40;p++){const res=await fetch(`https://api.helius.xyz/v0/addresses/${address}/transactions?api-key=${key}&limit=100${before?'&before='+before:''}`);
-  if(!res.ok)throw new Error('HELIUS_ERROR');const b=await res.json();if(!b.length)break;all=all.concat(b);before=b[b.length-1].signature;
-  if(b[b.length-1].timestamp*1000<from.getTime())break}
- const res=[];
- all.filter(x=>x.timestamp*1000>=from.getTime()&&x.timestamp*1000<=to.getTime()&&!x.transactionError).forEach(tx=>{
-  const date=new Date(tx.timestamp*1000),orca=(tx.source||'').toUpperCase()==='ORCA',tt=tx.tokenTransfers||[],nt=tx.nativeTransfers||[];
-  const L=(t,n)=>{if(n)return{amount:t.amount/1e9,asset:'SOL',id:'solana'};const k=FX_MINT[t.mint];return{amount:t.tokenAmount,asset:k?k[0]:(t.mint?t.mint.slice(0,4):'?'),id:k?k[1]:null}};
-  const mine=(t,d)=>(d==='out'?t.fromUserAccount:t.toUserAccount)===address;
-  const push=(l,d,x)=>res.push({date,hash:tx.signature,direction:d,amount:l.amount,asset:l.asset,coingeckoId:l.id,...x});
-  if(tx.type==='SWAP'){
-   const pick=d=>{const a=tt.filter(t=>mine(t,d)).map(t=>L(t,0)),b=nt.filter(t=>mine(t,d)&&t.amount>=3e6).sort((x,y)=>y.amount-x.amount).map(t=>L(t,1));return a[0]||b[0]};
-   const o=pick('out'),i=pick('in'),note='Swap'+(orca?' (Orca)':'');
-   if(o)push(o,"out",{category:'permuta',note,pair:tx.signature});if(i)push(i,"in",{category:'permuta',note,pair:tx.signature});return}
-  if(orca&&tt.length>=2){tt.forEach(t=>{if(t.fromUserAccount===address||t.toUserAccount===address)push(L(t,0),t.fromUserAccount===address?'out':'in',{category:'permuta',note:'Pool Orca (revisar)'})});return}
-  nt.forEach(t=>{if(t.amount<1000||(t.fromUserAccount!==address&&t.toUserAccount!==address))return;const o=t.fromUserAccount===address;push(L(t,1),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})});
-  tt.forEach(t=>{if(t.fromUserAccount!==address&&t.toUserAccount!==address)return;const o=t.fromUserAccount===address;push(L(t,0),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})})});
- return res}
-
-function parseKrakenCSV(text){
- const rows=[];let row=[],f='',q=false;
- for(let i=0;i<text.length;i++){const c=text[i];
-  if(q){if(c==='"'){if(text[i+1]==='"'){f+='"';i++}else q=false}else f+=c}
-  else if(c==='"')q=true;else if(c===','){row.push(f);f=''}
-  else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(f);f='';if(row.length>1||row[0])rows.push(row);row=[]}
-  else f+=c}
- if(f||row.length){row.push(f);rows.push(row)}
- const h=rows.shift().map(x=>x.trim().replace(/^\uFEFF/,''));
- return rows.map(r=>Object.fromEntries(h.map((k,i)=>[k,r[i]||''])))}
-const fxKA=a=>{a=(a||'').toUpperCase().replace(/\.(S|M|F|B|P)$/,'');return({XXBT:'XBT',XETH:'ETH',ZEUR:'EUR'})[a]||a};
-const fxSym=a=>a==='XBT'?'BTC':a;
-function buildKrakenTxs(rows){
- const g={};rows.forEach(r=>{if(r.refid)(g[r.refid]=g[r.refid]||[]).push(r)});const res=[];
- Object.entries(g).forEach(([id,rs])=>{
-  const type=(rs[0].type||'').toLowerCase(),date=new Date((rs[0].time||'').replace(' ','T').replace(/\.\d+$/,'')+'Z'),isE=r=>fxKA(r.asset)==='EUR';
-  if(['trade','spend','receive'].includes(type)){
-   const fi=rs.find(isE),cr=rs.filter(r=>!isE(r));
-   if(fi&&cr.length===1){const c=cr[0],e=Math.abs(+fi.amount),fe=+fi.fee||0,cf=+c.fee||0,q=Math.abs(+c.amount),sale=+fi.amount>0,code=fxKA(c.asset);
-    res.push({date,hash:id,direction:sale?'out':'in',amount:sale?q:q-cf,asset:fxSym(code),coingeckoId:FX_ID[code]||null,eurValue:sale?e-fe:e+fe,category:sale?'venta':'compra',note:'Kraken'})}
-   else if(!fi&&cr.length===2){const o=cr.find(r=>+r.amount<0),i=cr.find(r=>+r.amount>0);
-    if(o&&i)[[o,'out'],[i,'in']].forEach(([r,d])=>{const c=fxKA(r.asset);res.push({date,hash:id,direction:d,amount:Math.abs(+r.amount)-(d==='in'?(+r.fee||0):0),asset:fxSym(c),coingeckoId:FX_ID[c]||null,category:'permuta',note:'Kraken',pair:id})})}
-   return}
-  if(['deposit','withdrawal'].includes(type)){
-   rs.forEach(r=>{const c=fxKA(r.asset);if(c==='EUR')return;const a=+r.amount;
-    res.push({date,hash:id,direction:a>0?'in':'out',amount:Math.abs(a),asset:fxSym(c),coingeckoId:FX_ID[c]||null,category:'interna',note:'Kraken '+type})})}
- });
- return res}
-
-function krMerge(old,neu){
- const key=r=>r.txid||[r.refid,r.asset,r.time,r.amount].join('|'),m=new Map();let added=0;
- (old||[]).forEach(r=>m.set(key(r),r));
- neu.forEach(r=>{if(!m.has(key(r))){m.set(key(r),r);added++}});
- return{all:[...m.values()],added}}
-
-function importKraken(f){
- if(!f)return;const rd=new FileReader();
- rd.onload=e=>{try{
-  const rows=parseKrakenCSV(e.target.result);
-  let id=Object.keys(wallets).find(k=>wallets[k].network==='kraken');
-  if(!id){id='kraken_cuenta_'+Date.now();wallets[id]={network:'kraken',address:'',alias:'Kraken',isMine:false,ledgerRows:[],addresses:[]}}
-  const r=krMerge(wallets[id].ledgerRows,rows);wallets[id].ledgerRows=r.all;saveWallets();renderWalletsList();
-  alert(`Kraken: ${r.added} movimientos nuevos importados.`)}catch(err){alert('No se pudo leer el CSV: '+err.message)}};
- rd.readAsText(f)}
-
-const kindTag=w=>({kraken:' <span class="dim">(Kraken)</span>',aave:' <span class="dim">(Aave)</span>',externa:' <span class="dim">(externa)</span>'})[w.kind]||'';
-const ownAddrs=()=>{const s=new Map();Object.values(wallets).forEach(w=>{if(w.kind==='externa')return;const n=w.alias||NETWORK_META[w.network].label;if(w.address)s.set(w.address.toLowerCase(),n);(w.addresses||[]).forEach(a=>s.set(a.toLowerCase(),n))});return s};
-const fxOwnName=t=>{const s=ownAddrs(),c=(t.counterparties||[]).find(a=>a&&s.has(a.toLowerCase()));return c?' · '+(t.direction==='in'?'de ':'a ')+s.get(c.toLowerCase()):''};
-function suggestCategory(t,w){
- const ov=fxOv()[fxKey(t)];if(ov)return ov;
- if(t.category)return t.category;
- const s=ownAddrs();
- if((t.counterparties||[]).some(a=>a&&s.has(a.toLowerCase())))return'interna';
- return t.direction==='in'?'compra':'venta'}
-function changeTxCategory(i,v){const t=currentTxList[i];t.category=v;const o=fxOv();o[fxKey(t)]=v;localStorage.setItem('tx_cat_overrides_v1',JSON.stringify(o));computeTotals()}
-function fxHashLine(d,h,x,y){d.text(String(h||'').slice(0,90),x,y)}
-
-let fiscalRows=[],fiscalSum=null,fiscalYear=null;
-async function runFiscalPanel(){
- const y=+$('fiscal-year').value,wn=$('fiscal-warning'),errs=[];let all=[];
- $('fiscal-loading').classList.remove('hidden');['fiscal-summary','fiscal-warning'].forEach(i=>$(i).classList.add('hidden'));$('fiscal-table').innerHTML='';
- try{
-  for(const id of Object.keys(wallets)){const w=wallets[id];
-   try{const r=await fetchRawTxsForWallet(w,new Date('2015-01-01T00:00:00Z'),new Date(Date.UTC(y,11,31,23,59,59)));r.forEach(x=>x.w=w);all=all.concat(r)}
-   catch(e){errs.push((w.alias||NETWORK_META[w.network].label)+': '+(e.message||'error'))}}
-  await fxFill(all);
-  all.forEach(x=>x.category=suggestCategory(x,x.w));
-  all.sort((a,b)=>a.date-b.date);
-  const lots={},rows=[],S={gan:0,per:0,venta:0,permuta:0,interna:0};let missing=false;
-  all.forEach(x=>{const inY=x.date.getUTCFullYear()===y;
-   if(x.category==='interna'){if(inY)S.interna+=x.eurValue;return}
-   const L=lots[x.asset]=lots[x.asset]||[];
-   if(x.direction==='in'){L.push({q:x.amount,c:x.eurValue});return}
-   let q=x.amount,cost=0;
-   while(q>1e-12&&L.length){const l=L[0],u=Math.min(q,l.q),part=l.c*u/l.q;cost+=part;l.c-=part;l.q-=u;q-=u;if(l.q<=1e-12)L.shift()}
-   if(q>1e-9)missing=true;
-   if(!inY)return;
-   const g=x.eurValue-cost;if(g>=0)S.gan+=g;else S.per+=g;
-   if(x.category==='permuta')S.permuta+=x.eurValue;else S.venta+=x.eurValue;
-   rows.push({date:x.date,asset:x.asset,qty:x.amount,proceeds:x.eurValue,cost,gain:g,cat:x.category})});
-  fiscalRows=rows;fiscalSum=S;fiscalYear=y;
-  $('fis-ganancias').textContent=fmtEUR(S.gan);$('fis-perdidas').textContent=fmtEUR(S.per);$('fis-neto').textContent=fmtEUR(S.gan+S.per);
-  $('fis-vol-venta').textContent=fmtEUR(S.venta);$('fis-vol-permuta').textContent=fmtEUR(S.permuta);$('fis-vol-interna').textContent=fmtEUR(S.interna);
-  $('fiscal-summary').classList.remove('hidden');
-  $('fiscal-table').innerHTML=rows.length?rows.map(r=>`<div class="row" style="cursor:default"><div><div class="dim">${r.date.toLocaleDateString('es-ES')} · ${r.cat}</div><b>${r.qty.toFixed(6)} ${r.asset}</b><div class="dim">Venta ${fmtEUR(r.proceeds)} · Coste ${fmtEUR(r.cost)}</div></div><b class="${r.gain>=0?'up':'dn'}">${r.gain>=0?'+':''}${fmtEUR(r.gain)}</b></div>`).join(''):'<p class="dim" style="text-align:center">Sin ventas ni permutas en ese año.</p>';
-  const msg=[];if(errs.length)msg.push('Errores: '+errs.join(' | '));if(missing)msg.push('Faltan compras previas para algunas ventas (coste 0). Revisa que estén todas tus wallets y el CSV de Kraken.');
-  if(msg.length){wn.textContent=msg.join(' ');wn.classList.remove('hidden')}
- }finally{$('fiscal-loading').classList.add('hidden')}}
-
-function exportFiscalPDF(){
- if(!fiscalSum){alert('Pulsa "Calcular año" primero.');return}
- const{jsPDF}=window.jspdf,d=new jsPDF(),S=fiscalSum;let y=18;
- d.setFontSize(16);d.text(`Informe fiscal cripto ${fiscalYear} (FIFO)`,14,y);y+=10;d.setFontSize(10);
- [['Ganancias patrimoniales',S.gan],['Perdidas patrimoniales',S.per],['NETO (Modelo 100)',S.gan+S.per],['Volumen ventas',S.venta],['Volumen permutas',S.permuta],['Transferencias internas (excluidas)',S.interna]].forEach(([k,v])=>{d.text(`${k}: ${fmtEUR(v)}`,14,y);y+=6});
- y+=4;d.line(14,y,196,y);y+=6;d.setFontSize(9);
- ['Fecha','Tipo','Cantidad','Venta','Coste','Ganancia'].forEach((h,i)=>d.text(h,[14,38,60,104,132,162][i],y));y+=6;
- fiscalRows.forEach(r=>{if(y>280){d.addPage();y=20}
-  [r.date.toLocaleDateString('es-ES'),r.cat,`${r.qty.toFixed(6)} ${r.asset}`,fmtEUR(r.proceeds),fmtEUR(r.cost),fmtEUR(r.gain)].forEach((s,i)=>d.text(String(s),[14,38,60,104,132,162][i],y));y+=6});
- d.save(`informe_fiscal_${fiscalYear}.pdf`)}
 
 (function init(){
  tick();setInterval(tick,30000);
