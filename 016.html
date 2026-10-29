@@ -205,3 +205,36 @@ body::before{display:none}
 <div class="face back" style="text-align:center"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-linecap="round"><path d="M10 72a40 40 0 0 1 80 0" stroke-width="10"/><path d="M50 72L72 44" stroke-width="6"/></g><circle cx="50" cy="72" r="8" fill="currentColor"/></svg></span>
   <div class="k" style="text-align:left">Miedo y codicia</div>
   <div class="gw"><div class
+<!-- INICIO DE EFECTOS DE VIDA -->
+<div id="spot" style="position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(420px 420px at var(--mx,50%) var(--my,50%),rgba(247,147,26,.10),transparent 70%);mix-blend-mode:screen;transition:opacity .4s"></div>
+<style>
+  .reveal { opacity: 0; transform: translateY(28px) scale(.985); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); }
+  .reveal.in { opacity: 1; transform: none; }
+  .cube { transition: transform .3s cubic-bezier(.34,1.56,.64,1) !important; }
+  .cube:hover { transform: translateY(-3px); }
+  .cube:hover .ic { transform: rotate(-8deg) scale(1.08) !important; }
+  .btn { transition: transform .18s cubic-bezier(.34,1.56,.64,1), background .2s !important; }
+  .btn:active { transform: scale(.96); }
+  .rng button { transition: all .25s cubic-bezier(.34,1.56,.64,1) !important; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
+</style>
+<script>
+(function(){
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+  // 1. Luz que sigue al ratón
+  const spot = document.getElementById('spot');
+  let mx = innerWidth/2, my = innerHeight/2, tx = mx, ty = my;
+  window.addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; });
+  (function loop(){ mx += (tx-mx)*.08; my += (ty-my)*.08; spot.style.setProperty('--mx', mx+'px'); spot.style.setProperty('--my', my+'px'); requestAnimationFrame(loop); })();
+
+  // 2. Animación de scroll
+  const secs = [...document.querySelectorAll('main.g > *')];
+  secs.forEach(s => s.classList.add('reveal'));
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
+  secs.forEach(s => io.observe(s));
+})();
+</script>
+<!-- FIN DE EFECTOS DE VIDA -->
