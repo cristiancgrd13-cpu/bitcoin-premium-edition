@@ -203,7 +203,7 @@ body::before{display:none}
 <section class="c all hero tint" style="--tc:247,147,26">
   <div class="k">Valor total</div>
   <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
-  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">#850.000</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span><span style="white-space:normal">PRÓXIMO HALVING <b id="hv-date">—</b> <b id="hv-cd" style="font-variant-numeric:tabular-nums">—</b></span></div><div id="ath-box"></div>
+  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">#850.000</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span><span style="white-space:normal">PRÓXIMO HALVING <b id="hv-date">—</b> <b>3,125 → 1,5625 BTC</b> · <b id="hv-blocks" style="font-variant-numeric:tabular-nums">—</b></span><span><b id="hv-cd" style="font-variant-numeric:tabular-nums">—</b></span></div><div id="ath-box"></div>
   <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
 
@@ -720,8 +720,9 @@ function showTip(anim){
  if(anim)['blk','mined'].forEach(i=>{const b=$(i);b.classList.remove('flash');void b.offsetWidth;b.classList.add('flash')})}
 function chainTick(){}
 function halvTick(){
- const d=$('hv-date'),c=$('hv-cd');if(!d||!c)return;
- if(!tipOk||!hvTarget){d.textContent='—';c.textContent='';return}
+ const d=$('hv-date'),c=$('hv-cd'),hb=$('hv-blocks');if(!d||!c||!hb)return;
+ if(!tipOk||!hvTarget){d.textContent='—';c.textContent='';hb.textContent='—';return}
+ hb.textContent='faltan '+Math.max(HALV_BLOCK-tip.height,0).toLocaleString('es-ES')+' bloques';
  d.textContent='≈ '+new Date(hvTarget).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})+' ·';
  let ms=Math.max(hvTarget-Date.now(),0),s=Math.floor(ms/1000),dd=Math.floor(s/86400),hh=Math.floor(s%86400/3600),mm=Math.floor(s%3600/60),ss=s%60;
  c.textContent=`${dd}d ${String(hh).padStart(2,'0')}h ${String(mm).padStart(2,'0')}m ${String(ss).padStart(2,'0')}s`}
