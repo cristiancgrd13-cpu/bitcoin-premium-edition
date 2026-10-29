@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="es"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Portafolio</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <script>window.Chart||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"><\/script>')</script>
@@ -11,7 +14,6 @@
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--ink);color:#ececef;font-family:'JetBrains Mono',monospace;min-height:100vh}
-body::before{display:none}
 #bg{position:fixed;inset:0;width:100%;height:100%;z-index:-1}
 #spot{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(420px 420px at var(--mx,50%) var(--my,50%),rgba(247,147,26,.10),transparent 70%);mix-blend-mode:screen;transition:opacity .4s}
 .d,.hd h1{font-family:'JetBrains Mono',monospace;font-weight:800;letter-spacing:-.03em}
@@ -45,13 +47,10 @@ body::before{display:none}
 .chain b{color:var(--bt);font-weight:700}
 .hero>*{position:relative;z-index:1;pointer-events:none}
 .hero>.spark{pointer-events:auto;height:58%;position:absolute!important;left:0;right:0;bottom:0;z-index:0!important;touch-action:pan-y}
-.hero #blk a{pointer-events:auto}
 #ath-box{margin-top:1rem;min-height:30px;display:flex;flex-direction:column;align-items:flex-start;gap:0}
 .athl{color:var(--bt);font-weight:800;font-size:.95rem}
 .athv{color:#fff;margin-left:.4rem}.athd{color:#8a8a93;font-weight:400;margin-left:.3rem}
-.athl.one .athv,.athl.one .athd{margin-left:0}
 #blk{padding:0 .3rem;border-radius:3px}#blk a{color:inherit;text-decoration:none}
-.flash{animation:fl 1.8s ease-out}@keyframes fl{0%,45%{background:var(--bt);color:#000}100%{background:transparent}}
 .tk{overflow:hidden;white-space:nowrap;border:1px solid #2a2a30;background:#0f0f12;border-radius:6px;padding:.6rem 0;font-size:.9rem;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
 .tt{display:inline-block;white-space:nowrap;will-change:transform}
 .ti{margin:0 1.4rem}
@@ -83,15 +82,8 @@ body::before{display:none}
 #assets-list .cube .face{position:absolute;inset:0;margin:0;box-sizing:border-box;backface-visibility:hidden;-webkit-backface-visibility:hidden;overflow:hidden;border-radius:6px}
 #assets-list .cube .front{transform:translateZ(42px);padding:.7rem .9rem;border:1px solid;border-left-width:3px;display:flex;justify-content:space-between;align-items:center;gap:.5rem}
 #assets-list .cube .back{transform:rotateX(-90deg) translateZ(42px);background:#16161a;border:1px solid;border-left-width:3px;padding:.7rem .9rem;display:flex;flex-direction:column;justify-content:center;gap:.15rem;align-items:center;text-align:center}
-.cube .a1,.cube .a2{display:flex;justify-content:space-between;align-items:baseline;gap:.2rem .6rem;flex-wrap:wrap}
-.cube .a1>span,.cube .a2>span{white-space:nowrap}.cube .a1>b{margin-left:auto;white-space:nowrap;font-size:.95rem}
-.cube .a2>span:last-child{margin-left:auto}
-.cube .back .dim{font-size:.68rem}.cube .back .lk{font-size:.68rem;margin-left:.3rem}.cube .back .bp{font-size:1rem}
-#assets-list .cube .wm{position:absolute;right:12px;top:50%;width:74px;height:74px;transform:translateY(-50%);opacity:.12;pointer-events:none;z-index:-1}
-#assets-list .cube .wm svg{width:100%;height:100%;display:block}
-#assets-list .cube .back .bk{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);width:30px;height:30px}
 .bigcube{position:relative;height:130px;perspective:900px;cursor:pointer}
-.bigcube .cube-in{transform:translateZ(-65px)}
+.bigcube .cube-in{transform:translateZ(-65px);transition:transform .6s cubic-bezier(.34,1.56,.64,1)}
 .bigcube.flip .cube-in{transform:translateZ(-65px) rotateX(90deg)}
 .bigcube .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden}
 .bigcube .front{transform:translateZ(65px)}
@@ -101,8 +93,6 @@ body::before{display:none}
 .bigcube.h2.flip .cube-in{transform:translateZ(-103px) rotateX(90deg)}
 .bigcube.h2 .front{transform:translateZ(103px)}
 .bigcube.h2 .back{transform:rotateX(-90deg) translateZ(103px)}
-.lg{display:block;width:100%;height:100%}
-.lg-t{display:inline-block;width:1.2em;height:1.2em;vertical-align:-.25em;margin-right:.1rem}
 .prism{--ph:124px;--pa:35.8px;position:relative;height:var(--ph);perspective:700px}
 .prism-in{--n:0;position:absolute;inset:0;transform-style:preserve-3d;transform:translateZ(calc(var(--pa)*-1)) rotateX(calc(var(--n)*120deg));transition:transform .9s cubic-bezier(.45,.05,.2,1)}
 .pf{position:absolute;inset:0;display:flex;align-items:center;gap:.9rem;padding:0 1rem;box-sizing:border-box;border:1px solid;border-left-width:3px;border-radius:8px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
@@ -124,116 +114,237 @@ body::before{display:none}
 .mb{background:#0f0f12;border:1px solid #2a2a30;border-top:2px solid var(--bt);border-radius:10px;padding:1.4rem;width:100%;max-width:380px;max-height:88vh;overflow-y:auto}
 .x{float:right;background:0;border:0;color:var(--dim);font-size:1.6rem;cursor:pointer;line-height:1;transition:transform .2s,color .2s}
 .x:hover{color:#fff;transform:rotate(90deg)}
-.i{width:100%;background:#16161a;border:1px solid #34343c;border-radius:6px;padding:.65rem .9rem;color:#fff;margin:.25rem 0 .8rem;outline:0;font:inherit;font-family:'JetBrains Mono',monospace;transition:border-color .2s,box-shadow .2s}
-.i:focus{border-color:var(--bt);box-shadow:0 0 0 3px rgba(247,147,26,.15);outline:0}
-.box{background:#16161a;border-radius:6px;padding:1rem;margin-bottom:.8rem}
+.i{width:100%;background:#16161a;border:1px solid #34343c;border-radius:6px;padding:.65rem .9rem;color:#fff;margin:.25rem 0 .8rem;outline:0;font:inherit;font-family:'JetBrains Mono',monospace}
 .hd{display:flex;justify-content:space-between;align-items:baseline}
 .hd h1{margin:0;font-size:1.7rem;letter-spacing:-.03em}
-.hd .btn{white-space:nowrap;padding:.5rem .75rem;font-size:.78rem}
-#manage-list .mcard{position:relative;isolation:isolate;height:84px;margin-bottom:.8rem;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.7rem .9rem;border:1px solid;border-left-width:3px;border-radius:6px;overflow:hidden;cursor:pointer;transition:transform .2s cubic-bezier(.34,1.56,.64,1)}
-#manage-list .mcard:hover{transform:translateX(4px)}
-#manage-list .mcard>.fx{flex:1;min-width:0;gap:.55rem}
-#manage-list .mcard>.fx>div{min-width:0}
-#manage-list .mcard>.fx>div>*{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#manage-list .mcard>.fx>div>.dim{margin-top:.5rem;font-size:.75rem}
-#manage-list .mcard>div:last-child{flex:none;white-space:nowrap;display:flex;flex-direction:column;align-items:flex-end;gap:.5rem}
-#manage-list .mcard .ic{width:30px;height:30px;flex:none}
-#manage-list .mcard b.d{font-size:.92rem}
-#manage-list .mcard .wm{position:absolute;right:12px;top:50%;width:74px;height:74px;transform:translateY(-50%);opacity:.12;pointer-events:none;z-index:-1}
-.c.tint{background-image:linear-gradient(180deg,rgba(var(--tc),.26) 0%,rgba(var(--tc),.08) 45%,rgba(var(--tc),0) 78%),linear-gradient(rgba(var(--tc),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--tc),.04) 1px,transparent 1px);background-size:100% 100%,26px 26px,26px 26px;border-color:rgba(var(--tc),.38);border-top-color:rgb(var(--tc));box-shadow:0 0 26px rgba(var(--tc),.14);isolation:isolate;transition:border-color .6s,box-shadow .6s}
-.c.tint:hover{box-shadow:0 0 0 1px rgba(var(--tc),.35),0 18px 60px -18px rgba(var(--tc),.25)}
+#manage-list .mcard{position:relative;isolation:isolate;height:84px;margin-bottom:.8rem;box-sizing:border-box;display:flex;justify-content:space-between;align-items:center;gap:.5rem;padding:.7rem .9rem;border:1px solid;border-left-width:3px;border-radius:6px;overflow:hidden}
+.c.tint{background-image:linear-gradient(180deg,rgba(var(--tc),.26) 0%,rgba(var(--tc),.08) 45%,rgba(var(--tc),0) 78%),linear-gradient(rgba(var(--tc),.04) 1px,transparent 1px),linear-gradient(90deg,rgba(var(--tc),.04) 1px,transparent 1px);background-size:100% 100%,26px 26px,26px 26px;border-color:rgba(var(--tc),.38);border-top-color:rgb(var(--tc));box-shadow:0 0 26px rgba(var(--tc),.14)}
 .wmk{position:absolute;right:-24px;bottom:-30px;width:190px;height:190px;color:rgb(var(--tc));opacity:.09;transform:rotate(-12deg);pointer-events:none;z-index:-1}
 .wmk svg{width:100%;height:100%;display:block}
-.mb.tint{background-image:linear-gradient(180deg,rgba(var(--tc),.26) 0%,rgba(var(--tc),.08) 45%,rgba(var(--tc),0) 78%);border-color:rgba(var(--tc),.38);border-top-color:rgb(var(--tc));box-shadow:0 0 26px rgba(var(--tc),.14)}
 .yr-btn-container{position:relative;height:28px;margin-top:.4rem}
 .yr-btn{position:absolute;top:0;background:linear-gradient(180deg,rgba(45,212,191,.26) 0%,rgba(45,212,191,.08) 45%,rgba(45,212,191,0) 78%);border:1px solid rgba(45,212,191,.38);border-top-color:rgb(45,212,191);border-radius:6px;color:#ececef;font:inherit;font-size:.78rem;font-weight:700;padding:.2rem 0;text-align:center;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .yr-btn:hover{background:rgb(45,212,191);color:#000}
-#avg-list{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}
-#avg-list .row{margin:0}
-
-/* Animación de scroll */
 .reveal{opacity:0;transform:translateY(28px) scale(.985);transition:opacity .7s cubic-bezier(.2,.7,.2,1),transform .7s cubic-bezier(.2,.7,.2,1)}
 .reveal.in{opacity:1;transform:none}
 .reveal.d1{transition-delay:.07s}.reveal.d2{transition-delay:.14s}.reveal.d3{transition-delay:.21s}
-@media(prefers-reduced-motion:reduce){.reveal{opacity:1;transform:none}}
 </style>
 </head>
-<body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><linearGradient id="solg" x1="8" y1="22" x2="25" y2="9" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#9945FF"/><stop offset="1" stop-color="#14F195"/></linearGradient></defs></svg><canvas id="bg"></canvas><div id="spot"></div><main class="g">
-<div id="tk" class="all tk reveal"></div>
-<header class="all hd reveal"><h1 class="d"><span style="color:#f7931a">₿</span> Mi cartera</h1><span id="clock" class="dim"></span></header>
+<body>
+<canvas id="bg"></canvas><div id="spot"></div>
+<main class="g">
+  <div id="tk" class="all tk reveal">
+    <div class="tt">
+      <span class="ti"><b>BTC</b> 64,250 € <em class="up">+3.4%</em></span><span class="sep">/</span>
+      <span class="ti"><b>ETH</b> 3,420 € <em class="up">+1.8%</em></span><span class="sep">/</span>
+      <span class="ti"><b>SOL</b> 145 € <em class="dn">-0.5%</em></span>
+    </div>
+  </div>
+  <header class="all hd reveal">
+    <h1 class="d"><span style="color:#f7931a">₿</span> Mi cartera</h1>
+    <span id="clock" class="dim"></span>
+  </header>
 
-<section class="c all hero tint reveal" style="--tc:247,147,26">
-  <div class="k">Valor total</div>
-  <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
-  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">#850.000</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span><span style="white-space:normal">PRÓXIMO HALVING <b id="hv-date">—</b> <b id="hv-cd" style="font-variant-numeric:tabular-nums">—</b></span></div><div id="ath-box"></div>
-  <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
-</section>
+  <section class="c all hero tint reveal" style="--tc:247,147,26">
+    <div class="k">Valor total</div>
+    <div class="d big"><span id="total-value">45,230.50</span><i>€</i></div>
+    <div class="chain">
+      <span>ÚLTIMO BLOQUE BTC <b id="blk">#850.000</b></span>
+      <span><span id="lblmined">BTC MINADOS</span> <b id="mined">19,720,000</b></span>
+      <span style="white-space:normal">PRÓXIMO HALVING <b id="hv-date">Abril 2028</b> <b id="hv-cd" style="font-variant-numeric:tabular-nums">520 días</b></span>
+    </div>
+    <div id="ath-box"><span class="athl">ATH <span class="athv">69,000 €</span><span class="athd">(-6.8%)</span></span></div>
+    <div class="spwrap">
+      <div id="sp-read" class="sp-read">Rendimiento periodo: <span class="rv">+12.4%</span></div>
+      <div class="sp-cv"><canvas id="spark"></canvas></div>
+      <div class="rng" id="rng">
+        <button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A" class="on">1A</button><button data-r="TODO">TODO</button>
+      </div>
+    </div>
+  </section>
 
-<section class="c s3 tint reveal d1" data-front="34,214,138" data-back="99,102,241" style="--tc:34,214,138"><div class="bigcube" onclick="flipTint(this)"><div class="cube-in">
-<div class="face front"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M14 22V78M32 30V84M50 8V66M68 20V76M86 4V58" fill="none"/><rect x="8" y="36" width="12" height="28" fill="currentColor"/><rect x="26" y="40" width="12" height="28" fill="none"/><rect x="44" y="20" width="12" height="30" fill="currentColor"/><rect x="62" y="32" width="12" height="26" fill="none"/><rect x="80" y="12" width="12" height="28" fill="currentColor"/></g></svg></span><div class="k">Rendimiento total</div><div id="percentage" class="d perf">—</div><div id="perf-eur" class="d pe">—</div></div>
-<div class="face back"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"><ellipse cx="50" cy="30" rx="30" ry="10" fill="currentColor"/><path d="M20 30v14c0 5.5 13.4 10 30 10s30-4.5 30-10V30M20 44v14c0 5.5 13.4 10 30 10s30-4.5 30-10V44M20 58v14c0 5.5 13.4 10 30 10s30-4.5 30-10V58"/></g></svg></span><div class="k">Inversión total</div><div class="row" style="cursor:default"><b id="inv-total" class="d" style="font-size:1.6rem">—</b></div></div>
-</div></div></section>
+  <section class="c s3 tint reveal d1" style="--tc:34,214,138">
+    <div class="bigcube" onclick="flipTint(this)"><div class="cube-in">
+      <div class="face front">
+        <span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M14 22V78M32 30V84M50 8V66M68 20V76M86 4V58" fill="none"/></g></svg></span>
+        <div class="k">Rendimiento total</div>
+        <div id="percentage" class="d perf">+45.2%</div>
+        <div id="perf-eur" class="d pe">+14,100 €</div>
+      </div>
+      <div class="face back">
+        <div class="k">Inversión total</div>
+        <div class="row" style="cursor:default; width:100%"><b id="inv-total" class="d" style="font-size:1.6rem">31,130 €</b></div>
+      </div>
+    </div></div>
+  </section>
 
-<section class="c s3 tint reveal d2" style="--tc:150,160,185"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 30a10 10 0 0 1 10-10h44v14"/><rect x="14" y="30" width="72" height="52" rx="10"/><path d="M86 48H68a8 8 0 0 0 0 16h18"/></g><circle cx="69" cy="56" r="3.5" fill="currentColor"/></svg></span>
-  <div class="k">Mis activos</div>
-  <div id="assets-list"></div>
-  <div style="text-align:center;margin-top:.9rem"><button class="btn" onclick="openManage()">Modificar</button></div>
-</section>
+  <section class="c s3 tint reveal d2" style="--tc:150,160,185">
+    <div class="k">Mis activos</div>
+    <div id="assets-list">
+      <div class="row">
+        <div class="fx">
+          <div class="ic" style="background:#f7931a22;color:#f7931a">₿</div>
+          <div><b class="d">Bitcoin</b><span class="dim">0.5 BTC</span></div>
+        </div>
+        <div><b class="d">32,125 €</b><span class="up">+68%</span></div>
+      </div>
+      <div class="row">
+        <div class="fx">
+          <div class="ic" style="background:#8c9eff22;color:#8c9eff">Ξ</div>
+          <div><b class="d">Ethereum</b><span class="dim">3.0 ETH</span></div>
+        </div>
+        <div><b class="d">10,260 €</b><span class="up">+15%</span></div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:.9rem"><button class="btn" onclick="openManage()">Modificar</button></div>
+  </section>
 
-<section class="c s3 tint reveal" style="--tc:45,212,191"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5.5" stroke-linecap="round" stroke-linejoin="round"><rect x="10" y="18" width="80" height="72" rx="10"/><path d="M10 40h80M32 8v18M68 8v18"/></g><g fill="currentColor"><rect x="22" y="52" width="12" height="10" rx="2"/><rect x="44" y="52" width="12" height="10" rx="2"/><rect x="66" y="52" width="12" height="10" rx="2"/><rect x="22" y="70" width="12" height="10" rx="2"/><rect x="44" y="70" width="12" height="10" rx="2"/></g></svg></span>
-  <div class="k" style="margin-bottom:.3rem">Rendimiento anual</div>
-  <div class="dim" style="margin-bottom:.4rem;white-space:nowrap">Anualizado: <b id="ann" style="font-size:1rem">—</b></div>
-  <div id="live-datetime" class="dim" style="margin-bottom:.6rem;color:rgb(45,212,191);font-weight:700">—</div>
-  <div style="height:155px;pointer-events:none"><canvas id="annual"></canvas></div>
-  <div id="yr-buttons" class="yr-btn-container"></div>
-</section>
+  <section class="c s3 tint reveal" style="--tc:45,212,191">
+    <div class="k" style="margin-bottom:.3rem">Rendimiento anual</div>
+    <div class="dim" style="margin-bottom:.4rem;white-space:nowrap">Anualizado: <b id="ann" style="font-size:1rem">+18.5%</b></div>
+    <div id="live-datetime" class="dim" style="margin-bottom:.6rem;color:rgb(45,212,191);font-weight:700">2026</div>
+    <div style="height:155px;pointer-events:none"><canvas id="annual"></canvas></div>
+  </section>
 
-<section class="c s3 tint reveal d1" style="--tc:139,92,246"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="20" transform="rotate(-90 50 50)"><circle cx="50" cy="50" r="34" stroke-dasharray="110 104"/><circle cx="50" cy="50" r="34" stroke-dasharray="58 156" stroke-dashoffset="-114" opacity=".6"/><circle cx="50" cy="50" r="34" stroke-dasharray="36 178" stroke-dashoffset="-176" opacity=".35"/></g></svg></span>
-  <div class="k">Distribución</div>
-  <div style="height:280px"><canvas id="pie"></canvas></div>
-</section>
+  <section class="c s3 tint reveal d1" style="--tc:139,92,246">
+    <div class="k">Distribución</div>
+    <div style="height:280px"><canvas id="pie"></canvas></div>
+  </section>
 
-<section class="c s3 tint reveal d2" data-front="80,140,255" data-back="250,204,21" style="--tc:80,140,255"><div class="bigcube h2" onclick="flipTint(this)"><div class="cube-in">
-<div class="face front"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="currentColor"><circle cx="38" cy="56" r="32"/><circle cx="78" cy="30" r="19" opacity=".6"/><circle cx="82" cy="76" r="13" opacity=".4"/></g></svg></span><div class="k">Capitalización</div>
-<div class="prism" id="prism"><div class="prism-in" id="prism-in">
-<div class="pf" style="background:linear-gradient(100deg,#f7931a30 0%,#16161a 62%);border-color:#f7931a55;border-left-color:#f7931a"><span class="pic" id="pi0"></span><div class="ptx"><span class="dim">Bitcoin</span><b id="btc-cap" class="pv">1.436 Bill. €</b></div></div>
-<div class="pf" style="background:linear-gradient(100deg,#8c9eff30 0%,#16161a 62%);border-color:#8c9eff55;border-left-color:#8c9eff"><span class="pic" id="pi1"></span><div class="ptx"><span class="dim">Total cripto (incluye BTC)</span><b id="tot-cap" class="pv">2.850 Bill. €</b></div></div>
-<div class="pf" style="background:linear-gradient(100deg,#f5c54230 0%,#16161a 62%);border-color:#f5c54255;border-left-color:#f5c542"><span class="pic" id="pi2"></span><div class="ptx"><span class="dim">Oro</span><b id="gold-cap" class="pv">14.200 Bill. €</b></div></div>
-</div></div>
-<div class="dots" id="dots"><i class="on"></i><i></i><i></i></div>
+  <section class="c s3 tint reveal d2" style="--tc:80,140,255">
+    <div class="bigcube h2" onclick="flipTint(this)"><div class="cube-in">
+      <div class="face front">
+        <div class="k">Capitalización</div>
+        <div class="prism" id="prism">
+          <div class="prism-in" id="prism-in">
+            <div class="pf" style="background:linear-gradient(100deg,#f7931a30 0%,#16161a 62%);border-color:#f7931a55;border-left-color:#f7931a"><span class="pic">₿</span><div class="ptx"><span class="dim">Bitcoin</span><b id="btc-cap" class="pv">1.436 Bill. €</b></div></div>
+            <div class="pf" style="background:linear-gradient(100deg,#8c9eff30 0%,#16161a 62%);border-color:#8c9eff55;border-left-color:#8c9eff"><span class="pic">Ξ</span><div class="ptx"><span class="dim">Total cripto</span><b id="tot-cap" class="pv">2.850 Bill. €</b></div></div>
+            <div class="pf" style="background:linear-gradient(100deg,#f5c54230 0%,#16161a 62%);border-color:#f5c54255;border-left-color:#f5c542"><span class="pic">🪙</span><div class="ptx"><span class="dim">Oro</span><b id="gold-cap" class="pv">14.200 Bill. €</b></div></div>
+          </div>
+        </div>
+        <div class="dots" id="dots"><i class="on"></i><i></i><i></i></div>
+      </div>
+      <div class="face back" style="text-align:center">
+        <div class="k" style="text-align:left">Miedo y codicia</div>
+        <div class="gw">
+          <div class="gb"></div>
+          <div class="gn" id="needle" style="transform:translateX(-50%) rotate(25deg);"></div>
+          <div class="gv" id="fng-val">74</div>
+        </div>
+        <div class="dim" id="fng-lbl">Codicia extrema</div>
+      </div>
+    </div></div>
+  </section>
+</main>
+
+<!-- Modal de Modificación -->
+<div id="modal" class="m h">
+  <div class="mb">
+    <button class="x" onclick="closeManage()">&times;</button>
+    <div class="hd" style="margin-bottom:1rem"><h1>Modificar Cartera</h1></div>
+    <div id="manage-list">
+      <div class="dim">Panel de control de activos simulado.</div>
+    </div>
+    <button class="btn p" style="width:100%;margin-top:1rem" onclick="closeManage()">Guardar cambios</button>
+  </div>
 </div>
-<div class="face back" style="text-align:center"><span class="wmk" aria-hidden="true"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-linecap="round"><path d="M10 72a40 40 0 0 1 80 0" stroke-width="10"/><path d="M50 72L72 44" stroke-width="6"/></g><circle cx="50" cy="72" r="8" fill="currentColor"/></svg></span>
-  <div class="k" style="text-align:left">Miedo y codicia</div>
-  <div class="gw"><div class<!-- INICIO DE EFECTOS DE VIDA -->
-<div id="spot" style="position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(420px 420px at var(--mx,50%) var(--my,50%),rgba(247,147,26,.10),transparent 70%);mix-blend-mode:screen;transition:opacity .4s"></div>
-<style>
-  .reveal { opacity: 0; transform: translateY(28px) scale(.985); transition: opacity .7s cubic-bezier(.2,.7,.2,1), transform .7s cubic-bezier(.2,.7,.2,1); }
-  .reveal.in { opacity: 1; transform: none; }
-  .cube { transition: transform .3s cubic-bezier(.34,1.56,.64,1) !important; }
-  .cube:hover { transform: translateY(-3px); }
-  .cube:hover .ic { transform: rotate(-8deg) scale(1.08) !important; }
-  .btn { transition: transform .18s cubic-bezier(.34,1.56,.64,1), background .2s !important; }
-  .btn:active { transform: scale(.96); }
-  .rng button { transition: all .25s cubic-bezier(.34,1.56,.64,1) !important; }
-  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; } }
-</style>
+
 <script>
-(function(){
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+// Funciones interactivas básicas
+function flipTint(el) {
+  el.classList.toggle('flip');
+}
 
-  // 1. Luz que sigue al ratón
-  const spot = document.getElementById('spot');
-  let mx = innerWidth/2, my = innerHeight/2, tx = mx, ty = my;
-  window.addEventListener('pointermove', e => { tx = e.clientX; ty = e.clientY; });
-  (function loop(){ mx += (tx-mx)*.08; my += (ty-my)*.08; spot.style.setProperty('--mx', mx+'px'); spot.style.setProperty('--my', my+'px'); requestAnimationFrame(loop); })();
+function openManage() {
+  document.getElementById('modal').classList.remove('h');
+}
 
-  // 2. Animación de scroll
-  const secs = [...document.querySelectorAll('main.g > *')];
-  secs.forEach(s => s.classList.add('reveal'));
-  const io = new IntersectionObserver(entries => {
-    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
-  }, { threshold: .08, rootMargin: '0px 0px -40px 0px' });
-  secs.forEach(s => io.observe(s));
-})();
+function closeManage() {
+  document.getElementById('modal').classList.add('h');
+}
+
+// Inicialización de gráficos con Chart.js de ejemplo
+window.addEventListener('DOMContentLoaded', () => {
+  // Reloj y fecha en vivo
+  setInterval(() => {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleDateString('es-ES', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+  }, 1000);
+
+  // Sparkline Chart
+  const ctxSpark = document.getElementById('spark').getContext('2d');
+  new Chart(ctxSpark, {
+    type: 'line',
+    data: {
+      labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct'],
+      datasets: [{
+        data: [30, 35, 32, 40, 38, 42, 41, 44, 43, 45.2],
+        borderColor: '#f7931a',
+        backgroundColor: 'rgba(247,147,26,0.1)',
+        fill: true,
+        tension: 0.3,
+        borderWidth: 2,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { display: false }, y: { display: false } }
+    }
+  });
+
+  // Annual Chart
+  const ctxAnnual = document.getElementById('annual').getContext('2d');
+  new Chart(ctxAnnual, {
+    type: 'bar',
+    data: {
+      labels: ['2023', '2024', '2025', '2026'],
+      datasets: [{
+        data: [15, 28, 35, 18.5],
+        backgroundColor: '#2dd4bf',
+        borderRadius: 4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: { x: { grid: { display: false }, ticks: { color: '#8a8a93', font: { family: 'JetBrains Mono', size: 10 } } }, y: { display: false } }
+    }
+  });
+
+  // Pie Chart
+  const ctxPie = document.getElementById('pie').getContext('2d');
+  new Chart(ctxPie, {
+    type: 'doughnut',
+    data: {
+      labels: ['Bitcoin', 'Ethereum', 'Otros'],
+      datasets: [{
+        data: [70, 22, 8],
+        backgroundColor: ['#f7931a', '#8c9eff', '#898993'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#ececef', font: { family: 'JetBrains Mono', size: 11 } } }
+      }
+    }
+  });
+
+  // Carrusel automático del Prisma
+  let prismIndex = 0;
+  const prismIn = document.getElementById('prism-in');
+  const dots = document.querySelectorAll('#dots i');
+  setInterval(() => {
+    prismIndex = (prismIndex + 1) % 3;
+    prismIn.style.setProperty('--n', prismIndex);
+    dots.forEach((d, i) => d.classList.toggle('on', i === prismIndex));
+  }, 4000);
+});
 </script>
-<!-- FIN DE EFECTOS DE VIDA -->
+</body>
+</html>
