@@ -38,16 +38,27 @@ option{color:#000}
 </style></head>
 <body><canvas id="bg"></canvas>
 <main class="g">
-<header class="hd"><h1><span style="color:var(--bt)">₿</span> Cripto Fiscalidad</h1><p class="dim">Wallets, Kraken y cálculo de ganancias por FIFO</p></header>
+<header class="hd"><h1><span style="color:var(--bt)">₿</span> Cripto Fiscalidad</h1><p class="dim">Wallets, Kraken, pools DeFi y cálculo de ganancias por FIFO</p></header>
 
 <section class="c" style="--tc:247,147,26"><span class="wmk"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><circle cx="30" cy="50" r="19"/><path d="M49 50h42M78 50v15M65 50v11"/></g><circle cx="30" cy="50" r="6" fill="currentColor"/></svg></span>
-<div class="k">Mis claves públicas</div><p class="dim">Consulta transacciones y genera el extracto fiscal en PDF.</p><div id="wallets-list"></div>
+<div class="k">Mis claves públicas</div><p class="dim">Añade todas tus wallets (incluidas las de destino de tus retiros de Kraken y tu Phantom). Los traspasos entre ellas se detectan solos y no cuentan como venta.</p><div id="wallets-list"></div>
 <button class="btn p" style="width:100%;margin-top:.8rem" onclick="openAddWalletModal()">+ Añadir clave pública</button>
 <button class="btn" style="width:100%;margin-top:.6rem" onclick="$('kr-quick').click()">⬆ Importar CSV de Kraken (Ledgers)</button>
 <input id="kr-quick" type="file" accept=".csv,text/csv" class="hidden" onchange="importKraken(this.files[0]);this.value=''"></section>
 
+<section class="c" style="--tc:181,123,255"><span class="wmk"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M50 10C50 10 22 44 22 62a28 28 0 0 0 56 0C78 44 50 10 50 10z"/><path d="M36 64a14 14 0 0 0 14 14"/></g></svg></span>
+<div class="k">Phantom · Pools de liquidez</div><p class="dim">Analiza una wallet de Solana movimiento a movimiento (swaps, aportaciones y retiradas de pools, cobros de comisiones). Se calcula con el saldo neto real de cada transacción. Todo se integra después en el Panel fiscal.</p>
+<label class="dim">Wallet de Solana</label><select id="defi-wallet" class="i"></select>
+<div class="fx"><div style="flex:1"><label class="dim">Desde</label><input id="defi-from" type="date" class="i"></div><div style="flex:1"><label class="dim">Hasta</label><input id="defi-to" type="date" class="i"></div></div>
+<button class="btn p" style="width:100%" onclick="loadDefi()">🔍 Analizar movimientos</button>
+<div id="defi-loading" class="hidden" style="text-align:center;padding:1.2rem"><div class="spinner"></div><p class="dim">Consultando Solana y precios históricos…</p></div>
+<div id="defi-warn" class="hidden warn"></div>
+<div id="defi-tot" class="hidden box" style="margin-top:.8rem"></div>
+<div id="defi-list" style="max-height:480px;overflow-y:auto;margin:.8rem 0"></div>
+<p class="dim">Cambia la categoría de cada operación si no es correcta; se guarda en este navegador y se aplica también en el Panel fiscal.</p></section>
+
 <section class="c" style="--tc:245,196,66"><span class="wmk"><svg viewBox="0 0 100 100"><g fill="none" stroke="currentColor" stroke-width="5" stroke-linejoin="round" stroke-linecap="round"><path d="M24 8h36l18 18v64H24z"/><path d="M60 8v18h18"/><path d="M34 48h32M34 62h32M34 76h20"/></g></svg></span>
-<div class="k">Panel fiscal</div><p class="dim">Todas tus wallets y Kraken juntas · ganancia real por FIFO.</p>
+<div class="k">Panel fiscal</div><p class="dim">Todas tus wallets, Kraken y DeFi juntos · ganancia real por FIFO.</p>
 <div class="fx" style="margin:.8rem 0"><select id="fiscal-year" class="i" style="margin:0"></select><button class="btn p" style="white-space:nowrap" onclick="runFiscalPanel()">Calcular año</button></div>
 <div id="fiscal-loading" class="hidden" style="text-align:center;padding:1.5rem"><div class="spinner"></div><p class="dim">Consultando wallets y calculando FIFO…</p></div>
 <div id="fiscal-warning" class="hidden warn"></div>
@@ -55,22 +66,25 @@ option{color:#000}
 <div class="sr"><span class="dim">Ganancias patrimoniales</span><b id="fis-ganancias" class="up">0,00 €</b></div>
 <div class="sr"><span class="dim">Pérdidas patrimoniales</span><b id="fis-perdidas" class="dn">0,00 €</b></div>
 <div class="sr" style="border-top:1px solid var(--line);margin-top:.3rem;padding-top:.5rem"><b>Neto (casilla Modelo 100)</b><b id="fis-neto" style="color:var(--bt);font-size:1.1rem">0,00 €</b></div>
+<div class="sr"><span class="dim">Rendimientos (comisiones/rewards)</span><span id="fis-rend" class="dim">0,00 €</span></div>
 <div class="sr"><span class="dim">Volumen ventas</span><span id="fis-vol-venta" class="dim">0,00 €</span></div>
 <div class="sr"><span class="dim">Volumen permutas</span><span id="fis-vol-permuta" class="dim">0,00 €</span></div>
-<div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="dim">0,00 €</span></div></div>
+<div class="sr"><span class="dim">Transferencias internas (excluidas)</span><span id="fis-vol-interna" class="dim">0,00 €</span></div>
+<div id="fis-bywallet" style="border-top:1px solid var(--line);margin-top:.5rem;padding-top:.4rem"></div></div>
+<div id="fiscal-links" class="hidden box"></div>
 <div id="fiscal-table" style="max-height:480px;overflow-y:auto;margin:.8rem 0"></div>
 <button class="btn p" style="width:100%" onclick="exportFiscalPDF()">📄 Exportar informe fiscal anual (PDF)</button>
-<p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan en este navegador.</p></section>
+<p class="dim">Revisa la categoría de cada fila antes de exportar; se guardan en este navegador. El PDF incluye operaciones, traspasos enlazados y puntos por revisar.</p></section>
 </main>
 
 <div id="m-wallet" class="m h"><div class="mb"><button class="x" onclick="closeAddWalletModal()">&times;</button><b id="wallet-modal-title" style="font-size:1.2rem">Añadir clave pública</b>
-<div style="margin-top:1rem"><label class="dim">Red</label><select id="wallet-network" class="i" onchange="onWalletNetworkChange()"><option value="btc">Bitcoin (BTC)</option><option value="eth">Ethereum (ETH)</option><option value="sol">Solana (SOL)</option><option value="kraken">Kraken (importar CSV Ledgers)</option></select>
+<div style="margin-top:1rem"><label class="dim">Red</label><select id="wallet-network" class="i" onchange="onWalletNetworkChange()"><option value="btc">Bitcoin (BTC)</option><option value="eth">Ethereum (ETH)</option><option value="sol">Solana (SOL · Phantom)</option><option value="kraken">Kraken (importar CSV Ledgers)</option></select>
 <div id="wallet-address-wrap"><label class="dim">Dirección / clave pública</label><input id="wallet-address" class="i" placeholder="Pega aquí la dirección"></div>
 <label class="dim">Alias (opcional)</label><input id="wallet-alias" class="i" placeholder="Ej. Ledger BTC / Phantom">
 <div id="wallet-kind-wrap"><label class="dim">Tipo de clave</label><select id="wallet-kind" class="i"><option value="mia">Mía (Ledger, Trezor, Phantom…)</option><option value="kraken">Kraken (dirección de depósito)</option><option value="aave">Aave (protocolo)</option><option value="externa">De otra persona (cuenta como compra/venta)</option></select><p class="dim" style="margin:-.4rem 0 .8rem">Los envíos entre claves mías, Kraken y Aave son traspasos.</p></div>
 <div id="eth-key-wrap" class="hidden"><label class="dim">API key de Etherscan</label><input id="etherscan-key-input" class="i" placeholder="Pega tu API key"></div>
 <div id="sol-key-wrap" class="hidden"><label class="dim">API key de Helius</label><input id="helius-key-input" class="i" placeholder="Pega tu API key"></div>
-<div id="kraken-csv-wrap" class="hidden"><label class="dim">CSV de Kraken (Ledgers)</label><input id="kraken-csv-input" type="file" accept=".csv" class="i"><label class="dim">Direcciones de depósito de Kraken</label><textarea id="kraken-addr-input" class="i" rows="3" style="font-family:inherit"></textarea></div>
+<div id="kraken-csv-wrap" class="hidden"><label class="dim">CSV de Kraken (Ledgers)</label><input id="kraken-csv-input" type="file" accept=".csv" class="i"><label class="dim">Direcciones de depósito de Kraken (donde envías desde tus wallets)</label><textarea id="kraken-addr-input" class="i" rows="3" style="font-family:inherit"></textarea></div>
 <button class="btn p" style="width:100%" onclick="submitAddWallet()">Guardar</button></div></div></div>
 
 <div id="m-tx" class="m h"><div class="mb" style="max-width:520px"><button class="x" onclick="hide('m-tx')">&times;</button><b id="tx-modal-title" style="font-size:1.2rem">—</b>
@@ -82,7 +96,7 @@ option{color:#000}
 <div id="tx-list" style="max-height:320px;overflow-y:auto;margin:.8rem 0"></div>
 <div id="tx-totals" class="hidden box">
 <div class="sr"><span class="dim">Compras</span><b id="tot-compra" class="up">0,00 €</b></div><div class="sr"><span class="dim">Ventas</span><b id="tot-venta" class="dn">0,00 €</b></div>
-<div class="sr"><span class="dim">Permutas</span><b id="tot-permuta">0,00 €</b></div><div class="sr"><span class="dim">Transferencias internas</span><span id="tot-interna" class="dim">0,00 €</span></div>
+<div class="sr"><span class="dim">Permutas</span><b id="tot-permuta">0,00 €</b></div><div class="sr"><span class="dim">Recompensas</span><b id="tot-recompensa">0,00 €</b></div><div class="sr"><span class="dim">Transferencias internas</span><span id="tot-interna" class="dim">0,00 €</span></div>
 <div class="sr" style="border-top:1px solid var(--line);margin-top:.3rem;padding-top:.5rem"><b>Total a fiscalizar</b><b id="tot-fiscal" style="color:var(--bt)">0,00 €</b></div></div>
 <button class="btn p" style="width:100%" onclick="exportWalletPDF()">📄 Exportar extracto fiscal en PDF</button></div></div>
 
@@ -93,13 +107,23 @@ const load=(k,d)=>{try{const v=JSON.parse(localStorage.getItem(k));return v??d}c
 const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const show=id=>$(id).classList.remove('h'),hide=id=>$(id).classList.add('h');
 const NET={btc:{label:'Bitcoin',color:'#f7931a'},eth:{label:'Ethereum',color:'#8c9eff'},sol:{label:'Solana',color:'#b57bff'},kraken:{label:'Kraken',color:'#7b61ff'}};
+const CATS=['compra','venta','permuta','interna','recompensa'];
 let wallets=load('saved_wallets_v1',{}),currentTxList=[],currentWalletId=null,editingWalletId=null;
 const saveWallets=()=>save('saved_wallets_v1',wallets);
+const wn=w=>w?(w.alias||NET[w.network].label):'?';
+const qy=t=>`${t.amount.toFixed(6)} ${t.asset}`,dt=t=>t.date.toLocaleDateString('es-ES');
+const vol=t=>t.category==='permuta'&&t.direction==='in'?0:t.eurValue;
+const totalsOf=l=>{const o={compra:0,venta:0,permuta:0,interna:0,recompensa:0};l.forEach(t=>o[t.category]+=vol(t));return o};
 
 /* ---------- Precios históricos (Binance → CoinGecko) ---------- */
 const FX_ID={XBT:'bitcoin',BTC:'bitcoin',ETH:'ethereum',SOL:'solana',USDC:'usd-coin',USDT:'tether',DAI:'dai'};
 const FX_BIN={bitcoin:'BTCEUR',ethereum:'ETHEUR',solana:'SOLEUR'};
-const FX_MINT={EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:['USDC','usd-coin'],Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB:['USDT','tether'],So11111111111111111111111111111111111111112:['SOL','solana']};
+const WSOL='So11111111111111111111111111111111111111112';
+const FX_MINT={EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:['USDC','usd-coin'],Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB:['USDT','tether'],
+ JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN:['JUP','jupiter-exchange-solana'],mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So:['mSOL','msol'],
+ J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn:['JITOSOL','jito-staked-sol'],bSo13r4TkiE4KumL71LsHTPpL2euBYLFx6h9HP3piy1:['BSOL','blazestake-staked-sol'],
+ '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R':['RAY','raydium'],orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE:['ORCA','orca'],
+ DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263:['BONK','bonk'],EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm:['WIF','dogwifcoin']};
 const priceCache={},fxPC={};
 async function cgHist(id,d){const s=`${String(d.getUTCDate()).padStart(2,'0')}-${String(d.getUTCMonth()+1).padStart(2,'0')}-${d.getUTCFullYear()}`,k=id+s;
  if(priceCache[k]!=null)return priceCache[k];
@@ -112,18 +136,43 @@ async function fxPrice(id,date){const t=date.getTime();
  try{if(FX_BIN[id]){const p=await fxKl(FX_BIN[id],t);if(p)return p}
   if(['usd-coin','tether','dai'].includes(id)){const p=await fxKl('EURUSDT',t);if(p)return 1/p}}catch(e){}
  return cgHist(id,date)}
+
+/* Valora los movimientos. Pares (swaps/pools): el lado sin precio (ej. recibo LP) toma el valor del otro lado. */
 async function fxFill(txs){
  const todo=txs.filter(t=>t.eurValue==null&&t.coingeckoId);
  for(let i=0;i<todo.length;i+=8)await Promise.all(todo.slice(i,i+8).map(async t=>{t.eurValue=(await fxPrice(t.coingeckoId,t.date))*t.amount}));
  const P={};txs.filter(t=>t.pair).forEach(t=>(P[t.pair]=P[t.pair]||[]).push(t));
- Object.values(P).forEach(g=>{const v=g.find(t=>t.direction==='out'&&t.eurValue>0)||g.find(t=>t.eurValue>0);if(v)g.forEach(t=>t.eurValue=v.eurValue)});
- txs.forEach(t=>{if(t.eurValue==null||isNaN(t.eurValue))t.eurValue=0})}
+ Object.values(P).forEach(g=>{
+  const O=g.filter(t=>t.direction==='out'),I=g.filter(t=>t.direction==='in'),sum=a=>a.reduce((s,t)=>s+(t.eurValue||0),0),kn=a=>a.filter(t=>t.coingeckoId);
+  if(O.length===1&&I.length===1&&O[0].coingeckoId&&I[0].coingeckoId){const v=O[0].eurValue>0?O[0].eurValue:I[0].eurValue;O[0].eurValue=I[0].eurValue=v;return}
+  const fill=(A,V)=>{const u=A.filter(t=>!t.coingeckoId&&!(t.eurValue>0));u.forEach(t=>t.eurValue=Math.max(V-sum(kn(A)),0)/u.length)};
+  fill(I,sum(kn(O)));fill(O,sum(kn(I)))});
+ txs.forEach(t=>{if(t.eurValue==null||isNaN(t.eurValue))t.eurValue=0});
+ linkTransfers(txs)}
+
+/* ---------- Enlace automático de traspasos (Kraken ↔ wallets propias) ---------- */
+const FEE={BTC:3e-4,ETH:3e-3,SOL:.01},WIN=4*864e5;
+let LM={},LAST={pairs:[],pool:[],used:new Set(),cset:new Set()};
+const isK=t=>t.w&&t.w.network==='kraken';
+const cand=t=>{const n=t.note||'';if(n==='Kraken deposit'||n==='Kraken withdrawal')return true;return !isK(t)&&!t.category&&!n&&!fxOv()[fxKey(t)]};
+const sameTransfer=(o,i)=>{if(o.direction!=='out'||i.direction!=='in'||o.asset!==i.asset||o.w===i.w||Math.abs(o.date-i.date)>WIN)return false;
+ const d=o.amount-i.amount,f=Math.max(o.amount*.02,FEE[o.asset]||0);return d>=-o.amount*1e-3&&d<=f};
+function linkTransfers(txs){
+ LM={};const pool=txs.slice();
+ if(!pool.some(isK))Object.values(wallets).filter(w=>w.network==='kraken').forEach(w=>buildKrakenTxs(w.ledgerRows||[]).forEach(t=>{t.w=w;pool.push(t)}));
+ const c=pool.filter(cand).sort((a,b)=>a.date-b.date),used=new Set(),pairs=[];
+ c.filter(t=>t.direction==='out').forEach(o=>{let b=null;
+  c.forEach(i=>{if(used.has(i)||!sameTransfer(o,i))return;if(!b||Math.abs(i.date-o.date)<Math.abs(b.date-o.date))b=i});
+  if(!b)return;used.add(o);used.add(b);pairs.push({o,i:b});LM[fxKey(o)]=1;LM[fxKey(b)]=1;
+  o.note=(o.note||'')+' · 🔗 → '+wn(b.w);b.note=(b.note||'')+' · 🔗 ← '+wn(o.w)});
+ LAST={pairs,pool:c,used,cset:new Set(c)}}
 
 /* ---------- Claves públicas ---------- */
 const kindTag=w=>({kraken:' <span class="dim">(Kraken)</span>',aave:' <span class="dim">(Aave)</span>',externa:' <span class="dim">(externa)</span>'})[w.kind]||'';
 function renderWalletsList(){const ids=Object.keys(wallets);
  $('wallets-list').innerHTML=ids.length?ids.map(id=>{const w=wallets[id],m=NET[w.network],s=w.network==='kraken'?`${(w.ledgerRows||[]).length} movimientos${(w.addresses||[]).length?' · '+w.addresses.length+' dir.':''}`:w.address.slice(0,6)+'…'+w.address.slice(-4);
-  return `<div class="row" style="cursor:default"><div class="fx" style="cursor:pointer" onclick="openWalletTx('${id}')"><span style="color:${m.color};font-size:1.2rem">●</span><div><b>${w.alias||m.label}${kindTag(w)}</b><div class="dim">${m.label} · ${s}</div></div></div><div class="fx"><a class="lk" href="#" onclick="openWalletTx('${id}');return false">Ver</a><a class="lk" href="#" onclick="openEditWallet('${id}');return false">Editar</a><a class="lk" href="#" onclick="deleteWallet('${id}');return false">✕</a></div></div>`}).join(''):'<p class="dim">Aún no has añadido ninguna clave pública.</p>'}
+  return `<div class="row" style="cursor:default"><div class="fx" style="cursor:pointer" onclick="openWalletTx('${id}')"><span style="color:${m.color};font-size:1.2rem">●</span><div><b>${w.alias||m.label}${kindTag(w)}</b><div class="dim">${m.label} · ${s}</div></div></div><div class="fx"><a class="lk" href="#" onclick="openWalletTx('${id}');return false">Ver</a><a class="lk" href="#" onclick="openEditWallet('${id}');return false">Editar</a><a class="lk" href="#" onclick="deleteWallet('${id}');return false">✕</a></div></div>`}).join(''):'<p class="dim">Aún no has añadido ninguna clave pública.</p>';
+ refreshDefiSelect()}
 function openAddWalletModal(){editingWalletId=null;$('wallet-modal-title').textContent='Añadir clave pública';$('wallet-network').disabled=false;$('wallet-network').value='btc';['wallet-address','wallet-alias','etherscan-key-input','helius-key-input','kraken-addr-input'].forEach(i=>$(i).value='');$('wallet-kind').value='mia';show('m-wallet');onWalletNetworkChange()}
 function openEditWallet(id){const w=wallets[id];editingWalletId=id;$('wallet-modal-title').textContent='Editar clave pública';$('wallet-network').value=w.network;$('wallet-network').disabled=true;$('wallet-address').value=w.address||'';$('wallet-alias').value=w.alias||'';$('wallet-kind').value=w.kind||(w.isMine?'mia':'externa');$('kraken-addr-input').value=(w.addresses||[]).join('\n');show('m-wallet');onWalletNetworkChange()}
 function closeAddWalletModal(){hide('m-wallet');editingWalletId=null}
@@ -146,11 +195,12 @@ function openWalletTx(id){currentWalletId=id;const w=wallets[id],m=NET[w.network
  $('tx-date-from').value='2025-01-01';$('tx-date-to').value=new Date().toISOString().slice(0,10);$('tx-list').innerHTML='';['tx-totals','tx-warning'].forEach(i=>$(i).classList.add('hidden'));currentTxList=[];show('m-tx')}
 
 /* ---------- Consulta de redes ---------- */
-async function fetchRawTxsForWallet(w,f,t){
- if(w.network==='btc')return fetchBTCTxs(w.address,f,t);
- if(w.network==='sol'){const k=localStorage.getItem('helius_api_key');if(!k)throw new Error('Falta la API key de Helius');return fetchSOLTxsHelius(w.address,f,t,k)}
- if(w.network==='eth')return fetchETHTxs(w.address,f,t);
- return buildKrakenTxs(w.ledgerRows||[]).filter(x=>x.date>=f&&x.date<=t)}
+async function fetchRawTxsForWallet(w,f,t){let r;
+ if(w.network==='btc')r=await fetchBTCTxs(w.address,f,t);
+ else if(w.network==='sol'){const k=localStorage.getItem('helius_api_key');if(!k)throw new Error('Falta la API key de Helius');r=await fetchSOLTxsHelius(w.address,f,t,k)}
+ else if(w.network==='eth')r=await fetchETHTxs(w.address,f,t);
+ else r=buildKrakenTxs(w.ledgerRows||[]).filter(x=>x.date>=f&&x.date<=t);
+ r.forEach(x=>x.w=w);return r}
 async function fetchBTCTxs(address,from,to){
  let txs=[],last='';
  for(let p=0;p<60;p++){const res=await fetch(`https://blockstream.info/api/address/${address}/txs`+(last?`/chain/${last}`:''));
@@ -176,24 +226,35 @@ async function fetchETHTxs(address,from,to){
   const v=Number(BigInt(tx.value||'0'))/1e18;if(!v)return;const out=(tx.from||'').toLowerCase()===me;
   res.push({date:new Date(t),hash:tx.hash,direction:out?'out':'in',amount:v,asset:'ETH',coingeckoId:'ethereum',counterparties:[out?tx.to:tx.from]})});
  return res}
+
+/* Solana: se calcula el saldo NETO de cada transacción (SOL nativo incl. comisión y rent + tokens).
+   Así wrap/unwrap de SOL, rent y comisiones no generan ventas falsas y los pools quedan agrupados. */
 async function fetchSOLTxsHelius(address,from,to,key){
  let all=[],before;
- for(let p=0;p<40;p++){const res=await fetch(`https://api.helius.xyz/v0/addresses/${address}/transactions?api-key=${key}&limit=100${before?'&before='+before:''}`);
+ for(let p=0;p<60;p++){const res=await fetch(`https://api.helius.xyz/v0/addresses/${address}/transactions?api-key=${key}&limit=100${before?'&before='+before:''}`);
   if(!res.ok)throw new Error('Helius '+res.status);const b=await res.json();if(!b.length)break;all=all.concat(b);before=b[b.length-1].signature;
   if(b[b.length-1].timestamp*1000<from.getTime())break}
- const res=[];
- all.filter(x=>x.timestamp*1000>=from.getTime()&&x.timestamp*1000<=to.getTime()&&!x.transactionError).forEach(tx=>{
-  const date=new Date(tx.timestamp*1000),orca=(tx.source||'').toUpperCase()==='ORCA',tt=tx.tokenTransfers||[],nt=tx.nativeTransfers||[];
-  const L=(t,n)=>{if(n)return{amount:t.amount/1e9,asset:'SOL',id:'solana'};const k=FX_MINT[t.mint];return{amount:t.tokenAmount,asset:k?k[0]:(t.mint?t.mint.slice(0,4):'?'),id:k?k[1]:null}};
-  const mine=(t,d)=>(d==='out'?t.fromUserAccount:t.toUserAccount)===address;
-  const push=(l,d,x)=>res.push({date,hash:tx.signature,direction:d,amount:l.amount,asset:l.asset,coingeckoId:l.id,...x});
-  if(tx.type==='SWAP'){
-   const pick=d=>{const a=tt.filter(t=>mine(t,d)).map(t=>L(t,0)),b=nt.filter(t=>mine(t,d)&&t.amount>=3e6).sort((x,y)=>y.amount-x.amount).map(t=>L(t,1));return a[0]||b[0]};
-   const o=pick('out'),i=pick('in'),note='Swap'+(orca?' (Orca)':'');
-   if(o)push(o,'out',{category:'permuta',note,pair:tx.signature});if(i)push(i,'in',{category:'permuta',note,pair:tx.signature});return}
-  if(orca&&tt.length>=2){tt.forEach(t=>{if(t.fromUserAccount===address||t.toUserAccount===address)push(L(t,0),t.fromUserAccount===address?'out':'in',{category:'permuta',note:'Pool Orca (revisar)'})});return}
-  nt.forEach(t=>{if(t.amount<1000||(t.fromUserAccount!==address&&t.toUserAccount!==address))return;const o=t.fromUserAccount===address;push(L(t,1),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})});
-  tt.forEach(t=>{if(t.fromUserAccount!==address&&t.toUserAccount!==address)return;const o=t.fromUserAccount===address;push(L(t,0),o?'out':'in',{counterparties:[o?t.toUserAccount:t.fromUserAccount]})})});
+ const res=[],seen=new Set();
+ all.filter(x=>x.timestamp*1000>=from.getTime()&&x.timestamp*1000<=to.getTime()&&!x.transactionError&&!seen.has(x.signature)&&seen.add(x.signature)).forEach(tx=>{
+  const date=new Date(tx.timestamp*1000),net={};
+  const add=(asset,id,v,c)=>{const n=net[asset]=net[asset]||{asset,id,v:0,cp:[]};n.v+=v;if(c)n.cp.push(c)};
+  const nt=tx.nativeTransfers||[],me=(tx.accountData||[]).find(a=>a.account===address);
+  let sol=me&&me.nativeBalanceChange!=null?me.nativeBalanceChange:nt.reduce((s,t)=>s+(t.toUserAccount===address?t.amount:0)-(t.fromUserAccount===address?t.amount:0),0);
+  if(tx.feePayer===address)sol+=tx.fee||0;
+  add('SOL','solana',sol/1e9);
+  nt.forEach(t=>{if(t.fromUserAccount===address&&t.toUserAccount!==address)add('SOL','solana',0,t.toUserAccount);if(t.toUserAccount===address&&t.fromUserAccount!==address)add('SOL','solana',0,t.fromUserAccount)});
+  (tx.tokenTransfers||[]).forEach(t=>{if(t.mint===WSOL)return;const o=t.fromUserAccount===address,i=t.toUserAccount===address;if(o===i)return;
+   const k=FX_MINT[t.mint];add(k?k[0]:'LP:'+t.mint.slice(0,6),k?k[1]:null,o?-t.tokenAmount:t.tokenAmount,o?t.toUserAccount:t.fromUserAccount)});
+  let legs=Object.values(net).filter(n=>Math.abs(n.v)>1e-9);
+  if(legs.length>1)legs=legs.filter(n=>!(n.asset==='SOL'&&Math.abs(n.v)<.0105));
+  if(!legs.length)return;
+  const ins=legs.filter(l=>l.v>0),outs=legs.filter(l=>l.v<0),both=ins.length&&outs.length,swap=tx.type==='SWAP',tr=!tx.type||tx.type==='TRANSFER'||tx.type==='UNKNOWN';
+  const src=tx.source&&tx.source!=='SYSTEM_PROGRAM'?' · '+tx.source:'';
+  let category,note,pair;
+  if(both){category='permuta';pair=tx.signature;note=swap?'Swap'+src:'Pool/DeFi (revisar)'+src}
+  else if(!tr&&ins.length){category='recompensa';note='Cobro DeFi (revisar)'+src}
+  else if(!tr&&outs.length){category='venta';note='Aportación DeFi sin recibo (revisar)'+src}
+  legs.forEach(l=>res.push({date,hash:tx.signature,direction:l.v>0?'in':'out',amount:Math.abs(l.v),asset:l.asset,coingeckoId:l.id,counterparties:l.cp,category,note,pair}))});
  return res}
 
 /* ---------- Kraken ---------- */
@@ -240,79 +301,128 @@ function importKraken(f){
   alert(`Kraken: ${r.added} movimientos nuevos importados.`)}catch(err){alert('No se pudo leer el CSV: '+err.message)}};
  rd.readAsText(f)}
 
-/* ---------- Categorías y extracto por wallet ---------- */
+/* ---------- Categorías ---------- */
 const fxOv=()=>load('tx_cat_overrides_v1',{});
 const fxKey=t=>`${t.hash}|${t.asset}|${t.direction}|${(+t.amount).toFixed(6)}`;
 const ownAddrs=()=>{const s=new Map();Object.values(wallets).forEach(w=>{if(w.kind==='externa')return;const n=w.alias||NET[w.network].label;if(w.address)s.set(w.address.toLowerCase(),n);(w.addresses||[]).forEach(a=>s.set(a.toLowerCase(),n))});return s};
 const fxOwnName=t=>{const s=ownAddrs(),c=(t.counterparties||[]).find(a=>a&&s.has(a.toLowerCase()));return c?' · '+(t.direction==='in'?'de ':'a ')+s.get(c.toLowerCase()):''};
 function suggestCategory(t){
- const ov=fxOv()[fxKey(t)];if(ov)return ov;if(t.category)return t.category;
+ const ov=fxOv()[fxKey(t)];if(ov)return ov;if(LM[fxKey(t)])return'interna';if(t.category)return t.category;
  const s=ownAddrs();if((t.counterparties||[]).some(a=>a&&s.has(a.toLowerCase())))return'interna';
  return t.direction==='in'?'compra':'venta'}
+const catOpts=c=>CATS.map(k=>`<option value="${k}" ${c===k?'selected':''}>${k[0].toUpperCase()+k.slice(1)}</option>`).join('');
+
+/* ---------- Extracto por wallet ---------- */
 async function loadWalletTransactions(){
- const w=wallets[currentWalletId],f=new Date($('tx-date-from').value+'T00:00:00Z'),t=new Date($('tx-date-to').value+'T23:59:59Z'),wn=$('tx-warning');
+ const w=wallets[currentWalletId],f=new Date($('tx-date-from').value+'T00:00:00Z'),t=new Date($('tx-date-to').value+'T23:59:59Z'),wr=$('tx-warning');
  $('tx-loading').classList.remove('hidden');$('tx-list').innerHTML='';['tx-totals','tx-warning'].forEach(i=>$(i).classList.add('hidden'));
  try{let raw=[];
-  try{raw=await fetchRawTxsForWallet(w,f,t)}catch(e){wn.textContent='No se pudo consultar esta wallet: '+(e.message||'error')+'. Revisa la API key (ETH: Etherscan, SOL: Helius) y vuelve a intentarlo.';wn.classList.remove('hidden')}
+  try{raw=await fetchRawTxsForWallet(w,f,t)}catch(e){wr.textContent='No se pudo consultar esta wallet: '+(e.message||'error')+'. Revisa la API key (ETH: Etherscan, SOL: Helius) y vuelve a intentarlo.';wr.classList.remove('hidden')}
   await fxFill(raw);raw.forEach(x=>x.category=suggestCategory(x));raw.sort((a,b)=>b.date-a.date);currentTxList=raw;renderTxList();computeTotals()}
  finally{$('tx-loading').classList.add('hidden')}}
 function renderTxList(){const c=$('tx-list');
  if(!currentTxList.length){c.innerHTML='<p class="dim" style="text-align:center">Sin movimientos en ese rango.</p>';return}
- c.innerHTML=currentTxList.map((t,i)=>`<div class="row" style="cursor:default"><div><div class="dim">${t.date.toLocaleDateString('es-ES')}${t.note?' · '+t.note:''}${fxOwnName(t)}</div><b>${t.direction==='in'?'↓':'↑'} ${t.amount.toFixed(6)} ${t.asset}</b><div class="dim">${fmt(t.eurValue)}</div></div><select class="cat-select" onchange="changeTxCategory(${i},this.value)">${['compra','venta','permuta','interna'].map(k=>`<option value="${k}" ${t.category===k?'selected':''}>${k[0].toUpperCase()+k.slice(1)}</option>`).join('')}</select></div>`).join('');
+ c.innerHTML=currentTxList.map((t,i)=>`<div class="row" style="cursor:default"><div><div class="dim">${dt(t)}${t.note?' · '+t.note:''}${fxOwnName(t)}</div><b>${t.direction==='in'?'↓':'↑'} ${qy(t)}</b><div class="dim">${fmt(t.eurValue)}</div></div><select class="cat-select" onchange="changeTxCategory(${i},this.value)">${catOpts(t.category)}</select></div>`).join('');
  $('tx-totals').classList.remove('hidden')}
-function changeTxCategory(i,v){const t=currentTxList[i];t.category=v;const o=fxOv();o[fxKey(t)]=v;save('tx_cat_overrides_v1',o);computeTotals()}
-function computeTotals(){const o={compra:0,venta:0,permuta:0,interna:0};currentTxList.forEach(t=>o[t.category]+=t.eurValue);
+function setCat(t,v){t.category=v;const o=fxOv();o[fxKey(t)]=v;save('tx_cat_overrides_v1',o)}
+function changeTxCategory(i,v){setCat(currentTxList[i],v);computeTotals()}
+function computeTotals(){const o=totalsOf(currentTxList);
  Object.keys(o).forEach(k=>$('tot-'+k).textContent=fmt(o[k]));$('tot-fiscal').textContent=fmt(o.venta+o.permuta)}
 function exportWalletPDF(){
  if(!currentTxList.length){alert('Pulsa "Buscar transacciones" primero.');return}
- const w=wallets[currentWalletId],m=NET[w.network],{jsPDF}=window.jspdf,d=new jsPDF(),L={compra:'Compra',venta:'Venta',permuta:'Permuta',interna:'Transf. interna'},fr=$('tx-date-from').value,to=$('tx-date-to').value,X=[14,44,74,114,144];
+ const w=wallets[currentWalletId],m=NET[w.network],{jsPDF}=window.jspdf,d=new jsPDF(),L={compra:'Compra',venta:'Venta',permuta:'Permuta',interna:'Transf. interna',recompensa:'Recompensa'},fr=$('tx-date-from').value,to=$('tx-date-to').value,X=[14,44,74,114,144];
  d.setFontSize(16);d.text('Extracto de transacciones cripto',14,18);d.setFontSize(10);d.text(`Clave publica: ${w.alias?w.alias+' - ':''}${w.address}`,14,26);d.text(`Red: ${m.label} Periodo: ${fr} a ${to}`,14,32);
  let y=44;d.setFontSize(9);['Fecha','Tipo','Cantidad','Valor EUR','Hash (linea inferior)'].forEach((h,i)=>d.text(h,X[i],y));y+=4;d.line(14,y,196,y);y+=5;
- const o={compra:0,venta:0,permuta:0,interna:0};
- currentTxList.forEach(t=>{if(y>270){d.addPage();y=20}o[t.category]+=t.eurValue;d.setFontSize(9);[t.date.toLocaleDateString('es-ES'),L[t.category],`${t.amount.toFixed(6)} ${t.asset}`,fmt(t.eurValue)].forEach((s,i)=>d.text(String(s),X[i],y));d.setFontSize(6.5);d.text(String(t.hash||'').slice(0,90),14,y+4);y+=10});
+ currentTxList.forEach(t=>{if(y>270){d.addPage();y=20}d.setFontSize(9);[dt(t),L[t.category],qy(t),fmt(t.eurValue)].forEach((s,i)=>d.text(String(s),X[i],y));d.setFontSize(6.5);d.text(String(t.hash||'').slice(0,90),14,y+4);y+=10});
+ const o=totalsOf(currentTxList);
  y+=6;if(y>250){d.addPage();y=20}d.line(14,y,196,y);y+=8;d.setFontSize(10);
- [['Compras',o.compra],['Ventas',o.venta],['Permutas',o.permuta],['Transferencias internas (excluidas)',o.interna]].forEach(([k,v])=>{d.text(`${k}: ${fmt(v)}`,14,y);y+=6});
+ [['Compras',o.compra],['Ventas',o.venta],['Permutas (valor entregado)',o.permuta],['Recompensas',o.recompensa],['Transferencias internas (excluidas)',o.interna]].forEach(([k,v])=>{d.text(`${k}: ${fmt(v)}`,14,y);y+=6});
  d.setFontSize(12);d.text(`TOTAL A FISCALIZAR (ventas + permutas): ${fmt(o.venta+o.permuta)}`,14,y);d.save(`extracto_${w.network}_${(w.address||'kraken').slice(0,8)}_${fr}_a_${to}.pdf`)}
 
-/* ---------- Panel fiscal (FIFO) ---------- */
-let fiscalRows=[],fiscalSum=null,fiscalYear=null;
+/* ---------- Bloque Phantom / DeFi ---------- */
+let defiGroups=[];
+function refreshDefiSelect(){const s=$('defi-wallet'),ids=Object.keys(wallets).filter(i=>wallets[i].network==='sol'),cur=s.value;
+ s.innerHTML=ids.length?ids.map(i=>`<option value="${i}">${wallets[i].alias||'Solana'} · ${wallets[i].address.slice(0,6)}…${wallets[i].address.slice(-4)}</option>`).join(''):'<option value="">Añade antes tu clave de Solana (Phantom)</option>';
+ if(ids.includes(cur))s.value=cur}
+async function loadDefi(){
+ const w=wallets[$('defi-wallet').value],wr=$('defi-warn');if(!w){alert('Añade antes tu clave pública de Phantom (red Solana).');return}
+ const f=new Date($('defi-from').value+'T00:00:00Z'),t=new Date($('defi-to').value+'T23:59:59Z');
+ $('defi-loading').classList.remove('hidden');['defi-warn','defi-tot'].forEach(i=>$(i).classList.add('hidden'));$('defi-list').innerHTML='';
+ try{let raw=[];
+  try{raw=await fetchRawTxsForWallet(w,f,t)}catch(e){wr.textContent='No se pudo consultar Solana: '+(e.message||'error')+'. Revisa la API key de Helius.';wr.classList.remove('hidden')}
+  await fxFill(raw);raw.forEach(x=>x.category=suggestCategory(x));raw.sort((a,b)=>b.date-a.date);
+  const G=new Map();raw.forEach(x=>{if(!G.has(x.hash))G.set(x.hash,[]);G.get(x.hash).push(x)});defiGroups=[...G.values()];renderDefi()}
+ finally{$('defi-loading').classList.add('hidden')}}
+function renderDefi(){
+ const l=$('defi-list'),all=defiGroups.flat();
+ if(!defiGroups.length){l.innerHTML='<p class="dim" style="text-align:center">Sin movimientos en ese rango.</p>';$('defi-tot').classList.add('hidden');return}
+ l.innerHTML=defiGroups.map((g,i)=>`<div class="row" style="cursor:default;align-items:flex-start"><div><div class="dim">${dt(g[0])} · ${g[0].note||'Transferencia'}${fxOwnName(g[0])}</div>${g.map(t=>`<div><b>${t.direction==='in'?'↓':'↑'} ${qy(t)}</b> <span class="dim">${fmt(t.eurValue)}${t.eurValue?'':' ⚠ sin precio'}</span></div>`).join('')}</div><select class="cat-select" onchange="changeDefiCat(${i},this.value)">${catOpts(g[0].category)}</select></div>`).join('');
+ const o=totalsOf(all),rev=defiGroups.filter(g=>(g[0].note||'').includes('revisar')).length,np=all.filter(t=>!t.eurValue&&t.category!=='interna').length;
+ const sr=(a,v)=>`<div class="sr"><span class="dim">${a}</span><b>${v}</b></div>`;
+ $('defi-tot').innerHTML=sr('Operaciones',defiGroups.length)+sr('Permutas / swaps (valor)',fmt(o.permuta))+sr('Ventas',fmt(o.venta))+sr('Compras',fmt(o.compra))+sr('Recompensas',fmt(o.recompensa))+sr('Traspasos internos (excluidos)',fmt(o.interna))+sr('Por revisar',rev)+sr('Movimientos sin precio',np);
+ $('defi-tot').classList.remove('hidden')}
+function changeDefiCat(i,v){defiGroups[i].forEach(t=>setCat(t,v));renderDefi()}
+
+/* ---------- Panel fiscal (FIFO global) ---------- */
+let fiscalRows=[],fiscalSum=null,fiscalYear=null,fiscalInc=[],REP=null;
 async function runFiscalPanel(){
- const y=+$('fiscal-year').value,wn=$('fiscal-warning'),errs=[];let all=[];
- $('fiscal-loading').classList.remove('hidden');['fiscal-summary','fiscal-warning'].forEach(i=>$(i).classList.add('hidden'));$('fiscal-table').innerHTML='';
+ const y=+$('fiscal-year').value,wr=$('fiscal-warning'),errs=[];let all=[];
+ $('fiscal-loading').classList.remove('hidden');['fiscal-summary','fiscal-warning','fiscal-links'].forEach(i=>$(i).classList.add('hidden'));$('fiscal-table').innerHTML='';
  try{
   for(const id of Object.keys(wallets)){const w=wallets[id];
-   try{const r=await fetchRawTxsForWallet(w,new Date('2015-01-01T00:00:00Z'),new Date(Date.UTC(y,11,31,23,59,59)));r.forEach(x=>x.w=w);all=all.concat(r)}
-   catch(e){errs.push((w.alias||NET[w.network].label)+': '+(e.message||'error'))}}
+   try{all=all.concat(await fetchRawTxsForWallet(w,new Date('2015-01-01T00:00:00Z'),new Date(Date.UTC(y,11,31,23,59,59))))}
+   catch(e){errs.push(wn(w)+': '+(e.message||'error'))}}
   await fxFill(all);all.forEach(x=>x.category=suggestCategory(x));all.sort((a,b)=>a.date-b.date);
-  const lots={},rows=[],S={gan:0,per:0,venta:0,permuta:0,interna:0};let missing=false;
+  const lots={},rows=[],inc=[],S={gan:0,per:0,rend:0,venta:0,permuta:0,interna:0,byW:{}};let missing=false;
   all.forEach(x=>{const inY=x.date.getUTCFullYear()===y;
    if(x.category==='interna'){if(inY)S.interna+=x.eurValue;return}
    const L=lots[x.asset]=lots[x.asset]||[];
-   if(x.direction==='in'){L.push({q:x.amount,c:x.eurValue});return}
+   if(x.direction==='in'){L.push({q:x.amount,c:x.eurValue});if(x.category==='recompensa'&&inY){S.rend+=x.eurValue;inc.push({date:x.date,asset:x.asset,qty:x.amount,v:x.eurValue,w:wn(x.w)})}return}
    let q=x.amount,cost=0;
    while(q>1e-12&&L.length){const l=L[0],u=Math.min(q,l.q),part=l.c*u/l.q;cost+=part;l.c-=part;l.q-=u;q-=u;if(l.q<=1e-12)L.shift()}
    if(q>1e-9)missing=true;
    if(!inY)return;
-   const g=x.eurValue-cost;if(g>=0)S.gan+=g;else S.per+=g;
+   const g=x.eurValue-cost;if(g>=0)S.gan+=g;else S.per+=g;S.byW[wn(x.w)]=(S.byW[wn(x.w)]||0)+g;
    if(x.category==='permuta')S.permuta+=x.eurValue;else S.venta+=x.eurValue;
-   rows.push({date:x.date,asset:x.asset,qty:x.amount,proceeds:x.eurValue,cost,gain:g,cat:x.category})});
-  fiscalRows=rows;fiscalSum=S;fiscalYear=y;
-  $('fis-ganancias').textContent=fmt(S.gan);$('fis-perdidas').textContent=fmt(S.per);$('fis-neto').textContent=fmt(S.gan+S.per);
+   rows.push({date:x.date,asset:x.asset,qty:x.amount,proceeds:x.eurValue,cost,gain:g,cat:x.category,w:wn(x.w),hash:x.hash})});
+  fiscalRows=rows;fiscalSum=S;fiscalYear=y;fiscalInc=inc;
+  $('fis-ganancias').textContent=fmt(S.gan);$('fis-perdidas').textContent=fmt(S.per);$('fis-neto').textContent=fmt(S.gan+S.per);$('fis-rend').textContent=fmt(S.rend);
   $('fis-vol-venta').textContent=fmt(S.venta);$('fis-vol-permuta').textContent=fmt(S.permuta);$('fis-vol-interna').textContent=fmt(S.interna);
+  $('fis-bywallet').innerHTML=Object.entries(S.byW).map(([k,v])=>`<div class="sr"><span class="dim">Resultado · ${k}</span><span class="${v>=0?'up':'dn'}">${fmt(v)}</span></div>`).join('');
   $('fiscal-summary').classList.remove('hidden');
-  $('fiscal-table').innerHTML=rows.length?rows.map(r=>`<div class="row" style="cursor:default"><div><div class="dim">${r.date.toLocaleDateString('es-ES')} · ${r.cat}</div><b>${r.qty.toFixed(6)} ${r.asset}</b><div class="dim">Venta ${fmt(r.proceeds)} · Coste ${fmt(r.cost)}</div></div><b class="${r.gain>=0?'up':'dn'}">${r.gain>=0?'+':''}${fmt(r.gain)}</b></div>`).join(''):'<p class="dim" style="text-align:center">Sin ventas ni permutas en ese año.</p>';
+  $('fiscal-table').innerHTML=rows.length?rows.map(r=>`<div class="row" style="cursor:default"><div><div class="dim">${dt(r)} · ${r.cat} · ${r.w}</div><b>${qy({amount:r.qty,asset:r.asset})}</b><div class="dim">Venta ${fmt(r.proceeds)} · Coste ${fmt(r.cost)}</div></div><b class="${r.gain>=0?'up':'dn'}">${r.gain>=0?'+':''}${fmt(r.gain)}</b></div>`).join(''):'<p class="dim" style="text-align:center">Sin ventas ni permutas en ese año.</p>';
+  /* trazabilidad */
+  const Y=t=>t.date.getUTCFullYear()===y,P=LAST.pairs.filter(p=>Y(p.o)),
+   U=LAST.pool.filter(t=>isK(t)&&!LAST.used.has(t)&&Y(t)),
+   R=all.filter(t=>Y(t)&&!isK(t)&&t.category!=='interna'&&((t.note||'').includes('revisar')||(LAST.cset.has(t)&&!LAST.used.has(t)&&['compra','venta'].includes(t.category)))),
+   NP=all.filter(t=>Y(t)&&!t.eurValue&&t.category!=='interna');
+  REP={y,P,U,R,NP};
+  const sr=(a,v,c)=>`<div class="sr"><span class="dim">${a}</span><b class="${c}">${v}</b></div>`,bx=$('fiscal-links');
+  bx.innerHTML=`<div class="k" style="margin-bottom:.5rem">Trazabilidad ${y}</div>`+sr('Traspasos enlazados (no tributan)',P.length,'up')+sr('Kraken sin wallet que coincida',U.length,U.length?'dn':'up')+sr('Movimientos por revisar',R.length,R.length?'dn':'up')+sr('Movimientos sin precio',NP.length,NP.length?'dn':'up')+
+   (P.length?`<div style="margin:.6rem 0">${P.map(p=>`<div class="dim">🔗 ${dt(p.o)} · ${qy(p.o)} · ${wn(p.o.w)} → ${wn(p.i.w)}</div>`).join('')}</div>`:'')+
+   (U.length?`<div class="warn">Kraken sin pareja (tratados como traspaso, no tributan). Si el destino era de otra persona es una venta: añade esa clave pública o cambia la categoría.<br>${U.map(t=>`${dt(t)} · ${t.direction==='in'?'depósito':'retiro'} ${qy(t)}`).join('<br>')}</div>`:'')+
+   (R.length?`<div class="warn">Movimientos que no encajan con ninguna cuenta tuya o son operaciones DeFi dudosas. Revisa su categoría:<br>${R.map(t=>`${dt(t)} · ${wn(t.w)} · ${t.direction==='in'?'entrada':'salida'} ${qy(t)} → ${t.category}`).join('<br>')}</div>`:'')+
+   (NP.length?`<div class="warn">Sin precio histórico (valorados a 0 €): ${NP.map(t=>`${dt(t)} ${qy(t)}`).join(' | ')}</div>`:'');
+  bx.classList.remove('hidden');
   const msg=[];if(errs.length)msg.push('Errores: '+errs.join(' | '));if(missing)msg.push('Faltan compras previas para algunas ventas (coste 0). Revisa que estén todas tus wallets y el CSV de Kraken.');
-  if(msg.length){wn.textContent=msg.join(' ');wn.classList.remove('hidden')}
+  if(msg.length){wr.textContent=msg.join(' ');wr.classList.remove('hidden')}
  }finally{$('fiscal-loading').classList.add('hidden')}}
 function exportFiscalPDF(){
  if(!fiscalSum){alert('Pulsa "Calcular año" primero.');return}
- const{jsPDF}=window.jspdf,d=new jsPDF(),S=fiscalSum,X=[14,38,60,104,132,162];let y=18;
- d.setFontSize(16);d.text(`Informe fiscal cripto ${fiscalYear} (FIFO)`,14,y);y+=10;d.setFontSize(10);
- [['Ganancias patrimoniales',S.gan],['Perdidas patrimoniales',S.per],['NETO (Modelo 100)',S.gan+S.per],['Volumen ventas',S.venta],['Volumen permutas',S.permuta],['Transferencias internas (excluidas)',S.interna]].forEach(([k,v])=>{d.text(`${k}: ${fmt(v)}`,14,y);y+=6});
- y+=4;d.line(14,y,196,y);y+=6;d.setFontSize(9);
- ['Fecha','Tipo','Cantidad','Venta','Coste','Ganancia'].forEach((h,i)=>d.text(h,X[i],y));y+=6;
- fiscalRows.forEach(r=>{if(y>280){d.addPage();y=20}
-  [r.date.toLocaleDateString('es-ES'),r.cat,`${r.qty.toFixed(6)} ${r.asset}`,fmt(r.proceeds),fmt(r.cost),fmt(r.gain)].forEach((s,i)=>d.text(String(s),X[i],y));y+=6});
+ const{jsPDF}=window.jspdf,d=new jsPDF(),S=fiscalSum,X=[14,34,54,94,124,152,178];let y=18;
+ const ln=(s,z=10,g=6)=>{if(y>282){d.addPage();y=20}d.setFontSize(z);d.text(String(s),14,y);y+=g};
+ ln(`Informe fiscal cripto ${fiscalYear} (FIFO)`,16,10);
+ [['Ganancias patrimoniales',S.gan],['Perdidas patrimoniales',S.per],['NETO (Modelo 100)',S.gan+S.per],['Rendimientos (comisiones/rewards)',S.rend],['Volumen ventas',S.venta],['Volumen permutas',S.permuta],['Transferencias internas (excluidas)',S.interna]].forEach(([k,v])=>ln(`${k}: ${fmt(v)}`));
+ Object.entries(S.byW).forEach(([k,v])=>ln(`Resultado ${k}: ${fmt(v)}`,9));
+ y+=4;ln('Operaciones (venta / permuta)',12,7);
+ d.setFontSize(8);['Fecha','Tipo','Origen','Cantidad','Venta','Coste','Ganancia'].forEach((h,i)=>d.text(h,X[i],y));y+=5;
+ fiscalRows.forEach(r=>{if(y>280){d.addPage();y=20}d.setFontSize(7.5);[dt(r),r.cat,r.w.slice(0,16),qy({amount:r.qty,asset:r.asset}),fmt(r.proceeds),fmt(r.cost),fmt(r.gain)].forEach((s,i)=>d.text(String(s),X[i],y));y+=5});
+ if(fiscalInc.length){y+=4;ln('Rendimientos / recompensas',12,7);fiscalInc.forEach(r=>ln(`${dt(r)} ${r.w} ${qy({amount:r.qty,asset:r.asset})} ${fmt(r.v)}`,8,5))}
+ if(REP){y+=4;ln('Traspasos enlazados (no tributan)',12,7);
+  REP.P.forEach(p=>{ln(`${dt(p.o)} ${qy(p.o)} ${wn(p.o.w)} -> ${wn(p.i.w)} (recibido ${qy(p.i)}, ${dt(p.i)})`,8,4.5);ln(`  origen: ${String(p.o.hash||'').slice(0,80)}`,6,4);ln(`  destino: ${String(p.i.hash||'').slice(0,80)}`,6,5)});
+  y+=3;ln('Kraken sin pareja',12,7);REP.U.forEach(t=>ln(`${dt(t)} ${t.direction==='in'?'deposito':'retiro'} ${qy(t)}`,8,5));
+  y+=3;ln('Por revisar',12,7);REP.R.forEach(t=>ln(`${dt(t)} ${wn(t.w)} ${t.direction==='in'?'entrada':'salida'} ${qy(t)} -> ${t.category}`,8,5));
+  y+=3;ln('Sin precio',12,7);REP.NP.forEach(t=>ln(`${dt(t)} ${qy(t)}`,8,5))}
  d.save(`informe_fiscal_${fiscalYear}.pdf`)}
 
 /* ---------- Fondo matrix + init ---------- */
@@ -321,6 +431,7 @@ function exportFiscalPDF(){
  let last=0;(function f(t){if(t-last>70){last=t;x.fillStyle='rgba(9,9,11,.14)';x.fillRect(0,0,W,H);x.font=F+'px "JetBrains Mono",monospace';
   d.forEach((y,i)=>{x.fillStyle=Math.random()<.04?'rgba(255,200,120,.5)':'rgba(247,147,26,.17)';x.fillText('0123456789abcdef'[Math.random()*16|0],i*F,y*F);d[i]=y*F>H&&Math.random()>.975?0:y+1})}
   if(!RM)requestAnimationFrame(f)})(0)})();
-(function init(){const sel=$('fiscal-year'),cy=new Date().getFullYear();for(let y=cy;y>=2025;y--)sel.add(new Option(y,y));renderWalletsList()})();
+(function init(){const sel=$('fiscal-year'),cy=new Date().getFullYear();for(let y=cy;y>=2025;y--)sel.add(new Option(y,y));
+ $('defi-from').value='2025-01-01';$('defi-to').value=new Date().toISOString().slice(0,10);renderWalletsList()})();
 </script>
 </body></html>
