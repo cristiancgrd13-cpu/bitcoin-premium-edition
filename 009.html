@@ -203,7 +203,7 @@ body::before{display:none}
 <section class="c all hero tint" style="--tc:247,147,26">
   <div class="k">Valor total</div>
   <div class="d big"><span id="total-value">0,00</span><i>€</i></div>
-  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">#850.000</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span><span style="white-space:normal">PRÓXIMO HALVING <b id="hv-date">—</b> <b>3,125 → 1,5625 BTC</b> · <b id="hv-blocks" style="font-variant-numeric:tabular-nums">—</b></span><span><b id="hv-cd" style="font-variant-numeric:tabular-nums">—</b></span></div><div id="ath-box"></div>
+  <div class="chain"><span>ÚLTIMO BLOQUE BTC <b id="blk">#850.000</b></span><span><span id="lblmined">BTC MINADOS</span> <b id="mined">—</b></span><span>HALVING <b id="hv-date">—</b> <b>3,12 → 1,56 BTC</b></span><span><b id="hv-cd" style="font-variant-numeric:tabular-nums">—</b> <b id="hv-blocks" style="font-variant-numeric:tabular-nums">—</b></span></div><div id="ath-box"></div>
   <div class="spwrap"><div id="sp-read" class="sp-read"></div><div class="sp-cv"><canvas id="spark"></canvas></div><div class="rng" id="rng"><button data-r="1D">1D</button><button data-r="1S">1S</button><button data-r="1M">1M</button><button data-r="6M">6M</button><button data-r="1A">1A</button><button data-r="TODO">TODO</button></div></div>
 </section>
 
@@ -331,7 +331,7 @@ const qtyL=a=>a.type==='crypto'?`${a.amount} ${a.symbol}`:`${a.amount} ud.`;
 
 function anim(el,t){const s=parseFloat(el.dataset.v||0),t0=performance.now();(function f(n){const p=Math.min((n-t0)/800,1),e=1-Math.pow(1-p,3);el.textContent=(s+(t-s)*e).toLocaleString('es-ES',nf);if(p<1)requestAnimationFrame(f);else el.dataset.v=t})(t0)}
 
-const chg={};
+const chg={};let livePx=false;
 async function binPrices(){
  const M={BTCEUR:'bitcoin',ETHEUR:'ethereum',SOLEUR:'solana'};
  try{
@@ -342,6 +342,7 @@ async function binPrices(){
   if(!res.ok)return false;
   const d=await res.json();
   if(!Array.isArray(d))return false;
+  livePx=true;
   d.forEach(x=>{const id=M[x.symbol];if(id){live[id]=+x.lastPrice;chg[id]=+x.priceChangePercent}});
   return true;
  }catch(e){return false}
@@ -357,7 +358,7 @@ async function prices(){
   const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`, {signal: controller.signal});
   clearTimeout(id);
   if(res.ok){
-   const d=await res.json();
+   const d=await res.json();livePx=true;
    ids.forEach(i=>{if(d[i]){live[i]=d[i].eur;chg[i]=d[i].eur_24h_change}});
   }
  }catch(e){}
@@ -391,7 +392,7 @@ function updatePie(){
 }
 
 const YR=load('portfolio_years_v1',{});
-function trackYear(t,i){if(!(t>0))return;const y=new Date().getFullYear(),k=String(y);
+function trackYear(t,i){if(!(t>0)||!livePx)return;const y=new Date().getFullYear(),k=String(y);
  if(!YR[k]){const p=YR[String(y-1)];YR[k]={s:y<=START.getFullYear()?{v:0,i:0}:(p&&p.last?{v:p.last.v,i:p.last.i}:{v:t,i:i})}}
  YR[k].last={v:t,i:i};save('portfolio_years_v1',YR)}
 
@@ -482,7 +483,7 @@ setInterval(updateLiveDateTime, 1000);
 updateLiveDateTime();
 
 function updateATH(t){
- if(!(t>0))return;
+ if(!(t>0)||!livePx)return;
  const box=$('ath-box');let b=null;
  (fullSer||[]).forEach(p=>{if(!b||p.v>b.v)b={v:p.v,d:p.d}});
  if(!b){box.innerHTML='';return}
@@ -575,7 +576,7 @@ function ledgerSeries(frames,step,t){
  const n=out.length-1;out[n].v=t;out[n].inv=Object.values(assets).reduce((s,a)=>s+a.invested,0);
   return out}
 function updateSpark(t){
- if(!(t>0))return;lastT=t;drawSpark(t);loadDaily().then(()=>drawSpark(t));loadIntra(rng).then(()=>drawSpark(t))}
+ if(!(t>0)||!livePx)return;lastT=t;drawSpark(t);loadDaily().then(()=>drawSpark(lastT));loadIntra(rng).then(()=>drawSpark(lastT))}
 function setRange(r){
  rng=r;localStorage.setItem('portfolio_range_v1',r);sparkIdx=null;
  document.querySelectorAll('#rng button').forEach(b=>b.classList.toggle('on',b.dataset.r===r));
@@ -589,6 +590,7 @@ function showRead(i){
  const g=p.v-p.inv,dt=new Date(p.d);
  el.innerHTML=`<b>${dt.toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})}${sparkStep<864e5?' '+dt.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}):''}</b><span class="rv">${fmt(p.v)}</span><div class="dim">Invertido ${fmt(p.inv)} · <span class="${g>=0?'up':'dn'}">${g>=0?'+':''}${fmt(g)}</span></div>`}
 function drawSpark(t){
+ if(!(t>0)||!livePx)return;
  const full=daily?ledgerSeries(framesFrom(daily),864e5,t):null;fullSer=full||[];
  if(full)updateAnnual(t,inv());   
  const cf=currentFrames(),ser=cf?ledgerSeries(cf.frames,cf.step,t):null;sparkM=ser||[];sparkStep=cf?cf.step:864e5;
@@ -722,7 +724,7 @@ function chainTick(){}
 function halvTick(){
  const d=$('hv-date'),c=$('hv-cd'),hb=$('hv-blocks');if(!d||!c||!hb)return;
  if(!tipOk||!hvTarget){d.textContent='—';c.textContent='';hb.textContent='—';return}
- hb.textContent='faltan '+Math.max(HALV_BLOCK-tip.height,0).toLocaleString('es-ES')+' bloques';
+ hb.textContent='→ '+Math.max(HALV_BLOCK-tip.height,0).toLocaleString('es-ES')+' bloques';
  d.textContent='≈ '+new Date(hvTarget).toLocaleDateString('es-ES',{day:'2-digit',month:'short',year:'numeric'})+' ·';
  let ms=Math.max(hvTarget-Date.now(),0),s=Math.floor(ms/1000),dd=Math.floor(s/86400),hh=Math.floor(s%86400/3600),mm=Math.floor(s%3600/60),ss=s%60;
  c.textContent=`${dd}d ${String(hh).padStart(2,'0')}h ${String(mm).padStart(2,'0')}m ${String(ss).padStart(2,'0')}s`}
