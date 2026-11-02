@@ -464,7 +464,7 @@ function updateAnnual(t,i){
 
  if(!window.Chart)return;
  if(annual){annual.data.labels=years.map(String);annual.data.datasets[0].data=data;annual.data.datasets[0].backgroundColor=bg;annual.options.scales.y.min=-lim;annual.options.scales.y.max=lim;annual.options.scales.y.ticks.stepSize=lim/2;annual.update('none');setTimeout(alignYearButtons,30)}
- else{annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.5,categoryPercentage:.6}]},options:{maintainAspectRatio:false,events:[],plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
+ else{annual=new Chart($('annual'),{type:'bar',data:{labels:years.map(String),datasets:[{data,backgroundColor:bg,borderRadius:10,barPercentage:.5,categoryPercentage:.6}]},options:{maintainAspectRatio:false,animation:false,events:[],plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{display:false},y:{min:-lim,max:lim,ticks:{stepSize:lim/2,callback:v=>(v>0?'+':'')+v+'%'},grid:{color:c=>c.tick.value===0?'#8a8a93':'rgba(255,255,255,.06)'}}}}});
   setTimeout(alignYearButtons,100)}
 }
 
