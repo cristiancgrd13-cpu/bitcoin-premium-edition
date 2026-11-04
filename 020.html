@@ -63,6 +63,14 @@ th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);white-
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:#eeeef5;color:#000;padding:11px 16px;border-radius:12px;font-size:14px;font-weight:700;max-width:92vw;z-index:60}.toast[hidden]{display:none}
 .foot{font-size:12px;color:var(--dim);padding:0 4px}
 button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid rgb(var(--tc,124,92,255));outline-offset:2px}
+@media(min-width:820px){.ctr{grid-column:2 / span 4}}
+.pb label.l{display:block;font-size:12px;color:var(--dim);margin:12px 0 5px}
+.chips.w{flex-wrap:wrap}.chip.on{background:rgb(var(--tc));color:#000;border-color:rgb(var(--tc))}
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:12px 0 6px;font-size:13px;flex-wrap:wrap}
+.hrow select{width:auto;font-size:13px;padding:6px 8px}
+.tg{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;white-space:nowrap;margin:0}.tg input{width:auto;accent-color:rgb(var(--tc))}
+.sum{font-size:13px;line-height:1.7;margin:10px 0 12px}
+.bad{color:var(--dn)}
 </style>
 </head>
 <body>
@@ -75,16 +83,13 @@ button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{ou
 <div class="pills"><span style="--c:#14f195">Solana</span><span style="--c:#f3ba2f">BNB Chain</span><span style="--c:#8c9eff">Ethereum</span></div>
 </header>
 
-<section class="b s4" id="swap" style="--tc:124,92,255"></section>
-<section class="b s2" id="mkt" style="--tc:45,212,191"></section>
+<section class="b ctr" id="swap" style="--tc:124,92,255"></section>
 
-<div class="all dim" id="pools" style="padding:10px 2px 0"><b style="color:#fff;font-size:20px;letter-spacing:-.02em">Pools de liquidez</b><br>Acceso directo a los protocolos de cada red. APR y TVL son de demostración.</div>
-<section class="b s2 ptile" style="--tc:199,242,132"><div class="k">Solana <small>Jupiter</small></div><h3>Jupiter</h3><div class="row"><b>JUP/SOL</b><span class="v up">33,5%</span></div><div class="row"><b>SOL/USDC</b><span class="v up">21,2%</span></div><a class="btn" href="https://jup.ag" target="_blank" rel="noopener">Abrir Jupiter ↗</a></section>
-<section class="b s2 ptile" style="--tc:255,209,102"><div class="k">Solana <small>Orca</small></div><h3>Orca</h3><div class="row"><b>SOL/USDC</b><span class="v up">24,3%</span></div><div class="row"><b>ORCA/SOL</b><span class="v up">29,8%</span></div><a class="btn" href="https://www.orca.so" target="_blank" rel="noopener">Abrir Orca ↗</a></section>
-<section class="b s2 ptile" style="--tc:110,130,240"><div class="k">Solana <small>Raydium</small></div><h3>Raydium</h3><div class="row"><b>SOL/USDC</b><span class="v up">19,8%</span></div><div class="row"><b>RAY/USDC</b><span class="v up">41,2%</span></div><a class="btn" href="https://raydium.io" target="_blank" rel="noopener">Abrir Raydium ↗</a></section>
-<section class="b s2 ptile" style="--tc:31,199,212"><div class="k">BNB Chain <small>PancakeSwap</small></div><h3>PancakeSwap</h3><div class="row"><b>BNB/USDT</b><span class="v up">17,6%</span></div><div class="row"><b>CAKE/BNB</b><span class="v up">38,9%</span></div><a class="btn" href="https://pancakeswap.finance" target="_blank" rel="noopener">Abrir PancakeSwap ↗</a></section>
-<section class="b s2 ptile" style="--tc:255,0,122"><div class="k">Ethereum <small>Uniswap</small></div><h3>Uniswap</h3><div class="row"><b>ETH/USDC</b><span class="v up">12,4%</span></div><div class="row"><b>UNI/ETH</b><span class="v up">21,7%</span></div><a class="btn" href="https://app.uniswap.org" target="_blank" rel="noopener">Abrir Uniswap ↗</a></section>
-<section class="b s2 ptile soon" style="--tc:139,140,153"><div class="k">Próximamente</div><h3>Más por llegar</h3><div class="row"><b>Staking</b><span class="dim">en camino</span></div><div class="row"><b>Perpetuos</b><span class="dim">en camino</span></div><div class="row"><b>Apuestas</b><span class="dim">en camino</span></div></section>
+<div class="all" id="pools" style="padding:10px 2px 0"><b style="font-size:20px;letter-spacing:-.02em">Pools de liquidez</b><div class="dim" style="max-width:64ch;margin-top:2px">Crea tu posición desde Kosmara: un contrato la guarda como un NFT y se opera vía el protocolo que elijas. Un bloque por red; iremos añadiendo más.</div></div>
+<section class="b s2 pb" id="pl-sol" style="--tc:20,241,149"></section>
+<section class="b s2 pb" id="pl-eth" style="--tc:140,158,255"></section>
+<section class="b s2 pb" id="pl-bnb" style="--tc:243,186,47"></section>
+<section class="b all soon" style="--tc:139,140,153;padding:14px 18px"><div class="k" style="margin:0">Próximamente <small>más redes</small></div></section>
 
 <section class="b all" id="movimientos" style="--tc:34,214,138">
 <div class="k">Movimientos por clave pública <small>datos reales de la blockchain</small></div>
@@ -151,12 +156,91 @@ function doSwap(){
  toast("Swap simulado vía "+r.n+": "+f(a,4)+" "+fr.s+" por "+f(r.out,4)+" "+to.s+".");rSwap();
 }
 
-/* MERCADO */
-function rMkt(){
- $("mkt").innerHTML='<div class="k">Mercado <small>'+(S.live?"precios en vivo":"modo demostración")+"</small></div>"+
- ["SOL","ETH","BNB","JUP","RAY","ORCA","CAKE","UNI"].map(function(s){var ch=(P[s]/P0[s]-1)*100;return '<div class="row" style="margin-top:6px;padding:8px 12px"><b>'+s+'</b><span class="v">'+usd(P[s])+' <span class="'+(ch>=0?"up":"dn")+'">'+(ch>=0?"▲":"▼")+" "+f(Math.abs(ch),2)+"%</span></span></div>"}).join("");
- $("foot").textContent=S.live?"Precios en vivo de CoinGecko. Las rutas, los saldos, los APR y los swaps son simulados. Los movimientos son datos reales.":"Rutas, saldos, precios, APR y swaps simulados: nada se envía a ninguna blockchain. Los movimientos por clave pública sí son datos reales cuando la página se abre en GitHub.";
+/* POOLS: un bloque por red, posiciones como NFT (simulado) */
+function rMkt(){$("foot").textContent="Rutas, saldos, precios, posiciones, APR y NFT son simulados: nada se envía a ninguna blockchain. Los movimientos por clave pública son datos reales cuando la página se abre en GitHub."}
+var PCH={
+ sol:{n:"Solana",st:"USDC.sol",via:["Orca","Raydium","Meteora"],url:{Orca:"https://www.orca.so",Raydium:"https://raydium.io",Meteora:"https://www.meteora.ag"},pairs:[["SOL","USDC",24.3],["JUP","SOL",33.5],["RAY","USDC",41.2],["ORCA","SOL",29.8]]},
+ eth:{n:"Ethereum",st:"USDC.eth",via:["Uniswap","PancakeSwap"],url:{Uniswap:"https://app.uniswap.org",PancakeSwap:"https://pancakeswap.finance"},pairs:[["ETH","USDC",12.4],["UNI","ETH",21.7]]},
+ bnb:{n:"BNB Chain",st:"USDT.bnb",via:["PancakeSwap","Uniswap"],url:{PancakeSwap:"https://pancakeswap.finance",Uniswap:"https://app.uniswap.org"},pairs:[["BNB","USDT",17.6],["CAKE","BNB",38.9]]}
+},PS={},POS=[],PID=1041;
+["sol","eth","bnb"].forEach(function(c){PS[c]={i:0,via:PCH[c].via[0],r:5,cmin:"",cmax:"",auto:true,amt:"",slip:1}});
+function tid(s,c){return s==="USDC"?(c==="eth"?"USDC.eth":"USDC.sol"):s==="USDT"?"USDT.bnb":s}
+function fp(n){return n>=1?f(n,2):f(n,5)}
+function calc(c){
+ var s=PS[c],pr=PCH[c].pairs[s.i],A=pr[0],Q=pr[1],p=P[A]/P[Q],mn,mx,r;
+ if(s.r==="c"&&parseFloat(s.cmin)>0&&parseFloat(s.cmax)>parseFloat(s.cmin)){mn=parseFloat(s.cmin);mx=parseFloat(s.cmax);r=(mx-mn)/(2*p)*100}
+ else{r=s.r==="c"?5:s.r;mn=p*(1-r/100);mx=p*(1+r/100)}
+ return{A:A,B:Q,p:p,mn:mn,mx:mx,r:r,pa:50-Math.min(r,50)*.07,iA:tid(A,c),iB:tid(Q,c),apr:pr[2]}
 }
+function sum(c){
+ var k=calc(c),s=PS[c],a=parseFloat(s.amt)||0;
+ $("rg-"+c).textContent="Rango: "+fp(k.mn)+" – "+fp(k.mx)+" "+k.B+" por "+k.A;
+ $("sm-"+c).innerHTML="<div>"+k.A+" "+f(k.pa,1)+'% → <b class="num">'+f(a*k.pa/100/P[k.A],4)+" "+k.A+"</b></div><div>"+k.B+" "+f(100-k.pa,1)+'% → <b class="num">'+f(a*(100-k.pa)/100/P[k.B],4)+" "+k.B+"</b></div>"+
+ (s.auto?'<div class="dim">Autoswap vía '+s.via+": coste ≈ "+usd(a*.001)+" · deslizamiento máx. "+s.slip+"%</div>":'<div class="dim">Sin autoswap: aportas las dos monedas que ya tienes.</div>');
+}
+function rPool(c){
+ var d=PCH[c],s=PS[c],k=calc(c);
+ var po=d.pairs.map(function(x,i){return '<option value="'+i+'"'+(i===s.i?" selected":"")+">"+x[0]+"/"+x[1]+" · "+f(x[2],1)+"% APR</option>"}).join("");
+ var chips=[1,5,10].map(function(x){return '<button class="btn chip'+(s.r===x?" on":"")+'" data-pr="'+c+":"+x+'">±'+x+"%</button>"}).join("")+'<button class="btn chip'+(s.r==="c"?" on":"")+'" data-pr="'+c+':c">Personal.</button>';
+ var cu=s.r==="c"?'<div class="two"><input id="cmin-'+c+'" class="num" type="number" step="any" placeholder="Mín." value="'+s.cmin+'"><input id="cmax-'+c+'" class="num" type="number" step="any" placeholder="Máx." value="'+s.cmax+'"></div>':"";
+ var vo=d.via.map(function(v){return "<option"+(v===s.via?" selected":"")+">"+v+"</option>"}).join("");
+ var sl=[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===s.slip?" selected":"")+">"+v+"%</option>"}).join("");
+ $("pl-"+c).innerHTML='<div class="k">'+d.n+" <small>pools de liquidez</small></div>"+
+ '<label class="l" for="pp-'+c+'">Par</label><select id="pp-'+c+'">'+po+"</select>"+
+ '<div class="dim" style="margin-top:6px">Precio actual: <span class="num">'+fp(k.p)+"</span> "+k.B+" por "+k.A+"</div>"+
+ '<label class="l">Rango de precio</label><div class="chips w">'+chips+"</div>"+cu+'<div class="dim" id="rg-'+c+'" style="margin-top:6px"></div>'+
+ '<label class="l" for="amt-'+c+'">Cantidad de depósito (USD)</label>'+
+ '<div class="hrow"><label class="tg"><input type="checkbox" id="au-'+c+'"'+(s.auto?" checked":"")+'>Autoswap</label><span class="dim">Operar vía <select id="via-'+c+'">'+vo+'</select></span><span class="dim">Desliz. <select id="sl-'+c+'">'+sl+"</select></span></div>"+
+ '<input id="amt-'+c+'" class="num" type="number" inputmode="decimal" min="0" step="any" value="'+s.amt+'" placeholder="0.0"><div class="dim" style="margin-top:5px">Saldo demo: '+f(B[d.st],2)+" "+TM[d.st].s+"</div>"+
+ '<div class="chips"><button class="btn" data-pa="'+c+':25">25%</button><button class="btn" data-pa="'+c+':50">50%</button><button class="btn" data-pa="'+c+':100">Máx</button></div>'+
+ '<div class="sum" id="sm-'+c+'"></div><button class="btn p" data-dep="'+c+'">Depositar</button>'+
+ '<div class="dim" style="margin-top:8px">Se crea un NFT de posición (simulado). <a class="lk" href="'+d.url[s.via]+'" target="_blank" rel="noopener">Abrir '+s.via+" ↗</a></div>"+
+ '<div class="k" style="margin:18px 0 0">Mis posiciones <small>NFT</small></div><div id="pos-'+c+'"></div>';
+ sum(c);rPos(c);
+}
+function inR(o){var a=o.pair.split("/"),p=P[a[0]]/P[a[1]];return p>=o.mn&&p<=o.mx}
+function rPos(c){
+ var L=POS.filter(function(o){return o.ch===c}),el=$("pos-"+c);if(!el)return;
+ el.innerHTML=L.length?L.map(function(o){var r=inR(o);
+  return '<div class="row" style="flex-wrap:wrap"><div><b>#'+o.id+" · "+o.pair+"</b><small>vía "+o.via+" · "+fp(o.mn)+" – "+fp(o.mx)+' · <span class="'+(r?"up":"bad")+'">'+(r?"en rango":"fuera de rango")+'</span></small></div><div class="v"><b>'+usd(o.d)+'</b><small class="up" data-fe="'+o.id+'">+$'+f(o.e,4)+' fees</small></div><div class="two" style="width:100%;margin-top:6px"><button class="btn sm" data-pc="'+o.id+':claim">Cobrar fees</button><button class="btn sm" data-pc="'+o.id+':close">Cerrar y quemar NFT</button></div></div>'}).join(""):'<div class="dim" style="margin-top:8px">Aún no tienes posiciones en '+PCH[c].n+".</div>";
+}
+function deposit(c){
+ var k=calc(c),s=PS[c],a=parseFloat(s.amt),st=PCH[c].st;
+ if(!(a>0))return toast("Introduce una cantidad mayor que cero.");
+ var ta=a*k.pa/100/P[k.A],tb=a*(100-k.pa)/100/P[k.B];
+ if(s.auto){if(a>B[st])return toast("Saldo insuficiente de "+TM[st].s+".");B[st]-=a}
+ else{if(ta>B[k.iA]||tb>B[k.iB])return toast("Sin autoswap necesitas saldo de las dos monedas.");B[k.iA]-=ta;B[k.iB]-=tb}
+ var id=PID++;POS.push({id:id,ch:c,pair:k.A+"/"+k.B,via:s.via,mn:k.mn,mx:k.mx,d:s.auto?a*.999:a,e:0,apr:k.apr});
+ s.amt="";rPool(c);toast("NFT de posición #"+id+" creado (simulado) vía "+s.via+".");
+}
+function posAct(v){
+ var id=+v[0],o=POS.filter(function(x){return x.id===id})[0];if(!o)return;var st=PCH[o.ch].st;
+ if(v[1]==="claim"){if(!(o.e>0))return toast("Aún no hay fees que cobrar.");B[st]+=o.e;toast("Cobrados "+usd(o.e)+" en fees.");o.e=0}
+ else{B[st]+=o.d+o.e;POS.splice(POS.indexOf(o),1);toast("NFT #"+id+" quemado. Retirados "+usd(o.d+o.e)+".")}
+ rPool(o.ch);
+}
+document.addEventListener("click",function(e){
+ var x=e.target.closest("[data-pr],[data-pa],[data-dep],[data-pc]"),v;if(!x)return;
+ if(v=x.getAttribute("data-pr")){v=v.split(":");PS[v[0]].r=v[1]==="c"?"c":+v[1];rPool(v[0])}
+ else if(v=x.getAttribute("data-pa")){v=v.split(":");PS[v[0]].amt=String(Math.floor(B[PCH[v[0]].st]*v[1]/100*100)/100);rPool(v[0])}
+ else if(v=x.getAttribute("data-dep"))deposit(v);
+ else if(v=x.getAttribute("data-pc"))posAct(v.split(":"));
+});
+document.addEventListener("change",function(e){
+ var t=e.target,p=(t.id||"").split("-"),c=p[1];if(!c||!PS[c])return;
+ if(p[0]==="pp"){PS[c].i=+t.value;rPool(c)}else if(p[0]==="via"){PS[c].via=t.value;rPool(c)}else if(p[0]==="sl"){PS[c].slip=+t.value;rPool(c)}else if(p[0]==="au"){PS[c].auto=t.checked;rPool(c)}
+});
+document.addEventListener("input",function(e){
+ var t=e.target,p=(t.id||"").split("-"),c=p[1];if(!c||!PS[c])return;
+ if(p[0]==="amt")PS[c].amt=t.value;else if(p[0]==="cmin")PS[c].cmin=t.value;else if(p[0]==="cmax")PS[c].cmax=t.value;else return;
+ sum(c);
+});
+setInterval(function(){
+ POS.forEach(function(o){if(inR(o))o.e+=o.d*o.apr/100/8760});
+ document.querySelectorAll("[data-fe]").forEach(function(el){var o=POS.filter(function(x){return String(x.id)===el.getAttribute("data-fe")})[0];if(o)el.textContent="+$"+f(o.e,4)+" fees"});
+},1000);
+setInterval(function(){["sol","eth","bnb"].forEach(rPos)},3000);
+["sol","eth","bnb"].forEach(rPool);
 
 /* MOVIMIENTOS REALES */
 var SOLRPC="https://api.mainnet-beta.solana.com",BS="https://eth.blockscout.com/api/v2/addresses/";
