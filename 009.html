@@ -308,8 +308,8 @@ const META={
 };
 const cry=(k,amount,invested)=>{const m=META[k];return{type:'crypto',coingeckoId:m.id,name:m.name,symbol:m.sym,icon:m.icon,color:m.color,amount,invested}};
 
-const FIXED_QTY={btc:0.16233071,eth:1.14866904,sol:12.1237};
-const FIXED_INV={btc:11724.09,eth:2868.77,sol:1480.38};
+const FIXED_QTY={btc:0.16654812,eth:1.14918938,sol:12.1368};
+const FIXED_INV={btc:12024.09,eth:2868.77,sol:1480.38};
 const SEED={btc:cry('btc',FIXED_QTY.btc,FIXED_INV.btc),eth:cry('eth',FIXED_QTY.eth,FIXED_INV.eth),sol:cry('sol',FIXED_QTY.sol,FIXED_INV.sol)};
 let assets=load('portfolio_assets_v2',null);
 if(!assets||typeof assets!=='object'||Object.keys(assets).length===0){
@@ -508,7 +508,7 @@ const LEDGER={
   ['2026-05-05',0.003575,250.00],['2026-05-05',0.00176,125.04],['2026-05-27',0.00767,500.00],
   ['2026-06-08',0.00453,250.00],['2026-07-03',0.005525,300.00],['2026-07-04',0.00089,50.27],
   ['2026-07-26',0.000434962,24.59],['2026-08-05',0.00537,300.00],['2026-09-03',0.00445139,300.00],
-  ['2026-10-15',0.00136438,100.00]
+  ['2026-10-15',0.00136438,100.00],['2026-11-05',0.00422033,300.00]
  ],
  eth:[
   ['2026-01-01',0.10653,271.35],['2026-01-01',1.00000,2546.15],
