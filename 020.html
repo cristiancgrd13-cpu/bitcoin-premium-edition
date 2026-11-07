@@ -3,93 +3,86 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Kosmara: prototipo</title>
+<title>Kosmara</title>
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.98.0/lib/index.iife.min.js"></script>
 <style>
-:root{--ink:#07070a;--line:#25262e;--dim:#8b8c99;--acc:#7c5cff;--up:#22d68a;--dn:#ff5a6e;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--ink:#07070a;--line:#25262e;--dim:#8b8c99;--up:#22d68a;--dn:#ff5a6e;color-scheme:dark;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 html{scroll-padding-top:env(safe-area-inset-top,0px);scroll-behavior:smooth}
 *{box-sizing:border-box}
 body{margin:0;background:var(--ink);color:#eeeef5;font:15px/1.5 "Space Grotesk",system-ui,-apple-system,"Segoe UI",sans-serif;min-height:100vh}
-body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(520px 380px at 90% -4%,rgba(124,92,255,.28),transparent),radial-gradient(560px 420px at -8% 38%,rgba(45,212,191,.16),transparent),radial-gradient(500px 360px at 70% 108%,rgba(255,0,122,.12),transparent)}
-.mono,.num,input,textarea,.v{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
+body:before{content:"";position:fixed;inset:0;z-index:-1;background:radial-gradient(520px 380px at 90% -4%,rgba(124,92,255,.28),transparent),radial-gradient(560px 420px at -8% 38%,rgba(45,212,191,.16),transparent),radial-gradient(500px 360px at 70% 108%,rgba(255,214,10,.1),transparent)}
+.num,input,textarea,.v{font-family:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace}
 .g{display:grid;gap:12px;max-width:1080px;margin:auto;padding:14px 14px 50px}.g>*{min-width:0}
-@media(min-width:820px){.g{grid-template-columns:repeat(6,1fr)}.s2{grid-column:span 2}.s4{grid-column:span 4}.all{grid-column:1/-1}}
+@media(min-width:820px){.g{grid-template-columns:repeat(6,1fr)}.s3{grid-column:span 3}.all{grid-column:1/-1}.ctr{grid-column:2 / span 4}.plist{grid-template-columns:1fr 1fr}}
 .b{position:relative;isolation:isolate;overflow:hidden;border-radius:22px;padding:18px;border:1px solid rgba(var(--tc),.34);background-color:rgba(12,12,16,.88);background-image:linear-gradient(180deg,rgba(var(--tc),.30) 0%,rgba(var(--tc),.10) 42%,rgba(var(--tc),0) 80%);box-shadow:0 0 30px rgba(var(--tc),.12)}
 .k{font-size:13px;font-weight:700;color:rgb(var(--tc));letter-spacing:.02em;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:8px}
 .k small{font-weight:500;color:var(--dim)}
 .dim{color:var(--dim);font-size:12px}.up{color:var(--up)}.dn{color:var(--dn)}
 nav.top{display:flex;align-items:center;gap:14px;padding:4px 2px}
-.logo{font-weight:700;font-size:21px;letter-spacing:-.02em;display:flex;align-items:center;gap:8px}.logo i{font-style:normal;color:var(--acc)}
-.links{display:none;gap:16px;margin-left:12px;font-size:14px}.links a{color:var(--dim);text-decoration:none}.links a:hover{color:#fff}
+.logo{font-weight:700;font-size:21px;letter-spacing:-.02em;white-space:nowrap}.logo i{font-style:normal;color:#7c5cff}
+.links{display:none;gap:16px;font-size:14px}.links a{color:var(--dim);text-decoration:none}.links a:hover{color:#fff}
 @media(min-width:620px){.links{display:flex}}
 .sp{flex:1}
 button,.btn{font:inherit;font-weight:700;cursor:pointer}
 .btn{display:inline-block;text-align:center;text-decoration:none;color:#eeeef5;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:12px;padding:9px 14px;font-size:14px}
 .btn:hover{background:rgba(255,255,255,.13)}
-.btn.p{width:100%;padding:15px;font-size:16px;background:rgb(var(--tc));color:#000;border:0;border-radius:14px}
+.btn.p{display:block;width:100%;padding:14px;font-size:16px;background:rgb(var(--tc));color:#000;border:0;border-radius:14px;margin-top:10px}
 .btn.sm{padding:7px 11px;font-size:13px}
-h1{margin:6px 0 8px;font-size:clamp(30px,8vw,52px);line-height:1.02;letter-spacing:-.035em}
+.ywallet{background:#FFD60A;color:#000;border:0;border-radius:12px;padding:10px 16px;white-space:nowrap}.ywallet:hover{background:#ffe14d}
+h1{margin:6px 0 8px;font-size:clamp(28px,7.5vw,48px);line-height:1.04;letter-spacing:-.035em}
 h1 em{font-style:normal;background:linear-gradient(180deg,#b7a6ff,#2dd4bf);-webkit-background-clip:text;background-clip:text;color:transparent}
-.lead{color:#b4b5c6;max-width:46ch;margin:0 0 14px}
+.lead{color:#b4b5c6;max-width:46ch;margin:0 0 12px}
 .pills{display:flex;gap:8px;flex-wrap:wrap}.pills span{border:1px solid var(--line);border-radius:99px;padding:5px 12px;font-size:13px;background:rgba(255,255,255,.04)}
 .pills span:before{content:"";display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--c);margin-right:7px}
 .box{background:rgba(0,0,0,.35);border:1px solid var(--line);border-radius:16px;padding:12px}
-.box label{display:block;font-size:12px;color:var(--dim);margin-bottom:6px}
+label{display:block;font-size:12px;color:var(--dim);margin:12px 0 5px}.box label{margin-top:0}
 .srow{display:flex;gap:10px;align-items:center}
 select,input,textarea{background:rgba(255,255,255,.06);border:1px solid var(--line);border-radius:12px;color:#fff;font-size:14px;padding:10px 11px;outline:0;width:100%}
 option{color:#000}
 .srow select{width:auto;max-width:46%;flex:none;font-family:inherit;font-weight:700}
-.srow input,.recv{flex:1;min-width:0;text-align:right;background:none;border:0;font-size:24px;font-weight:700;padding:2px}
-.recv{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.mid{display:flex;justify-content:center;margin:-10px 0;position:relative;z-index:1}
-.mid button{width:38px;height:38px;border-radius:50%;border:4px solid #0c0c10;background:rgb(var(--tc));color:#000;font-size:18px}
-.chips{display:flex;gap:8px;margin:10px 0 2px}.chips .btn{flex:1;padding:6px}
+.srow input{flex:1;min-width:0;text-align:right;background:none;border:0;font-size:22px;font-weight:700;padding:2px}
+.chips{display:flex;gap:8px;margin:10px 0 2px;flex-wrap:wrap}.chips .btn{flex:1;padding:7px 6px;white-space:nowrap}
+.chip.on{background:rgb(var(--tc));color:#000;border-color:rgb(var(--tc))}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(0,0,0,.32);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:8px}
 .row b{font-size:15px}.row small{display:block;color:var(--dim);font-size:12px}.row .v{text-align:right;white-space:nowrap}
-.row.sel{border-color:rgb(var(--tc));box-shadow:0 0 16px rgba(var(--tc),.28)}.pick{cursor:pointer}
+.row.sel{border-color:rgb(var(--tc));box-shadow:0 0 16px rgba(var(--tc),.28)}.pick{cursor:pointer}.pick:hover{border-color:rgba(var(--tc),.6)}
 .tag{background:rgb(var(--tc));color:#000;font-size:10px;font-weight:700;padding:1px 7px;border-radius:99px;margin-left:6px}
-.ptile h3{margin:0 0 2px;font-size:22px;letter-spacing:-.02em}
-.ptile .btn{margin-top:14px;width:100%}
+.tag.o{background:none;border:1px solid var(--line);color:var(--dim)}
+.plist{display:grid;gap:0 10px}
 .soon{border-style:dashed;background-image:none;box-shadow:none}
-textarea{min-height:120px;font-size:11px;white-space:pre}
+textarea{min-height:110px;font-size:11px;white-space:pre}
 .scroll{overflow-x:auto;margin-top:12px}table{border-collapse:collapse;width:100%;font-size:12px}
 th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
-.lk{color:rgb(var(--tc));text-decoration:none}
-.stat{min-height:20px;margin-top:10px;font-size:13px;color:var(--dim)}
+.lk{color:rgb(var(--tc,45,212,191));text-decoration:none}
+.stat{min-height:20px;margin-top:10px;font-size:13px;color:var(--dim);overflow-wrap:anywhere}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.tg{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;margin:0;color:#eeeef5}.tg input{width:auto;accent-color:rgb(var(--tc))}
+.hrow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:12px 0 4px;flex-wrap:wrap}
+.hrow select{width:auto;font-size:13px;padding:6px 8px}
+.sum{font-size:13px;line-height:1.7;margin:10px 0}
 .m{position:fixed;inset:0;background:rgba(0,0,0,.76);display:flex;align-items:flex-end;justify-content:center;z-index:50}.m[hidden]{display:none}
-.mb{width:100%;max-width:520px;background:#0d0d12;border:1px solid var(--line);border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px))}
-.mb .btn{display:block;width:100%;text-align:left;margin-top:10px;padding:14px}
+.mb{width:100%;max-width:540px;max-height:92vh;overflow-y:auto;background:#0d0d12;border:1px solid var(--line);border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom,0px));position:relative}
+.x{position:absolute;right:12px;top:8px;background:none;border:0;color:var(--dim);font-size:28px;line-height:1}
+.wbtn{display:flex;align-items:center;gap:12px;width:100%;margin-top:10px;padding:11px 14px;border-radius:14px;border:0;font-size:16px;text-align:left}
+.wbtn svg{width:34px;height:34px;flex:none}.wbtn small{margin-left:auto;font-weight:500;opacity:.75;font-size:12px}
+.wbtn.ph{background:#AB9FF2;color:#16131f}.wbtn.mm{background:#F6851B;color:#1a1005}.wbtn.cn{background:rgba(255,255,255,.07);color:#eeeef5;justify-content:center}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:#eeeef5;color:#000;padding:11px 16px;border-radius:12px;font-size:14px;font-weight:700;max-width:92vw;z-index:60}.toast[hidden]{display:none}
 .foot{font-size:12px;color:var(--dim);padding:0 4px}
 button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid rgb(var(--tc,124,92,255));outline-offset:2px}
-@media(min-width:820px){.ctr{grid-column:2 / span 4}}
-.pb label.l{display:block;font-size:12px;color:var(--dim);margin:12px 0 5px}
-.chips.w{flex-wrap:wrap}.chip.on{background:rgb(var(--tc));color:#000;border-color:rgb(var(--tc))}
-.hrow{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:12px 0 6px;font-size:13px;flex-wrap:wrap}
-.hrow select{width:auto;font-size:13px;padding:6px 8px}
-.tg{display:flex;align-items:center;gap:7px;font-size:13px;cursor:pointer;white-space:nowrap;margin:0}.tg input{width:auto;accent-color:rgb(var(--tc))}
-.sum{font-size:13px;line-height:1.7;margin:10px 0 12px}
-.bad{color:var(--dn)}
 </style>
 </head>
 <body>
 <div class="g">
-<nav class="all top"><div class="logo"><i>✦</i>Kosmara</div><div class="links"><a href="#swap">Swap</a><a href="#pools">Pools</a><a href="#movimientos">Movimientos</a></div><div class="sp"></div><button class="btn sm" id="bConn" data-act="open">Conectar wallet</button></nav>
-
-<header class="all" style="padding:10px 2px 6px">
-<h1>Todo DeFi en <em>una sola puerta</em></h1>
-<p class="lead">Swap con las mejores rutas, accesos directos a los pools de cada red y tus movimientos exportables, desde un único lugar.</p>
-<div class="pills"><span style="--c:#14f195">Solana</span><span style="--c:#f3ba2f">BNB Chain</span><span style="--c:#8c9eff">Ethereum</span></div>
-</header>
+<nav class="all top"><button class="ywallet" id="bConn" data-act="open">Conectar wallet</button><div class="links"><a href="#swap">Swap</a><a href="#pools">Pools</a><a href="#movimientos">Movimientos</a></div><div class="sp"></div><div class="logo"><i>✦</i> Kosmara</div></nav>
+<header class="all" style="padding:8px 2px 4px"><h1>Todo DeFi en <em>una sola puerta</em></h1><p class="lead">Swap con las mejores rutas, todos los pools de Solana en una lista y tus movimientos exportables.</p><div class="pills"><span style="--c:#14f195">Solana · datos reales</span><span style="--c:#8c9eff">Ethereum · próximamente</span><span style="--c:#f3ba2f">BNB Chain · próximamente</span></div></header>
 
 <section class="b ctr" id="swap" style="--tc:124,92,255"></section>
+<section class="b ctr" id="cfg" style="--tc:139,140,153"></section>
 
-<div class="all" id="pools" style="padding:10px 2px 0"><b style="font-size:20px;letter-spacing:-.02em">Pools de liquidez</b><div class="dim" style="max-width:64ch;margin-top:2px">Crea tu posición desde Kosmara: un contrato la guarda como un NFT y se opera vía el protocolo que elijas. Un bloque por red; iremos añadiendo más.</div></div>
-<section class="b s2 pb" id="pl-sol" style="--tc:20,241,149"></section>
-<section class="b s2 pb" id="pl-eth" style="--tc:140,158,255"></section>
-<section class="b s2 pb" id="pl-bnb" style="--tc:243,186,47"></section>
-<section class="b all soon" style="--tc:139,140,153;padding:14px 18px"><div class="k" style="margin:0">Próximamente <small>más redes</small></div></section>
+<section class="b all" id="pools" style="--tc:20,241,149"></section>
+<section class="b s3 soon" style="--tc:140,158,255"><div class="k">Ethereum <small>próximamente</small></div><div class="dim">Pools de Uniswap y PancakeSwap con el mismo flujo: lista, rango, autoswap y creación de posición.</div></section>
+<section class="b s3 soon" style="--tc:243,186,47"><div class="k">BNB Chain <small>próximamente</small></div><div class="dim">Pools de PancakeSwap y Uniswap con el mismo flujo. Después, más redes.</div></section>
 
 <section class="b all" id="movimientos" style="--tc:34,214,138">
 <div class="k">Movimientos por clave pública <small>datos reales de la blockchain</small></div>
@@ -97,153 +90,218 @@ button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{ou
 <div class="stat" id="hst">Detecto la red automáticamente. Solo se leen datos públicos; nunca pegues claves privadas ni frases semilla.</div>
 <div id="hres"></div>
 </section>
-<p class="all foot" id="foot"></p>
+<p class="all foot">Prototipo sin auditar. Los swaps de este prototipo son reales y mueven fondos de tu wallet: prueba con importes pequeños. Crear la posición (NFT) se hace en el protocolo elegido; el contrato propio de Kosmara llegará más adelante.</p>
 </div>
 
-<div class="m" id="sheet" hidden><div class="mb" role="dialog" aria-label="Conectar wallet"><b>Conectar wallet</b>
-<button class="btn" data-w="ph">Phantom (Solana)</button><button class="btn" data-w="mm">MetaMask (Ethereum y BNB Chain)</button><button class="btn" data-w="x">Cancelar</button>
-<p class="dim" style="margin:12px 0 0">Al conectar, tu dirección pública se rellena en Movimientos. No se firma ni se envía nada.</p></div></div>
+<div class="m" id="sheet" hidden><div class="mb" role="dialog" aria-label="Conectar wallet"><button class="x" data-act="close" aria-label="Cerrar">×</button><b style="font-size:18px">Conectar wallet</b>
+<button class="wbtn ph" data-w="ph"><svg viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#fff"/><path d="M7 29c0-10 5.5-17 13-17s13 7 13 15c0 2.2-1.7 2.8-3.3 1.6s-3.1-2-4.6-.4-3 1.9-4.9 0-3.5-1.9-5 0S7.6 31 7 29z" fill="#AB9FF2"/><circle cx="16.5" cy="21" r="2" fill="#fff"/><circle cx="24" cy="21" r="2" fill="#fff"/></svg><span>Phantom</span><small>Solana</small></button>
+<button class="wbtn mm" data-w="mm"><svg viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#fff"/><polygon points="5,8 17,16 14,22" fill="#E17726"/><polygon points="35,8 23,16 26,22" fill="#E17726"/><polygon points="14,22 20,18 26,22 28,30 20,35 12,30" fill="#F5841F"/><polygon points="14,22 20,25 26,22 20,18" fill="#D7C1B3"/><polygon points="17,29 20,32 23,29 20,27" fill="#763E1A"/><circle cx="16.5" cy="24" r="1.2" fill="#161616"/><circle cx="23.5" cy="24" r="1.2" fill="#161616"/></svg><span>MetaMask</span><small>Ethereum y BNB Chain</small></button>
+<button class="wbtn cn" data-act="close">Cancelar</button>
+<p class="dim" style="margin:12px 0 0">Si estás en el móvil, las wallets no se ven desde un navegador normal. Abre esta web dentro de la wallet: <a class="lk" id="lPh" href="#" target="_blank" rel="noopener">Phantom ↗</a> · <a class="lk" id="lMm" href="#" target="_blank" rel="noopener">MetaMask ↗</a>. Más billeteras y cold wallets llegarán después.</p></div></div>
+<div class="m" id="ps" hidden></div>
 <div class="toast" id="toast" hidden></div>
 
 <script>
-var CHN={sol:"Solana",bnb:"BNB Chain",eth:"Ethereum"};
-var TK=[["SOL","SOL","sol",12.4],["USDC.sol","USDC","sol",320],["JUP","JUP","sol",450],["RAY","RAY","sol",90],["ORCA","ORCA","sol",60],["BNB","BNB","bnb",3.2],["USDT.bnb","USDT","bnb",410],["CAKE","CAKE","bnb",120],["ETH","ETH","eth",.9],["USDC.eth","USDC","eth",250],["UNI","UNI","eth",35]].map(function(a){return{id:a[0],s:a[1],ch:a[2],b:a[3]}});
-var TM={},B={};TK.forEach(function(k){TM[k.id]=k;B[k.id]=k.b});
-var P={SOL:150,USDC:1,USDT:1,JUP:.8,RAY:2.4,ORCA:3.2,BNB:600,CAKE:2.5,ETH:3000,UNI:8},P0={};for(var q in P)P0[q]=P[q];
-var CG={SOL:"solana",ETH:"ethereum",BNB:"binancecoin",JUP:"jupiter-exchange-solana",ORCA:"orca",RAY:"raydium",CAKE:"pancakeswap-token",UNI:"uniswap"};
-var RT={sol:[["Jupiter",.9992],["Orca",.9981],["Raydium",.9975]],bnb:[["PancakeSwap",.9985],["1inch",.999],["Biswap",.9962]],eth:[["Uniswap",.9984],["1inch",.9991],["Curve",.9979]]};
-var BR=[["Wormhole",.9965,"≈ 4 min",2.1],["Stargate",.9975,"≈ 2 min",3.4],["deBridge",.9958,"≈ 1 min",2.9]];
-var S={from:"SOL",to:"USDC.sol",amt:"",rt:"",live:false,rows:[],addr:"",net:""},N=0,CSV="";
 function $(i){return document.getElementById(i)}
 function f(n,d){return n.toLocaleString("es-ES",{maximumFractionDigits:d==null?2:d})}
-function usd(n){return "$"+f(n,2)}
-function toast(t){var e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(function(){e.hidden=true},3600)}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function toast(t){var e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(function(){e.hidden=true},4200)}
+function LS(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";localStorage.setItem(k,v)}catch(e){return ""}}
+function fp(n){return !isFinite(n)?"—":n>=1?f(n,n>=100?2:4):f(n,6)}
+function short(a){return a&&a.length>12?a.slice(0,5)+"…"+a.slice(-4):a||""}
+var S={key:LS("kz_jup"),rpc:LS("kz_rpc"),pk:"",wname:"",bal:{},pools:{},stat:{},flt:"all",q:"",sort:"tvl",lim:40,sel:"",rows:[],net:"",addr:""},CSV="";
+function rpcUrl(){return S.rpc||"https://api.mainnet-beta.solana.com"}
+async function rc(m,p){var r=await fetch(rpcUrl(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:m,params:p})});if(!r.ok)throw new Error("RPC HTTP "+r.status);var j=await r.json();if(j.error)throw new Error(j.error.message);return j.result}
+function b64u(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
+function u8b(u){var s="";for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return btoa(s)}
 
-/* SWAP */
-function routes(){
- var a=parseFloat(S.amt),fr=TM[S.from],to=TM[S.to];if(!(a>0)||fr.id===to.id)return[];
- var base=a*P[fr.s]/P[to.s],L=[];
- if(fr.ch===to.ch)RT[fr.ch].forEach(function(r,i){L.push({n:r[0],out:base*r[1]*(1+Math.sin(N*1.3+i*2.1)*6e-4),sub:"Comisión "+f(100-r[1]*100,2)+"%"})});
- else BR.forEach(function(r,i){L.push({n:r[0],out:base*r[1]*(1+Math.sin(N*1.1+i*1.7)*6e-4)-r[3]/P[to.s],sub:r[2]+" · puente $"+r[3]})});
- return L.sort(function(x,y){return y.out-x.out});
+/* ---------- Jupiter (swap real) ---------- */
+var JB="https://api.jup.ag/swap/",LBL=null;
+async function jj(u,body){
+ var o={headers:{"x-api-key":S.key}};if(body){o.method="POST";o.headers["Content-Type"]="application/json";o.body=JSON.stringify(body)}
+ var r=await fetch(JB+u,o),t=await r.text(),j=null;try{j=JSON.parse(t)}catch(e){}
+ if(!r.ok||(j&&j.error))throw new Error((j&&(j.error||j.message))||"Jupiter HTTP "+r.status);return j}
+async function labels(){if(LBL)return LBL;var m=await jj("v1/program-id-to-label"),a=[];for(var k in m)if(a.indexOf(m[k])<0)a.push(m[k]);LBL=a;return a}
+async function dexFor(v){var re={Orca:/orca|whirlpool/i,Raydium:/raydium/i,Meteora:/meteora/i}[v],d=(await labels()).filter(function(l){return re.test(l)}).join(",");if(!d)throw new Error("Jupiter no lista "+v);return d}
+async function quoteV(v,im,om,amt,slip){
+ if(!S.key)throw new Error("Falta la clave de Jupiter");
+ if(v==="Jupiter"){var o=await jj("v2/order?inputMint="+im+"&outputMint="+om+"&amount="+amt);return{out:+o.outAmount}}
+ var q=await jj("v1/quote?inputMint="+im+"&outputMint="+om+"&amount="+amt+"&slippageBps="+Math.round(slip*100)+"&dexes="+encodeURIComponent(await dexFor(v)));return{out:+q.outAmount}
 }
-function pickRoute(L){for(var i=0;i<L.length;i++)if(L[i].n===S.rt)return L[i];return L[0]}
-function quote(){
- var el=$("qt");if(!el)return;var L=routes(),to=TM[S.to],fr=TM[S.from];
- $("xinfo").textContent=fr.ch!==to.ch?"Entre redes: "+CHN[fr.ch]+" → "+CHN[to.ch]+" (puente + swap)":"Misma red: "+CHN[fr.ch];
- if(!L.length){el.innerHTML='<div class="dim" style="margin-top:8px">Introduce una cantidad para comparar rutas.</div>';$("recv").textContent="0.0";return}
- var sel=pickRoute(L),best=L[0].out;$("recv").textContent=f(sel.out,6);
- el.innerHTML=L.map(function(r,i){return '<div class="row pick'+(r.n===sel.n?" sel":"")+'" data-rt="'+r.n+'"><div><b>'+r.n+"</b>"+(i?"":'<span class="tag">MEJOR</span>')+"<small>"+r.sub+'</small></div><div class="v"><b>'+f(r.out,4)+" "+to.s+'</b><small class="'+(i?"dn":"up")+'">'+(i?f((r.out/best-1)*100,2)+"%":"mejor precio")+"</small></div></div>"}).join("");
+async function execSwap(v,im,om,amt,slip){
+ var pv=window.phantom&&window.phantom.solana;if(!pv||!S.pk)throw new Error("Conecta Phantom primero");
+ if(!window.solanaWeb3)throw new Error("No se cargó la librería de Solana");
+ var V=solanaWeb3.VersionedTransaction;
+ if(v==="Jupiter"){
+  var o=await jj("v2/order?inputMint="+im+"&outputMint="+om+"&amount="+amt+"&taker="+S.pk);if(!o.transaction)throw new Error("Jupiter no devolvió transacción");
+  var sg=await pv.signTransaction(V.deserialize(b64u(o.transaction))),ex=await jj("v2/execute",{signedTransaction:u8b(sg.serialize()),requestId:o.requestId});
+  if(ex.status&&ex.status!=="Success")throw new Error(ex.error||ex.status);return ex.signature||""}
+ var q=await jj("v1/quote?inputMint="+im+"&outputMint="+om+"&amount="+amt+"&slippageBps="+Math.round(slip*100)+"&dexes="+encodeURIComponent(await dexFor(v)));
+ var s=await jj("v1/swap",{quoteResponse:q,userPublicKey:S.pk,dynamicComputeUnitLimit:true}),r=await pv.signAndSendTransaction(V.deserialize(b64u(s.swapTransaction)));return r.signature
 }
-function opts(sel){return TK.map(function(k){return '<option value="'+k.id+'"'+(k.id===sel?" selected":"")+">"+k.s+" · "+CHN[k.ch]+"</option>"}).join("")}
+
+/* ---------- Swap ---------- */
+var SOLM="So11111111111111111111111111111111111111112",VEN=["Jupiter","Orca","Raydium","Meteora"];
+var TKS=[["SOL",SOLM,9],["USDC","EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",6],["JUP","JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",6],["ORCA","orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",6],["RAY","4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",6]].map(function(a){return{s:a[0],m:a[1],d:a[2]}}),TM={};
+TKS.forEach(function(t){TM[t.s]=t});
+var SW={from:"SOL",to:"USDC",amt:"",slip:1,res:[],sel:""};
+function sres(h){var e=$("sres");if(e)e.innerHTML=h}
+function sopts(v){return TKS.map(function(t){return "<option"+(t.s===v?" selected":"")+">"+t.s+"</option>"}).join("")}
 function rSwap(){
- var fr=TM[S.from];
- $("swap").innerHTML='<div class="k">Swap <small>mejor precio entre protocolos y redes</small></div>'+
- '<div class="box"><label for="amt">Das · saldo demo '+f(B[S.from],4)+" "+fr.s+'</label><div class="srow"><select id="sf">'+opts(S.from)+'</select><input id="amt" class="num" type="number" inputmode="decimal" min="0" step="any" value="'+S.amt+'" placeholder="0.0"></div>'+
- '<div class="chips"><button class="btn" data-pct="25">25%</button><button class="btn" data-pct="50">50%</button><button class="btn" data-pct="100">Máx</button></div></div>'+
- '<div class="mid"><button data-act="flip" aria-label="Invertir">⇅</button></div>'+
- '<div class="box"><label for="st">Recibes (estimado)</label><div class="srow"><select id="st">'+opts(S.to)+'</select><div class="recv num" id="recv">0.0</div></div></div>'+
- '<div class="dim" id="xinfo" style="margin:12px 2px 0"></div><div id="qt"></div>'+
- '<div style="height:12px"></div><button class="btn p" data-act="swap">Swap</button>';
- quote();
+ var fr=TM[SW.from],bal=S.bal[fr.m];
+ $("swap").innerHTML='<div class="k">Swap en Solana <small>rutas reales vía Jupiter</small></div>'+
+ '<div class="box"><label for="amt">Das · saldo '+(S.pk?f(bal||0,6)+" "+fr.s:"conecta Phantom")+'</label><div class="srow"><select id="sf">'+sopts(SW.from)+'</select><input id="amt" class="num" type="number" inputmode="decimal" min="0" step="any" value="'+esc(SW.amt)+'" placeholder="0.0"></div>'+
+ '<div class="chips"><button class="btn" data-pct="25">25%</button><button class="btn" data-pct="50">50%</button><button class="btn" data-pct="100">Máx</button><button class="btn" data-act="flip">⇅</button></div></div>'+
+ '<div class="box" style="margin-top:8px"><label for="st">Recibes</label><div class="srow"><select id="st">'+sopts(SW.to)+'</select><span class="dim">estimado en las rutas</span></div></div>'+
+ '<div class="hrow"><span class="dim">Deslizamiento máx. <select id="sw-slip">'+[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===SW.slip?" selected":"")+">"+v+"%</option>"}).join("")+'</select></span></div>'+
+ '<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="quote">Buscar mejores precios</button><div id="qt"></div>'+
+ '<button class="btn p" data-act="doswap">Swap (real)</button><div class="stat" id="sres"></div><div class="dim" style="margin-top:6px">DFlow, JupiterZ y otros routers compiten dentro de la opción Jupiter (mejor ruta).</div>';
+ rQt();
 }
-function doSwap(){
- var a=parseFloat(S.amt),L=routes(),fr=TM[S.from],to=TM[S.to];
- if(!(a>0))return toast("Introduce una cantidad mayor que cero.");
- if(fr.id===to.id)return toast("Elige dos activos distintos.");
- if(a>B[S.from])return toast("Saldo insuficiente de "+fr.s+".");
- var r=pickRoute(L);B[S.from]-=a;B[S.to]+=r.out;S.amt="";S.rt="";
- toast("Swap simulado vía "+r.n+": "+f(a,4)+" "+fr.s+" por "+f(r.out,4)+" "+to.s+".");rSwap();
+function rQt(){
+ var el=$("qt");if(!el)return;var to=TM[SW.to];
+ el.innerHTML=SW.res.map(function(r,i){return r.err?'<div class="row"><div><b>'+r.v+'</b><small class="dn">'+esc(r.err)+"</small></div></div>":'<div class="row pick'+(r.v===SW.sel?" sel":"")+'" data-rt="'+r.v+'"><div><b>'+r.v+"</b>"+(r.best?'<span class="tag">MEJOR</span>':"")+'<small>'+(r.v==="Jupiter"?"mejor ruta (todos los routers)":"solo "+r.v)+'</small></div><div class="v"><b>'+f(r.out,6)+" "+to.s+'</b><small class="'+(r.best?"up":"dn")+'">'+(r.best?"mejor precio":f(r.diff,2)+"%")+"</small></div></div>"}).join("");
+}
+async function quoteAll(){
+ var a=parseFloat(SW.amt),fr=TM[SW.from],to=TM[SW.to];
+ if(!(a>0)||fr===to)return sres("Elige dos activos distintos e introduce una cantidad.");
+ if(!S.key)return sres("Falta la clave de Jupiter: pégala en el bloque Conexiones.");
+ var amt=Math.floor(a*Math.pow(10,fr.d));sres("Consultando rutas…");
+ var R=await Promise.all(VEN.map(function(v){return quoteV(v,fr.m,to.m,amt,SW.slip).then(function(q){return{v:v,out:q.out/Math.pow(10,to.d)}},function(e){return{v:v,err:e.message}})}));
+ var ok=R.filter(function(r){return !r.err}).sort(function(x,y){return y.out-x.out}),bad=R.filter(function(r){return r.err});
+ ok.forEach(function(r,i){r.best=i===0;r.diff=ok[0].out?(r.out/ok[0].out-1)*100:0});
+ SW.res=ok.concat(bad);SW.sel=ok.length?ok[0].v:"";rQt();sres(ok.length?"Elige una ruta y pulsa Swap.":"Ninguna ruta disponible.");
+}
+async function doSwap(){
+ var a=parseFloat(SW.amt),fr=TM[SW.from],to=TM[SW.to],r=SW.res.filter(function(x){return x.v===SW.sel&&!x.err})[0];
+ if(!S.pk)return toast("Conecta Phantom primero.");if(!r)return sres("Primero busca las mejores rutas.");
+ if(!confirm("Vas a firmar un swap REAL:\n"+f(a,6)+" "+fr.s+" por unos "+f(r.out,6)+" "+to.s+" vía "+r.v+".\nRevisa los detalles en Phantom antes de aprobar."))return;
+ try{sres("Esperando tu firma en Phantom…");var sg=await execSwap(r.v,fr.m,to.m,Math.floor(a*Math.pow(10,fr.d)),SW.slip);
+  sres('Swap enviado. <a class="lk" href="https://solscan.io/tx/'+esc(sg)+'" target="_blank" rel="noopener">Ver en Solscan ↗</a>');SW.amt="";SW.res=[];loadBal().then(rSwap)}
+ catch(e){sres("No se pudo completar: "+esc(e.message))}
 }
 
-/* POOLS: un bloque por red, posiciones como NFT (simulado) */
-function rMkt(){$("foot").textContent="Rutas, saldos, precios, posiciones, APR y NFT son simulados: nada se envía a ninguna blockchain. Los movimientos por clave pública son datos reales cuando la página se abre en GitHub."}
-var PCH={
- sol:{n:"Solana",st:"USDC.sol",via:["Orca","Raydium","Meteora"],url:{Orca:"https://www.orca.so",Raydium:"https://raydium.io",Meteora:"https://www.meteora.ag"},pairs:[["SOL","USDC",24.3],["JUP","SOL",33.5],["RAY","USDC",41.2],["ORCA","SOL",29.8]]},
- eth:{n:"Ethereum",st:"USDC.eth",via:["Uniswap","PancakeSwap"],url:{Uniswap:"https://app.uniswap.org",PancakeSwap:"https://pancakeswap.finance"},pairs:[["ETH","USDC",12.4],["UNI","ETH",21.7]]},
- bnb:{n:"BNB Chain",st:"USDT.bnb",via:["PancakeSwap","Uniswap"],url:{PancakeSwap:"https://pancakeswap.finance",Uniswap:"https://app.uniswap.org"},pairs:[["BNB","USDT",17.6],["CAKE","BNB",38.9]]}
-},PS={},POS=[],PID=1041;
-["sol","eth","bnb"].forEach(function(c){PS[c]={i:0,via:PCH[c].via[0],r:5,cmin:"",cmax:"",auto:true,amt:"",slip:1}});
-function tid(s,c){return s==="USDC"?(c==="eth"?"USDC.eth":"USDC.sol"):s==="USDT"?"USDT.bnb":s}
-function fp(n){return n>=1?f(n,2):f(n,5)}
-function calc(c){
- var s=PS[c],pr=PCH[c].pairs[s.i],A=pr[0],Q=pr[1],p=P[A]/P[Q],mn,mx,r;
- if(s.r==="c"&&parseFloat(s.cmin)>0&&parseFloat(s.cmax)>parseFloat(s.cmin)){mn=parseFloat(s.cmin);mx=parseFloat(s.cmax);r=(mx-mn)/(2*p)*100}
- else{r=s.r==="c"?5:s.r;mn=p*(1-r/100);mx=p*(1+r/100)}
- return{A:A,B:Q,p:p,mn:mn,mx:mx,r:r,pa:50-Math.min(r,50)*.07,iA:tid(A,c),iB:tid(Q,c),apr:pr[2]}
+/* ---------- Conexiones ---------- */
+function rCfg(){
+ $("cfg").innerHTML='<div class="k">Conexiones <small>se guardan solo en este navegador</small></div>'+
+ '<label for="jk">Clave de API de Jupiter (gratis en <a class="lk" href="https://developers.jup.ag/portal" target="_blank" rel="noopener">developers.jup.ag/portal</a>)</label><input id="jk" type="password" autocomplete="off" value="'+esc(S.key)+'" placeholder="Pega tu clave">'+
+ '<label for="rp">RPC de Solana (opcional; con uno propio, p. ej. Helius, va más fino que el público)</label><input id="rp" type="url" autocomplete="off" value="'+esc(S.rpc)+'" placeholder="https://api.mainnet-beta.solana.com">';
 }
-function sum(c){
- var k=calc(c),s=PS[c],a=parseFloat(s.amt)||0;
- $("rg-"+c).textContent="Rango: "+fp(k.mn)+" – "+fp(k.mx)+" "+k.B+" por "+k.A;
- $("sm-"+c).innerHTML="<div>"+k.A+" "+f(k.pa,1)+'% → <b class="num">'+f(a*k.pa/100/P[k.A],4)+" "+k.A+"</b></div><div>"+k.B+" "+f(100-k.pa,1)+'% → <b class="num">'+f(a*(100-k.pa)/100/P[k.B],4)+" "+k.B+"</b></div>"+
- (s.auto?'<div class="dim">Autoswap vía '+s.via+": coste ≈ "+usd(a*.001)+" · deslizamiento máx. "+s.slip+"%</div>":'<div class="dim">Sin autoswap: aportas las dos monedas que ya tienes.</div>');
-}
-function rPool(c){
- var d=PCH[c],s=PS[c],k=calc(c);
- var po=d.pairs.map(function(x,i){return '<option value="'+i+'"'+(i===s.i?" selected":"")+">"+x[0]+"/"+x[1]+" · "+f(x[2],1)+"% APR</option>"}).join("");
- var chips=[1,5,10].map(function(x){return '<button class="btn chip'+(s.r===x?" on":"")+'" data-pr="'+c+":"+x+'">±'+x+"%</button>"}).join("")+'<button class="btn chip'+(s.r==="c"?" on":"")+'" data-pr="'+c+':c">Personal.</button>';
- var cu=s.r==="c"?'<div class="two"><input id="cmin-'+c+'" class="num" type="number" step="any" placeholder="Mín." value="'+s.cmin+'"><input id="cmax-'+c+'" class="num" type="number" step="any" placeholder="Máx." value="'+s.cmax+'"></div>':"";
- var vo=d.via.map(function(v){return "<option"+(v===s.via?" selected":"")+">"+v+"</option>"}).join("");
- var sl=[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===s.slip?" selected":"")+">"+v+"%</option>"}).join("");
- $("pl-"+c).innerHTML='<div class="k">'+d.n+" <small>pools de liquidez</small></div>"+
- '<label class="l" for="pp-'+c+'">Par</label><select id="pp-'+c+'">'+po+"</select>"+
- '<div class="dim" style="margin-top:6px">Precio actual: <span class="num">'+fp(k.p)+"</span> "+k.B+" por "+k.A+"</div>"+
- '<label class="l">Rango de precio</label><div class="chips w">'+chips+"</div>"+cu+'<div class="dim" id="rg-'+c+'" style="margin-top:6px"></div>'+
- '<label class="l" for="amt-'+c+'">Cantidad de depósito (USD)</label>'+
- '<div class="hrow"><label class="tg"><input type="checkbox" id="au-'+c+'"'+(s.auto?" checked":"")+'>Autoswap</label><span class="dim">Operar vía <select id="via-'+c+'">'+vo+'</select></span><span class="dim">Desliz. <select id="sl-'+c+'">'+sl+"</select></span></div>"+
- '<input id="amt-'+c+'" class="num" type="number" inputmode="decimal" min="0" step="any" value="'+s.amt+'" placeholder="0.0"><div class="dim" style="margin-top:5px">Saldo demo: '+f(B[d.st],2)+" "+TM[d.st].s+"</div>"+
- '<div class="chips"><button class="btn" data-pa="'+c+':25">25%</button><button class="btn" data-pa="'+c+':50">50%</button><button class="btn" data-pa="'+c+':100">Máx</button></div>'+
- '<div class="sum" id="sm-'+c+'"></div><button class="btn p" data-dep="'+c+'">Depositar</button>'+
- '<div class="dim" style="margin-top:8px">Se crea un NFT de posición (simulado). <a class="lk" href="'+d.url[s.via]+'" target="_blank" rel="noopener">Abrir '+s.via+" ↗</a></div>"+
- '<div class="k" style="margin:18px 0 0">Mis posiciones <small>NFT</small></div><div id="pos-'+c+'"></div>';
- sum(c);rPos(c);
-}
-function inR(o){var a=o.pair.split("/"),p=P[a[0]]/P[a[1]];return p>=o.mn&&p<=o.mx}
-function rPos(c){
- var L=POS.filter(function(o){return o.ch===c}),el=$("pos-"+c);if(!el)return;
- el.innerHTML=L.length?L.map(function(o){var r=inR(o);
-  return '<div class="row" style="flex-wrap:wrap"><div><b>#'+o.id+" · "+o.pair+"</b><small>vía "+o.via+" · "+fp(o.mn)+" – "+fp(o.mx)+' · <span class="'+(r?"up":"bad")+'">'+(r?"en rango":"fuera de rango")+'</span></small></div><div class="v"><b>'+usd(o.d)+'</b><small class="up" data-fe="'+o.id+'">+$'+f(o.e,4)+' fees</small></div><div class="two" style="width:100%;margin-top:6px"><button class="btn sm" data-pc="'+o.id+':claim">Cobrar fees</button><button class="btn sm" data-pc="'+o.id+':close">Cerrar y quemar NFT</button></div></div>'}).join(""):'<div class="dim" style="margin-top:8px">Aún no tienes posiciones en '+PCH[c].n+".</div>";
-}
-function deposit(c){
- var k=calc(c),s=PS[c],a=parseFloat(s.amt),st=PCH[c].st;
- if(!(a>0))return toast("Introduce una cantidad mayor que cero.");
- var ta=a*k.pa/100/P[k.A],tb=a*(100-k.pa)/100/P[k.B];
- if(s.auto){if(a>B[st])return toast("Saldo insuficiente de "+TM[st].s+".");B[st]-=a}
- else{if(ta>B[k.iA]||tb>B[k.iB])return toast("Sin autoswap necesitas saldo de las dos monedas.");B[k.iA]-=ta;B[k.iB]-=tb}
- var id=PID++;POS.push({id:id,ch:c,pair:k.A+"/"+k.B,via:s.via,mn:k.mn,mx:k.mx,d:s.auto?a*.999:a,e:0,apr:k.apr});
- s.amt="";rPool(c);toast("NFT de posición #"+id+" creado (simulado) vía "+s.via+".");
-}
-function posAct(v){
- var id=+v[0],o=POS.filter(function(x){return x.id===id})[0];if(!o)return;var st=PCH[o.ch].st;
- if(v[1]==="claim"){if(!(o.e>0))return toast("Aún no hay fees que cobrar.");B[st]+=o.e;toast("Cobrados "+usd(o.e)+" en fees.");o.e=0}
- else{B[st]+=o.d+o.e;POS.splice(POS.indexOf(o),1);toast("NFT #"+id+" quemado. Retirados "+usd(o.d+o.e)+".")}
- rPool(o.ch);
-}
-document.addEventListener("click",function(e){
- var x=e.target.closest("[data-pr],[data-pa],[data-dep],[data-pc]"),v;if(!x)return;
- if(v=x.getAttribute("data-pr")){v=v.split(":");PS[v[0]].r=v[1]==="c"?"c":+v[1];rPool(v[0])}
- else if(v=x.getAttribute("data-pa")){v=v.split(":");PS[v[0]].amt=String(Math.floor(B[PCH[v[0]].st]*v[1]/100*100)/100);rPool(v[0])}
- else if(v=x.getAttribute("data-dep"))deposit(v);
- else if(v=x.getAttribute("data-pc"))posAct(v.split(":"));
-});
-document.addEventListener("change",function(e){
- var t=e.target,p=(t.id||"").split("-"),c=p[1];if(!c||!PS[c])return;
- if(p[0]==="pp"){PS[c].i=+t.value;rPool(c)}else if(p[0]==="via"){PS[c].via=t.value;rPool(c)}else if(p[0]==="sl"){PS[c].slip=+t.value;rPool(c)}else if(p[0]==="au"){PS[c].auto=t.checked;rPool(c)}
-});
-document.addEventListener("input",function(e){
- var t=e.target,p=(t.id||"").split("-"),c=p[1];if(!c||!PS[c])return;
- if(p[0]==="amt")PS[c].amt=t.value;else if(p[0]==="cmin")PS[c].cmin=t.value;else if(p[0]==="cmax")PS[c].cmax=t.value;else return;
- sum(c);
-});
-setInterval(function(){
- POS.forEach(function(o){if(inR(o))o.e+=o.d*o.apr/100/8760});
- document.querySelectorAll("[data-fe]").forEach(function(el){var o=POS.filter(function(x){return String(x.id)===el.getAttribute("data-fe")})[0];if(o)el.textContent="+$"+f(o.e,4)+" fees"});
-},1000);
-setInterval(function(){["sol","eth","bnb"].forEach(rPos)},3000);
-["sol","eth","bnb"].forEach(rPool);
 
-/* MOVIMIENTOS REALES */
-var SOLRPC="https://api.mainnet-beta.solana.com",BS="https://eth.blockscout.com/api/v2/addresses/";
+/* ---------- Pools reales ---------- */
+function sy(s){return s==="WSOL"?"SOL":s}
+function tk(t){t=t||{};return{m:t.address||t.mint||t.id||"",s:sy(t.symbol||t.name||"?"),d:t.decimals!=null?+t.decimals:9}}
+function nm(x){x=+x;return isFinite(x)?x:null}
+function mk(pr,id,A,B,p,tvl,vol,apr,fee,url){return{k:pr+":"+id,pr:pr,id:id,A:A,B:B,p:+p,tvl:+tvl||0,vol:+vol||0,apr:nm(apr),fee:nm(fee),url:url}}
+var SRC={
+ Orca:{u:function(q){return "https://api.orca.so/v2/solana/pools"+(q?"/search?q="+encodeURIComponent(q)+"&limit=50":"?limit=100&sortBy=tvl&sortDirection=desc&minTvl=20000")},
+  r:function(j){return j.data||[]},
+  n:function(p){var st=(p.stats&&(p.stats["24h"]||p.stats["1d"]))||{},y=st.yieldOverTvl!=null?st.yieldOverTvl:p.yieldOverTvl;return mk("Orca",p.address,tk(p.tokenA),tk(p.tokenB),p.price,p.tvlUsdc!=null?p.tvlUsdc:p.tvl,st.volume!=null?st.volume:p.volume24h,y!=null?y*36500:null,p.feeRate!=null?p.feeRate/1e4:null,"https://www.orca.so/pools/"+p.address)}},
+ Raydium:{u:function(q){return q?null:"https://api-v3.raydium.io/pools/info/list?poolType=concentrated&poolSortField=tvl&sortType=desc&pageSize=100&page=1"},
+  r:function(j){return (j.data&&j.data.data)||j.data||[]},
+  n:function(p){var d=p.day||{};return mk("Raydium",p.id,tk(p.mintA),tk(p.mintB),p.price,p.tvl,d.volume,d.apr,p.feeRate!=null?p.feeRate*100:null,"https://raydium.io/clmm/create-position/?pool_id="+p.id)}},
+ Meteora:{u:function(q){return "https://dlmm.datapi.meteora.ag/pools?page=1&page_size="+(q?50:100)+"&sort_by=tvl:desc"+(q?"&query="+encodeURIComponent(q):"")},
+  r:function(j){return j.data||[]},
+  n:function(p){var v=p.volume,vol=v&&typeof v==="object"?(v["24h"]!=null?v["24h"]:v.h24):v,a=p.apr;if(a&&typeof a==="object")a=a["24h"]!=null?a["24h"]:a.h24;
+   if(a==null){var fr=p.fee_tvl_ratio;fr=fr&&typeof fr==="object"?(fr["24h"]!=null?fr["24h"]:fr.h24):fr;if(fr!=null)a=fr*365}
+   var fee=p.pool_config&&p.pool_config.base_fee_pct!=null?p.pool_config.base_fee_pct:p.base_fee_pct;
+   return mk("Meteora",p.address,tk(p.token_x),tk(p.token_y),p.current_price!=null?p.current_price:p.price,p.tvl,vol,a,fee,"https://app.meteora.ag/dlmm/"+p.address)}}
+};
+async function loadPools(q){
+ await Promise.all(Object.keys(SRC).map(async function(n){
+  var s=SRC[n],u=s.u(q);if(!u)return;
+  try{var r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);var L=s.r(await r.json()),c=0;
+   L.forEach(function(p){try{var o=s.n(p);if(o.id&&o.A.m&&o.B.m){S.pools[o.k]=o;c++}}catch(e){}});S.stat[n]=c+" pools"}
+  catch(e){S.stat[n]="error: "+(e.message||"red")}}));
+ rPools();
+}
+function filt(){
+ var q=S.q.toLowerCase().trim(),L=Object.keys(S.pools).map(function(k){return S.pools[k]});
+ L=L.filter(function(p){return (S.flt==="all"||p.pr===S.flt)&&(!q||(p.A.s+"/"+p.B.s+" "+p.A.m+" "+p.B.m+" "+p.id).toLowerCase().indexOf(q)>=0)});
+ var k=S.sort;L.sort(function(a,b){return (b[k]||0)-(a[k]||0)});return L;
+}
+function rPools(){
+ var L=filt(),chips=["all","Orca","Raydium","Meteora"].map(function(x){return '<button class="btn chip'+(S.flt===x?" on":"")+'" data-flt="'+x+'">'+(x==="all"?"Todas":x)+"</button>"}).join("");
+ var st=Object.keys(SRC).map(function(n){var s=S.stat[n];return n+": "+(s?esc(s):"cargando…")}).join(" · ");
+ var rows=L.slice(0,S.lim).map(function(p){
+  return '<div class="row pick" data-pool="'+esc(p.k)+'"><div><b>'+esc(p.A.s)+"/"+esc(p.B.s)+'</b><span class="tag o">'+p.pr+"</span><small>TVL $"+f(p.tvl,0)+(p.fee!=null?" · comisión "+f(p.fee,2)+"%":"")+'</small></div><div class="v"><b class="up">'+(p.apr!=null?f(p.apr,1)+"%":"—")+"</b><small>APR · vol. $"+f(p.vol,0)+"</small></div></div>"}).join("");
+ var h=$("pools");h.innerHTML='<div class="k">Solana · pools de liquidez <small>'+L.length+' pools</small></div>'+
+  '<input id="pq" placeholder="Buscar par o token (SOL, HYPE, USDC…)" value="'+esc(S.q)+'" autocomplete="off"><div class="chips">'+chips+
+  '<select id="psort" style="flex:none;width:auto"><option value="tvl"'+(S.sort==="tvl"?" selected":"")+'>Ordenar: TVL</option><option value="vol"'+(S.sort==="vol"?" selected":"")+'>Ordenar: volumen</option><option value="apr"'+(S.sort==="apr"?" selected":"")+">Ordenar: APR</option></select></div>"+
+  '<div class="stat">'+st+'</div><div class="plist" id="plist">'+(rows||'<div class="dim" style="margin-top:10px">Sin resultados todavía.</div>')+"</div>"+(L.length>S.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="more">Ver más</button>':"");
+ var pq=$("pq");if(S.focusQ){pq.focus();pq.setSelectionRange(pq.value.length,pq.value.length)}
+}
+var qT=null;
+
+/* ---------- Crear posición ---------- */
+var ST={r:5,cmin:"",cmax:"",pay:"B",amt:"",auto:true,via:"Jupiter",slip:1};
+function pcalc(){
+ var p=S.pools[S.sel],z=ST,pr=p.p,pa,pb;
+ if(z.r==="c"&&parseFloat(z.cmin)>0&&parseFloat(z.cmax)>parseFloat(z.cmin)){pa=+z.cmin;pb=+z.cmax}else{var r=z.r==="c"?5:z.r;pa=pr*(1-r/100);pb=pr*(1+r/100)}
+ var sp=Math.sqrt(pr),x,y;
+ if(pr<=pa){x=1/Math.sqrt(pa)-1/Math.sqrt(pb);y=0}else if(pr>=pb){x=0;y=Math.sqrt(pb)-Math.sqrt(pa)}else{x=1/sp-1/Math.sqrt(pb);y=sp-Math.sqrt(pa)}
+ var vx=x*pr,fa=vx+y>0?vx/(vx+y):.5,a=parseFloat(z.amt)||0,payB=z.pay==="B",tB=payB?a:a*pr,vA=tB*fa,vB=tB-vA;
+ return{p:p,pa:pa,pb:pb,fa:fa,aA:vA/pr,aB:vB,payB:payB,a:a,swapIn:payB?vA:vB/pr};
+}
+function sumPs(){
+ var p=S.pools[S.sel];if(!p||!(p.p>0)){return}
+ var c=pcalc(),pay=c.payB?p.B:p.A,oth=c.payB?p.A:p.B;
+ $("prg").textContent="Rango: "+fp(c.pa)+" – "+fp(c.pb)+" "+p.B.s+" por "+p.A.s;
+ $("psum").innerHTML="<div>"+esc(p.A.s)+" "+f(c.fa*100,1)+'% → <b class="num">'+f(c.aA,6)+" "+esc(p.A.s)+"</b></div><div>"+esc(p.B.s)+" "+f((1-c.fa)*100,1)+'% → <b class="num">'+f(c.aB,6)+" "+esc(p.B.s)+"</b></div>"+
+  (ST.auto?'<div class="dim">Autoswap: cambiar <b class="num">'+f(c.swapIn,6)+" "+esc(pay.s)+"</b> por "+esc(oth.s)+" vía "+ST.via+"</div>":'<div class="dim">Sin autoswap: necesitas ya las dos monedas.</div>');
+ var b=S.bal[pay.m];$("pbal").textContent=S.pk?"Saldo: "+f(b||0,6)+" "+pay.s:"Conecta Phantom para ver tu saldo.";
+}
+function rPs(){
+ var p=S.pools[S.sel],el=$("ps");if(!p){el.hidden=true;return}
+ var z=ST,chips=[1,5,10].map(function(x){return '<button class="btn chip'+(z.r===x?" on":"")+'" data-pr="'+x+'">±'+x+"%</button>"}).join("")+'<button class="btn chip'+(z.r==="c"?" on":"")+'" data-pr="c">Personal.</button>',
+ cu=z.r==="c"?'<div class="two"><input id="cmin" class="num" type="number" step="any" placeholder="Mín." value="'+esc(z.cmin)+'"><input id="cmax" class="num" type="number" step="any" placeholder="Máx." value="'+esc(z.cmax)+'"></div>':"",
+ vo=VEN.map(function(v){return "<option"+(v===z.via?" selected":"")+">"+v+"</option>"}).join(""),
+ sl=[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===z.slip?" selected":"")+">"+v+"%</option>"}).join("");
+ el.style.setProperty("--tc","20,241,149");
+ el.innerHTML='<div class="mb"><button class="x" data-act="closeps" aria-label="Cerrar">×</button><b style="font-size:20px">Crear posición</b><div class="dim">'+esc(p.A.s)+"/"+esc(p.B.s)+" · "+p.pr+(p.fee!=null?" · comisión "+f(p.fee,2)+"%":"")+" · precio "+fp(p.p)+" "+esc(p.B.s)+" por "+esc(p.A.s)+"</div>"+
+ '<label>Rango de precio</label><div class="chips">'+chips+"</div>"+cu+'<div class="dim" id="prg" style="margin-top:6px"></div>'+
+ '<label for="pa">Cantidad de depósito</label><div class="box"><div class="srow"><select id="ppay"><option value="A"'+(z.pay==="A"?" selected":"")+">"+esc(p.A.s)+'</option><option value="B"'+(z.pay==="B"?" selected":"")+">"+esc(p.B.s)+'</option></select><input id="pa" class="num" type="number" inputmode="decimal" min="0" step="any" value="'+esc(z.amt)+'" placeholder="0.0"></div><div class="dim" id="pbal" style="margin-top:6px"></div></div>'+
+ '<div class="hrow"><label class="tg"><input type="checkbox" id="pau"'+(z.auto?" checked":"")+'>Autoswap</label><span class="dim">Operar vía <select id="pvia">'+vo+'</select></span><span class="dim">Desliz. <select id="pslp">'+sl+"</select></span></div>"+
+ '<div class="sum" id="psum"></div>'+
+ '<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="autoswap">Hacer autoswap (real)</button><div class="stat" id="pres"></div>'+
+ '<a class="btn p" href="'+esc(p.url)+'" target="_blank" rel="noopener">Crear posición en '+p.pr+' ↗</a>'+
+ '<div class="dim" style="margin-top:10px">El autoswap deja tus fondos en la proporción del rango. La posición (NFT) la crea el protocolo al depositar; el contrato propio de Kosmara llegará después. Dato de DFlow: entra dentro de la opción Jupiter.</div></div>';
+ el.hidden=false;sumPs();
+}
+async function autoswap(){
+ var p=S.pools[S.sel],c=pcalc(),pay=c.payB?p.B:p.A,oth=c.payB?p.A:p.B,amt=Math.floor(c.swapIn*Math.pow(10,pay.d));
+ var r=function(h){$("pres").innerHTML=h};
+ if(!S.pk)return r("Conecta Phantom primero.");if(!(amt>0))return r("Introduce una cantidad.");if(!S.key)return r("Falta la clave de Jupiter (bloque Conexiones).");
+ try{r("Consultando ruta…");var q=await quoteV(ST.via,pay.m,oth.m,amt,ST.slip),out=q.out/Math.pow(10,oth.d);
+  if(!confirm("Vas a firmar un swap REAL para el autoswap:\n"+f(c.swapIn,6)+" "+pay.s+" por unos "+f(out,6)+" "+oth.s+" vía "+ST.via+".\nRevisa los detalles en Phantom antes de aprobar."))return r("Cancelado.");
+  r("Esperando tu firma en Phantom…");var sg=await execSwap(ST.via,pay.m,oth.m,amt,ST.slip);
+  r('Autoswap enviado. <a class="lk" href="https://solscan.io/tx/'+esc(sg)+'" target="_blank" rel="noopener">Ver en Solscan ↗</a> Ahora crea la posición en '+p.pr+".");loadBal().then(sumPs)}
+ catch(e){r("No se pudo completar: "+esc(e.message))}
+}
+
+/* ---------- Wallets ---------- */
+async function loadBal(){
+ if(!S.pk)return;
+ try{var o={};o[SOLM]=(await rc("getBalance",[S.pk])).value/1e9;
+  await Promise.all(["TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA","TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"].map(async function(pg){
+   var t=await rc("getTokenAccountsByOwner",[S.pk,{programId:pg},{encoding:"jsonParsed"}]);
+   t.value.forEach(function(a){var i=a.account.data.parsed.info;o[i.mint]=(o[i.mint]||0)+(i.tokenAmount.uiAmount||0)})}));
+  S.bal=o}
+ catch(e){toast("No se pudo leer tu saldo: "+e.message)}
+}
+async function wallet(w){
+ try{
+  if(w==="ph"){var pv=window.phantom&&window.phantom.solana;if(!pv)throw new Error("Phantom no detectada. En el móvil, abre la web dentro de Phantom (enlace del cuadro).");
+   S.pk=(await pv.connect()).publicKey.toString();S.wname="Phantom";$("addr").value=S.pk;await loadBal();rSwap();sumPsSafe()}
+  else{var e=window.ethereum;if(!e)throw new Error("MetaMask no detectada. En el móvil, abre la web dentro de MetaMask (enlace del cuadro).");
+   var a=(await e.request({method:"eth_requestAccounts"}))[0];S.wname="MetaMask";$("addr").value=a;toast("Dirección de MetaMask cargada en Movimientos. Los swaps y pools de Ethereum y BNB llegan después.")}
+  $("bConn").textContent=S.wname+" "+short($("addr").value);$("sheet").hidden=true;
+ }catch(x){toast(x.message||"No se pudo conectar.")}
+}
+function sumPsSafe(){if(S.sel&&!$("ps").hidden)sumPs()}
+
+/* ---------- Movimientos reales ---------- */
+var BS="https://eth.blockscout.com/api/v2/addresses/";
 var MINT={EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:"USDC",So11111111111111111111111111111111111111112:"wSOL",JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN:"JUP"};
 function iso(t){return t?new Date(t*1e3).toISOString().slice(0,19).replace("T"," "):""}
 function stt(t){$("hst").textContent=t}
@@ -255,16 +313,16 @@ function solRows(s,tx,a){
  var fee=i===0?m.fee/1e9:0,dl=i>=0?(m.postBalances[i]-m.preBalances[i])/1e9+fee:0;
  (m.preTokenBalances||[]).forEach(function(x){if(x.owner===a)T[x.mint]=(T[x.mint]||0)-(x.uiTokenAmount.uiAmount||0)});
  (m.postTokenBalances||[]).forEach(function(x){if(x.owner===a)T[x.mint]=(T[x.mint]||0)+(x.uiTokenAmount.uiAmount||0)});
- var tk=Object.keys(T).filter(function(k){return Math.abs(T[k])>1e-12});
- if(Math.abs(dl)>1e-12||fee||!tk.length){b.imp=dl;b.dir=dl>0?"entrada":dl<0?"salida":"otro";b.fee=fee||"";R.push(b)}
- tk.forEach(function(k){var c=Object.assign({},b);c.ty="token";c.imp=T[k];c.dir=T[k]>0?"entrada":"salida";c.act=MINT[k]||k.slice(0,4)+"…"+k.slice(-4);c.fee="";R.push(c)});
+ var tk2=Object.keys(T).filter(function(k){return Math.abs(T[k])>1e-12});
+ if(Math.abs(dl)>1e-12||fee||!tk2.length){b.imp=dl;b.dir=dl>0?"entrada":dl<0?"salida":"otro";b.fee=fee||"";R.push(b)}
+ tk2.forEach(function(k){var c=Object.assign({},b);c.ty="token";c.imp=T[k];c.dir=T[k]>0?"entrada":"salida";c.act=MINT[k]||k.slice(0,4)+"…"+k.slice(-4);c.fee="";R.push(c)});
  return R}
 async function histSol(a){
- var H={"Content-Type":"application/json"},r=await fetch(SOLRPC,{method:"POST",headers:H,body:JSON.stringify({jsonrpc:"2.0",id:1,method:"getSignaturesForAddress",params:[a,{limit:40}]})});
+ var H={"Content-Type":"application/json"},r=await fetch(rpcUrl(),{method:"POST",headers:H,body:JSON.stringify({jsonrpc:"2.0",id:1,method:"getSignaturesForAddress",params:[a,{limit:40}]})});
  if(!r.ok)throw new Error("HTTP "+r.status);var j=await r.json();if(j.error)throw new Error(j.error.message);
  var sg=j.result,R=[];
  for(var i=0;i<sg.length;i+=10){var ch=sg.slice(i,i+10),txs=[];stt("Leyendo movimientos "+Math.min(i+10,sg.length)+" de "+sg.length+"…");
-  try{var rr=await fetch(SOLRPC,{method:"POST",headers:H,body:JSON.stringify(ch.map(function(s,k){return{jsonrpc:"2.0",id:k,method:"getTransaction",params:[s.signature,{encoding:"jsonParsed",maxSupportedTransactionVersion:0}]}}))}),jj=await rr.json();if(Array.isArray(jj))jj.forEach(function(o){txs[o.id]=o.result})}catch(e){}
+  try{var rr=await fetch(rpcUrl(),{method:"POST",headers:H,body:JSON.stringify(ch.map(function(s,k){return{jsonrpc:"2.0",id:k,method:"getTransaction",params:[s.signature,{encoding:"jsonParsed",maxSupportedTransactionVersion:0}]}}))}),jx=await rr.json();if(Array.isArray(jx))jx.forEach(function(o){txs[o.id]=o.result})}catch(e){}
   ch.forEach(function(s,k){solRows(s,txs[k],a).forEach(function(x){R.push(x)})});
   await new Promise(function(z){setTimeout(z,350)})}
  return R}
@@ -284,9 +342,9 @@ function sh(h){return h&&h.length>14?h.slice(0,6)+"…"+h.slice(-4):h}
 function showHist(){
  CSV=makeCsv();var R=S.rows,lk=S.net==="sol"?"https://solscan.io/tx/":"https://etherscan.io/tx/";
  if(!R.length){$("hres").innerHTML='<div class="dim" style="margin-top:12px">Esta dirección no tiene movimientos.</div>';return}
- var rows=R.slice(0,30).map(function(r){return "<tr><td>"+r.d+"</td><td>"+r.ty+'</td><td class="'+(r.dir==="entrada"?"up":r.dir==="salida"?"dn":"")+'">'+r.dir+'</td><td class="mono">'+(r.imp===""?"":f(r.imp,6))+" "+r.act+'</td><td><a class="lk" href="'+lk+r.h+'" target="_blank" rel="noopener">'+sh(r.h)+"</a></td></tr>"}).join("");
+ var rows=R.slice(0,30).map(function(r){return "<tr><td>"+esc(r.d)+"</td><td>"+esc(r.ty)+'</td><td class="'+(r.dir==="entrada"?"up":r.dir==="salida"?"dn":"")+'">'+r.dir+'</td><td class="num">'+(r.imp===""?"":f(r.imp,6))+" "+esc(r.act)+'</td><td><a class="lk" href="'+lk+esc(r.h)+'" target="_blank" rel="noopener">'+esc(sh(r.h))+"</a></td></tr>"}).join("");
  $("hres").innerHTML='<div class="scroll"><table><tr><th>Fecha (UTC)</th><th>Tipo</th><th>Dirección</th><th>Importe</th><th>Hash</th></tr>'+rows+"</table></div>"+(R.length>30?'<div class="dim" style="margin-top:8px">Mostrando 30 de '+R.length+" filas. El CSV las incluye todas.</div>":"")+
- '<div class="two"><button class="btn" data-act="dl">Descargar CSV</button><button class="btn" data-act="copy">Copiar CSV</button></div><label class="dim" for="csv" style="display:block;margin:12px 0 4px">Vista previa del CSV</label><textarea id="csv" readonly>'+CSV.replace(/&/g,"&amp;").replace(/</g,"&lt;")+"</textarea>";
+ '<div class="two"><button class="btn" data-act="dl">Descargar CSV</button><button class="btn" data-act="copy">Copiar CSV</button></div><label for="csv">Vista previa del CSV</label><textarea id="csv" readonly>'+esc(CSV)+"</textarea>";
 }
 async function loadHist(){
  var a=$("addr").value.trim(),net=/^0x[0-9a-fA-F]{40}$/.test(a)?"eth":/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(a)?"sol":"";
@@ -294,51 +352,47 @@ async function loadHist(){
  S.addr=a;S.net=net;$("hres").innerHTML="";stt("Conectando con "+(net==="sol"?"Solana":"Ethereum")+"…");
  try{S.rows=net==="sol"?await histSol(a):await histEth(a);showHist();
   var blank=net==="sol"&&S.rows.length&&S.rows.every(function(r){return r.imp===""});
-  stt(S.rows.length+" filas cargadas de "+(net==="sol"?"Solana (últimas 40 transacciones)":"Ethereum (página más reciente)")+(blank?". El nodo público no devolvió los importes; reintenta en un momento.":"."))}
- catch(e){stt(String(e&&e.message).indexOf("fetch")>=0?"No se pudo conectar con la blockchain. Esta vista previa bloquea conexiones externas: ábrela desde tu página de GitHub.":"No se pudo leer: "+(e&&e.message)+". Los nodos públicos tienen límites; prueba de nuevo en un minuto.")}
+  stt(S.rows.length+" filas cargadas de "+(net==="sol"?"Solana (últimas 40 transacciones)":"Ethereum (página más reciente)")+(blank?". El nodo no devolvió los importes; prueba con un RPC propio en Conexiones.":"."))}
+ catch(e){stt("No se pudo leer: "+(e&&e.message)+". Los nodos públicos tienen límites; prueba un RPC propio en Conexiones.")}
 }
-function dlCsv(){
- if(!CSV)return;var b=new Blob(["\ufeff"+CSV],{type:"text/csv;charset=utf-8"}),u=URL.createObjectURL(b),l=document.createElement("a");
- l.href=u;l.download="movimientos-"+S.addr.slice(0,6)+".csv";document.body.appendChild(l);l.click();l.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);toast("Descarga iniciada. Si no aparece, usa Copiar CSV.");
-}
+function dlCsv(){if(!CSV)return;var b=new Blob(["\ufeff"+CSV],{type:"text/csv;charset=utf-8"}),u=URL.createObjectURL(b),l=document.createElement("a");l.href=u;l.download="movimientos-"+S.addr.slice(0,6)+".csv";document.body.appendChild(l);l.click();l.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);toast("Descarga iniciada. Si no aparece, usa Copiar CSV.")}
 function copyCsv(){var ta=$("csv"),ok=false;try{navigator.clipboard.writeText(CSV);ok=true}catch(e){}if(!ok){try{ta.select();ok=document.execCommand("copy")}catch(e){}}toast(ok?"CSV copiado.":"No se pudo copiar solo: mantén pulsado el texto y copia.")}
 
-/* eventos */
+/* ---------- eventos ---------- */
 document.addEventListener("click",function(e){
- var q=function(s){return e.target.closest(s)},a=q("[data-act]"),pc=q("[data-pct]"),rt=q("[data-rt]"),w=q("[data-w]");
+ var q=function(s){return e.target.closest(s)},a=q("[data-act]"),w=q("[data-w]"),pl=q("[data-pool]"),fl=q("[data-flt]"),pr=q("[data-pr]"),rt=q("[data-rt]"),pc=q("[data-pct]");
  if(e.target===$("sheet"))$("sheet").hidden=true;
+ if(e.target===$("ps")){S.sel="";rPs()}
  if(w)return wallet(w.getAttribute("data-w"));
- if(rt){S.rt=rt.getAttribute("data-rt");return quote()}
- if(pc){S.amt=String(Math.floor(B[S.from]*pc.getAttribute("data-pct")/100*1e6)/1e6);return rSwap()}
+ if(pl){S.sel=pl.getAttribute("data-pool");var p=S.pools[S.sel];ST.pay=p&&p.B.s&&/USD/.test(p.B.s)?"B":"B";ST.amt="";rPs();return}
+ if(fl){S.flt=fl.getAttribute("data-flt");S.focusQ=false;return rPools()}
+ if(pr){var v=pr.getAttribute("data-pr");ST.r=v==="c"?"c":+v;return rPs()}
+ if(rt){SW.sel=rt.getAttribute("data-rt");return rQt()}
+ if(pc){var t=TM[SW.from];SW.amt=String(Math.floor((S.bal[t.m]||0)*pc.getAttribute("data-pct")/100*1e6)/1e6);return rSwap()}
  if(a){var m=a.getAttribute("data-act");
-  if(m==="open")$("sheet").hidden=false;else if(m==="swap")doSwap();else if(m==="load")loadHist();else if(m==="dl")dlCsv();else if(m==="copy")copyCsv();
-  else if(m==="flip"){var z=S.from;S.from=S.to;S.to=z;S.amt="";S.rt="";rSwap()}}
+  if(m==="open"){$("lPh").href="https://phantom.app/ul/browse/"+encodeURIComponent(location.href)+"?ref="+encodeURIComponent(location.origin);$("lMm").href="https://metamask.app.link/dapp/"+location.host+location.pathname;$("sheet").hidden=false}
+  else if(m==="close")$("sheet").hidden=true;else if(m==="closeps"){S.sel="";rPs()}
+  else if(m==="quote")quoteAll();else if(m==="doswap")doSwap();else if(m==="autoswap")autoswap();
+  else if(m==="more"){S.lim+=40;rPools()}else if(m==="load")loadHist();else if(m==="dl")dlCsv();else if(m==="copy")copyCsv();
+  else if(m==="flip"){var z=SW.from;SW.from=SW.to;SW.to=z;SW.amt="";SW.res=[];rSwap()}}
 });
-document.addEventListener("input",function(e){if(e.target.id==="amt"){S.amt=e.target.value;quote()}});
+document.addEventListener("input",function(e){
+ var t=e.target,id=t.id;
+ if(id==="amt"){SW.amt=t.value;SW.res=[];rQt()}
+ else if(id==="pq"){S.q=t.value;S.focusQ=true;rPools();clearTimeout(qT);if(t.value.trim().length>=2)qT=setTimeout(function(){loadPools(t.value.trim())},600)}
+ else if(id==="pa"){ST.amt=t.value;sumPs()}else if(id==="cmin"){ST.cmin=t.value;sumPs()}else if(id==="cmax"){ST.cmax=t.value;sumPs()}
+});
 document.addEventListener("change",function(e){
- if(e.target.id==="sf"){S.from=e.target.value;S.amt="";S.rt="";rSwap()}
- if(e.target.id==="st"){S.to=e.target.value;S.rt="";rSwap()}
+ var t=e.target,id=t.id;
+ if(id==="sf"){SW.from=t.value;SW.amt="";SW.res=[];rSwap()}else if(id==="st"){SW.to=t.value;SW.res=[];rSwap()}else if(id==="sw-slip"){SW.slip=+t.value;SW.res=[];rQt()}
+ else if(id==="psort"){S.sort=t.value;S.focusQ=false;rPools()}
+ else if(id==="ppay"){ST.pay=t.value;sumPs()}else if(id==="pau"){ST.auto=t.checked;sumPs()}else if(id==="pvia"){ST.via=t.value;sumPs()}else if(id==="pslp"){ST.slip=+t.value;sumPs()}
+ else if(id==="jk"){S.key=t.value.trim();LS("kz_jup",S.key);toast("Clave de Jupiter guardada en este navegador.")}
+ else if(id==="rp"){S.rpc=t.value.trim();LS("kz_rpc",S.rpc);toast("RPC guardado.");if(S.pk)loadBal().then(rSwap)}
 });
 $("addr").addEventListener("keydown",function(e){if(e.key==="Enter")loadHist()});
 
-/* wallets: solo leen la dirección pública */
-async function wallet(w){
- if(w==="x"){$("sheet").hidden=true;return}
- try{var a="",n="";
-  if(w==="ph"){var p=window.phantom&&window.phantom.solana;if(!p)throw 0;a=(await p.connect()).publicKey.toString();n="Phantom"}
-  else{var e=window.ethereum;if(!e)throw 0;a=(await e.request({method:"eth_requestAccounts"}))[0];n="MetaMask"}
-  $("addr").value=a;$("bConn").textContent=n+" "+a.slice(0,5)+"…"+a.slice(-4);$("sheet").hidden=true;toast("Dirección cargada en Movimientos.");
- }catch(x){toast("No se detectó la wallet. Ábrela en un ordenador con la extensión o en el navegador interno de tu wallet.")}
-}
-
-/* precios */
-setInterval(function(){N++;if(!S.live)for(var k in P)if(k!=="USDC"&&k!=="USDT")P[k]*=1+(Math.random()-.5)*.004;rMkt();quote()},3000);
-async function live(){
- try{var r=await fetch("https://api.coingecko.com/api/v3/simple/price?ids="+Object.keys(CG).map(function(k){return CG[k]}).join(",")+"&vs_currencies=usd"),j=await r.json(),ok=false;
-  for(var k in CG)if(j[CG[k]]&&j[CG[k]].usd){if(!S.live)P0[k]=j[CG[k]].usd;P[k]=j[CG[k]].usd;ok=true}
-  if(ok)S.live=true;rMkt()}catch(e){}
-}
-rSwap();rMkt();live();setInterval(live,60000);
+rSwap();rCfg();rPools();loadPools();
 </script>
 </body>
 </html>
