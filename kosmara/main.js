@@ -6,7 +6,7 @@ import { getWallets } from "@wallet-standard/app";
 
 function $(i){return document.getElementById(i)}
 function f(n,d){return n.toLocaleString("es-ES",{maximumFractionDigits:d==null?2:d})}
-function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&").replace(/</g,"<").replace(/>/g,">")}
 function toast(t){var e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(toast.h);toast.h=setTimeout(function(){e.hidden=true},4200)}
 function LS(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";localStorage.setItem(k,v)}catch(e){return ""}}
 function fp(n){return !isFinite(n)?"—":n>=1?f(n,n>=100?2:4):f(n,6)}
@@ -241,7 +241,7 @@ async function loadBal(){
   S.bal=o}
  catch(e){toast("No se pudo leer tu saldo: "+e.message)}
 }
-function solWallets(){return getWallets().get().filter(function(w){return w.features["standard:connect"]&&w.features["solana:signTransaction"])}
+function solWallets(){return getWallets().get().filter(function(w){return w.features["standard:connect"]&&w.features["solana:signTransaction"]})}
 async function wallet(w){
  try{
   if(w==="mm")return toast("MetaMask se usará cuando conectemos Ethereum y BNB Chain. Esta versión es solo Solana.");
