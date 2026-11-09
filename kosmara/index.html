@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kosmara</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+<div class="g">
+<nav class="all top"><button class="ywallet" id="bConn" data-act="open">Conectar wallet</button><div class="links"><a href="#swap">Swap</a><a href="#pools">Pools</a><a href="#movimientos">Movimientos</a></div><div class="sp"></div><div class="logo"><i>✦</i> Kosmara</div></nav>
+<header class="all" style="padding:8px 2px 4px"><h1>Todo DeFi en <em>una sola puerta</em></h1><p class="lead">Swap con las mejores rutas, todos los pools de Solana en una lista y tus movimientos exportables.</p><div class="pills"><span style="--c:#14f195">Solana · datos reales</span><span style="--c:#8c9eff">Ethereum · próximamente</span><span style="--c:#f3ba2f">BNB Chain · próximamente</span></div></header>
+
+<section class="b ctr" id="swap" style="--tc:124,92,255"></section>
+<section class="b ctr" id="cfg" style="--tc:139,140,153"></section>
+
+<section class="b all" id="pools" style="--tc:20,241,149"></section>
+<section class="b s3 soon" style="--tc:140,158,255"><div class="k">Ethereum <small>próximamente</small></div><div class="dim">Pools de Uniswap y PancakeSwap con el mismo flujo: lista, rango, autoswap y creación de posición.</div></section>
+<section class="b s3 soon" style="--tc:243,186,47"><div class="k">BNB Chain <small>próximamente</small></div><div class="dim">Pools de PancakeSwap y Uniswap con el mismo flujo. Después, más redes.</div></section>
+
+<section class="b all" id="movimientos" style="--tc:34,214,138">
+<div class="k">Movimientos por clave pública <small>datos reales de la blockchain</small></div>
+<div class="box"><label for="addr">Clave pública (Solana o Ethereum)</label><div class="srow"><input id="addr" style="text-align:left;font-size:13px;background:rgba(255,255,255,.06);border:1px solid var(--line);padding:11px" placeholder="Pega aquí una dirección pública" autocomplete="off" spellcheck="false"><button class="btn sm" data-act="load" style="white-space:nowrap">Cargar</button></div></div>
+<div class="stat" id="hst">Detecto la red automáticamente. Solo se leen datos públicos; nunca pegues claves privadas ni frases semilla.</div>
+<div id="hres"></div>
+</section>
+<p class="all foot">Prototipo sin auditar. Los swaps de este prototipo son reales y mueven fondos de tu wallet: prueba con importes pequeños. En Orca, la posición (NFT) se crea desde aquí y llega directa a tu wallet; Raydium y Meteora llegarán después.</p>
+</div>
+
+<div class="m" id="sheet" hidden><div class="mb" role="dialog" aria-label="Conectar wallet"><button class="x" data-act="close" aria-label="Cerrar">×</button><b style="font-size:18px">Conectar wallet</b>
+<button class="wbtn ph" data-w="ph"><svg viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#fff"/><path d="M7 29c0-10 5.5-17 13-17s13 7 13 15c0 2.2-1.7 2.8-3.3 1.6s-3.1-2-4.6-.4-3 1.9-4.9 0-3.5-1.9-5 0S7.6 31 7 29z" fill="#AB9FF2"/><circle cx="16.5" cy="21" r="2" fill="#fff"/><circle cx="24" cy="21" r="2" fill="#fff"/></svg><span>Phantom</span><small>Solana</small></button>
+<button class="wbtn mm" data-w="mm"><svg viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#fff"/><polygon points="5,8 17,16 14,22" fill="#E17726"/><polygon points="35,8 23,16 26,22" fill="#E17726"/><polygon points="14,22 20,18 26,22 28,30 20,35 12,30" fill="#F5841F"/><polygon points="14,22 20,25 26,22 20,18" fill="#D7C1B3"/><polygon points="17,29 20,32 23,29 20,27" fill="#763E1A"/><circle cx="16.5" cy="24" r="1.2" fill="#161616"/><circle cx="23.5" cy="24" r="1.2" fill="#161616"/></svg><span>MetaMask</span><small>Ethereum y BNB Chain</small></button>
+<button class="wbtn cn" data-act="close">Cancelar</button>
+<p class="dim" style="margin:12px 0 0">Si estás en el móvil, las wallets no se ven desde un navegador normal. Abre esta web dentro de la wallet: <a class="lk" id="lPh" href="#" target="_blank" rel="noopener">Phantom ↗</a> · <a class="lk" id="lMm" href="#" target="_blank" rel="noopener">MetaMask ↗</a>. Más billeteras y cold wallets llegarán después.</p></div></div>
+<div class="m" id="ps" hidden></div>
+<div class="toast" id="toast" hidden></div>
+
+<script type="module" src="./main.js"></script>
+</body>
+</html>
