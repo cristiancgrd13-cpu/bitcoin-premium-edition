@@ -70,6 +70,19 @@ th,td{text-align:left;padding:7px 6px;border-bottom:1px solid var(--line);white-
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(18px + env(safe-area-inset-bottom,0px));background:#eeeef5;color:#000;padding:11px 16px;border-radius:12px;font-size:14px;font-weight:700;max-width:92vw;z-index:60}.toast[hidden]{display:none}
 .foot{font-size:12px;color:var(--dim);padding:0 4px}
 button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid rgb(var(--tc,124,92,255));outline-offset:2px}
+
+.plist{grid-template-columns:minmax(0,1fr)}
+@media(min-width:820px){.plist{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}}
+.plist>*{min-width:0}
+.row>div:first-child{min-width:0}
+.row .v{flex:none;max-width:55%;white-space:normal}
+.row small{overflow-wrap:anywhere}
+.row.prow{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 12px;align-items:baseline}
+.row.prow .a{min-width:0}
+.row.prow .r{text-align:right}
+.row.prow small{display:block;margin:0}
+.wl{display:block;width:34px;height:34px;flex:none}
+.wl svg,.wl img{width:100%;height:100%;display:block;border-radius:8px;object-fit:contain}
 </style>
 </head>
 <body>
@@ -94,8 +107,8 @@ button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{ou
 </div>
 
 <div class="m" id="sheet" hidden><div class="mb" role="dialog" aria-label="Conectar wallet"><button class="x" data-act="close" aria-label="Cerrar">×</button><b style="font-size:18px">Conectar wallet</b>
-<button class="wbtn ph" data-w="ph"><svg viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#fff"/><path d="M7 29c0-10 5.5-17 13-17s13 7 13 15c0 2.2-1.7 2.8-3.3 1.6s-3.1-2-4.6-.4-3 1.9-4.9 0-3.5-1.9-5 0S7.6 31 7 29z" fill="#AB9FF2"/><circle cx="16.5" cy="21" r="2" fill="#fff"/><circle cx="24" cy="21" r="2" fill="#fff"/></svg><span>Phantom</span><small>Solana</small></button>
-<button class="wbtn mm" data-w="mm"><svg viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#fff"/><polygon points="5,8 17,16 14,22" fill="#E17726"/><polygon points="35,8 23,16 26,22" fill="#E17726"/><polygon points="14,22 20,18 26,22 28,30 20,35 12,30" fill="#F5841F"/><polygon points="14,22 20,25 26,22 20,18" fill="#D7C1B3"/><polygon points="17,29 20,32 23,29 20,27" fill="#763E1A"/><circle cx="16.5" cy="24" r="1.2" fill="#161616"/><circle cx="23.5" cy="24" r="1.2" fill="#161616"/></svg><span>MetaMask</span><small>Ethereum y BNB Chain</small></button>
+<button class="wbtn ph" data-w="ph"><span class="wl"><svg viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#fff"/><path d="M7 29c0-10 5.5-17 13-17s13 7 13 15c0 2.2-1.7 2.8-3.3 1.6s-3.1-2-4.6-.4-3 1.9-4.9 0-3.5-1.9-5 0S7.6 31 7 29z" fill="#AB9FF2"/><circle cx="16.5" cy="21" r="2" fill="#fff"/><circle cx="24" cy="21" r="2" fill="#fff"/></svg></span><span>Phantom</span><small>Solana</small></button>
+<button class="wbtn mm" data-w="mm"><span class="wl"><svg viewBox="0 0 40 40"><rect width="40" height="40" rx="10" fill="#fff"/><polygon points="5,8 17,16 14,22" fill="#E17726"/><polygon points="35,8 23,16 26,22" fill="#E17726"/><polygon points="14,22 20,18 26,22 28,30 20,35 12,30" fill="#F5841F"/><polygon points="14,22 20,25 26,22 20,18" fill="#D7C1B3"/><polygon points="17,29 20,32 23,29 20,27" fill="#763E1A"/><circle cx="16.5" cy="24" r="1.2" fill="#161616"/><circle cx="23.5" cy="24" r="1.2" fill="#161616"/></svg></span><span>MetaMask</span><small>Ethereum y BNB Chain</small></button>
 <button class="wbtn cn" data-act="close">Cancelar</button>
 <p class="dim" style="margin:12px 0 0">Si estás en el móvil, las wallets no se ven desde un navegador normal. Abre esta web dentro de la wallet: <a class="lk" id="lPh" href="#" target="_blank" rel="noopener">Phantom ↗</a> · <a class="lk" id="lMm" href="#" target="_blank" rel="noopener">MetaMask ↗</a>. Más billeteras y cold wallets llegarán después.</p></div></div>
 <div class="m" id="ps" hidden></div>
@@ -197,7 +210,7 @@ var SRC={
  Orca:{u:function(q){return "https://api.orca.so/v2/solana/pools"+(q?"/search?q="+encodeURIComponent(q)+"&limit=50":"?limit=100&sortBy=tvl&sortDirection=desc&minTvl=20000")},
   r:function(j){return j.data||[]},
   n:function(p){var st=(p.stats&&(p.stats["24h"]||p.stats["1d"]))||{},y=st.yieldOverTvl!=null?st.yieldOverTvl:p.yieldOverTvl;return mk("Orca",p.address,tk(p.tokenA),tk(p.tokenB),p.price,p.tvlUsdc!=null?p.tvlUsdc:p.tvl,st.volume!=null?st.volume:p.volume24h,y!=null?y*36500:null,p.feeRate!=null?p.feeRate/1e4:null,"https://www.orca.so/pools/"+p.address)}},
- Raydium:{u:function(q){return q?null:"https://api-v3.raydium.io/pools/info/list?poolType=concentrated&poolSortField=tvl&sortType=desc&pageSize=100&page=1"},
+ Raydium:{u:function(q){return q?null:["https://api-v3.raydium.io/pools/info/list?poolType=concentrated&poolSortField=liquidity&sortType=desc&pageSize=100&page=1","https://api-v3.raydium.io/pools/info/list?poolType=all&poolSortField=default&sortType=desc&pageSize=100&page=1"]},
   r:function(j){return (j.data&&j.data.data)||j.data||[]},
   n:function(p){var d=p.day||{};return mk("Raydium",p.id,tk(p.mintA),tk(p.mintB),p.price,p.tvl,d.volume,d.apr,p.feeRate!=null?p.feeRate*100:null,"https://raydium.io/clmm/create-position/?pool_id="+p.id)}},
  Meteora:{u:function(q){return "https://dlmm.datapi.meteora.ag/pools?page=1&page_size="+(q?50:100)+"&sort_by=tvl:desc"+(q?"&query="+encodeURIComponent(q):"")},
@@ -210,7 +223,7 @@ var SRC={
 async function loadPools(q){
  await Promise.all(Object.keys(SRC).map(async function(n){
   var s=SRC[n],u=s.u(q);if(!u)return;
-  try{var r=await fetch(u);if(!r.ok)throw new Error("HTTP "+r.status);var L=s.r(await r.json()),c=0;
+  try{var r=null,er="";for(var ui=0,us=[].concat(u);ui<us.length;ui++){try{r=await fetch(us[ui]);if(r.ok)break;er="HTTP "+r.status}catch(e2){er=e2.message}r=null}if(!r||!r.ok)throw new Error(er||"sin respuesta");var L=s.r(await r.json()),c=0;
    L.forEach(function(p){try{var o=s.n(p);if(o.id&&o.A.m&&o.B.m){S.pools[o.k]=o;c++}}catch(e){}});S.stat[n]=c+" pools"}
   catch(e){S.stat[n]="error: "+(e.message||"red")}}));
  rPools();
@@ -224,7 +237,7 @@ function rPools(){
  var L=filt(),chips=["all","Orca","Raydium","Meteora"].map(function(x){return '<button class="btn chip'+(S.flt===x?" on":"")+'" data-flt="'+x+'">'+(x==="all"?"Todas":x)+"</button>"}).join("");
  var st=Object.keys(SRC).map(function(n){var s=S.stat[n];return n+": "+(s?esc(s):"cargando…")}).join(" · ");
  var rows=L.slice(0,S.lim).map(function(p){
-  return '<div class="row pick" data-pool="'+esc(p.k)+'"><div><b>'+esc(p.A.s)+"/"+esc(p.B.s)+'</b><span class="tag o">'+p.pr+"</span><small>TVL $"+f(p.tvl,0)+(p.fee!=null?" · comisión "+f(p.fee,2)+"%":"")+'</small></div><div class="v"><b class="up">'+(p.apr!=null?f(p.apr,1)+"%":"—")+"</b><small>APR · vol. $"+f(p.vol,0)+"</small></div></div>"}).join("");
+  return '<div class="row pick prow" data-pool="'+esc(p.k)+'"><div class="a"><b>'+esc(p.A.s)+"/"+esc(p.B.s)+'</b><span class="tag o">'+p.pr+'</span></div><div class="r up"><b>'+(p.apr!=null?f(p.apr,1)+"%":"—")+'</b> <small>APR</small></div><small>TVL $'+f(p.tvl,0)+(p.fee!=null?" · comisión "+f(p.fee,2)+"%":"")+'</small><small class="r">vol. $'+f(p.vol,0)+"</small></div>"}).join("");
  var h=$("pools");h.innerHTML='<div class="k">Solana · pools de liquidez <small>'+L.length+' pools</small></div>'+
   '<input id="pq" placeholder="Buscar par o token (SOL, HYPE, USDC…)" value="'+esc(S.q)+'" autocomplete="off"><div class="chips">'+chips+
   '<select id="psort" style="flex:none;width:auto"><option value="tvl"'+(S.sort==="tvl"?" selected":"")+'>Ordenar: TVL</option><option value="vol"'+(S.sort==="vol"?" selected":"")+'>Ordenar: volumen</option><option value="apr"'+(S.sort==="apr"?" selected":"")+">Ordenar: APR</option></select></div>"+
@@ -370,7 +383,7 @@ document.addEventListener("click",function(e){
  if(rt){SW.sel=rt.getAttribute("data-rt");return rQt()}
  if(pc){var t=TM[SW.from];SW.amt=String(Math.floor((S.bal[t.m]||0)*pc.getAttribute("data-pct")/100*1e6)/1e6);return rSwap()}
  if(a){var m=a.getAttribute("data-act");
-  if(m==="open"){$("lPh").href="https://phantom.app/ul/browse/"+encodeURIComponent(location.href)+"?ref="+encodeURIComponent(location.origin);$("lMm").href="https://metamask.app.link/dapp/"+location.host+location.pathname;$("sheet").hidden=false}
+  if(m==="open"){setIcons();$("lPh").href="https://phantom.app/ul/browse/"+encodeURIComponent(location.href)+"?ref="+encodeURIComponent(location.origin);$("lMm").href="https://metamask.app.link/dapp/"+location.host+location.pathname;$("sheet").hidden=false}
   else if(m==="close")$("sheet").hidden=true;else if(m==="closeps"){S.sel="";rPs()}
   else if(m==="quote")quoteAll();else if(m==="doswap")doSwap();else if(m==="autoswap")autoswap();
   else if(m==="more"){S.lim+=40;rPools()}else if(m==="load")loadHist();else if(m==="dl")dlCsv();else if(m==="copy")copyCsv();
@@ -393,6 +406,24 @@ document.addEventListener("change",function(e){
 $("addr").addEventListener("keydown",function(e){if(e.key==="Enter")loadHist()});
 
 rSwap();rCfg();rPools();loadPools();
+
+/* ---------- logos originales de las wallets ---------- */
+var WSW=[],ICON={ph:"",mm:""};
+(function(){var api={register:function(){for(var i=0;i<arguments.length;i++)WSW.push(arguments[i]);return function(){}}};
+ try{window.addEventListener("wallet-standard:register-wallet",function(e){try{e.detail(api)}catch(x){}});window.dispatchEvent(new CustomEvent("wallet-standard:app-ready",{detail:api}))}catch(x){}
+ try{window.addEventListener("eip6963:announceProvider",function(e){var i=e.detail&&e.detail.info;if(i&&/metamask/i.test((i.name||"")+(i.rdns||""))&&i.icon){ICON.mm=i.icon;setIcons()}});window.dispatchEvent(new Event("eip6963:requestProvider"))}catch(x){}})();
+function setIcons(){
+ try{var pw=WSW.filter(function(x){return /phantom/i.test(x.name)})[0];if(pw&&pw.icon)ICON.ph=pw.icon}catch(e){}
+ [["ph","phantom"],["mm","metamask"]].forEach(function(a){
+  var box=document.querySelector('[data-w="'+a[0]+'"] .wl');if(!box)return;
+  if(ICON[a[0]]){box.innerHTML='<img alt="" src="'+ICON[a[0]]+'">';return}
+  var c=[a[1]+".svg",a[1]+".png"],i=0,im=new Image();
+  im.alt="";im.onload=function(){box.innerHTML="";box.appendChild(im)};
+  im.onerror=function(){i++;if(i<c.length)im.src="./"+c[i]};
+  im.src="./"+c[0];
+ });
+}
+setIcons();
 </script>
 </body>
 </html>
