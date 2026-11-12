@@ -221,7 +221,7 @@ document.addEventListener("click",function(e){var b=e.target.closest&&e.target.c
 window.addEventListener("popstate",function(){kzShow((location.hash||"#home").slice(1),false)});
 kzShow((location.hash||"#home").slice(1),false);
 window.addEventListener("unhandledrejection",function(e){var r=e.reason;window.onerror("Promesa: "+(r&&r.message||r),"",0)});
-setTimeout(function(){if(!window.kzOK)window.onerror("El script principal no terminó de cargar (v7)","",0)},2500);
+setTimeout(function(){if(!window.kzOK)window.onerror("Principal parado cerca del paso "+window.kzP+" (v8)","",0)},2500);
 </script>
 <script>try{
 
@@ -232,6 +232,7 @@ function toast(t){var e=$("toast");e.textContent=t;e.hidden=false;clearTimeout(t
 function LS(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";localStorage.setItem(k,v)}catch(e){return ""}}
 function fp(n){return !isFinite(n)?"—":n>=1?f(n,n>=100?2:4):f(n,6)}
 function short(a){return a&&a.length>12?a.slice(0,5)+"…"+a.slice(-4):a||""}
+window.kzP=9;
 var S={key:LS("kz_jup"),rpc:LS("kz_rpc"),pk:"",wname:"",bal:{},pools:{},stat:{},flt:"all",chip:"",q:"",sort:"tvl",lim:40,sel:"",rows:[],net:"",addr:""},CSV="";
 function rpcUrl(){return S.rpc||"https://api.mainnet-beta.solana.com"}
 async function rc(m,p){var r=await fetch(rpcUrl(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:m,params:p})});if(!r.ok)throw new Error("RPC HTTP "+r.status);var j=await r.json();if(j.error)throw new Error(j.error.message);return j.result}
@@ -239,6 +240,7 @@ function b64u(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length
 function u8b(u){var s="";for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return btoa(s)}
 
 /* ---------- Jupiter (swap real) ---------- */
+window.kzP=16;
 var JB="https://api.jup.ag/swap/",LBL=null;
 async function jj(u,body){
  var o={headers:{"x-api-key":S.key}};if(body){o.method="POST";o.headers["Content-Type"]="application/json";o.body=JSON.stringify(body)}
@@ -264,9 +266,13 @@ async function execSwap(v,im,om,amt,slip){
 }
 
 /* ---------- Swap ---------- */
+window.kzP=41;
 var SOLM="So11111111111111111111111111111111111111112",VEN=["Jupiter","Orca","Raydium","Meteora"];
+window.kzP=42;
 var TKS=[["SOL",SOLM,9],["USDC","EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",6],["JUP","JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",6],["ORCA","orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",6],["RAY","4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",6]].map(function(a){return{s:a[0],m:a[1],d:a[2]}}),TM={};
+window.kzP=43;
 TKS.forEach(function(t){TM[t.s]=t});
+window.kzP=44;
 var SW={from:"SOL",to:"USDC",amt:"",slip:1,res:[],sel:""};
 function sres(h){var e=$("sres");if(e)e.innerHTML=h}
 function sopts(v){return TKS.map(function(t){return "<option"+(t.s===v?" selected":"")+">"+t.s+"</option>"}).join("")}
@@ -316,6 +322,7 @@ function sy(s){return s==="WSOL"?"SOL":s}
 function tk(t){t=t||{};return{m:t.address||t.mint||t.id||"",s:sy(t.symbol||t.name||"?"),d:t.decimals!=null?+t.decimals:9,i:t.imageUrl||t.logoURI||t.logo_uri||t.logo||t.icon||""}}
 function nm(x){x=+x;return isFinite(x)?x:null}
 function mk(pr,id,A,B,p,tvl,vol,apr,fee,url){return{k:pr+":"+id,pr:pr,id:id,A:A,B:B,p:+p,tvl:+tvl||0,vol:+vol||0,apr:nm(apr),fee:nm(fee),url:url}}
+window.kzP=93;
 var SRC={
  Orca:{u:function(q){return "https://api.orca.so/v2/solana/pools"+(q?"/search?q="+encodeURIComponent(q)+"&limit=50":"?limit=100&sortBy=tvl&sortDirection=desc&minTvl=20000")},
   r:function(j){return j.data||[]},
@@ -338,7 +345,9 @@ async function loadPools(q){
   catch(e){S.stat[n]="error: "+(e.message||"red")}}));
  rPools();if(S.view==="home")rHome();
 }
+window.kzP=115;
 var STB=/usd|dai|eur|frax|gho|usx/i;
+window.kzP=116;
 var CHIPS={
  stable:{n:"Stablecoins",q:["USDC"],t:function(p){return STB.test(p.A.s)&&STB.test(p.B.s)}},
  sol:{n:"SOL",q:["SOL"],t:function(p){return p.A.s==="SOL"||p.B.s==="SOL"}},
@@ -349,6 +358,7 @@ var CHIPS={
  rwa:{n:"RWAs",q:["xStock","BUIDL","USDY"],t:function(p){return RWAR.test(p.A.s)||RWAR.test(p.B.s)}},
  gov:{n:"Gobernanza",q:["JUP","ORCA","RAY","JTO","PYTH"],t:function(p){return GOVR.test(p.A.s)||GOVR.test(p.B.s)}}
 };
+window.kzP=126;
 var LSTR=/^(msol|jitosol|bsol|jupsol|hsol|vsol|dsol|stsol|bbsol|picosol|lsol|bnsol|hubsol|inf)$/i,MEMER=/^(bonk|wif|trump|popcat|fartcoin|pengu|mew|bome|goat|pnut|moodeng|useless|wen|myro|giga|ponke|michi|buttcoin|pump)$/i,RWAR=/^[A-Z]{2,8}x$|^(buidl|ousg|usdy|bcspx)$/i,GOVR=/^(jup|orca|ray|jto|pyth|drift|mnde|kmno|tnsr|met)$/i;
 function ico(t){return '<span class="ico">'+esc((t.s||"?").slice(0,1))+(t.i?'<img src="'+esc(t.i)+'" alt="" loading="lazy" onerror="this.remove()">':"")+"</span>"}
 function filt(){
@@ -368,9 +378,11 @@ function rPools(){
   '<input id="pq" placeholder="Buscar tokens o dirección de mint" value="'+esc(S.q)+'" autocomplete="off"><div class="chips tabsrow">'+cb+"</div>"+res;
  var pq=$("pq");if(S.focusQ){pq.focus();pq.setSelectionRange(pq.value.length,pq.value.length)}
 }
+window.kzP=145;
 var qT=null;
 
 /* ---------- Crear posición ---------- */
+window.kzP=148;
 var ST={r:5,cmin:"",cmax:"",pay:"B",amt:"",auto:true,via:"Jupiter",slip:1};
 function pcalc(){
  var p=S.pools[S.sel],z=ST,pr=p.p,pa,pb;
@@ -438,7 +450,9 @@ async function wallet(w){
 function sumPsSafe(){if(S.sel&&!$("ps").hidden)sumPs()}
 
 /* ---------- Movimientos reales ---------- */
+window.kzP=215;
 var BS="https://eth.blockscout.com/api/v2/addresses/";
+window.kzP=216;
 var MINT={EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v:"USDC",So11111111111111111111111111111111111111112:"wSOL",JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN:"JUP"};
 function iso(t){return t?new Date(t*1e3).toISOString().slice(0,19).replace("T"," "):""}
 function stt(t){$("hst").textContent=t}
@@ -496,6 +510,7 @@ function dlCsv(){if(!CSV)return;var b=new Blob(["\ufeff"+CSV],{type:"text/csv;ch
 function copyCsv(){var ta=$("csv"),ok=false;try{navigator.clipboard.writeText(CSV);ok=true}catch(e){}if(!ok){try{ta.select();ok=document.execCommand("copy")}catch(e){}}toast(ok?"CSV copiado.":"No se pudo copiar solo: mantén pulsado el texto y copia.")}
 
 /* ---------- eventos ---------- */
+window.kzP=273;
 document.addEventListener("click",function(e){
  var q=function(s){return e.target.closest(s)},a=q("[data-act]"),w=q("[data-w]"),pl=q("[data-pool]"),fl=q("[data-flt]"),pr=q("[data-pr]"),rt=q("[data-rt]"),pc=q("[data-pct]");
  if(e.target===$("sheet"))$("sheet").hidden=true;
@@ -513,12 +528,14 @@ document.addEventListener("click",function(e){
   else if(m==="more"){S.lim+=40;rPools()}else if(m==="load")loadHist();else if(m==="dl")dlCsv();else if(m==="pdf")dlPdf();else if(m==="copy")copyCsv();
   else if(m==="flip"){var z=SW.from;SW.from=SW.to;SW.to=z;SW.amt="";SW.res=[];rSwap()}}
 });
+window.kzP=290;
 document.addEventListener("input",function(e){
  var t=e.target,id=t.id;
  if(id==="amt"){SW.amt=t.value;SW.res=[];rQt()}
  else if(id==="pq"){S.q=t.value;S.chip="";S.lim=40;S.focusQ=true;rPools();clearTimeout(qT);if(t.value.trim().length>=2)qT=setTimeout(function(){loadPools(t.value.trim())},600)}
  else if(id==="pa"){ST.amt=t.value;sumPs()}else if(id==="cmin"){ST.cmin=t.value;sumPs()}else if(id==="cmax"){ST.cmax=t.value;sumPs()}
 });
+window.kzP=296;
 document.addEventListener("change",function(e){
  var t=e.target,id=t.id;
  if(id==="sf"){SW.from=t.value;SW.amt="";SW.res=[];rSwap()}else if(id==="st"){SW.to=t.value;SW.res=[];rSwap()}else if(id==="sw-slip"){SW.slip=+t.value;SW.res=[];rQt()}
@@ -527,12 +544,16 @@ document.addEventListener("change",function(e){
  else if(id==="jk"){S.key=t.value.trim();LS("kz_jup",S.key);toast("Clave de Jupiter guardada en este navegador.")}
  else if(id==="rp"){S.rpc=t.value.trim();LS("kz_rpc",S.rpc);toast("RPC guardado.");if(S.pk)loadBal().then(rSwap)}
 });
+window.kzP=304;
 $("addr").addEventListener("keydown",function(e){if(e.key==="Enter")loadHist()});
 
+window.kzP=306;
 rSwap();rCfg();rPools();loadPools();
 
 /* ---------- logos originales de las wallets ---------- */
+window.kzP=309;
 var WSW=[],ICON={ph:"",mm:""};
+window.kzP=310;
 (function(){var api={register:function(){for(var i=0;i<arguments.length;i++)WSW.push(arguments[i]);return function(){}}};
  try{window.addEventListener("wallet-standard:register-wallet",function(e){try{e.detail(api)}catch(x){}});window.dispatchEvent(new CustomEvent("wallet-standard:app-ready",{detail:api}))}catch(x){}
  try{window.addEventListener("eip6963:announceProvider",function(e){var i=e.detail&&e.detail.info;if(i&&/metamask/i.test((i.name||"")+(i.rdns||""))&&i.icon){ICON.mm=i.icon;setIcons()}});window.dispatchEvent(new Event("eip6963:requestProvider"))}catch(x){}})();
@@ -547,8 +568,10 @@ function setIcons(){
   im.src="./"+c[0];
  });
 }
+window.kzP=324;
 setIcons();
 
+window.kzP=326;
 document.addEventListener("click",function(e){
  var c=e.target.closest("[data-chip]");if(!c)return;
  var id=c.getAttribute("data-chip");S.chip=S.chip===id?"":id;S.q="";S.lim=40;S.focusQ=false;rPools();
@@ -557,8 +580,11 @@ document.addEventListener("click",function(e){
 
 
 /* ---------- navegación por pestañas ---------- */
+window.kzP=334;
 var VIEWS=["home","pools","portfolio","swap","lottery","wallet"];
+window.kzP=335;
 S.positions=[];S.pfTab="liq";S.lotN="1";S.lotP="1000";S.view="home";
+window.kzP=336;
 window.kzAfter=function(v){S.view=v;if(v==="home")rHome();else if(v==="portfolio")rPf();else if(v==="wallet")rWallet();else if(v==="lottery")rLot()};
 
 /* ---------- inicio (solo lectura) ---------- */
@@ -589,11 +615,9 @@ function rPf(){
  else body='<div class="dim" style="margin-top:12px;line-height:1.6">Tu wallet está conectada, pero esta versión todavía no lee tus posiciones (los NFT). Esa lectura llegará con la versión compilada con el SDK de Orca. Mientras tanto puedes verlas en <a class="lk" href="https://www.orca.so/portfolio" target="_blank" rel="noopener">orca.so ↗</a>.</div>';
  $("pfList").innerHTML='<div class="chips"><button class="btn chip'+(S.pfTab==="liq"?" on":"")+'" data-pft="liq">Posiciones de liquidez <span class="tag">'+n+'</span></button><button class="btn chip'+(S.pfTab==="vault"?" on":"")+'" data-pft="vault">Vaults</button></div>'+body;
 }
+window.kzP=366;
 document.addEventListener("click",function(e){var t=e.target.closest("[data-pft]");if(t){S.pfTab=t.getAttribute("data-pft");rPf()}});
 
 /* ---------- lotería (preparada, sin compras reales) ---------- */
 function rLot(){
- var n=Math.max(1,parseInt(S.lotN)||1),p=parseFloat(S.lotP)||0;
- $("lotMain").innerHTML='<div class="k">Lotería Kosmara <small>en preparación</small></div>'+
-  '<div class="pills" style="margin-bottom:12px"><span style="--c:#ffd60a">Próximamente · sin compras reales</span></div>'+
-  '<div class="two" style="margin-top:0"><div class="box"><div class="dim">Bote actual</div><b class="num" style="font-size:20px">0,00 €</b></div><div clas
+ var n=
