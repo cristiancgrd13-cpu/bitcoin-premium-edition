@@ -221,8 +221,9 @@ document.addEventListener("click",function(e){var b=e.target.closest&&e.target.c
 window.addEventListener("popstate",function(){kzShow((location.hash||"#home").slice(1),false)});
 kzShow((location.hash||"#home").slice(1),false);
 window.addEventListener("unhandledrejection",function(e){var r=e.reason;window.onerror("Promesa: "+(r&&r.message||r),"",0)});
-setTimeout(function(){if(!window.kzOK)window.onerror("Principal parado en paso "+window.kzP+" (v9)","",0,0)},2500);
+setTimeout(function(){if(!window.kzOK)window.onerror("v10 kzA="+window.kzA+" paso="+window.kzP+" rPools="+typeof window.rPools+" estado="+document.readyState+" scripts="+document.scripts.length+" sheet="+(!!document.getElementById("sheet"))+" ua="+navigator.userAgent.slice(0,90),"",0,0)},2500);
 </script>
+<script>window.kzA=1;</script>
 <script>try{
 
 function $(i){return document.getElementById(i)}
@@ -613,9 +614,4 @@ function rPf(){
  else if(n)body=S.positions.map(posCard).join("");
  else if(!S.pk)body='<div class="dim" style="margin-top:12px">Conecta tu wallet para ver tus posiciones.</div><button class="btn p" data-act="open">Conectar wallet</button>';
  else body='<div class="dim" style="margin-top:12px;line-height:1.6">Tu wallet está conectada, pero esta versión todavía no lee tus posiciones (los NFT). Esa lectura llegará con la versión compilada con el SDK de Orca. Mientras tanto puedes verlas en <a class="lk" href="https://www.orca.so/portfolio" target="_blank" rel="noopener">orca.so ↗</a>.</div>';
- $("pfList").innerHTML='<div class="chips"><button class="btn chip'+(S.pfTab==="liq"?" on":"")+'" data-pft="liq">Posiciones de liquidez <span class="tag">'+n+'</span></button><button class="btn chip'+(S.pfTab==="vault"?" on":"")+'" data-pft="vault">Vaults</button></div>'+body;
-}
-window.kzP=366;
-document.addEventListener("click",function(e){var t=e.target.closest("[data-pft]");if(t){S.pfTab=t.getAttribute("data-pft");rPf()}});
-
-/* ---------- 
+ $("pfList").innerHTML='<div class="chips"><button class="btn chip'+(S.pfTab==="liq"?" on":"")+'" data-pft="liq">Posiciones de liquidez <span class="tag">'+n+'</span></button><button class="btn chip'+(S.pfTab==="vault"?" on":"")+'" da
