@@ -220,8 +220,11 @@ function kzShow(v,push){
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-v]");if(b)kzShow(b.getAttribute("data-v"))});
 window.addEventListener("popstate",function(){kzShow((location.hash||"#home").slice(1),false)});
 kzShow((location.hash||"#home").slice(1),false);
+window.addEventListener("unhandledrejection",function(e){var r=e.reason;window.onerror("Promesa: "+(r&&r.message||r),"",0)});
+setTimeout(function(){if(!window.kzOK)window.onerror("El script principal no terminó de cargar (v7)","",0)},2500);
 </script>
-<script>
+<script>try{
+
 function $(i){return document.getElementById(i)}
 function f(n,d){return n.toLocaleString("es-ES",{maximumFractionDigits:d==null?2:d})}
 function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
@@ -593,6 +596,4 @@ function rLot(){
  var n=Math.max(1,parseInt(S.lotN)||1),p=parseFloat(S.lotP)||0;
  $("lotMain").innerHTML='<div class="k">Lotería Kosmara <small>en preparación</small></div>'+
   '<div class="pills" style="margin-bottom:12px"><span style="--c:#ffd60a">Próximamente · sin compras reales</span></div>'+
-  '<div class="two" style="margin-top:0"><div class="box"><div class="dim">Bote actual</div><b class="num" style="font-size:20px">0,00 €</b></div><div class="box"><div class="dim">Papeletas vendidas</div><b class="num" style="font-size:20px">0</b></div></div>'+
-  '<div class="box" style="margin-top:8px"><div class="dim">Próximo sorteo</div><b>Por definir</b></div>'+
-  '<label for="lotN">Papeletas (
+  '<div class="two" style="margin-top:0"><div class="box"><div class="dim">Bote actual</div><b class="num" style="font-size:20px">0,00 €</b></div><div clas
