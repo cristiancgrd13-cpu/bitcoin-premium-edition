@@ -207,7 +207,7 @@ button:active,button:focus{outline:0;box-shadow:none}
 
 <script>document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("#bConn,[data-act=open]");if(t){var sh=document.getElementById("sheet");if(sh)sh.hidden=false}});</script>
 <script>
-window.onerror=function(m,u,l){var d=document.getElementById("kzerr");if(!d){d=document.createElement("div");d.id="kzerr";d.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99;background:#7a1020;color:#fff;font:12px monospace;padding:6px 10px";document.body.appendChild(d)}d.textContent="Error: "+m+" (línea "+l+")"};
+window.kzLog=[];window.onerror=function(m,u,l,c){window.kzLog.push(m+" (línea "+l+", col "+c+")");var d=document.getElementById("kzerr");if(!d){d=document.createElement("div");d.id="kzerr";d.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99;background:#7a1020;color:#fff;font:12px monospace;padding:6px 10px;white-space:pre-wrap";document.body.appendChild(d)}d.textContent=window.kzLog.join("\n")};
 var KZV=["home","pools","portfolio","swap","lottery","wallet"];
 function kzShow(v,push){
  if(KZV.indexOf(v)<0)v="home";
@@ -221,7 +221,7 @@ document.addEventListener("click",function(e){var b=e.target.closest&&e.target.c
 window.addEventListener("popstate",function(){kzShow((location.hash||"#home").slice(1),false)});
 kzShow((location.hash||"#home").slice(1),false);
 window.addEventListener("unhandledrejection",function(e){var r=e.reason;window.onerror("Promesa: "+(r&&r.message||r),"",0)});
-setTimeout(function(){if(!window.kzOK)window.onerror("Principal parado cerca del paso "+window.kzP+" (v8)","",0)},2500);
+setTimeout(function(){if(!window.kzOK)window.onerror("Principal parado en paso "+window.kzP+" (v9)","",0,0)},2500);
 </script>
 <script>try{
 
@@ -618,6 +618,4 @@ function rPf(){
 window.kzP=366;
 document.addEventListener("click",function(e){var t=e.target.closest("[data-pft]");if(t){S.pfTab=t.getAttribute("data-pft");rPf()}});
 
-/* ---------- lotería (preparada, sin compras reales) ---------- */
-function rLot(){
- var n=
+/* ---------- 
