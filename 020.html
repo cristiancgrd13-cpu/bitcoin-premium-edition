@@ -123,6 +123,7 @@ button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible{ou
 .bar button.mid.on .c{background:#3a3217;border-color:#FFD60A}
 .rg{position:relative;height:8px;border-radius:99px;background:rgba(34,214,138,.35);margin:10px 0}
 .rg i{position:absolute;top:-4px;width:6px;height:16px;border-radius:3px;background:#fff}
+.pos{background:rgba(0,0,0,.32);border:1px solid var(--line);border-radius:14px;padding:12px;margin-top:10px}
 
 *{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
 button{outline:0;-webkit-appearance:none;appearance:none;user-select:none;-webkit-user-select:none;touch-action:manipulation}
@@ -221,9 +222,8 @@ document.addEventListener("click",function(e){var b=e.target.closest&&e.target.c
 window.addEventListener("popstate",function(){kzShow((location.hash||"#home").slice(1),false)});
 kzShow((location.hash||"#home").slice(1),false);
 window.addEventListener("unhandledrejection",function(e){var r=e.reason;window.onerror("Promesa: "+(r&&r.message||r),"",0)});
-setTimeout(function(){if(!window.kzOK)window.onerror("v10 kzA="+window.kzA+" paso="+window.kzP+" rPools="+typeof window.rPools+" estado="+document.readyState+" scripts="+document.scripts.length+" sheet="+(!!document.getElementById("sheet"))+" ua="+navigator.userAgent.slice(0,90),"",0,0)},2500);
+setTimeout(function(){if(!window.kzOK)window.onerror("Principal parado en paso "+window.kzP+" (v9)","",0,0)},2500);
 </script>
-<script>window.kzA=1;</script>
 <script>try{
 
 function $(i){return document.getElementById(i)}
@@ -368,13 +368,13 @@ function filt(){
  var k=S.sort;L.sort(function(a,b){return (b[k]||0)-(a[k]||0)});return L;
 }
 function rPools(){
- var act=!!(S.chip||S.q.trim()),L=act?filt():[];
+ var act=true,L=filt();
  var cb=Object.keys(CHIPS).map(function(k){return '<button class="btn chip'+(S.chip===k?" on":"")+'" data-chip="'+k+'">'+CHIPS[k].n+"</button>"}).join("");
  var fl=["all","Orca","Raydium","Meteora"].map(function(x){return '<button class="btn chip'+(S.flt===x?" on":"")+'" data-flt="'+x+'">'+(x==="all"?"Todas":x)+"</button>"}).join("");
  var st=Object.keys(SRC).map(function(n){var s=S.stat[n];return n+": "+(s?esc(s):"cargando…")}).join(" · ");
  var rows=L.slice(0,S.lim).map(function(p){return '<div class="row pick prow" data-pool="'+esc(p.k)+'"><div class="a"><span class="icos">'+ico(p.A)+ico(p.B)+'</span><b>'+esc(p.A.s)+"/"+esc(p.B.s)+'</b><span class="tag o">'+p.pr+'</span></div><div class="r up"><b>'+(p.apr!=null?f(p.apr,1)+"%":"—")+'</b> <small>APR</small></div><small>TVL $'+f(p.tvl,0)+(p.fee!=null?" · comisión "+f(p.fee,2)+"%":"")+'</small><small class="r">vol. $'+f(p.vol,0)+"</small></div>"}).join("");
  var srt='<select id="psort" style="flex:none;width:auto"><option value="tvl"'+(S.sort==="tvl"?" selected":"")+'>Ordenar: TVL</option><option value="vol"'+(S.sort==="vol"?" selected":"")+'>Ordenar: volumen</option><option value="apr"'+(S.sort==="apr"?" selected":"")+">Ordenar: APR</option></select>";
- var res=act?'<div class="chips">'+fl+srt+'</div><div class="stat">'+st+'</div><div class="plist" id="plist">'+(rows||'<div class="dim" style="margin-top:10px">Sin resultados todavía. Si acabas de buscar, espera un momento.</div>')+"</div>"+(L.length>S.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="more">Ver más</button>':""):'<div class="dim" style="margin-top:12px">Elige una categoría o escribe un token para ver sus pools. Datos reales de Orca, Raydium y Meteora.</div>';
+ var res=act?'<div class="chips">'+fl+srt+'</div><div class="stat">'+st+'</div><div class="plist" id="plist">'+(rows||'<div class="dim" style="margin-top:10px">Cargando pools… Si no aparecen en unos segundos, revisa tu conexión.</div>')+"</div>"+(L.length>S.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="more">Ver más</button>':""):'<div class="dim" style="margin-top:12px">Elige una categoría o escribe un token para ver sus pools. Datos reales de Orca, Raydium y Meteora.</div>';
  $("pools").innerHTML='<div class="k">Solana · pools de liquidez <small>'+(act?L.length+" pools":"busca un token")+"</small></div>"+
   '<input id="pq" placeholder="Buscar tokens o dirección de mint" value="'+esc(S.q)+'" autocomplete="off"><div class="chips tabsrow">'+cb+"</div>"+res;
  var pq=$("pq");if(S.focusQ){pq.focus();pq.setSelectionRange(pq.value.length,pq.value.length)}
@@ -614,4 +614,7 @@ function rPf(){
  else if(n)body=S.positions.map(posCard).join("");
  else if(!S.pk)body='<div class="dim" style="margin-top:12px">Conecta tu wallet para ver tus posiciones.</div><button class="btn p" data-act="open">Conectar wallet</button>';
  else body='<div class="dim" style="margin-top:12px;line-height:1.6">Tu wallet está conectada, pero esta versión todavía no lee tus posiciones (los NFT). Esa lectura llegará con la versión compilada con el SDK de Orca. Mientras tanto puedes verlas en <a class="lk" href="https://www.orca.so/portfolio" target="_blank" rel="noopener">orca.so ↗</a>.</div>';
- $("pfList").innerHTML='<div class="chips"><button class="btn chip'+(S.pfTab==="liq"?" on":"")+'" data-pft="liq">Posiciones de liquidez <span class="tag">'+n+'</span></button><button class="btn chip'+(S.pfTab==="vault"?" on":"")+'" da
+ $("pfList").innerHTML='<div class="chips"><button class="btn chip'+(S.pfTab==="liq"?" on":"")+'" data-pft="liq">Posiciones de liquidez <span class="tag">'+n+'</span></button><button class="btn chip'+(S.pfTab==="vault"?" on":"")+'" data-pft="vault">Vaults</button></div>'+body;
+}
+window.kzP=366;
+document.addEventListener("click",function(e){var t=e.targe
