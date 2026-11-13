@@ -42,17 +42,7 @@ jobs:
             grep -n -A22 -E "^type Position = " node_modules/@orca-so/whirlpools-client/dist/index.d.ts | cut -c1-200 || true
             grep -n -A26 -E "^type Whirlpool = " node_modules/@orca-so/whirlpools-client/dist/index.d.ts | cut -c1-200 || true
           } > ../sdk/api.txt 2>&1
-          {
-            O="Origin: https://cristiancgrd13-cpu.github.io"
-            for u in "https://api.orca.so/v2/solana/pools?limit=1&sortBy=tvl&sortDirection=desc&minTvl=20000" "https://api.orca.so/v2/solana/pools/Czfq3xZZDmsdGdUyrNLtRhGc47cXcZtLG4crryfu44zE" "https://api.kamino.finance/strategies/metrics?env=mainnet-beta&status=LIVE" "https://api.geckoterminal.com/api/v2/networks/eth/pools?include=base_token,quote_token,dex&sort=h24_volume_usd_desc&page=1" "https://api.geckoterminal.com/api/v2/networks/bsc/pools?include=base_token,quote_token,dex&sort=h24_volume_usd_desc&page=1" "https://api.jup.ag/lend/v1/earn/tokens" "https://api-v3.raydium.io/pools/info/list?poolType=concentrated&poolSortField=liquidity&sortType=desc&pageSize=1&page=1"; do
-              echo "== $u"
-              curl -s -m 20 -o /tmp/b.json -D /tmp/h.txt -H "$O" "$u" || true
-              grep -i -E "^HTTP|access-control-allow-origin|content-type" /tmp/h.txt || true
-              head -c 2600 /tmp/b.json || true
-              echo
-              node -e "try{const j=JSON.parse(require('fs').readFileSync('/tmp/b.json','utf8'));const d=Array.isArray(j)?j:(j.data&&j.data.data)||j.data||[];console.log('items',Array.isArray(d)?d.length:typeof d);if(j.included)console.log('dex ids',[...new Set(j.data.map(x=>x.relationships.dex.data.id))].join(','),'| included0',JSON.stringify(j.included[0]).slice(0,500))}catch(e){console.log('no json',e.message)}" || true
-            done
-          } > ../sdk/probe.txt 2>&1
+          ls -la ../sdk >> ../sdk/build-log.txt
       - name: Guardar resultado
         if: always()
         run: |
