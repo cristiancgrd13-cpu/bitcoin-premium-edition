@@ -1,5 +1,5 @@
 
-added 64 packages, and audited 65 packages in 10s
+added 64 packages, and audited 65 packages in 12s
 
 4 packages are looking for funding
   run `npm fund` for details
@@ -19,12 +19,12 @@ transforming...
 [32m✓[39m 54 modules transformed.
 rendering chunks...
 computing gzip size...
-[2m../sdk/[22m[36mkz-sdk.js  [39m[1m[2m340.40 kB[22m[1m[22m[2m │ gzip: 121.63 kB[22m
-[32m✓ built in 919ms[39m
+[2m../sdk/[22m[36mkz-sdk.js  [39m[1m[2m340.55 kB[22m[1m[22m[2m │ gzip: 121.68 kB[22m
+[32m✓ built in 894ms[39m
 BUILD OK
 total 364
-drwxr-xr-x 2 runner runner   4096 Nov 13 09:29 .
-drwxr-xr-x 8 runner runner   4096 Nov 13 09:29 ..
--rw-r--r-- 1 runner runner  16069 Nov 13 09:29 api.txt
--rw-r--r-- 1 runner runner    602 Nov 13 09:29 build-log.txt
--rw-r--r-- 1 runner runner 340409 Nov 13 09:29 kz-sdk.js
+drwxr-xr-x 2 runner runner   4096 Nov 13 09:30 .
+drwxr-xr-x 8 runner runner   4096 Nov 13 09:30 ..
+-rw-r--r-- 1 runner runner  16069 Nov 13 09:30 api.txt
+-rw-r--r-- 1 runner runner    602 Nov 13 09:30 build-log.txt
+-rw-r--r-- 1 runner runner 340555 Nov 13 09:30 kz-sdk.js

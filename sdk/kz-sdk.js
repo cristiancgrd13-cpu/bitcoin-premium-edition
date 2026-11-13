@@ -4822,6 +4822,7 @@ function vt(A) {
     "Splash pools only support full range positions"
   );
 }
+typeof globalThis.Buffer > "u" && (globalThis.Buffer = { from: (A) => typeof A == "string" ? new TextEncoder().encode(A) : Uint8Array.from(A) });
 const $t = H("ComputeBudget111111111111111111111111111111"), VA = {
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: "USDC",
   Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: "USDT"
