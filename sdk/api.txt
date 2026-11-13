@@ -184,3 +184,58 @@ index.js.map
 171-declare function orderMints(mint1: Address, mint2: Address): [Address, Address];
 172-
 173:export { type ClosePositionConfig, type ClosePositionInstructions, type CreatePoolConfig, type CreatePoolInstructions, DEFAULT_ADDRESS, DEFAULT_ENFORCE_TOKEN_BALANCE_CHECK, DEFAULT_FUNDER, DEFAULT_NATIVE_MINT_WRAPPING_STRATEGY, DEFAULT_SLIPPAGE_TOLERANCE_BPS, type DecreaseLiquidityConfig, type DecreaseLiquidityInstructions, type DecreaseLiquidityQuoteParam, ENFORCE_TOKEN_BALANCE_CHECK, type ExactInParams, type ExactOutParams, FUNDER, type HarvestPositionConfig, type HarvestPositionInstructions, type HydratedPosition, type HydratedPositionBundle, type IncreaseLiquidityConfig, type IncreaseLiquidityInstructions, type IncreaseLiquidityParam, type InitializablePool, type InitializedPool, NATIVE_MINT_WRAPPING_STRATEGY, type NativeMintWrappingStrategy, type OpenPositionConfig, type OpenPositionInstructions, type PoolInfo, type PositionData, type PositionOrBundle, SLIPPAGE_TOLERANCE_BPS, SPLASH_POOL_TICK_SPACING, type SwapConfig, type SwapInstructions, type SwapParams, type SwapQuote, closePosition, closePositionInstructions, createConcentratedLiquidityPool, createConcentratedLiquidityPoolInstructions, createSplashPool, createSplashPoolInstructions, decreaseLiquidity, decreaseLiquidityInstructions, fetchConcentratedLiquidityPool, fetchPositionsForOwner, fetchPositionsInWhirlpool, fetchSplashPool, fetchWhirlpoolsByTokenPair, getPayer, harvestAllPositionFees, harvestPosition, harvestPositionInstructions, increaseLiquidityInstructions, increasePosLiquidity, openConcentratedPosition, openConcentratedPositionWithTickBounds, openFullRangePosition, openFullRangePositionInstructions, openPositionInstructions, openPositionInstructionsWithTickBounds, orderMints, resetConfiguration, setDefaultFunder, setDefaultSlippageToleranceBps, setEnforceTokenBalanceCheck, setNativeMintWrappingStrategy, setPayerFromBytes, swap, swapInstructions };
+== client
+640:declare function fetchAllPosition(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address>, config?: FetchAccountsConfig): Promise<Account<Position>[]>;
+641:declare function fetchAllMaybePosition(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address>, config?: FetchAccountsConfig): Promise<MaybeAccount<Position>[]>;
+742:declare function fetchAllWhirlpool(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address>, config?: FetchAccountsConfig): Promise<Account<Whirlpool>[]>;
+743:declare function fetchAllMaybeWhirlpool(rpc: Parameters<typeof fetchEncodedAccounts>[0], addresses: Array<Address>, config?: FetchAccountsConfig): Promise<MaybeAccount<Whirlpool>[]>;
+608:type Position = {
+609-    discriminator: ReadonlyUint8Array;
+610-    whirlpool: Address;
+611-    positionMint: Address;
+612-    liquidity: bigint;
+613-    tickLowerIndex: number;
+614-    tickUpperIndex: number;
+615-    feeGrowthCheckpointA: bigint;
+616-    feeOwedA: bigint;
+617-    feeGrowthCheckpointB: bigint;
+618-    feeOwedB: bigint;
+619-    rewardInfos: Array<PositionRewardInfo>;
+620-};
+621-type PositionArgs = {
+622-    whirlpool: Address;
+623-    positionMint: Address;
+624-    liquidity: number | bigint;
+625-    tickLowerIndex: number;
+626-    tickUpperIndex: number;
+627-    feeGrowthCheckpointA: number | bigint;
+628-    feeOwedA: number | bigint;
+629-    feeGrowthCheckpointB: number | bigint;
+630-    feeOwedB: number | bigint;
+692:type Whirlpool = {
+693-    discriminator: ReadonlyUint8Array;
+694-    whirlpoolsConfig: Address;
+695-    whirlpoolBump: ReadonlyUint8Array;
+696-    tickSpacing: number;
+697-    feeTierIndexSeed: ReadonlyUint8Array;
+698-    feeRate: number;
+699-    protocolFeeRate: number;
+700-    liquidity: bigint;
+701-    sqrtPrice: bigint;
+702-    tickCurrentIndex: number;
+703-    protocolFeeOwedA: bigint;
+704-    protocolFeeOwedB: bigint;
+705-    tokenMintA: Address;
+706-    tokenVaultA: Address;
+707-    feeGrowthGlobalA: bigint;
+708-    tokenMintB: Address;
+709-    tokenVaultB: Address;
+710-    feeGrowthGlobalB: bigint;
+711-    rewardLastUpdatedTimestamp: bigint;
+712-    rewardInfos: Array<WhirlpoolRewardInfo>;
+713-};
+714-type WhirlpoolArgs = {
+715-    whirlpoolsConfig: Address;
+716-    whirlpoolBump: ReadonlyUint8Array;
+717-    tickSpacing: number;
+718-    feeTierIndexSeed: ReadonlyUint8Array;
