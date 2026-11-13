@@ -1,0 +1,49 @@
+name: Kosmara SDK
+on:
+  push:
+    branches: [main]
+    paths:
+      - "kosmara-sdk/**"
+      - ".github/workflows/kosmara-sdk.yml"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: kosmara-sdk
+  cancel-in-progress: true
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Compilar
+        working-directory: kosmara-sdk
+        run: |
+          mkdir -p ../sdk
+          ( npm install && npm run build ) > ../sdk/build-log.txt 2>&1 && echo "BUILD OK" >> ../sdk/build-log.txt || echo "BUILD FAILED" >> ../sdk/build-log.txt
+          tail -n 120 ../sdk/build-log.txt > ../sdk/build-log.tmp && mv ../sdk/build-log.tmp ../sdk/build-log.txt
+          {
+            echo "== versiones"
+            for p in @orca-so/whirlpools @orca-so/whirlpools-core @orca-so/whirlpools-client @solana/kit; do
+              node -e "const j=JSON.parse(require('fs').readFileSync('node_modules/$p/package.json','utf8'));console.log(j.name,j.version,JSON.stringify(j.exports||j.main).slice(0,700))" || true
+            done
+            echo "== dist"
+            ls node_modules/@orca-so/whirlpools/dist node_modules/@orca-so/whirlpools-core/dist || true
+            echo "== api"
+            for D in node_modules/@orca-so/whirlpools/dist/*.d.ts; do
+              echo "-- $D"
+              grep -n -A16 -E "declare function (openConcentratedPosition|openPositionInstructions|openPositionInstructionsWithTickBounds|fetchPositionsForOwner|setRpc|setDefaultFunder|setWhirlpoolsConfig|setPayerFromBytes|setDefaultSlippageToleranceBps|buildAndSendTransaction|buildTransaction)\b|type (IncreaseLiquidityParam|IncreaseLiquidityQuoteParam|OpenPositionInstructions|OpenPositionParams|HydratedPosition|HydratedBundledPosition|PositionOrBundle|PositionData|OpenConcentratedPositionOptions)\b|WhirlpoolDeployment" "$D" | head -n 500 || true
+            done
+          } > ../sdk/api.txt 2>&1
+      - name: Guardar resultado
+        if: always()
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sdk
+          git commit -m "Compilar SDK de Kosmara" || exit 0
+          git pull --rebase origin main
+          git push
