@@ -1,11 +1,10 @@
-npm warn deprecated uuid@10.0.0: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
 
-added 72 packages, and audited 73 packages in 9s
+added 64 packages, and audited 65 packages in 10s
 
-6 packages are looking for funding
+4 packages are looking for funding
   run `npm fund` for details
 
-4 vulnerabilities (3 moderate, 1 high)
+2 vulnerabilities (1 moderate, 1 high)
 
 To address all issues (including breaking changes), run:
   npm audit fix --force
@@ -17,20 +16,15 @@ Run `npm audit` for details.
 
 [36mvite v5.4.21 [32mbuilding for production...[36m[39m
 transforming...
-[1m[33m[plugin:vite:resolve][39m[22m [33m[plugin vite:resolve] Module "assert" has been externalized for browser compatibility, imported by "/home/runner/work/bitcoin-premium-edition/bitcoin-premium-edition/kosmara-sdk/node_modules/@orca-so/whirlpools/dist/index.js". See https://vite.dev/guide/troubleshooting.html#module-externalized-for-browser-compatibility for more details.[39m
 [32m✓[39m 54 modules transformed.
 rendering chunks...
-[31mx[39m Build failed in 735ms
-[31merror during build:
-[31m[vite-plugin-top-level-await] missing field `type`[31m
-    at Compiler.printSync (/home/runner/work/bitcoin-premium-edition/bitcoin-premium-edition/kosmara-sdk/node_modules/@swc/core/index.js:257:29)
-    at Object.printSync (/home/runner/work/bitcoin-premium-edition/bitcoin-premium-edition/kosmara-sdk/node_modules/@swc/core/index.js:409:21)
-    at /home/runner/work/bitcoin-premium-edition/bitcoin-premium-edition/kosmara-sdk/node_modules/vite-plugin-top-level-await/dist/index.js:119:32
-    at Array.map (<anonymous>)
-    at Object.generateBundle (/home/runner/work/bitcoin-premium-edition/bitcoin-premium-edition/kosmara-sdk/node_modules/vite-plugin-top-level-await/dist/index.js:111:57)
-    at async Bundle.generate (file:///home/runner/work/bitcoin-premium-edition/bitcoin-premium-edition/kosmara-sdk/node_modules/rollup/dist/es/shared/node-entry.js:22415:9)
-    at async file:///home/runner/work/bitcoin-premium-edition/bitcoin-premium-edition/kosmara-sdk/node_modules/rollup/dist/es/shared/node-entry.js:25359:27
-    at async catchUnfinishedHookActions (file:///home/runner/work/bitcoin-premium-edition/bitcoin-premium-edition/kosmara-sdk/node_modules/rollup/dist/es/shared/node-entry.js:24727:16)
-    at async build (file:///home/runner/work/bitcoin-premium-edition/bitcoin-premium-edition/kosmara-sdk/node_modules/vite/dist/node/chunks/dep-BK3b2jBa.js:65715:16)
-    at async CAC.<anonymous> (file:///home/runner/work/bitcoin-premium-edition/bitcoin-premium-edition/kosmara-sdk/node_modules/vite/dist/node/cli.js:829:5)[39m
-BUILD FAILED
+computing gzip size...
+[2m../sdk/[22m[36mkz-sdk.js  [39m[1m[2m368.30 kB[22m[1m[22m[2m │ gzip: 130.52 kB[22m
+[32m✓ built in 878ms[39m
+BUILD OK
+total 388
+drwxr-xr-x 2 runner runner   4096 Nov 13 09:20 .
+drwxr-xr-x 8 runner runner   4096 Nov 13 09:20 ..
+-rw-r--r-- 1 runner runner  16069 Nov 13 09:20 api.txt
+-rw-r--r-- 1 runner runner    602 Nov 13 09:20 build-log.txt
+-rw-r--r-- 1 runner runner 368309 Nov 13 09:20 kz-sdk.js
