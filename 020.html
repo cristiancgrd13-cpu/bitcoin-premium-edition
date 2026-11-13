@@ -331,13 +331,13 @@ var SRC={
  Raydium:{u:function(q){return q?null:["https://api-v3.raydium.io/pools/info/list?poolType=concentrated&poolSortField=liquidity&sortType=desc&pageSize=100&page=1","https://api-v3.raydium.io/pools/info/list?poolType=all&poolSortField=default&sortType=desc&pageSize=100&page=1"]},
   r:function(j){return (j.data&&j.data.data)||j.data||[]},
   n:function(p){var d=p.day||{};return mk("Raydium",p.id,tk(p.mintA),tk(p.mintB),p.price,p.tvl,d.volume,d.apr,p.feeRate!=null?p.feeRate*100:null,"https://raydium.io/clmm/create-position/?pool_id="+p.id)}},
- Jupiter:{need:function(){return !!S.key},msg:"falta la clave de Jupiter (Wallet → Conexiones)",h:function(){return{"x-api-key":S.key}},
+ Jupiter:{h:function(){return S.key?{"x-api-key":S.key}:{}},
   u:function(q){return q?null:"https://api.jup.ag/lend/v1/earn/tokens"},
   r:function(j){return Array.isArray(j)?j:j.data||[]},
-  n:function(p){var a=p.asset||{},d=a.decimals!=null?+a.decimals:+p.decimals||6,r=+p.totalRate,o=mk("Jupiter",p.address,{m:a.address||p.assetAddress,s:sy(a.symbol||p.symbol||"?"),d:d,i:a.logo_url||a.logoUrl||""},{m:"-",s:"",d:0,i:""},0,(+p.totalAssets||0)/Math.pow(10,d)*(+a.price||0),0,isFinite(r)?(r>1?r/100:r*100):null,null,"https://jup.ag/lend/earn");o.kind="Earn · un solo token";return o}},
+  n:function(p){var a=p.asset||{},d=a.decimals!=null?+a.decimals:+p.decimals||6,r=+p.totalRate,o=mk("Jupiter",p.address,{m:a.address||p.assetAddress,s:sy(a.symbol||p.symbol||"?"),d:d,i:a.logoUrl||a.logo_url||""},{m:"-",s:"",d:0,i:""},0,(+p.totalAssets||0)/Math.pow(10,d)*(+a.price||0),0,isFinite(r)?(r>1?r/100:r*100):null,null,"https://jup.ag/lend/earn");o.kind="Earn · un solo token";return o}},
  Kamino:{u:function(q){return q?null:"https://api.kamino.finance/strategies/metrics?env=mainnet-beta&status=LIVE"},
   r:function(j){return Array.isArray(j)?j:j.data||[]},
-  n:function(p){var k=(p.kaminoApy&&p.kaminoApy.vault)||{},v=(p.apy&&p.apy.vault)||{},a=k.apy7d!=null?k.apy7d:v.totalApy,o=mk("Kamino",p.strategy,{m:p.tokenAMint,s:sy(p.tokenA||"?"),d:9,i:""},{m:p.tokenBMint,s:sy(p.tokenB||"?"),d:9,i:""},v.poolPrice||0,p.totalValueLocked,0,a!=null?a*100:null,null,"https://app.kamino.finance/liquidity/"+p.strategy);o.kind="Vault automático";return o}}
+  n:function(p){var k=(p.kaminoApy&&p.kaminoApy.vault)||{},v=(p.apy&&p.apy.vault)||{},a=k.apy7d!=null?k.apy7d:v.totalApy,o=mk("Kamino",p.strategy,{m:p.tokenAMint,s:sy(p.tokenA||"?"),d:9,i:""},{m:p.tokenBMint,s:sy(p.tokenB||"?"),d:9,i:""},v.poolPrice||0,p.totalValueLocked,0,a!=null?a*100:null,null,"https://app.kamino.finance/liquidity/"+p.strategy);o.kind="Vault automático";return o.tvl>1000?o:null}}
 };
 async function loadPools(q){
  await Promise.all(Object.keys(SRC).map(async function(n){
@@ -609,7 +609,7 @@ function posCard(p){
  return '<div class="pos"><div class="srow" style="justify-content:space-between"><b style="font-size:17px">'+esc(p.pair)+'</b><span class="tag o">'+esc(p.fee)+'%</span></div>'+
   '<div class="srow" style="justify-content:space-between;margin-top:10px"><span class="tag '+(inR?"":"o")+'">'+(inR?"Dentro del rango":"Fuera de rango")+'</span><span class="num">'+fp(p.price)+'</span></div>'+
   '<div class="srow" style="justify-content:space-between;margin-top:8px"><b class="num up">'+fp(p.lo)+'</b><b class="num up">'+fp(p.hi)+'</b></div><div class="rg"><i style="left:calc('+pc+'% - 3px)"></i></div>'+
-  r("Saldo",usd(p.usd))+r("PNL total",usd(p.pnl))+r("Rendimiento cosechado",usd(p.harv))+r("Rendimiento pendiente",usd(p.pend))+r("Duración",esc(p.dur||"—"))+"</div>";
+  (p.symA?r("Tokens",f(p.amtA,4)+" "+esc(p.symA)+" + "+f(p.amtB,4)+" "+esc(p.symB)):"")+r("Saldo",usd(p.usd))+r("PNL total",usd(p.pnl))+r("Rendimiento cosechado",usd(p.harv))+r("Rendimiento pendiente",usd(p.pend))+r("Duración",esc(p.dur||"—"))+(p.mint?'<a class="lk" style="display:block;margin-top:8px" href="https://www.orca.so/portfolio" target="_blank" rel="noopener">Gestionar en Orca ↗</a>':"")+"</div>";
 }
 function rPf(){
  var n=S.positions.length,tot=S.positions.reduce(function(a,p){return a+p.usd},0);
@@ -662,15 +662,15 @@ document.addEventListener("input",function(e){var id=e.target.id;if(id==="lotN"|
 
 
 /* ---------- Ethereum y BNB (GeckoTerminal) ---------- */
-var NET={eth:{n:"Ethereum",el:"poolsEth",dx:["Uniswap","Curve"],x:"ethereum"},bsc:{n:"BNB Chain",el:"poolsBnb",dx:["PancakeSwap","Uniswap","THENA"],x:"bnb"}},NS={eth:{q:"",f:"all",lim:3,st:""},bsc:{q:"",f:"all",lim:3,st:""}},GT="https://api.geckoterminal.com/api/v2/",nT=null;
+var NET={eth:{n:"Ethereum",el:"poolsEth",dx:["Uniswap","Curve"],x:"ethereum",ds:["uniswap_v3","curve"]},bsc:{n:"BNB Chain",el:"poolsBnb",dx:["PancakeSwap","Uniswap","THENA"],x:"bnb",ds:["pancakeswap-v3-bsc"]}},NS={eth:{q:"",f:"all",lim:3,st:""},bsc:{q:"",f:"all",lim:3,st:""}},GT="https://api.geckoterminal.com/api/v2/",nT=null;
 function dxn(id,net){var d=/pancake/i.test(id)?"PancakeSwap":/uniswap/i.test(id)?"Uniswap":/curve/i.test(id)?"Curve":/thena/i.test(id)?"THENA":"";return NET[net].dx.indexOf(d)<0?"":d}
 function dxu(pr,net,a){return pr==="Uniswap"?"https://app.uniswap.org/explore/pools/"+NET[net].x+"/"+a:pr==="PancakeSwap"?"https://pancakeswap.finance/liquidity/pools":pr==="Curve"?"https://www.curve.finance/dex/ethereum/pools":"https://thena.fi/liquidity"}
 async function loadNet(net,q){
- var st=NS[net],b="include=base_token,quote_token,dex",us=q?[GT+"search/pools?query="+encodeURIComponent(q)+"&network="+net+"&"+b]:[1,2,3].map(function(i){return GT+"networks/"+net+"/pools?"+b+"&sort=h24_volume_usd_desc&page="+i});
- try{var c=0;for(var i=0;i<us.length;i++){var r=await fetch(us[i]);if(!r.ok)throw new Error("HTTP "+r.status);var j=await r.json(),T={};
+ var st=NS[net],b="include=base_token,quote_token,dex",us=q?[GT+"search/pools?query="+encodeURIComponent(q)+"&network="+net+"&"+b]:[1,2].map(function(i){return GT+"networks/"+net+"/pools?"+b+"&sort=h24_volume_usd_desc&page="+i}).concat(NET[net].ds.map(function(d){return GT+"networks/"+net+"/dexes/"+d+"/pools?"+b+"&sort=h24_volume_usd_desc"}));
+ try{var c=0;for(var i=0;i<us.length;i++){var r=await fetch(us[i]);if(!r.ok){if(c)break;throw new Error("HTTP "+r.status)}var j=await r.json(),T={};
    (j.included||[]).forEach(function(x){T[x.id]=x.attributes||{}});
    (j.data||[]).forEach(function(d){var a=d.attributes||{},rl=d.relationships||{},id=function(k){return (rl[k]&&rl[k].data&&rl[k].data.id)||""},pr=dxn(id("dex"),net),A=T[id("base_token")],B=T[id("quote_token")];if(!pr||!A||!B||!a.address)return;
-    var fee=(/([\d.]+)%/.exec(a.name||"")||[])[1],tvl=+a.reserve_in_usd||0,vol=+(a.volume_usd&&a.volume_usd.h24)||0,o=mk(pr,a.address,tk(A),tk(B),a.base_token_price_quote_token,tvl,vol,fee&&tvl?vol*fee*365/tvl:null,fee?+fee:null,dxu(pr,net,a.address));o.k=net+":"+a.address;o.net=net;S.pools[o.k]=o;c++})}
+    var fee=(/([\d.]+)%/.exec(a.name||"")||[])[1]||(/_v2$/.test(id("dex"))?(pr==="Uniswap"?.3:.25):0),tvl=+a.reserve_in_usd||0;if(tvl<50000)return;var vol=+(a.volume_usd&&a.volume_usd.h24)||0,o=mk(pr,a.address,tk(A),tk(B),a.base_token_price_quote_token,tvl,vol,fee&&tvl?vol*fee*365/tvl:null,fee?+fee:null,dxu(pr,net,a.address));o.k=net+":"+a.address;o.net=net;S.pools[o.k]=o;c++})}
   st.st=q?c+" resultados para “"+q+"”":"Top por volumen 24 h · datos de GeckoTerminal"}catch(e){st.st="error: "+(e.message||"red")}
  rNet(net);
 }
@@ -689,12 +689,16 @@ document.addEventListener("input",function(e){var t=e.target,n=t.getAttribute&&t
 async function mkPos(){
  var p=S.pools[S.sel],c=pcalc(),r=function(h){$("pres").innerHTML=h};
  if(!S.pk)return r("Conecta Phantom primero.");if(!(c.a>0))return r("Introduce una cantidad.");
- if(!confirm("Vas a abrir una posición REAL en Orca ("+p.A.s+"/"+p.B.s+").\nEl NFT llegará a tu wallet. Revisa la transacción en Phantom antes de aprobar."))return;
- try{r("Preparando la posición…");var o=await kzSdk.openPosition({rpc:rpcUrl(),pool:p.id,owner:S.pk,amountA:c.aA,amountB:c.aB,decA:p.A.d,decB:p.B.d,lower:c.pa,upper:c.pb,slipBps:Math.round(ST.slip*100),provider:window.phantom.solana});
-  r('Posición creada. <a class="lk" href="https://solscan.io/tx/'+esc(o.signature)+'" target="_blank" rel="noopener">Ver en Solscan ↗</a>');loadBal();loadPos()}
- catch(e){r("No se pudo completar: "+esc(e.message))}
+ await loadBal();
+ var bA=(S.bal[p.A.m]||0)-(p.A.m===SOLM?.02:0),bB=(S.bal[p.B.m]||0)-(p.B.m===SOLM?.02:0),aA=Math.min(c.aA,Math.max(0,bA)),aB=Math.min(c.aB,Math.max(0,bB));
+ if(aA<c.aA*.9||aB<c.aB*.9)return r("Te falta "+(aA<c.aA*.9?p.A.s:p.B.s)+" en la wallet para este rango. Pulsa primero el autoswap y vuelve a intentarlo.");
+ if(!confirm("Vas a abrir una posición REAL en Orca ("+p.A.s+"/"+p.B.s+").\nHasta "+f(aA,6)+" "+p.A.s+" + "+f(aB,6)+" "+p.B.s+".\nEl NFT llegará a tu wallet. Revisa la transacción en Phantom antes de aprobar."))return;
+ try{r("Preparando la posición…");var o=await kzSdk.openPosition({rpc:rpcUrl(),pool:p.id,owner:S.pk,amountA:aA,amountB:aB,decA:p.A.d,decB:p.B.d,lower:c.pa,upper:c.pb,slipBps:Math.round(ST.slip*100),provider:window.phantom.solana});
+  r((o.confirmed?"Posición creada.":"Transacción enviada; aún sin confirmar.")+' <a class="lk" href="https://solscan.io/tx/'+esc(o.signature)+'" target="_blank" rel="noopener">Ver transacción ↗</a> · <a class="lk" href="https://solscan.io/token/'+esc(o.positionMint)+'" target="_blank" rel="noopener">Ver NFT ↗</a>');loadBal();loadPos()}
+ catch(e){r("No se pudo completar: "+esc((e&&e.message)||e))}
 }
 async function loadPos(){if(!S.pk||!(window.kzSdk&&kzSdk.ready))return;try{S.positions=await kzSdk.positions({rpc:rpcUrl(),owner:S.pk});S.posOk=true;S.posErr=""}catch(e){S.posErr=e.message}rPf()}
+window.addEventListener("kzsdk",function(){loadPos();if(S.sel&&!$("ps").hidden)rPs()});
 try{var kzM=document.createElement("script");kzM.type="module";kzM.src="./sdk/kz-sdk.js";document.head.appendChild(kzM)}catch(e){}
 
 window.kzP=400;

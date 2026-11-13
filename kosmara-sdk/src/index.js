@@ -21,6 +21,8 @@ const STABLES = {
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: "USDC",
   Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB: "USDT",
 };
+const MAX_TX_BYTES = 1232;
+const PRIORITY_MICROLAMPORTS = 20000;
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Instruccion del programa Compute Budget: etiqueta + entero little-endian.
@@ -80,17 +82,23 @@ async function openPosition(o) {
     funder,
   });
 
-  const instructions = [budgetIx(2, 600000, 4), budgetIx(3, 50000, 8)].concat(res.instructions);
   const blockhash = (await rpc.getLatestBlockhash().send()).value;
-  const message = pipe(
-    createTransactionMessage({ version: 0 }),
-    (m) => setTransactionMessageFeePayerSigner(funder, m),
-    (m) => setTransactionMessageLifetimeUsingBlockhash(blockhash, m),
-    (m) => appendTransactionMessageInstructions(instructions, m),
-  );
-  // Firma con las claves temporales que genera el SDK (el mint del NFT); la wallet firma despues.
-  const partial = await partiallySignTransactionMessageWithSigners(message);
-  const bytes = new Uint8Array(getTransactionEncoder().encode(partial));
+  const build = async (instructions) => {
+    const message = pipe(
+      createTransactionMessage({ version: 0 }),
+      (m) => setTransactionMessageFeePayerSigner(funder, m),
+      (m) => setTransactionMessageLifetimeUsingBlockhash(blockhash, m),
+      (m) => appendTransactionMessageInstructions(instructions, m),
+    );
+    // Firma con las claves temporales que genera el SDK (el mint del NFT); la wallet firma despues.
+    const partial = await partiallySignTransactionMessageWithSigners(message);
+    return new Uint8Array(getTransactionEncoder().encode(partial));
+  };
+  // Con comision de prioridad (mejora la entrada en bloque). Si la transaccion
+  // no cabe en el limite de Solana (1232 bytes), se envia sin ella.
+  let bytes = await build([budgetIx(3, PRIORITY_MICROLAMPORTS, 8)].concat(res.instructions));
+  if (bytes.length > MAX_TX_BYTES) bytes = await build(res.instructions);
+  if (bytes.length > MAX_TX_BYTES) throw new Error("La transacción es demasiado grande para enviarla de una vez (" + bytes.length + " bytes)");
 
   const sent = await o.provider.signAndSendTransaction(V.deserialize(bytes));
   const signature = (sent && sent.signature) || String(sent);
@@ -100,6 +108,7 @@ async function openPosition(o) {
     confirmed,
     positionMint: String(res.positionMint),
     initializationCost: Number(res.initializationCost) / 1e9,
+    bytes: bytes.length,
   };
 }
 
