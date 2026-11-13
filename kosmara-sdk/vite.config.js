@@ -5,7 +5,8 @@ import { fileURLToPath } from "node:url";
 // Compila src/index.js en un unico modulo ../sdk/kz-sdk.js que carga la web.
 export default defineConfig({
   plugins: [wasm()],
-  define: { global: "globalThis" },
+  // En modo libreria Vite no sustituye process.env; en el navegador "process" no existe.
+  define: { global: "globalThis", "process.env.NODE_ENV": JSON.stringify("production") },
   resolve: {
     // El SDK de Orca importa "assert" de Node; en el navegador usamos un sustituto minimo.
     alias: { assert: fileURLToPath(new URL("./src/assert-shim.js", import.meta.url)) },
