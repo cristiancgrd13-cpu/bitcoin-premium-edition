@@ -16,6 +16,12 @@ import {
   getTransactionEncoder,
 } from "@solana/kit";
 
+// El SDK de Orca usa Buffer.from() de Node en dos funciones (posiciones agrupadas).
+// En el navegador no existe, asi que damos un sustituto minimo.
+if (typeof globalThis.Buffer === "undefined") {
+  globalThis.Buffer = { from: (x) => (typeof x === "string" ? new TextEncoder().encode(x) : Uint8Array.from(x)) };
+}
+
 const COMPUTE_BUDGET = address("ComputeBudget111111111111111111111111111111");
 const STABLES = {
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: "USDC",
