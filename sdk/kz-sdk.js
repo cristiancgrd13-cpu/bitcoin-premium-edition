@@ -1,0 +1,1 @@
+window.kzSdk = { ready: false };

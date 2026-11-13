@@ -1,0 +1,186 @@
+== versiones
+@orca-so/whirlpools 8.0.1 {"import":{"types":"./dist/index.d.ts","import":"./dist/index.js"},"require":{"types":"./dist/index.d.cts","require":"./dist/index.cjs"}}
+@orca-so/whirlpools-core 3.1.0 "./dist/nodejs/orca_whirlpools_core_js_bindings.js"
+@orca-so/whirlpools-client 7.0.0 {"import":{"types":"./dist/index.d.ts","import":"./dist/index.js"},"require":{"types":"./dist/index.d.cts","require":"./dist/index.cjs"}}
+@solana/kit 5.5.1 {"edge-light":{"import":"./dist/index.node.mjs","require":"./dist/index.node.cjs"},"workerd":{"import":"./dist/index.node.mjs","require":"./dist/index.node.cjs"},"browser":{"import":"./dist/index.browser.mjs","require":"./dist/index.browser.cjs"},"node":{"import":"./dist/index.node.mjs","require":"./dist/index.node.cjs"},"react-native":"./dist/index.native.mjs","types":"./dist/types/index.d.ts"}
+== dist
+node_modules/@orca-so/whirlpools-core/dist:
+browser
+nodejs
+
+node_modules/@orca-so/whirlpools/dist:
+index.cjs
+index.cjs.map
+index.d.cts
+index.d.ts
+index.js
+index.js.map
+== api
+-- node_modules/@orca-so/whirlpools/dist/index.d.ts
+2:import { WhirlpoolDeployment, Whirlpool, Position, PositionBundle } from '@orca-so/whirlpools-client';
+3:export { DEFAULT_WHIRLPOOL_DEPLOYMENT, WhirlpoolDeployment } from '@orca-so/whirlpools-client';
+4-import { DecreaseLiquidityQuote, CollectFeesQuote, CollectRewardsQuote, ExactInSwapQuote, ExactOutSwapQuote } from '@orca-so/whirlpools-core';
+5-export { getRpcConfig, setComputeUnitMarginMultiplier, setJitoBlockEngineUrl, setJitoFeePercentile, setJitoTipSetting, setPriorityFeePercentile, setPriorityFeeSetting, setRpc } from '@orca-so/tx-sender';
+6-
+7-declare const DEFAULT_ADDRESS: Address;
+8-declare const SPLASH_POOL_TICK_SPACING = 32896;
+9-declare const DEFAULT_FUNDER: TransactionSigner<string>;
+10-declare let FUNDER: TransactionSigner<string>;
+11:declare function setDefaultFunder(funder: TransactionSigner<string> | Address | null): void;
+12-declare const DEFAULT_SLIPPAGE_TOLERANCE_BPS = 100;
+13-declare let SLIPPAGE_TOLERANCE_BPS: number;
+14:declare function setDefaultSlippageToleranceBps(slippageToleranceBps: number): void;
+15-type NativeMintWrappingStrategy = "keypair" | "seed" | "ata" | "none";
+16-declare const DEFAULT_NATIVE_MINT_WRAPPING_STRATEGY: NativeMintWrappingStrategy;
+17-declare let NATIVE_MINT_WRAPPING_STRATEGY: NativeMintWrappingStrategy;
+18-declare function setNativeMintWrappingStrategy(strategy: NativeMintWrappingStrategy): void;
+19-declare const DEFAULT_ENFORCE_TOKEN_BALANCE_CHECK = false;
+20-declare let ENFORCE_TOKEN_BALANCE_CHECK: boolean;
+21-declare function setEnforceTokenBalanceCheck(enforceBalanceCheck: boolean): void;
+22-declare function resetConfiguration(): void;
+23:declare function setPayerFromBytes(pkBytes: Uint8Array<ArrayBuffer>): Promise<KeyPairSigner<string>>;
+24-declare function getPayer(): KeyPairSigner;
+25-
+26-type ActionResult<R> = R & {
+27-    callback: (payer?: KeyPairSigner) => Promise<Signature>;
+28-};
+29-
+30-type CreatePoolInstructions = {
+31-    instructions: Instruction[];
+32-    initializationCost: Lamports;
+33-    poolAddress: Address;
+34-};
+35-type CreatePoolConfig = {
+36-    initialPrice?: number;
+37-    funder?: TransactionSigner<string>;
+38:    whirlpoolDeployment?: WhirlpoolDeployment;
+39-};
+40-declare function createSplashPoolInstructions(rpc: Rpc<GetAccountInfoApi & GetMultipleAccountsApi>, tokenMintA: Address, tokenMintB: Address, config?: CreatePoolConfig): Promise<CreatePoolInstructions>;
+41-declare function createConcentratedLiquidityPoolInstructions(rpc: Rpc<GetAccountInfoApi & GetMultipleAccountsApi>, tokenMintA: Address, tokenMintB: Address, tickSpacing: number, config?: CreatePoolConfig): Promise<CreatePoolInstructions>;
+42-declare function createSplashPool(tokenMintA: Address, tokenMintB: Address, config?: CreatePoolConfig): Promise<ActionResult<CreatePoolInstructions>>;
+43-declare function createConcentratedLiquidityPool(tokenMintA: Address, tokenMintB: Address, tickSpacing: number, config?: CreatePoolConfig): Promise<ActionResult<CreatePoolInstructions>>;
+44-
+45-type DecreaseLiquidityQuoteParam = {
+46-    liquidity: bigint;
+47-} | {
+48-    tokenA: bigint;
+49-} | {
+50-    tokenB: bigint;
+51-};
+52-type DecreaseLiquidityInstructions = {
+53-    quote: DecreaseLiquidityQuote;
+54-    instructions: Instruction[];
+--
+59:    whirlpoolDeployment?: WhirlpoolDeployment;
+60-};
+61-declare function decreaseLiquidityInstructions(rpc: Rpc<GetAccountInfoApi & GetMultipleAccountsApi & GetMinimumBalanceForRentExemptionApi & GetEpochInfoApi>, positionMintAddress: Address, param: DecreaseLiquidityQuoteParam, config?: DecreaseLiquidityConfig): Promise<DecreaseLiquidityInstructions>;
+62-type ClosePositionInstructions = DecreaseLiquidityInstructions & {
+63-    feesQuote: CollectFeesQuote;
+64-    rewardsQuote: CollectRewardsQuote;
+65-};
+66-type ClosePositionConfig = {
+67-    slippageToleranceBps?: number;
+68-    authority?: TransactionSigner<string>;
+69:    whirlpoolDeployment?: WhirlpoolDeployment;
+70-};
+71-declare function closePositionInstructions(rpc: Rpc<GetAccountInfoApi & GetMultipleAccountsApi & GetMinimumBalanceForRentExemptionApi & GetEpochInfoApi>, positionMintAddress: Address, config?: ClosePositionConfig): Promise<ClosePositionInstructions>;
+72-declare function closePosition(positionMintAddress: Address, config?: ClosePositionConfig): Promise<ActionResult<ClosePositionInstructions>>;
+73-declare function decreaseLiquidity(positionMintAddress: Address, param: DecreaseLiquidityQuoteParam, config?: DecreaseLiquidityConfig): Promise<ActionResult<DecreaseLiquidityInstructions>>;
+74-
+75-type HarvestPositionInstructions = {
+76-    feesQuote: CollectFeesQuote;
+77-    rewardsQuote: CollectRewardsQuote;
+78-    instructions: Instruction[];
+79-};
+80-type HarvestPositionConfig = {
+81-    authority?: TransactionSigner<string>;
+82:    whirlpoolDeployment?: WhirlpoolDeployment;
+83-};
+84-declare function harvestPositionInstructions(rpc: Rpc<GetAccountInfoApi & GetMultipleAccountsApi & GetMinimumBalanceForRentExemptionApi & GetEpochInfoApi>, positionMintAddress: Address, config?: HarvestPositionConfig): Promise<HarvestPositionInstructions>;
+85-declare function harvestPosition(positionMintAddress: Address, config?: HarvestPositionConfig): Promise<ActionResult<HarvestPositionInstructions>>;
+86:declare function harvestAllPositionFees(whirlpoolDeployment?: WhirlpoolDeployment): Promise<Signature[]>;
+87-
+88-type IncreaseLiquidityRpc = Rpc<GetAccountInfoApi & GetMultipleAccountsApi & GetMinimumBalanceForRentExemptionApi>;
+89:type IncreaseLiquidityParam = {
+90-    tokenMaxA: bigint;
+91-    tokenMaxB: bigint;
+92-};
+93-type IncreaseLiquidityInstructions = {
+94-    instructions: Instruction[];
+95-};
+96-type IncreaseLiquidityConfig = {
+97-    slippageToleranceBps?: number;
+98-    authority?: TransactionSigner<string>;
+99:    whirlpoolDeployment?: WhirlpoolDeployment;
+100-};
+101-declare function increaseLiquidityInstructions(rpc: IncreaseLiquidityRpc, positionMintAddress: Address, param: IncreaseLiquidityParam, config?: IncreaseLiquidityConfig): Promise<IncreaseLiquidityInstructions>;
+102:type OpenPositionInstructions = IncreaseLiquidityInstructions & {
+103-    initializationCost: Lamports;
+104-    positionMint: Address;
+105-};
+106-type OpenPositionConfig = {
+107-    slippageToleranceBps?: number;
+108-    withTokenMetadataExtension?: boolean;
+109-    funder?: TransactionSigner<string>;
+110:    whirlpoolDeployment?: WhirlpoolDeployment;
+111-};
+112-declare function openFullRangePositionInstructions(rpc: IncreaseLiquidityRpc, poolAddress: Address, param: IncreaseLiquidityParam, config?: OpenPositionConfig): Promise<OpenPositionInstructions>;
+113:declare function openPositionInstructions(rpc: IncreaseLiquidityRpc, poolAddress: Address, param: IncreaseLiquidityParam, lowerPrice: number, upperPrice: number, config?: OpenPositionConfig): Promise<OpenPositionInstructions>;
+114:declare function openPositionInstructionsWithTickBounds(rpc: IncreaseLiquidityRpc, poolAddress: Address, param: IncreaseLiquidityParam, lowerTickIndex: number, upperTickIndex: number, config?: OpenPositionConfig): Promise<OpenPositionInstructions>;
+115-declare function increasePosLiquidity(positionMintAddress: Address, param: IncreaseLiquidityParam, config?: IncreaseLiquidityConfig): Promise<ActionResult<IncreaseLiquidityInstructions>>;
+116-declare function openFullRangePosition(poolAddress: Address, param: IncreaseLiquidityParam, config?: OpenPositionConfig): Promise<ActionResult<OpenPositionInstructions>>;
+117:declare function openConcentratedPosition(poolAddress: Address, param: IncreaseLiquidityParam, lowerPrice: number, upperPrice: number, config?: OpenPositionConfig): Promise<ActionResult<OpenPositionInstructions>>;
+118-declare function openConcentratedPositionWithTickBounds(poolAddress: Address, param: IncreaseLiquidityParam, lowerTickIndex: number, upperTickIndex: number, config?: OpenPositionConfig): Promise<ActionResult<OpenPositionInstructions>>;
+119-
+120-type InitializablePool = {
+121-    initialized: false;
+122-} & Pick<Whirlpool, "whirlpoolsConfig" | "tickSpacing" | "feeRate" | "protocolFeeRate" | "tokenMintA" | "tokenMintB">;
+123-type InitializedPool = {
+124-    initialized: true;
+125-    price: number;
+126-} & Whirlpool;
+127-type PoolInfo = (InitializablePool | InitializedPool) & {
+128-    address: Address;
+129-};
+130:declare function fetchSplashPool(rpc: Rpc<GetAccountInfoApi & GetMultipleAccountsApi>, tokenMintOne: Address, tokenMintTwo: Address, whirlpoolDeployment?: WhirlpoolDeployment): Promise<PoolInfo>;
+131:declare function fetchConcentratedLiquidityPool(rpc: Rpc<GetAccountInfoApi & GetMultipleAccountsApi>, tokenMintOne: Address, tokenMintTwo: Address, tickSpacing: number, whirlpoolDeployment?: WhirlpoolDeployment): Promise<PoolInfo>;
+132:declare function fetchWhirlpoolsByTokenPair(rpc: Rpc<GetAccountInfoApi & GetMultipleAccountsApi & GetProgramAccountsApi>, tokenMintOne: Address, tokenMintTwo: Address, whirlpoolDeployment?: WhirlpoolDeployment): Promise<PoolInfo[]>;
+133-
+134:type HydratedPosition = Account<Position> & {
+135-    isPositionBundle: false;
+136-};
+137-type HydratedPositionBundle = Account<PositionBundle> & {
+138-    positions: Account<Position>[];
+139-    isPositionBundle: true;
+140-};
+141:type PositionOrBundle = HydratedPosition | HydratedPositionBundle;
+142:type PositionData = PositionOrBundle & {
+143-    tokenProgram: Address;
+144-};
+145:declare function fetchPositionsForOwner(rpc: Rpc<GetTokenAccountsByOwnerApi & GetMultipleAccountsApi>, owner: Address, whirlpoolDeployment?: WhirlpoolDeployment): Promise<PositionData[]>;
+146:declare function fetchPositionsInWhirlpool(rpc: Rpc<GetProgramAccountsApi>, whirlpool: Address, whirlpoolDeployment?: WhirlpoolDeployment): Promise<HydratedPosition[]>;
+147-
+148-type ExactInParams = {
+149-    inputAmount: bigint;
+150-};
+151-type ExactOutParams = {
+152-    outputAmount: bigint;
+153-};
+154-type SwapParams = (ExactInParams | ExactOutParams) & {
+155-    mint: Address;
+156-};
+157-type SwapQuote<T extends SwapParams> = T extends ExactInParams ? ExactInSwapQuote : ExactOutSwapQuote;
+158-type SwapInstructions<T extends SwapParams> = {
+159-    instructions: Instruction[];
+160-    quote: SwapQuote<T>;
+161-    tradeEnableTimestamp: bigint;
+162-};
+--
+166:    whirlpoolDeployment?: WhirlpoolDeployment;
+167-};
+168-declare function swapInstructions<T extends SwapParams>(rpc: Rpc<GetAccountInfoApi & GetMultipleAccountsApi & GetMinimumBalanceForRentExemptionApi & GetEpochInfoApi>, params: T, poolAddress: Address, config?: SwapConfig): Promise<SwapInstructions<T>>;
+169-declare function swap<T extends SwapParams>(params: T, poolAddress: Address, config?: SwapConfig): Promise<ActionResult<SwapInstructions<T>>>;
+170-
+171-declare function orderMints(mint1: Address, mint2: Address): [Address, Address];
+172-
+173:export { type ClosePositionConfig, type ClosePositionInstructions, type CreatePoolConfig, type CreatePoolInstructions, DEFAULT_ADDRESS, DEFAULT_ENFORCE_TOKEN_BALANCE_CHECK, DEFAULT_FUNDER, DEFAULT_NATIVE_MINT_WRAPPING_STRATEGY, DEFAULT_SLIPPAGE_TOLERANCE_BPS, type DecreaseLiquidityConfig, type DecreaseLiquidityInstructions, type DecreaseLiquidityQuoteParam, ENFORCE_TOKEN_BALANCE_CHECK, type ExactInParams, type ExactOutParams, FUNDER, type HarvestPositionConfig, type HarvestPositionInstructions, type HydratedPosition, type HydratedPositionBundle, type IncreaseLiquidityConfig, type IncreaseLiquidityInstructions, type IncreaseLiquidityParam, type InitializablePool, type InitializedPool, NATIVE_MINT_WRAPPING_STRATEGY, type NativeMintWrappingStrategy, type OpenPositionConfig, type OpenPositionInstructions, type PoolInfo, type PositionData, type PositionOrBundle, SLIPPAGE_TOLERANCE_BPS, SPLASH_POOL_TICK_SPACING, type SwapConfig, type SwapInstructions, type SwapParams, type SwapQuote, closePosition, closePositionInstructions, createConcentratedLiquidityPool, createConcentratedLiquidityPoolInstructions, createSplashPool, createSplashPoolInstructions, decreaseLiquidity, decreaseLiquidityInstructions, fetchConcentratedLiquidityPool, fetchPositionsForOwner, fetchPositionsInWhirlpool, fetchSplashPool, fetchWhirlpoolsByTokenPair, getPayer, harvestAllPositionFees, harvestPosition, harvestPositionInstructions, increaseLiquidityInstructions, increasePosLiquidity, openConcentratedPosition, openConcentratedPositionWithTickBounds, openFullRangePosition, openFullRangePositionInstructions, openPositionInstructions, openPositionInstructionsWithTickBounds, orderMints, resetConfiguration, setDefaultFunder, setDefaultSlippageToleranceBps, setEnforceTokenBalanceCheck, setNativeMintWrappingStrategy, setPayerFromBytes, swap, swapInstructions };

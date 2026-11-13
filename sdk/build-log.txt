@@ -1,0 +1,25 @@
+npm warn deprecated uuid@10.0.0: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+
+added 72 packages, and audited 73 packages in 10s
+
+6 packages are looking for funding
+  run `npm fund` for details
+
+4 vulnerabilities (3 moderate, 1 high)
+
+To address all issues (including breaking changes), run:
+  npm audit fix --force
+
+Run `npm audit` for details.
+
+> kosmara-sdk@0.1.0 build
+> vite build
+
+[36mvite v5.4.21 [32mbuilding for production...[36m[39m
+transforming...
+[32m✓[39m 1 modules transformed.
+rendering chunks...
+computing gzip size...
+[2m../sdk/[22m[36mkz-sdk.js  [39m[1m[2m0.03 kB[22m[1m[22m[2m │ gzip: 0.05 kB[22m
+[32m✓ built in 138ms[39m
+BUILD OK
