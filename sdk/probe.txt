@@ -1,0 +1,84 @@
+== https://api.mainnet-beta.solana.com
+getSlot | HTTP/2 403  | acao=* |  {"jsonrpc":"2.0","error":{"code": 403,"message":"Access forbidden"}, "id": 1 }  
+getBalance | HTTP/2 403  | acao=* |  {"jsonrpc":"2.0","error":{"code": 403,"message":"Access forbidden"}, "id": 1 }  
+getTokenAccountsByOwner | HTTP/2 403  | acao=* |  {"jsonrpc":"2.0","error":{"code": 403,"message":"Access forbidden"}, "id": 1 }  
+getMultipleAccounts | HTTP/2 403  | acao=* |  {"jsonrpc":"2.0","error":{"code": 403,"message":"Access forbidden"}, "id": 1 }  
+getLatestBlockhash | HTTP/2 403  | acao=* |  {"jsonrpc":"2.0","error":{"code": 403,"message":"Access forbidden"}, "id": 1 }  
+preflight | HTTP/2 200  | allow-headers=authorization, content-type,solana-client
+== https://solana-rpc.publicnode.com
+getSlot | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","result":469449032,"id":1} 
+getBalance | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","result":{"context":{"apiVersion":"4.4.1","slot":469449033},"value":1924314186007},"id":1} 
+getTokenAccountsByOwner | HTTP/2 403  | acao=* | {"jsonrpc":"2.0","error":{"code":-32602,"message":"Request blocked"},"id":1}
+getMultipleAccounts | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","result":{"context":{"apiVersion":"4.4.1","slot":469449048},"value":[{"data":["P5XRDOGAYwkT5E
+getLatestBlockhash | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","result":{"context":{"apiVersion":"4.4.1","slot":469449048},"value":{"blockhash":"5dxzY9jQi13
+preflight | HTTP/2 204  | allow-headers=content-type,solana-client
+== https://solana.drpc.org
+getSlot | HTTP/2 400  | acao=* | {"id":1,"jsonrpc":"2.0","error":{"message":"chain is not available on free plan, please upgrade to paid plan",
+getBalance | HTTP/2 400  | acao=* | {"id":1,"jsonrpc":"2.0","error":{"message":"chain is not available on free plan, please upgrade to paid plan",
+getTokenAccountsByOwner | HTTP/2 400  | acao=* | {"id":1,"jsonrpc":"2.0","error":{"message":"chain is not available on free plan, please upgrade to paid plan",
+getMultipleAccounts | HTTP/2 400  | acao=* | {"id":1,"jsonrpc":"2.0","error":{"message":"chain is not available on free plan, please upgrade to paid plan",
+getLatestBlockhash | HTTP/2 400  | acao=* | {"id":1,"jsonrpc":"2.0","error":{"message":"chain is not available on free plan, please upgrade to paid plan",
+preflight | HTTP/2 204  | allow-headers=content-type,solana-client
+== https://rpc.ankr.com/solana
+getSlot | HTTP/2 403  | acao=* | {"error":"message: API key is not allowed to access blockchain, json-rpc code: -32052, rest code: 403"}
+getBalance | HTTP/2 403  | acao=* | {"error":"message: API key is not allowed to access blockchain, json-rpc code: -32052, rest code: 403"}
+getTokenAccountsByOwner | HTTP/2 403  | acao=* | {"error":"message: API key is not allowed to access blockchain, json-rpc code: -32052, rest code: 403"}
+getMultipleAccounts | HTTP/2 403  | acao=* | {"error":"message: API key is not allowed to access blockchain, json-rpc code: -32052, rest code: 403"}
+getLatestBlockhash | HTTP/2 403  | acao=* | {"error":"message: API key is not allowed to access blockchain, json-rpc code: -32052, rest code: 403"}
+preflight | HTTP/2 204  | allow-headers=DNT,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Range,Authorization,solana-client,client-sdk-version,client-sdk-type,client-target-api-version,x-ton-client-version,x-client-name,x-client-version,Accept-Token-Tier,Rpc-Compress,Rpc-Decode
+== https://solana.api.onfinality.io/public
+getSlot | HTTP/2 429  | acao=* | {"jsonrpc":"2.0","error":{"code":-32029,"message":"Too Many Requests, Please apply an OnFinality API key or co
+getBalance | HTTP/2 429  | acao=* | {"jsonrpc":"2.0","error":{"code":-32029,"message":"Too Many Requests, Please apply an OnFinality API key or co
+getTokenAccountsByOwner | HTTP/2 429  | acao=* | {"jsonrpc":"2.0","error":{"code":-32029,"message":"Too Many Requests, Please apply an OnFinality API key or co
+getMultipleAccounts | HTTP/2 429  | acao=* | {"jsonrpc":"2.0","error":{"code":-32029,"message":"Too Many Requests, Please apply an OnFinality API key or co
+getLatestBlockhash | HTTP/2 429  | acao=* | {"jsonrpc":"2.0","error":{"code":-32029,"message":"Too Many Requests, Please apply an OnFinality API key or co
+preflight | HTTP/2 200  | allow-headers=content-type,solana-client
+== https://solana-mainnet.rpc.extrnode.com
+getSlot |  | acao= | 
+getBalance |  | acao= | 
+getTokenAccountsByOwner |  | acao= | 
+getMultipleAccounts |  | acao= | 
+getLatestBlockhash |  | acao= | 
+preflight |  | allow-headers=
+== https://go.getblock.us/86aac42ad4484f3c813079afc201451c
+getSlot | HTTP/2 401  | acao= | Unknown token
+getBalance | HTTP/2 401  | acao= | Unknown token
+getTokenAccountsByOwner | HTTP/2 401  | acao= | Unknown token
+getMultipleAccounts | HTTP/2 401  | acao= | Unknown token
+getLatestBlockhash | HTTP/2 401  | acao= | Unknown token
+preflight | HTTP/2 401  | allow-headers=
+== https://public.rpc.solanavibestation.com
+getSlot | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","result":469449063,"id":1} 
+getBalance | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","result":{"context":{"apiVersion":"4.4.1","slot":469449064},"value":1924314186007},"id":1} 
+getTokenAccountsByOwner |  | acao= | 
+getMultipleAccounts | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","result":{"context":{"apiVersion":"4.4.1","slot":469449132},"value":[{"data":["P5XRDOGAYwkT5E
+getLatestBlockhash | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","result":{"context":{"apiVersion":"4.4.1","slot":469449132},"value":{"blockhash":"FDVDN2yTfMT
+preflight | HTTP/2 204  | allow-headers=Content-Type,Authorization,Solana-Client
+== https://solana.leorpc.com/?api_key=FREE
+getSlot | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","id":null,"result":null,"error":{"code":-32603,"message":"Internal JSON-RPC error."}} 
+getBalance | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","id":null,"result":null,"error":{"code":-32603,"message":"Internal JSON-RPC error."}} 
+getTokenAccountsByOwner | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","id":null,"result":null,"error":{"code":-32603,"message":"Internal JSON-RPC error."}} 
+getMultipleAccounts | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","id":null,"result":null,"error":{"code":-32603,"message":"Internal JSON-RPC error."}} 
+getLatestBlockhash | HTTP/2 200  | acao=* | {"jsonrpc":"2.0","id":1,"result":{"context":{"apiVersion":"4.4.1","slot":469448758},"value":{"blockhash":"6ZYi
+preflight | HTTP/2 200  | allow-headers=
+== https://api.blockeden.xyz/solana/KeCh6p22EX5AeRHxMSmc
+getSlot | HTTP/2 402  | acao=* | {"success":false,"error":{"code":"PAID_PLAN_REQUIRED","message":"A paid plan is required","details":"Your plan
+getBalance | HTTP/2 402  | acao=* | {"success":false,"error":{"code":"PAID_PLAN_REQUIRED","message":"A paid plan is required","details":"Your plan
+getTokenAccountsByOwner | HTTP/2 402  | acao=* | {"success":false,"error":{"code":"PAID_PLAN_REQUIRED","message":"A paid plan is required","details":"Your plan
+getMultipleAccounts | HTTP/2 402  | acao=* | {"success":false,"error":{"code":"PAID_PLAN_REQUIRED","message":"A paid plan is required","details":"Your plan
+getLatestBlockhash | HTTP/2 402  | acao=* | {"success":false,"error":{"code":"PAID_PLAN_REQUIRED","message":"A paid plan is required","details":"Your plan
+preflight | HTTP/2 200  | allow-headers=*
+== https://solana.lavenderfive.com
+getSlot |  | acao= | 
+getBalance |  | acao= | 
+getTokenAccountsByOwner |  | acao= | 
+getMultipleAccounts |  | acao= | 
+getLatestBlockhash |  | acao= | 
+preflight |  | allow-headers=
+== https://endpoints.omniatech.io/v1/sol/mainnet/public
+getSlot | HTTP/2 521  | acao= | error code: 521 
+getBalance | HTTP/2 521  | acao= | error code: 521 
+getTokenAccountsByOwner | HTTP/2 521  | acao= | error code: 521 
+getMultipleAccounts | HTTP/2 521  | acao= | error code: 521 
+getLatestBlockhash | HTTP/2 521  | acao= | error code: 521 
+preflight | HTTP/2 521  | allow-headers=
