@@ -235,8 +235,13 @@ function fp(n){return !isFinite(n)?"—":n>=1?f(n,n>=100?2:4):f(n,6)}
 function short(a){return a&&a.length>12?a.slice(0,5)+"…"+a.slice(-4):a||""}
 window.kzP=9;
 var S={key:LS("kz_jup"),rpc:LS("kz_rpc"),pk:"",wname:"",bal:{},pools:{},stat:{},flt:"all",chip:"",q:"",sort:"tvl",lim:3,sel:"",rows:[],net:"",addr:""},CSV="";
-function rpcUrl(){return S.rpc||"https://api.mainnet-beta.solana.com"}
-async function rc(m,p){var r=await fetch(rpcUrl(),{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:m,params:p})});if(!r.ok)throw new Error("RPC HTTP "+r.status);var j=await r.json();if(j.error)throw new Error(j.error.message);return j.result}
+var RPCS=["https://solana-rpc.publicnode.com","https://public.rpc.solanavibestation.com"];
+function rpcUrl(){return S.rpc||S.rpcOk||RPCS[0]}
+async function rc(m,p){
+ var c=rpcUrl(),us=S.rpc?[S.rpc]:[c].concat(RPCS.filter(function(u){return u!==c})),er="";
+ for(var i=0;i<us.length;i++){try{var r=await fetch(us[i],{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:m,params:p})});if(!r.ok)throw new Error("RPC HTTP "+r.status);var j=await r.json();if(j.error)throw new Error(j.error.message);if(!S.rpc)S.rpcOk=us[i];return j.result}catch(e){er=e.message}}
+ throw new Error(er);
+}
 function b64u(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
 function u8b(u){var s="";for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return btoa(s)}
 
@@ -304,7 +309,7 @@ async function quoteAll(){
 }
 async function doSwap(){
  var a=parseFloat(SW.amt),fr=TM[SW.from],to=TM[SW.to],r=SW.res.filter(function(x){return x.v===SW.sel&&!x.err})[0];
- if(!S.pk)return toast("Conecta Phantom primero.");if(!r)return sres("Primero busca las mejores rutas.");
+ if(!S.pk)await wallet("ph");if(!S.pk)return toast("Conecta Phantom primero.");if(!r)return sres("Primero busca las mejores rutas.");
  if(!confirm("Vas a firmar un swap REAL:\n"+f(a,6)+" "+fr.s+" por unos "+f(r.out,6)+" "+to.s+" vía "+r.v+".\nRevisa los detalles en Phantom antes de aprobar."))return;
  try{sres("Esperando tu firma en Phantom…");var sg=await execSwap(r.v,fr.m,to.m,Math.floor(a*Math.pow(10,fr.d)),SW.slip);
   sres('Swap enviado. <a class="lk" href="https://solscan.io/tx/'+esc(sg)+'" target="_blank" rel="noopener">Ver en Solscan ↗</a>');SW.amt="";SW.res=[];loadBal().then(rSwap)}
@@ -315,7 +320,7 @@ async function doSwap(){
 function rCfg(){
  $("cfg").innerHTML='<div class="k">Conexiones <small>se guardan solo en este navegador</small></div>'+
  '<label for="jk">Clave de API de Jupiter (gratis en <a class="lk" href="https://developers.jup.ag/portal" target="_blank" rel="noopener">developers.jup.ag/portal</a>)</label><input id="jk" type="password" autocomplete="off" value="'+esc(S.key)+'" placeholder="Pega tu clave">'+
- '<label for="rp">RPC de Solana (opcional; con uno propio, p. ej. Helius, va más fino que el público)</label><input id="rp" type="url" autocomplete="off" value="'+esc(S.rpc)+'" placeholder="https://api.mainnet-beta.solana.com">';
+ '<label for="rp">RPC de Solana (opcional; el público sirve para saldos y crear posiciones, pero para ver el Portafolio hace falta uno propio, p. ej. Helius)</label><input id="rp" type="url" autocomplete="off" value="'+esc(S.rpc)+'" placeholder="https://mainnet.helius-rpc.com/?api-key=…">';
 }
 
 /* ---------- Pools reales ---------- */
@@ -426,7 +431,7 @@ function rPs(){
 async function autoswap(){
  var p=S.pools[S.sel],c=pcalc(),pay=c.payB?p.B:p.A,oth=c.payB?p.A:p.B,amt=Math.floor(c.swapIn*Math.pow(10,pay.d));
  var r=function(h){$("pres").innerHTML=h};
- if(!S.pk)return r("Conecta Phantom primero.");if(!(amt>0))return r("Introduce una cantidad.");if(!S.key)return r("Falta la clave de Jupiter (pestaña Wallet, bloque Conexiones).");
+ if(!S.pk)await wallet("ph");if(!S.pk)return r("Conecta Phantom primero.");if(!(amt>0))return r("Introduce una cantidad.");if(!S.key)return r("Falta la clave de Jupiter (pestaña Wallet, bloque Conexiones).");
  try{r("Consultando ruta…");var q=await quoteV(ST.via,pay.m,oth.m,amt,ST.slip),out=q.out/Math.pow(10,oth.d);
   if(!confirm("Vas a firmar un swap REAL para el autoswap:\n"+f(c.swapIn,6)+" "+pay.s+" por unos "+f(out,6)+" "+oth.s+" vía "+ST.via+".\nRevisa los detalles en Phantom antes de aprobar."))return r("Cancelado.");
   r("Esperando tu firma en Phantom…");var sg=await execSwap(ST.via,pay.m,oth.m,amt,ST.slip);
@@ -435,14 +440,24 @@ async function autoswap(){
 }
 
 /* ---------- Wallets ---------- */
+var TPG=["TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA","TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"];
+async function balAta(o){
+ // Los RPC publicos bloquean el listado de cuentas: se consultan una a una las de los tokens conocidos.
+ var W=window.solanaWeb3;if(!W)throw new Error("sin librería de Solana");var PK=W.PublicKey,own=new PK(S.pk),AT=new PK("ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL"),ms={},sel=S.pools[S.sel];
+ TKS.forEach(function(t){ms[t.m||t[1]]=1});if(sel&&!sel.net){ms[sel.A.m]=1;ms[sel.B.m]=1}
+ var ad=[];Object.keys(ms).forEach(function(m){if(m===SOLM||m.length<32)return;TPG.forEach(function(g){try{ad.push(PK.findProgramAddressSync([own.toBuffer(),new PK(g).toBuffer(),new PK(m).toBuffer()],AT)[0].toBase58())}catch(e){}})});
+ for(var i=0;i<ad.length;i+=100){var r=await rc("getMultipleAccounts",[ad.slice(i,i+100),{encoding:"jsonParsed"}]);
+  (r.value||[]).forEach(function(a){var n=a&&a.data&&a.data.parsed&&a.data.parsed.info;if(n&&n.tokenAmount)o[n.mint]=(o[n.mint]||0)+(n.tokenAmount.uiAmount||0)})}
+}
 async function loadBal(){
  if(!S.pk)return;
  try{var o={};o[SOLM]=(await rc("getBalance",[S.pk])).value/1e9;
-  await Promise.all(["TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA","TokenzQdBNbLqP5VEhdkAS6EPFLC1PHnBqCXEpPxuEb"].map(async function(pg){
+  try{if(!S.rpc)throw 0;await Promise.all(TPG.map(async function(pg){
    var t=await rc("getTokenAccountsByOwner",[S.pk,{programId:pg},{encoding:"jsonParsed"}]);
-   t.value.forEach(function(a){var i=a.account.data.parsed.info;o[i.mint]=(o[i.mint]||0)+(i.tokenAmount.uiAmount||0)})}));
+   t.value.forEach(function(a){var i=a.account.data.parsed.info;o[i.mint]=(o[i.mint]||0)+(i.tokenAmount.uiAmount||0)})}))}
+  catch(e1){await balAta(o)}
   S.bal=o}
- catch(e){toast("No se pudo leer tu saldo: "+e.message)}
+ catch(e){toast("No se pudo leer tu saldo: "+e.message+(S.rpc?"":". Prueba con un RPC propio en Wallet → Conexiones."))}
 }
 async function wallet(w){
  try{
@@ -522,7 +537,7 @@ document.addEventListener("click",function(e){
  if(e.target===$("sheet"))$("sheet").hidden=true;
  if(e.target===$("ps")){S.sel="";rPs()}
  if(w)return wallet(w.getAttribute("data-w"));
- if(pl){S.sel=pl.getAttribute("data-pool");var p=S.pools[S.sel];ST.pay=p&&p.B.s&&/USD/.test(p.B.s)?"B":"B";ST.amt="";rPs();return}
+ if(pl){S.sel=pl.getAttribute("data-pool");var p=S.pools[S.sel];ST.pay=p&&p.B.s&&/USD/.test(p.B.s)?"B":"B";ST.amt="";rPs();if(S.pk&&!S.rpc)loadBal().then(sumPsSafe);return}
  if(fl){S.flt=fl.getAttribute("data-flt");S.focusQ=false;return rPools()}
  if(pr){var v=pr.getAttribute("data-pr");ST.r=v==="c"?"c":+v;return rPs()}
  if(rt){SW.sel=rt.getAttribute("data-rt");return rQt()}
@@ -688,7 +703,7 @@ document.addEventListener("input",function(e){var t=e.target,n=t.getAttribute&&t
 /* ---------- SDK de Orca (sdk/kz-sdk.js, compilado aparte) ---------- */
 async function mkPos(){
  var p=S.pools[S.sel],c=pcalc(),r=function(h){$("pres").innerHTML=h};
- if(!S.pk)return r("Conecta Phantom primero.");if(!(c.a>0))return r("Introduce una cantidad.");
+ if(!S.pk)await wallet("ph");if(!S.pk)return r("Conecta Phantom primero.");if(!(c.a>0))return r("Introduce una cantidad.");
  await loadBal();
  var bA=(S.bal[p.A.m]||0)-(p.A.m===SOLM?.02:0),bB=(S.bal[p.B.m]||0)-(p.B.m===SOLM?.02:0),aA=Math.min(c.aA,Math.max(0,bA)),aB=Math.min(c.aB,Math.max(0,bB));
  if(aA<c.aA*.9||aB<c.aB*.9)return r("Te falta "+(aA<c.aA*.9?p.A.s:p.B.s)+" en la wallet para este rango. Pulsa primero el autoswap y vuelve a intentarlo.");
@@ -697,7 +712,12 @@ async function mkPos(){
   r((o.confirmed?"Posición creada.":"Transacción enviada; aún sin confirmar.")+' <a class="lk" href="https://solscan.io/tx/'+esc(o.signature)+'" target="_blank" rel="noopener">Ver transacción ↗</a> · <a class="lk" href="https://solscan.io/token/'+esc(o.positionMint)+'" target="_blank" rel="noopener">Ver NFT ↗</a>');loadBal();loadPos()}
  catch(e){r("No se pudo completar: "+esc((e&&e.message)||e))}
 }
-async function loadPos(){if(!S.pk||!(window.kzSdk&&kzSdk.ready))return;try{S.positions=await kzSdk.positions({rpc:rpcUrl(),owner:S.pk});S.posOk=true;S.posErr=""}catch(e){S.posErr=e.message}rPf()}
+async function loadPos(){if(!S.pk||!(window.kzSdk&&kzSdk.ready))return;try{S.positions=await kzSdk.positions({rpc:rpcUrl(),owner:S.pk});S.posOk=true;S.posErr=""}catch(e){S.posErr=S.rpc?e.message:"el RPC público no permite listar posiciones; pon un RPC propio en Wallet → Conexiones"}rPf()}
+(function(){var pv=window.phantom&&window.phantom.solana;if(!pv)return;
+ var on=function(k){if(!k)return;S.pk=k.toString();S.wname="Phantom";$("addr").value=S.pk;$("bConn").textContent="Phantom "+short(S.pk);loadBal().then(function(){rSwap();sumPsSafe();rWallet();rPf();loadPos()})};
+ try{pv.connect({onlyIfTrusted:true}).then(function(r){on(r&&r.publicKey)}).catch(function(){})}catch(e){}
+ try{if(pv.on)pv.on("accountChanged",function(k){if(k)on(k)})}catch(e){}
+})();
 window.addEventListener("kzsdk",function(){loadPos();if(S.sel&&!$("ps").hidden)rPs()});
 try{var kzM=document.createElement("script");kzM.type="module";kzM.src="./sdk/kz-sdk.js";document.head.appendChild(kzM)}catch(e){}
 
