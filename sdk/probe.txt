@@ -1,0 +1,39 @@
+== A: markets candidata
+HTTP/2 200  | acao=* | bytes=36853
+{"data":{"markets":[{"name":"AaveV3Ethereum","address":"0x87870Bca3F3fD6335C3F4ce8392D69350B4fA4E2","reserves":[{"underlyingToken":{"symbol":"1INCH","address":"0x111111111117dC0aa78b770fA6A738034120C302","decimals":18,"imageUrl":"https://token-logos.family.co/asset?id=1:0x111111111117dC0aa78b770fA6A738034120C302&token=1INCH"},"supplyInfo":{"apy":{"value":"0.000963898284190995920486745"},"total":{"value":"680694.482946228524427554"}},"size":{"usd":"45552.07479876161285469191368"},"isFrozen":true,"isPaused":false},{"underlyingToken":{"symbol":"AAVE","address":"0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9","decimals":18,"imageUrl":"https://token-logos.family.co/asset?id=1:0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9&token=AAVE"},"supplyInfo":{"apy":{"value":"0"},"total":{"value":"804188.035005835639196038"}},"size":{"usd":"85630394.29906542859396610484"},"isFrozen":false,"isPaused":false},{"underlyingToken":{"symbol":"BAL","address":"0xba100000625a3754423978a60c9317c58a424e3D","decimals":18,"imageUrl":"https://token-logos.family.co/asset?id=1:0xba100000625a3754423978a60c9317c58a424e3D&token=BAL"},"supplyInfo":{"apy":{"value":"0.039651734748361399454063535"},"total":{"value":"146949.518707932138745568"}},"size":{"usd":"19647.1506512505269502824416"},"isFrozen":true,"isPaused":false},{"underlyingToken":{"symbol":"BTC.b","address":"0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072","decimals":8,"imageUrl":"https://token-logos.family.co/asset?id=1:0xB0F70C0bD6FD87dbEb7C10dC692a2a6106817072&token=BTC.b"},"supplyInfo":{"apy":{"value":"0"},"total":{"value":"39.03723862"}},"size":{"usd":"2517534.5505745858"},"isFrozen":false,"isPaused":false},{"underlyingToken":{"symbol":"CRV","address":"0xD533a949740bb3306d119CC777fa900bA034cd52","decimals":18,"imageUrl":"https://token-logos.family.co/asset
+== B: tipos
+-- Query
+HTTP/2 200  | acao=* | bytes=7348
+{"data":{"__type":{"kind":"OBJECT","fields":[{"name":"health","type":{"name":null,"kind":"NON_NULL","ofType":{"name":"Boolean","kind":"SCALAR","ofType":null}}},{"name":"chains","type":{"name":null,"kind":"NON_NULL","ofType":{"name":null,"kind":"LIST","ofType":{"name":null,"kind":"NON_NULL"}}}},{"name":"vaultDeposit","type":{"name":null,"kind":"NON_NULL","ofType":{"name":"ExecutionPlan","kind":"UNI
+-- Market
+HTTP/2 200  | acao=* | bytes=1150
+OBJECT name:NON_NULL>String  chain:NON_NULL>Chain  address:NON_NULL>EvmAddress  eModeCategories:NON_NULL>LIST>NON_NULL  userState:MarketUserState  icon:NON_NULL>String  reserves:NON_NULL>LIST>NON_NULL  totalMarketSize:NON_NULL>BigDecimal  totalAvailableLiquidity:NON_NULL>BigDecimal
+-- Reserve
+HTTP/2 200  | acao=* | bytes=2204
+OBJECT market:NON_NULL>MarketInfo  underlyingToken:NON_NULL>Currency  aToken:NON_NULL>Currency  vToken:NON_NULL>Currency  acceptsNative:NativeCurrency  size:NON_NULL>TokenAmount  usdExchangeRate:NON_NULL>BigDecimal  usdOracleAddress:NON_NULL>EvmAddress  supplyInfo:NON_NULL>ReserveSupplyInfo  borrowInfo:ReserveBorrowInfo  isFrozen:NON_NULL>Boolean  isPaused:NON_NULL>Boolean  flashLoanEnabled:NON_NULL>Boolean  interestRateStrategyAddress:NON_NULL>EvmAddress  permitSupported:NON_NULL>Boolean  incentives:NON_NULL>LIST>NON_NULL  eModeInfo:NON_NULL>LIST>NON_NULL  userState:ReserveUserState
+-- ReserveSupplyInfo
+HTTP/2 200  | acao=* | bytes=1058
+OBJECT apy:NON_NULL>PercentValue  maxLTV:NON_NULL>PercentValue  liquidationThreshold:NON_NULL>PercentValue  liquidationBonus:NON_NULL>PercentValue  canBeCollateral:NON_NULL>Boolean  supplyCap:NON_NULL>TokenAmount  supplyCapReached:NON_NULL>Boolean  total:NON_NULL>DecimalValue
+-- MarketsRequest
+HTTP/2 200  | acao=* | bytes=267
+INPUT_OBJECT chainIds:NON_NULL>LIST>  user:EvmAddress
+-- PercentValue
+HTTP/2 200  | acao=* | bytes=529
+OBJECT raw:NON_NULL>BigInt  decimals:NON_NULL>Int  value:NON_NULL>BigDecimal  formatted:NON_NULL>BigDecimal
+-- TokenAmount
+HTTP/2 200  | acao=* | bytes=425
+OBJECT usdPerToken:NON_NULL>BigDecimal  amount:NON_NULL>DecimalValue  usd:NON_NULL>BigDecimal
+-- Currency
+HTTP/2 200  | acao=* | bytes=757
+OBJECT address:NON_NULL>EvmAddress  chainId:NON_NULL>ChainId  name:NON_NULL>String  imageUrl:NON_NULL>String  symbol:NON_NULL>String  decimals:NON_NULL>Int
+-- DecimalValue
+HTTP/2 200  | acao=* | bytes=408
+OBJECT raw:NON_NULL>BigInt  decimals:NON_NULL>Int  value:NON_NULL>BigDecimal
+== C: preflight
+HTTP/2 200 
+access-control-allow-methods: GET,POST
+access-control-allow-headers: *
+access-control-allow-origin: *
+== D: llama
+aa70268e-4b52-42bf-a116-608b370f9501 | HTTP/2 200  | acao=* | bytes=218869 | rd":null,"il7d":null,"apyBase7d":null,"pricePerShare":null},{"timestamp":"2026-11-15T17:01:13.059Z","tvlUsd":162267606,"apy":4.07774,"apyBase":4.07774,"apyReward":null,"il7d":null,"apyBase7d":null,"pricePerShare":null}]}
+f981a304-bb6c-45b8-b0c5-fd2f515ad23a | HTTP/2 200  | acao=* | bytes=217760 | rd":null,"il7d":null,"apyBase7d":null,"pricePerShare":null},{"timestamp":"2026-11-15T17:01:13.059Z","tvlUsd":400635884,"apy":3.15178,"apyBase":3.15178,"apyReward":null,"il7d":null,"apyBase7d":null,"pricePerShare":null}]}
