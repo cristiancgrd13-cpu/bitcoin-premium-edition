@@ -205,6 +205,24 @@ button:active,button:focus{outline:0;box-shadow:none}
 .badge{display:inline-block;font-size:11px;font-weight:700;border:1px solid #5d5e6c;color:#b4b5c6;border-radius:99px;padding:2px 9px;margin-left:8px;vertical-align:middle}
 #hTop .prow{cursor:pointer}
 @media(prefers-reduced-motion:reduce){.hz h1 span i{animation:none;transform:none}.tick-in{animation:none}.hz-live .dot{animation:none}}
+
+/* ---------- selector de wallets ---------- */
+.wg{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:18px 0 2px;font-size:14px;font-weight:700}
+.wg small{font-weight:500;color:var(--dim);font-size:12px;text-align:right}
+.wrow{display:flex;align-items:center;gap:12px;width:100%;margin-top:8px;padding:10px 12px;border-radius:14px;border:1px solid var(--line);background:rgba(255,255,255,.04);color:#eeeef5;font:inherit;font-size:15px;text-align:left;text-decoration:none;cursor:pointer}
+.wrow:hover{background:rgba(255,255,255,.08)}
+.wrow.on{border-color:rgba(34,214,138,.6);background:rgba(34,214,138,.08)}
+.wrow.off .wn{color:#b4b5c6}
+.wrow .wn{display:flex;flex-direction:column;font-weight:700;min-width:0}
+.wrow .wn small{font-weight:500;color:var(--dim);font-size:12px}
+.wst{margin-left:auto;font-size:12px;font-weight:600;color:var(--dim);white-space:nowrap}
+.wst.ok{color:var(--up)}
+.wst.ok:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--up);margin-right:6px;vertical-align:1px}
+.wl-l{display:grid;place-items:center;border-radius:9px;font-weight:800;font-size:16px;color:#fff}
+.wl-w{background:#fff;border-radius:9px;padding:4px;box-sizing:border-box}
+.whw{margin:8px 0 0;padding:12px 14px;border-radius:14px;background:rgba(255,214,10,.06);border:1px solid rgba(255,214,10,.25);font-size:13.5px;line-height:1.55;color:#c9cadb}
+.whw b{color:#eeeef5}.whw ul{margin:6px 0 0;padding-left:18px}.whw li{margin-bottom:4px}
+.wtip{margin:4px 2px 0;font-size:12.5px;color:var(--dim)}
 </style>
 </head>
 <body>
@@ -223,7 +241,7 @@ button:active,button:focus{outline:0;box-shadow:none}
 
 <h2 class="all hd">Abre una posición en tres pasos</h2>
 <div class="all steps">
-<div class="step"><b>Conecta tu wallet</b><span>Hoy con Phantom. No hay registro ni cuenta: tu wallet es tu acceso.</span></div>
+<div class="step"><b>Conecta tu wallet</b><span>Phantom, Solflare, Trust Wallet, MetaMask o Rabby, y tu Ledger a través de ellas. Sin registro ni cuenta.</span></div>
 <div class="step"><b>Elige pool y rango</b><span>Kosmara calcula cuánto necesitas de cada token y lo reparte por ti con un autoswap.</span></div>
 <div class="step"><b>Firma en tu wallet</b><span>Orca crea el NFT de tu posición y te lo envía directamente. Nunca pasa por Kosmara.</span></div>
 </div>
@@ -306,11 +324,7 @@ button:active,button:focus{outline:0;box-shadow:none}
 <button data-v="lottery"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="15" rx="2"/><circle cx="12" cy="11.5" r="3.2"/><path d="M12 8.3v1.2M12 13.5v1.2M7 19v2M17 19v2"/></svg><span>Vault</span></button>
 <button data-v="wallet"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h11v4"/><rect x="3" y="7" width="18" height="13" rx="2"/><circle cx="16.5" cy="13.5" r="1.2" fill="currentColor"/></svg><span>Wallet</span></button>
 </nav>
-<div class="m" id="sheet" hidden><div class="mb" role="dialog" aria-label="Conectar wallet"><button class="x" data-act="close" aria-label="Cerrar">×</button><b style="font-size:18px">Conectar wallet</b>
-<button class="wbtn ph" data-w="ph"><span class="wl"><svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="0 0 108 108" fill="none"><rect width="108" height="108" rx="26" fill="#AB9FF2"/><path fill-rule="evenodd" clip-rule="evenodd" d="M46.5267 69.9229C42.0054 76.8509 34.4292 85.6182 24.348 85.6182C19.5824 85.6182 15 83.6563 15 75.1342C15 53.4305 44.6326 19.8327 72.1268 19.8327C87.768 19.8327 94 30.6846 94 43.0079C94 58.8258 83.7355 76.9122 73.5321 76.9122C70.2939 76.9122 68.7053 75.1342 68.7053 72.314C68.7053 71.5783 68.8275 70.7812 69.0719 69.9229C65.5893 75.8699 58.8685 81.3878 52.5754 81.3878C47.993 81.3878 45.6713 78.5063 45.6713 74.4598C45.6713 72.9884 45.9768 71.4556 46.5267 69.9229ZM83.6761 42.5794C83.6761 46.1704 81.5575 47.9658 79.1875 47.9658C76.7816 47.9658 74.6989 46.1704 74.6989 42.5794C74.6989 38.9885 76.7816 37.1931 79.1875 37.1931C81.5575 37.1931 83.6761 38.9885 83.6761 42.5794ZM70.2103 42.5795C70.2103 46.1704 68.0916 47.9658 65.7216 47.9658C63.3157 47.9658 61.233 46.1704 61.233 42.5795C61.233 38.9885 63.3157 37.1931 65.7216 37.1931C68.0916 37.1931 70.2103 38.9885 70.2103 42.5795Z" fill="#FFFDF8"/></svg></span><span>Phantom</span><small>Solana</small></button>
-<button class="wbtn mm" data-w="mm"><span class="wl"><svg width="35" height="34" viewBox="0 0 35 34" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M32.7077 32.7522L25.1688 30.5174L19.4833 33.9008L15.5167 33.8991L9.82793 30.5174L2.29225 32.7522L0 25.0489L2.29225 16.4993L0 9.27094L2.29225 0.312256L14.0674 7.31554H20.9326L32.7077 0.312256L35 9.27094L32.7077 16.4993L35 25.0489L32.7077 32.7522Z" fill="#FF5C16"/><path d="M2.29395 0.312256L14.0691 7.32047L13.6008 12.1301L2.29395 0.312256Z" fill="#FF5C16"/><path d="M9.82959 25.0522L15.0106 28.9811L9.82959 30.5175V25.0522Z" fill="#FF5C16"/><path d="M14.5966 18.5565L13.6009 12.1333L7.22692 16.5009L7.22363 16.4993V16.5025L7.24335 20.9983L9.82809 18.5565H9.82974H14.5966Z" fill="#FF5C16"/><path d="M32.7077 0.312256L20.9326 7.32047L21.3993 12.1301L32.7077 0.312256Z" fill="#FF5C16"/><path d="M25.1722 25.0522L19.9912 28.9811L25.1722 30.5175V25.0522Z" fill="#FF5C16"/><path d="M27.7766 16.5025H27.7783H27.7766V16.4993L27.775 16.5009L21.401 12.1333L20.4053 18.5565H25.1722L27.7586 20.9983L27.7766 16.5025Z" fill="#FF5C16"/><path d="M9.82793 30.5175L2.29225 32.7522L0 25.0522H9.82793V30.5175Z" fill="#E34807"/><path d="M14.5947 18.5549L16.0341 27.8406L14.0393 22.6777L7.23975 20.9984L9.82613 18.5549H14.593H14.5947Z" fill="#E34807"/><path d="M25.1721 30.5175L32.7078 32.7522L35.0001 25.0522H25.1721V30.5175Z" fill="#E34807"/><path d="M20.4053 18.5549L18.9658 27.8406L20.9607 22.6777L27.7602 20.9984L25.1722 18.5549H20.4053Z" fill="#E34807"/><path d="M0 25.0488L2.29225 16.4993H7.22183L7.23991 20.9967L14.0394 22.676L16.0343 27.8389L15.0089 28.976L9.82793 25.0472H0V25.0488Z" fill="#FF8D5D"/><path d="M35.0001 25.0488L32.7078 16.4993H27.7783L27.7602 20.9967L20.9607 22.676L18.9658 27.8389L19.9912 28.976L25.1722 25.0472H35.0001V25.0488Z" fill="#FF8D5D"/><path d="M20.9325 7.31543H17.4999H14.0673L13.6006 12.1251L16.0342 27.834H18.9656L21.4008 12.1251L20.9325 7.31543Z" fill="#FF8D5D"/><path d="M2.29225 0.312256L0 9.27094L2.29225 16.4993H7.22183L13.5991 12.1301L2.29225 0.312256Z" fill="#661800"/><path d="M13.17 20.4199H10.9369L9.72095 21.6062L14.0409 22.6727L13.17 20.4182V20.4199Z" fill="#661800"/><path d="M32.7077 0.312256L34.9999 9.27094L32.7077 16.4993H27.7781L21.4009 12.1301L32.7077 0.312256Z" fill="#661800"/><path d="M21.833 20.4199H24.0694L25.2853 21.6079L20.9604 22.676L21.833 20.4182V20.4199Z" fill="#661800"/><path d="M19.4817 30.8362L19.9911 28.9794L18.9658 27.8423H16.0327L15.0073 28.9794L15.5167 30.8362" fill="#661800"/><path d="M19.4816 30.8359V33.9021H15.5166V30.8359H19.4816Z" fill="#C0C4CD"/><path d="M9.82959 30.5142L15.52 33.9008V30.8346L15.0106 28.9778L9.82959 30.5142Z" fill="#E7EBF6"/><path d="M25.1721 30.5142L19.4817 33.9008V30.8346L19.9911 28.9778L25.1721 30.5142Z" fill="#E7EBF6"/></svg></span><span>MetaMask</span><small>Ethereum y BNB Chain</small></button>
-<button class="wbtn cn" data-act="close">Cancelar</button>
-<p class="dim" style="margin:12px 0 0">Si estás en el móvil, las wallets no se ven desde un navegador normal. Abre esta web dentro de la wallet: <a class="lk" id="lPh" href="#" target="_blank" rel="noopener">Phantom ↗</a> · <a class="lk" id="lMm" href="#" target="_blank" rel="noopener">MetaMask ↗</a>. Más billeteras y cold wallets llegarán después.</p></div></div>
+<div class="m" id="sheet" hidden><div class="mb" role="dialog" aria-label="Conectar wallet" id="wsheet"><button class="x" data-act="close" aria-label="Cerrar">×</button><b style="font-size:18px">Conectar wallet</b></div></div>
 <div class="m" id="ps" hidden></div>
 <div class="toast" id="toast" hidden></div>
 
@@ -369,7 +383,7 @@ async function quoteV(v,im,om,amt,slip){
  var q=await jj("v1/quote?inputMint="+im+"&outputMint="+om+"&amount="+amt+"&slippageBps="+Math.round(slip*100)+"&dexes="+encodeURIComponent(await dexFor(v)));return{out:+q.outAmount}
 }
 async function execSwap(v,im,om,amt,slip){
- var pv=window.phantom&&window.phantom.solana;if(!pv||!S.pk)throw new Error("Conecta Phantom primero");
+ var pv=S.sw;if(!pv||!S.pk)throw new Error("Conecta una wallet de Solana primero");
  if(!window.solanaWeb3)throw new Error("No se cargó la librería de Solana");
  var V=solanaWeb3.VersionedTransaction;
  if(v==="Jupiter"){
@@ -394,7 +408,7 @@ function sopts(v){return TKS.map(function(t){return "<option"+(t.s===v?" selecte
 function rSwap(){
  var fr=TM[SW.from],bal=S.bal[fr.m];
  $("swap").innerHTML='<div class="k">Swap en Solana <small>rutas reales vía Jupiter</small></div>'+
- '<div class="box"><label for="amt">Das · saldo '+(S.pk?f(bal||0,6)+" "+fr.s:"conecta Phantom")+'</label><div class="srow"><select id="sf">'+sopts(SW.from)+'</select><input id="amt" class="num" type="number" inputmode="decimal" min="0" step="any" value="'+esc(SW.amt)+'" placeholder="0.0"></div>'+
+ '<div class="box"><label for="amt">Das · saldo '+(S.pk?f(bal||0,6)+" "+fr.s:"conecta tu wallet")+'</label><div class="srow"><select id="sf">'+sopts(SW.from)+'</select><input id="amt" class="num" type="number" inputmode="decimal" min="0" step="any" value="'+esc(SW.amt)+'" placeholder="0.0"></div>'+
  '<div class="chips"><button class="btn" data-pct="25">25%</button><button class="btn" data-pct="50">50%</button><button class="btn" data-pct="100">Máx</button><button class="btn" data-act="flip">⇅</button></div></div>'+
  '<div class="box" style="margin-top:8px"><label for="st">Recibes</label><div class="srow"><select id="st">'+sopts(SW.to)+'</select><span class="dim">estimado en las rutas</span></div></div>'+
  '<div class="hrow"><span class="dim">Deslizamiento máx. <select id="sw-slip">'+[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===SW.slip?" selected":"")+">"+v+"%</option>"}).join("")+'</select></span></div>'+
@@ -418,9 +432,9 @@ async function quoteAll(){
 }
 async function doSwap(){
  var a=parseFloat(SW.amt),fr=TM[SW.from],to=TM[SW.to],r=SW.res.filter(function(x){return x.v===SW.sel&&!x.err})[0];
- if(!S.pk)await wallet("ph");if(!S.pk)return toast("Conecta Phantom primero.");if(!r)return sres("Primero busca las mejores rutas.");
- if(!confirm("Vas a firmar un swap REAL:\n"+f(a,6)+" "+fr.s+" por unos "+f(r.out,6)+" "+to.s+" vía "+r.v+".\nRevisa los detalles en Phantom antes de aprobar."))return;
- try{sres("Esperando tu firma en Phantom…");var sg=await execSwap(r.v,fr.m,to.m,Math.floor(a*Math.pow(10,fr.d)),SW.slip);
+ if(!(await needSol()))return toast("Elige una wallet de Solana para continuar.");if(!r)return sres("Primero busca las mejores rutas.");
+ if(!confirm("Vas a firmar un swap REAL:\n"+f(a,6)+" "+fr.s+" por unos "+f(r.out,6)+" "+to.s+" vía "+r.v+".\nRevisa los detalles en tu wallet antes de aprobar."))return;
+ try{sres("Esperando tu firma en la wallet…");var sg=await execSwap(r.v,fr.m,to.m,Math.floor(a*Math.pow(10,fr.d)),SW.slip);
   sres('Swap enviado. <a class="lk" href="https://solscan.io/tx/'+esc(sg)+'" target="_blank" rel="noopener">Ver en Solscan ↗</a>');SW.amt="";SW.res=[];loadBal().then(rSwap)}
  catch(e){sres("No se pudo completar: "+esc(e.message))}
 }
@@ -516,7 +530,7 @@ function sumPs(){
  $("prg").textContent="Rango: "+fp(c.pa)+" – "+fp(c.pb)+" "+p.B.s+" por "+p.A.s;
  $("psum").innerHTML="<div>"+esc(p.A.s)+" "+f(c.fa*100,1)+'% → <b class="num">'+f(c.aA,6)+" "+esc(p.A.s)+"</b></div><div>"+esc(p.B.s)+" "+f((1-c.fa)*100,1)+'% → <b class="num">'+f(c.aB,6)+" "+esc(p.B.s)+"</b></div>"+
   (ST.auto?'<div class="dim">Autoswap: cambiar <b class="num">'+f(c.swapIn,6)+" "+esc(pay.s)+"</b> por "+esc(oth.s)+" vía "+ST.via+"</div>":'<div class="dim">Sin autoswap: necesitas ya las dos monedas.</div>');
- var b=S.bal[pay.m];$("pbal").textContent=S.pk?"Saldo: "+f(b||0,6)+" "+pay.s:"Conecta Phantom para ver tu saldo.";
+ var b=S.bal[pay.m];$("pbal").textContent=S.pk?"Saldo: "+f(b||0,6)+" "+pay.s:"Conecta tu wallet para ver tu saldo.";
 }
 function rPs(){
  var p=S.pools[S.sel],el=$("ps");if(!p){el.hidden=true;return}
@@ -540,10 +554,10 @@ function rPs(){
 async function autoswap(){
  var p=S.pools[S.sel],c=pcalc(),pay=c.payB?p.B:p.A,oth=c.payB?p.A:p.B,amt=Math.floor(c.swapIn*Math.pow(10,pay.d));
  var r=function(h){$("pres").innerHTML=h};
- if(!S.pk)await wallet("ph");if(!S.pk)return r("Conecta Phantom primero.");if(!(amt>0))return r("Introduce una cantidad.");if(!S.key)return r("Falta la clave de Jupiter (pestaña Wallet, bloque Conexiones).");
+ if(!(await needSol()))return r("Elige una wallet de Solana para continuar.");if(!(amt>0))return r("Introduce una cantidad.");if(!S.key)return r("Falta la clave de Jupiter (pestaña Wallet, bloque Conexiones).");
  try{r("Consultando ruta…");var q=await quoteV(ST.via,pay.m,oth.m,amt,ST.slip),out=q.out/Math.pow(10,oth.d);
-  if(!confirm("Vas a firmar un swap REAL para el autoswap:\n"+f(c.swapIn,6)+" "+pay.s+" por unos "+f(out,6)+" "+oth.s+" vía "+ST.via+".\nRevisa los detalles en Phantom antes de aprobar."))return r("Cancelado.");
-  r("Esperando tu firma en Phantom…");var sg=await execSwap(ST.via,pay.m,oth.m,amt,ST.slip);
+  if(!confirm("Vas a firmar un swap REAL para el autoswap:\n"+f(c.swapIn,6)+" "+pay.s+" por unos "+f(out,6)+" "+oth.s+" vía "+ST.via+".\nRevisa los detalles en tu wallet antes de aprobar."))return r("Cancelado.");
+  r("Esperando tu firma en la wallet…");var sg=await execSwap(ST.via,pay.m,oth.m,amt,ST.slip);
   r('Autoswap enviado. <a class="lk" href="https://solscan.io/tx/'+esc(sg)+'" target="_blank" rel="noopener">Ver en Solscan ↗</a> Ahora crea la posición en '+p.pr+".");loadBal().then(sumPs)}
  catch(e){r("No se pudo completar: "+esc(e.message))}
 }
@@ -568,14 +582,98 @@ async function loadBal(){
   S.bal=o}
  catch(e){toast("No se pudo leer tu saldo: "+e.message+(S.rpc?"":". Prueba con un RPC propio en Wallet → Conexiones."))}
 }
-async function wallet(w){
- try{
-  if(w==="ph"){var pv=window.phantom&&window.phantom.solana;if(!pv)throw new Error("Phantom no detectada. En el móvil, abre la web dentro de Phantom (enlace del cuadro).");
-   S.pk=(await pv.connect()).publicKey.toString();S.wname="Phantom";$("addr").value=S.pk;await loadBal();rSwap();sumPsSafe();rWallet();rPf();loadPos()}
-  else{var e=window.ethereum;if(!e)throw new Error("MetaMask no detectada. En el móvil, abre la web dentro de MetaMask (enlace del cuadro).");
-   var a=(await e.request({method:"eth_requestAccounts"}))[0];S.wname="MetaMask";$("addr").value=a;toast("Dirección de MetaMask cargada en Movimientos. Los swaps y pools de Ethereum y BNB llegan después.")}
-  $("bConn").textContent=S.wname+" "+short($("addr").value);$("sheet").hidden=true;
- }catch(x){toast(x.message||"No se pudo conectar.")}
+/* ---------- wallets ----------
+   Solana: Phantom, Solflare, Trust Wallet, Backpack (firman pools, swap y portafolio).
+   EVM: MetaMask, Rabby, Trust Wallet y cualquier otra que se anuncie (EIP-6963).
+   Ledger y Trezor se usan a través de esas wallets: Kosmara nunca habla con el dispositivo. */
+var MOB=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent),EIP={},SVGI={ph:"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"108\" height=\"108\" viewBox=\"0 0 108 108\" fill=\"none\"><rect width=\"108\" height=\"108\" rx=\"26\" fill=\"#AB9FF2\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M46.5267 69.9229C42.0054 76.8509 34.4292 85.6182 24.348 85.6182C19.5824 85.6182 15 83.6563 15 75.1342C15 53.4305 44.6326 19.8327 72.1268 19.8327C87.768 19.8327 94 30.6846 94 43.0079C94 58.8258 83.7355 76.9122 73.5321 76.9122C70.2939 76.9122 68.7053 75.1342 68.7053 72.314C68.7053 71.5783 68.8275 70.7812 69.0719 69.9229C65.5893 75.8699 58.8685 81.3878 52.5754 81.3878C47.993 81.3878 45.6713 78.5063 45.6713 74.4598C45.6713 72.9884 45.9768 71.4556 46.5267 69.9229ZM83.6761 42.5794C83.6761 46.1704 81.5575 47.9658 79.1875 47.9658C76.7816 47.9658 74.6989 46.1704 74.6989 42.5794C74.6989 38.9885 76.7816 37.1931 79.1875 37.1931C81.5575 37.1931 83.6761 38.9885 83.6761 42.5794ZM70.2103 42.5795C70.2103 46.1704 68.0916 47.9658 65.7216 47.9658C63.3157 47.9658 61.233 46.1704 61.233 42.5795C61.233 38.9885 63.3157 37.1931 65.7216 37.1931C68.0916 37.1931 70.2103 38.9885 70.2103 42.5795Z\" fill=\"#FFFDF8\"/></svg>",mm:"<svg width=\"35\" height=\"34\" viewBox=\"0 0 35 34\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M32.7077 32.7522L25.1688 30.5174L19.4833 33.9008L15.5167 33.8991L9.82793 30.5174L2.29225 32.7522L0 25.0489L2.29225 16.4993L0 9.27094L2.29225 0.312256L14.0674 7.31554H20.9326L32.7077 0.312256L35 9.27094L32.7077 16.4993L35 25.0489L32.7077 32.7522Z\" fill=\"#FF5C16\"/><path d=\"M2.29395 0.312256L14.0691 7.32047L13.6008 12.1301L2.29395 0.312256Z\" fill=\"#FF5C16\"/><path d=\"M9.82959 25.0522L15.0106 28.9811L9.82959 30.5175V25.0522Z\" fill=\"#FF5C16\"/><path d=\"M14.5966 18.5565L13.6009 12.1333L7.22692 16.5009L7.22363 16.4993V16.5025L7.24335 20.9983L9.82809 18.5565H9.82974H14.5966Z\" fill=\"#FF5C16\"/><path d=\"M32.7077 0.312256L20.9326 7.32047L21.3993 12.1301L32.7077 0.312256Z\" fill=\"#FF5C16\"/><path d=\"M25.1722 25.0522L19.9912 28.9811L25.1722 30.5175V25.0522Z\" fill=\"#FF5C16\"/><path d=\"M27.7766 16.5025H27.7783H27.7766V16.4993L27.775 16.5009L21.401 12.1333L20.4053 18.5565H25.1722L27.7586 20.9983L27.7766 16.5025Z\" fill=\"#FF5C16\"/><path d=\"M9.82793 30.5175L2.29225 32.7522L0 25.0522H9.82793V30.5175Z\" fill=\"#E34807\"/><path d=\"M14.5947 18.5549L16.0341 27.8406L14.0393 22.6777L7.23975 20.9984L9.82613 18.5549H14.593H14.5947Z\" fill=\"#E34807\"/><path d=\"M25.1721 30.5175L32.7078 32.7522L35.0001 25.0522H25.1721V30.5175Z\" fill=\"#E34807\"/><path d=\"M20.4053 18.5549L18.9658 27.8406L20.9607 22.6777L27.7602 20.9984L25.1722 18.5549H20.4053Z\" fill=\"#E34807\"/><path d=\"M0 25.0488L2.29225 16.4993H7.22183L7.23991 20.9967L14.0394 22.676L16.0343 27.8389L15.0089 28.976L9.82793 25.0472H0V25.0488Z\" fill=\"#FF8D5D\"/><path d=\"M35.0001 25.0488L32.7078 16.4993H27.7783L27.7602 20.9967L20.9607 22.676L18.9658 27.8389L19.9912 28.976L25.1722 25.0472H35.0001V25.0488Z\" fill=\"#FF8D5D\"/><path d=\"M20.9325 7.31543H17.4999H14.0673L13.6006 12.1251L16.0342 27.834H18.9656L21.4008 12.1251L20.9325 7.31543Z\" fill=\"#FF8D5D\"/><path d=\"M2.29225 0.312256L0 9.27094L2.29225 16.4993H7.22183L13.5991 12.1301L2.29225 0.312256Z\" fill=\"#661800\"/><path d=\"M13.17 20.4199H10.9369L9.72095 21.6062L14.0409 22.6727L13.17 20.4182V20.4199Z\" fill=\"#661800\"/><path d=\"M32.7077 0.312256L34.9999 9.27094L32.7077 16.4993H27.7781L21.4009 12.1301L32.7077 0.312256Z\" fill=\"#661800\"/><path d=\"M21.833 20.4199H24.0694L25.2853 21.6079L20.9604 22.676L21.833 20.4182V20.4199Z\" fill=\"#661800\"/><path d=\"M19.4817 30.8362L19.9911 28.9794L18.9658 27.8423H16.0327L15.0073 28.9794L15.5167 30.8362\" fill=\"#661800\"/><path d=\"M19.4816 30.8359V33.9021H15.5166V30.8359H19.4816Z\" fill=\"#C0C4CD\"/><path d=\"M9.82959 30.5142L15.52 33.9008V30.8346L15.0106 28.9778L9.82959 30.5142Z\" fill=\"#E7EBF6\"/><path d=\"M25.1721 30.5142L19.4817 33.9008V30.8346L19.9911 28.9778L25.1721 30.5142Z\" fill=\"#E7EBF6\"/></svg>"};
+function here(){return location.href.split("#")[0]}
+var WL=[
+ {id:"ph",n:"Phantom",net:"sol",c:"#AB9FF2",ws:/phantom/i,get:function(){return window.phantom&&window.phantom.solana},
+  dl:function(u){return "https://phantom.app/ul/browse/"+encodeURIComponent(u)+"?ref="+encodeURIComponent(location.origin)},site:"https://phantom.com"},
+ {id:"sf",n:"Solflare",net:"sol",c:"#FC7227",ws:/solflare/i,get:function(){var p=window.solflare;return p&&p.isSolflare?p:null},
+  dl:function(u){return "https://solflare.com/ul/v1/browse/"+encodeURIComponent(u)+"?ref="+encodeURIComponent(location.origin)},site:"https://solflare.com"},
+ {id:"tws",n:"Trust Wallet",net:"sol",c:"#3375BB",ws:/trust/i,get:function(){return window.trustwallet&&window.trustwallet.solana},
+  dl:function(u){return "https://link.trustwallet.com/open_url?coin_id=501&url="+encodeURIComponent(u)},site:"https://trustwallet.com"},
+ {id:"bp",n:"Backpack",net:"sol",c:"#E33E3F",ws:/backpack/i,get:function(){var b=window.backpack;return b&&(b.solana||(b.connect?b:null))},site:"https://backpack.app"},
+ {id:"mm",n:"MetaMask",net:"evm",c:"#F6851B",rd:/metamask/i,lg:function(e){return e.isMetaMask&&!e.isRabby&&!e.isTrust&&!e.isTrustWallet&&!e.isPhantom&&!e.isBraveWallet},
+  dl:function(){return "https://metamask.app.link/dapp/"+location.host+location.pathname},site:"https://metamask.io"},
+ {id:"rb",n:"Rabby",net:"evm",c:"#7084FF",rd:/rabby/i,lg:function(e){return !!e.isRabby},site:"https://rabby.io",tip:"En el móvil, abre Kosmara desde el navegador de la app de Rabby."},
+ {id:"twe",n:"Trust Wallet",net:"evm",c:"#3375BB",rd:/trust/i,lg:function(e){return !!(e.isTrust||e.isTrustWallet)},
+  dl:function(u){return "https://link.trustwallet.com/open_url?coin_id=60&url="+encodeURIComponent(u)},site:"https://trustwallet.com"}
+];
+function eipTag(d){return (d.info.rdns||"")+" "+(d.info.name||"")}
+function evmGet(w){
+ for(var k in EIP)if(w.rd.test(eipTag(EIP[k])))return EIP[k].provider;
+ if(w.id==="twe"&&window.trustwallet&&window.trustwallet.ethereum)return window.trustwallet.ethereum;
+ var e=window.ethereum;if(!e)return null;var L=e.providers&&e.providers.length?e.providers:[e];
+ for(var i=0;i<L.length;i++)if(w.lg(L[i]))return L[i];return null;
+}
+WL.forEach(function(w){if(w.net==="evm")w.get=function(){return evmGet(w)}});
+function eipExtra(){return Object.keys(EIP).map(function(k){var d=EIP[k];return d}).filter(function(d){return !WL.some(function(w){return w.rd&&w.rd.test(eipTag(d))})}).map(function(d){return{id:"eip:"+(d.info.uuid||d.info.rdns),n:d.info.name||"Wallet",net:"evm",c:"#4a4b58",icon:d.info.icon,get:function(){return d.provider}}})}
+function WID(id){return WL.concat(eipExtra()).filter(function(w){return w.id===id})[0]}
+try{window.addEventListener("eip6963:announceProvider",function(e){var d=e.detail;if(d&&d.info&&d.provider){EIP[d.info.uuid||d.info.rdns||d.info.name]=d;if(S.sheetOpen)rSheet()}});window.dispatchEvent(new Event("eip6963:requestProvider"))}catch(x){}
+
+function wIcon(w){
+ var src=w.icon||"";
+ if(!src&&w.net==="evm"&&w.rd)for(var k in EIP)if(w.rd.test(eipTag(EIP[k]))&&EIP[k].info.icon){src=EIP[k].info.icon;break}
+ if(!src&&w.ws)try{var x=WSW.filter(function(v){return w.ws.test(v.name)})[0];if(x&&x.icon)src=x.icon}catch(e){}
+ if(src)return '<span class="wl"><img alt="" src="'+esc(src)+'"></span>';
+ if(SVGI[w.id])return '<span class="wl'+(w.id==="mm"?" wl-w":"")+'">'+SVGI[w.id]+"</span>";
+ return '<span class="wl wl-l" style="background:'+w.c+'" aria-hidden="true">'+esc(w.n.charAt(0))+"</span>";
+}
+function wRow(w){
+ var p=w.get&&w.get(),on=(w.net==="sol"&&S.wid===w.id)||(w.net==="evm"&&S.eid===w.id),inner,st;
+ st=on?'<span class="wst ok">Conectada</span>':p?'<span class="wst ok">Detectada</span>':MOB&&w.dl?'<span class="wst">Abrir en la app</span>':'<span class="wst">Instalar</span>';
+ inner=wIcon(w)+'<span class="wn">'+esc(w.n)+(on?"<small>"+short(w.net==="sol"?S.pk:S.eaddr)+"</small>":"")+"</span>"+st;
+ if(p||on)return '<button class="wrow'+(on?" on":"")+'" data-w="'+esc(w.id)+'">'+inner+"</button>";
+ return '<a class="wrow off" href="'+esc(MOB&&w.dl?w.dl(here()):w.site)+'" target="_blank" rel="noopener">'+inner+"</a>"+(w.tip&&MOB?'<p class="wtip">'+esc(w.tip)+"</p>":"");
+}
+var HW={
+ ledger:'<b>Ledger</b> se usa a través de una wallet: la añades dentro de ella una vez y, a partir de ahí, cada operación de Kosmara la confirmas en el dispositivo.<ul><li><b>Solana:</b> Phantom o Solflare, en el ordenador.</li><li><b>Ethereum, BNB y otras:</b> MetaMask o Rabby. En el móvil, Rabby la conecta por Bluetooth.</li></ul>',
+ trezor:'<b>Trezor</b> se usa a través de una wallet: la añades dentro de ella una vez y cada operación la confirmas en el dispositivo.<ul><li><b>Ethereum, BNB y otras:</b> MetaMask o Rabby. En el móvil, Rabby la conecta por Bluetooth.</li><li><b>Solana:</b> todavía no hemos comprobado un camino fiable con Trezor.</li></ul>'
+};
+function rSheet(){
+ var sol=WL.filter(function(w){return w.net==="sol"}),evm=WL.filter(function(w){return w.net==="evm"}).concat(eipExtra());
+ var hw=function(k,n){return '<button class="wrow" data-hw="'+k+'" aria-expanded="'+(S.hw===k)+'"><span class="wl wl-l" style="background:#2a2b33" aria-hidden="true">'+n.charAt(0)+'</span><span class="wn">'+n+'<small>A través de tu wallet</small></span><span class="wst">'+(S.hw===k?"Ocultar":"Cómo conectar")+"</span></button>"+(S.hw===k?'<div class="whw">'+HW[k]+"</div>":"")};
+ $("wsheet").innerHTML='<button class="x" data-act="close" aria-label="Cerrar">×</button><b style="font-size:18px">Conectar wallet</b>'+
+  '<p class="dim" style="margin:6px 0 0;font-size:13px">Kosmara nunca ve tus claves: cada operación la firmas tú.</p>'+
+  '<h4 class="wg">Solana <small>pools, swap y portafolio</small></h4>'+sol.map(wRow).join("")+
+  '<h4 class="wg">Ethereum, BNB y otras <small>de momento, solo tu dirección</small></h4>'+evm.map(wRow).join("")+
+  '<h4 class="wg">Cold wallet</h4>'+hw("ledger","Ledger")+hw("trezor","Trezor")+
+  (MOB?'<p class="dim" style="margin:14px 0 0;font-size:12.5px">En el móvil, una wallet solo se ve si abres Kosmara dentro de su app. «Abrir en la app» lo hace por ti.</p>':"")+
+  (S.pk||S.eaddr?'<button class="wbtn cn" data-act="wout" style="margin-top:14px">Desconectar</button>':"");
+}
+function openSheet(){S.sheetOpen=true;try{window.dispatchEvent(new Event("eip6963:requestProvider"))}catch(e){}rSheet();$("sheet").hidden=false}
+function rConn(){$("bConn").textContent=S.pk?S.wname+" "+short(S.pk):S.eaddr?S.ename+" "+short(S.eaddr):"Conectar wallet"}
+async function solConnect(p,silent){var r=await p.connect(silent?{onlyIfTrusted:true}:undefined),k=(r&&r.publicKey)||p.publicKey;if(!k)throw new Error("La wallet no devolvió ninguna dirección.");return k.toString()}
+/* Misma interfaz para todas las wallets de Solana: si no firman y envían a la vez, firmamos y enviamos por RPC. */
+function solWrap(p){return{p:p,
+ signTransaction:function(t){return p.signTransaction(t)},
+ signAndSendTransaction:async function(t){
+  if(p.signAndSendTransaction){var r=await p.signAndSendTransaction(t);return{signature:typeof r==="string"?r:r&&r.signature}}
+  var sg=await p.signTransaction(t);return{signature:await rc("sendTransaction",[u8b(sg.serialize()),{encoding:"base64",maxRetries:3}])}}}}
+function solOn(w,pk){S.sw=solWrap(w.get());S.pk=pk;S.wid=w.id;S.wname=w.n;LS("kz_w",w.id);$("addr").value=S.pk;rConn();loadBal().then(function(){rSwap();sumPsSafe();rWallet();rPf();loadPos()})}
+async function wallet(id){
+ try{var w=WID(id);if(!w)throw new Error("Wallet no disponible.");var p=w.get&&w.get();
+  if(!p)throw new Error(w.n+" no está en este navegador."+(MOB?" Ábrela desde «Abrir en la app».":""));
+  if(w.net==="sol")solOn(w,await solConnect(p,false));
+  else{var a=(await p.request({method:"eth_requestAccounts"}))[0];if(!a)throw new Error("La wallet no devolvió ninguna dirección.");
+   S.ev=p;S.eaddr=a;S.eid=w.id;S.ename=w.n;LS("kz_we",w.id);$("addr").value=a;rConn();
+   toast("Dirección de "+w.n+" cargada en Movimientos. Swaps y pools de Ethereum y BNB llegarán después.")}
+  S.sheetOpen=false;$("sheet").hidden=true;
+ }catch(x){toast((x&&x.message)||"No se pudo conectar.")}
+}
+function wOut(){
+ try{if(S.sw&&S.sw.p&&S.sw.p.disconnect)S.sw.p.disconnect()}catch(e){}
+ S.sw=null;S.pk="";S.wid="";S.wname="";S.ev=null;S.eaddr="";S.eid="";S.ename="";S.bal={};S.positions=[];S.posOk=false;
+ LS("kz_w","-");LS("kz_we","");rConn();rSwap();rWallet();rPf();rSheet();toast("Wallet desconectada.");
+}
+/* Pide wallet de Solana: reconecta la última usada o abre el selector. */
+async function needSol(){
+ if(S.pk&&S.sw)return true;var id=LS("kz_w"),w=id&&WID(id);
+ if(w&&w.net==="sol"&&w.get()){await wallet(id);if(S.pk)return true}
+ openSheet();return false;
 }
 function sumPsSafe(){if(S.sel&&!$("ps").hidden)sumPs()}
 
@@ -652,8 +750,8 @@ document.addEventListener("click",function(e){
  if(rt){SW.sel=rt.getAttribute("data-rt");return rQt()}
  if(pc){var t=TM[SW.from];SW.amt=String(Math.floor((S.bal[t.m]||0)*pc.getAttribute("data-pct")/100*1e6)/1e6);return rSwap()}
  if(a){var m=a.getAttribute("data-act");
-  if(m==="open"){setIcons();$("lPh").href="https://phantom.app/ul/browse/"+encodeURIComponent(location.href)+"?ref="+encodeURIComponent(location.origin);$("lMm").href="https://metamask.app.link/dapp/"+location.host+location.pathname;$("sheet").hidden=false}
-  else if(m==="close")$("sheet").hidden=true;else if(m==="closeps"){S.sel="";rPs()}
+  if(m==="open")openSheet();
+  else if(m==="close"){S.sheetOpen=false;$("sheet").hidden=true}else if(m==="wout")wOut();else if(m==="closeps"){S.sel="";rPs()}
   else if(m==="quote")quoteAll();else if(m==="doswap")doSwap();else if(m==="vmore"){S.vlim+=10;rLot()}else if(m==="autoswap")autoswap();else if(m==="mkpos")mkPos();
   else if(m==="more"){S.lim+=10;rPools()}else if(m==="load")loadHist();else if(m==="dl")dlCsv();else if(m==="pdf")dlPdf();else if(m==="copy")copyCsv();
   else if(m==="flip"){var z=SW.from;SW.from=SW.to;SW.to=z;SW.amt="";SW.res=[];rSwap()}}
@@ -682,24 +780,9 @@ rSwap();rCfg();rPools();loadPools();
 
 /* ---------- logos originales de las wallets ---------- */
 window.kzP=309;
-var WSW=[],ICON={ph:"",mm:""};
-window.kzP=310;
-(function(){var api={register:function(){for(var i=0;i<arguments.length;i++)WSW.push(arguments[i]);return function(){}}};
- try{window.addEventListener("wallet-standard:register-wallet",function(e){try{e.detail(api)}catch(x){}});window.dispatchEvent(new CustomEvent("wallet-standard:app-ready",{detail:api}))}catch(x){}
- try{window.addEventListener("eip6963:announceProvider",function(e){var i=e.detail&&e.detail.info;if(i&&/metamask/i.test((i.name||"")+(i.rdns||""))&&i.icon){ICON.mm=i.icon;setIcons()}});window.dispatchEvent(new Event("eip6963:requestProvider"))}catch(x){}})();
-function setIcons(){
- try{var pw=WSW.filter(function(x){return /phantom/i.test(x.name)})[0];if(pw&&pw.icon)ICON.ph=pw.icon}catch(e){}
- [["ph","phantom"],["mm","metamask"]].forEach(function(a){
-  var box=document.querySelector('[data-w="'+a[0]+'"] .wl');if(!box)return;
-  if(ICON[a[0]]){box.innerHTML='<img alt="" src="'+ICON[a[0]]+'">';return}
-  var c=[a[1]+".svg",a[1]+".png"],i=0,im=new Image();
-  im.alt="";im.onload=function(){box.innerHTML="";box.appendChild(im)};
-  im.onerror=function(){i++;if(i<c.length)im.src="./"+c[i]};
-  im.src="./"+c[0];
- });
-}
-window.kzP=324;
-setIcons();
+var WSW=[];
+(function(){var api={register:function(){for(var i=0;i<arguments.length;i++)WSW.push(arguments[i]);if(S.sheetOpen)rSheet();return function(){}}};
+ try{window.addEventListener("wallet-standard:register-wallet",function(e){try{e.detail(api)}catch(x){}});window.dispatchEvent(new CustomEvent("wallet-standard:app-ready",{detail:api}))}catch(x){}})();
 
 window.kzP=326;
 document.addEventListener("click",function(e){
@@ -731,18 +814,21 @@ var ROAD=[
  ["test","Swap con comparación de rutas","Vía Jupiter. Por ahora necesita tu clave de API."],
  ["test","Crear posiciones en Orca sin salir de Kosmara","El NFT llega directo a tu wallet."],
  ["test","Portafolio de posiciones","Lee tus posiciones de Orca. Necesita un RPC propio."],
+ ["test","Más wallets y cold wallets","Phantom, Solflare, Trust Wallet, Backpack, MetaMask y Rabby; Ledger y Trezor a través de ellas."],
  ["soon","Cerrar posiciones y cobrar comisiones","Gestión completa sin ir a Orca."],
  ["soon","Crear posiciones en Raydium",""],
  ["soon","Crear posiciones en Uniswap y PancakeSwap","Ethereum y BNB Chain con MetaMask."],
  ["soon","Swaps y puentes entre redes",""],
- ["soon","Más billeteras y cold wallets",""],
+ ["soon","Conexión por QR (WalletConnect)","Para wallets del móvil que no tienen navegador propio."],
  ["soon","Alertas de rango","Aviso cuando una posición deja de trabajar."],
  ["soon","Informe fiscal","Ganancias y pérdidas listas para la declaración."],
  ["soon","Puntos Kosmara","Recompensas por usar el protocolo."],
  ["soon","Predicciones con puntos","Juego gratuito, sin dinero."],
  ["soon","Staking de SOL",""],
  ["soon","Token MARA","Reparto inicial a partir de los puntos."],
- ["idea","Vault Kosmara","Depósitos retirables: 80 % del interés para ti, 20 % a recompra y quema del token."],
+ ["soon","Earn de Kosmara en Kamino","Primer vault propio, en USDC: depósitos retirables con parte del rendimiento a recompra."],
+ ["idea","Vault Kosmara en más redes","Ethereum, BNB y Base: 80 % del interés para ti, 20 % a recompra y quema del token."],
+ ["idea","Préstamos con recompensas","Pedir prestado desde Kosmara ganando puntos, con límites para evitar abusos."],
  ["idea","Vaults con rebalanceo automático",""]
 ];
 function rRoad(){
@@ -897,7 +983,7 @@ function rNet(net){
  $(N.el).innerHTML='<div class="k">'+N.n+' · pools de liquidez <small>'+L.length+' pools</small></div><input data-nq="'+net+'" placeholder="Buscar tokens" value="'+esc(st.q)+'" autocomplete="off"><div class="chips">'+fl+'</div><div class="stat">'+esc(st.st||"cargando…")+'</div><div class="plist">'+(L.slice(0,st.lim).map(prow).join("")||'<div class="dim" style="margin-top:10px">Sin pools todavía.</div>')+"</div>"+(L.length>st.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-nm="'+net+'">Ver más</button>':"");
  if(st.foc){var i=$(N.el).querySelector("input");i.focus();i.setSelectionRange(i.value.length,i.value.length)}
 }
-document.addEventListener("click",function(e){var vf=e.target.closest("[data-vf]");if(vf){S.vf=vf.getAttribute("data-vf");S.vlim=6;rLot();return}var a=e.target.closest("[data-nf]"),m=e.target.closest("[data-nm]");
+document.addEventListener("click",function(e){var hw=e.target.closest("[data-hw]");if(hw){var k=hw.getAttribute("data-hw");S.hw=S.hw===k?"":k;rSheet();return}var vf=e.target.closest("[data-vf]");if(vf){S.vf=vf.getAttribute("data-vf");S.vlim=6;rLot();return}var a=e.target.closest("[data-nf]"),m=e.target.closest("[data-nm]");
  if(a){var v=a.getAttribute("data-nf").split(":");NS[v[0]].f=v[1];NS[v[0]].foc=false;rNet(v[0])}
  else if(m){var n=m.getAttribute("data-nm");NS[n].lim+=10;NS[n].foc=false;rNet(n)}});
 document.addEventListener("input",function(e){var t=e.target,n=t.getAttribute&&t.getAttribute("data-nq");if(!n)return;var st=NS[n];st.q=t.value;st.lim=3;st.foc=true;rNet(n);clearTimeout(nT);if(t.value.trim().length>=2)nT=setTimeout(function(){loadNet(n,t.value.trim())},700)});
@@ -905,20 +991,20 @@ document.addEventListener("input",function(e){var t=e.target,n=t.getAttribute&&t
 /* ---------- SDK de Orca (sdk/kz-sdk.js, compilado aparte) ---------- */
 async function mkPos(){
  var p=S.pools[S.sel],c=pcalc(),r=function(h){$("pres").innerHTML=h};
- if(!S.pk)await wallet("ph");if(!S.pk)return r("Conecta Phantom primero.");if(!(c.a>0))return r("Introduce una cantidad.");
+ if(!(await needSol()))return r("Elige una wallet de Solana para continuar.");if(!(c.a>0))return r("Introduce una cantidad.");
  await loadBal();
  var bA=(S.bal[p.A.m]||0)-(p.A.m===SOLM?.02:0),bB=(S.bal[p.B.m]||0)-(p.B.m===SOLM?.02:0),aA=Math.min(c.aA,Math.max(0,bA)),aB=Math.min(c.aB,Math.max(0,bB));
  if(aA<c.aA*.9||aB<c.aB*.9)return r("Te falta "+(aA<c.aA*.9?p.A.s:p.B.s)+" en la wallet para este rango. Pulsa primero el autoswap y vuelve a intentarlo.");
- if(!confirm("Vas a abrir una posición REAL en Orca ("+p.A.s+"/"+p.B.s+").\nHasta "+f(aA,6)+" "+p.A.s+" + "+f(aB,6)+" "+p.B.s+".\nEl NFT llegará a tu wallet. Revisa la transacción en Phantom antes de aprobar."))return;
- try{r("Preparando la posición…");var o=await kzSdk.openPosition({rpc:rpcUrl(),pool:p.id,owner:S.pk,amountA:aA,amountB:aB,decA:p.A.d,decB:p.B.d,lower:c.pa,upper:c.pb,slipBps:Math.round(ST.slip*100),provider:window.phantom.solana});
+ if(!confirm("Vas a abrir una posición REAL en Orca ("+p.A.s+"/"+p.B.s+").\nHasta "+f(aA,6)+" "+p.A.s+" + "+f(aB,6)+" "+p.B.s+".\nEl NFT llegará a tu wallet. Revisa la transacción en tu wallet antes de aprobar."))return;
+ try{r("Preparando la posición…");var o=await kzSdk.openPosition({rpc:rpcUrl(),pool:p.id,owner:S.pk,amountA:aA,amountB:aB,decA:p.A.d,decB:p.B.d,lower:c.pa,upper:c.pb,slipBps:Math.round(ST.slip*100),provider:S.sw});
   r((o.confirmed?"Posición creada.":"Transacción enviada; aún sin confirmar.")+' <a class="lk" href="https://solscan.io/tx/'+esc(o.signature)+'" target="_blank" rel="noopener">Ver transacción ↗</a> · <a class="lk" href="https://solscan.io/token/'+esc(o.positionMint)+'" target="_blank" rel="noopener">Ver NFT ↗</a>');loadBal();loadPos()}
  catch(e){r("No se pudo completar: "+esc((e&&e.message)||e))}
 }
 async function loadPos(){if(!S.pk||!(window.kzSdk&&kzSdk.ready))return;try{S.positions=await kzSdk.positions({rpc:rpcUrl(),owner:S.pk});S.posOk=true;S.posErr=""}catch(e){S.posErr=S.rpc?e.message:"el RPC público no permite listar posiciones; pon un RPC propio en Wallet → Conexiones"}rPf()}
-(function(){var pv=window.phantom&&window.phantom.solana;if(!pv)return;
- var on=function(k){if(!k)return;S.pk=k.toString();S.wname="Phantom";$("addr").value=S.pk;$("bConn").textContent="Phantom "+short(S.pk);loadBal().then(function(){rSwap();sumPsSafe();rWallet();rPf();loadPos()})};
- try{pv.connect({onlyIfTrusted:true}).then(function(r){on(r&&r.publicKey)}).catch(function(){})}catch(e){}
- try{if(pv.on)pv.on("accountChanged",function(k){if(k)on(k)})}catch(e){}
+(function(){var id=LS("kz_w");if(id==="-")return;id=id||"ph";var w=WID(id);if(!w||w.net!=="sol")return;var p=w.get();if(!p)return;
+ var go=function(k){if(k)solOn(w,k.toString())};
+ if(id==="ph")solConnect(p,true).then(go).catch(function(){});else if(p.isConnected&&p.publicKey)go(p.publicKey);
+ try{if(p.on)p.on("accountChanged",function(k){if(k&&S.wid===w.id)go(k)})}catch(e){}
 })();
 window.addEventListener("kzsdk",function(){loadPos();if(S.sel&&!$("ps").hidden)rPs()});
 try{var kzM=document.createElement("script");kzM.type="module";kzM.src="./sdk/kz-sdk.js";document.head.appendChild(kzM)}catch(e){}
