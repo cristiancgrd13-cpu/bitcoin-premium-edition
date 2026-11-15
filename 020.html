@@ -520,7 +520,7 @@ function sumPs(){
 }
 function rPs(){
  var p=S.pools[S.sel],el=$("ps");if(!p){el.hidden=true;return}
- if(p.kind||p.net){el.style.setProperty("--tc","20,241,149");el.innerHTML='<div class="mb"><button class="x" data-act="closeps" aria-label="Cerrar">×</button><b style="font-size:20px">'+esc(p.A.s)+(p.B.s?"/"+esc(p.B.s):"")+'</b><div class="dim">'+p.pr+" · "+esc(p.net?NET[p.net].n:p.kind)+" · TVL $"+f(p.tvl,0)+(p.apr!=null?(p.net?" · APR est. ":" · APY ")+f(p.apr,1)+"%":"")+'</div><div class="dim" style="margin-top:12px;line-height:1.6">'+(p.net?"La posición se abre en "+p.pr+" con tu wallet (MetaMask). Crear posiciones de "+NET[p.net].n+" sin salir de Kosmara llegará en la siguiente fase.":p.pr==="Kamino"?"Kamino gestiona el rango y reinvierte las comisiones por ti. Recibes un token del vault, no un NFT.":"Depositas un solo token en Jupiter Lend y recibes un token que acumula el interés. No hay rango ni NFT.")+'</div><a class="btn p" href="'+esc(p.url)+'" target="_blank" rel="noopener">'+(p.net?"Abrir en ":"Depositar en ")+p.pr+" ↗</a></div>";el.hidden=false;return}
+ if(p.kind||p.net){el.style.setProperty("--tc","20,241,149");el.innerHTML='<div class="mb"><button class="x" data-act="closeps" aria-label="Cerrar">×</button><b style="font-size:20px">'+esc(p.A.s)+(p.B.s?"/"+esc(p.B.s):"")+'</b><div class="dim">'+p.pr+" · "+esc(p.kind||NET[p.net].n)+" · TVL $"+f(p.tvl,0)+(p.apr!=null?(p.net&&!p.kind?" · APR est. ":" · APY ")+f(p.apr,1)+"%":"")+'</div><div class="dim" style="margin-top:12px;line-height:1.6">'+(p.pr==="Aave"?"Depositas un solo token en Aave, en la red Ethereum, con tu wallet (MetaMask) y lo retiras cuando quieras. El interés lo pagan quienes piden prestado y cambia cada día. Operar en Ethereum tiene coste de gas.":p.net?"La posición se abre en "+p.pr+" con tu wallet (MetaMask). Crear posiciones de "+NET[p.net].n+" sin salir de Kosmara llegará en la siguiente fase.":p.pr==="Kamino"?"Kamino gestiona el rango y reinvierte las comisiones por ti. Recibes un token del vault, no un NFT.":"Depositas un solo token en Jupiter Lend y recibes un token que acumula el interés. No hay rango ni NFT.")+'</div><a class="btn p" href="'+esc(p.url)+'" target="_blank" rel="noopener">'+(p.net&&!p.kind?"Abrir en ":"Depositar en ")+p.pr+" ↗</a></div>";el.hidden=false;return}
  var z=ST,chips=[1,5,10].map(function(x){return '<button class="btn chip'+(z.r===x?" on":"")+'" data-pr="'+x+'">±'+x+"%</button>"}).join("")+'<button class="btn chip'+(z.r==="c"?" on":"")+'" data-pr="c">Personal.</button>',
  cu=z.r==="c"?'<div class="two"><input id="cmin" class="num" type="number" step="any" placeholder="Mín." value="'+esc(z.cmin)+'"><input id="cmax" class="num" type="number" step="any" placeholder="Máx." value="'+esc(z.cmax)+'"></div>':"",
  vo=VEN.map(function(v){return "<option"+(v===z.via?" selected":"")+">"+v+"</option>"}).join(""),
@@ -725,7 +725,7 @@ function poolRow(p){
    "on" = en marcha (verde) · "test" = en pruebas (amarillo) · "soon" = próximamente · "idea" = en estudio */
 var ROAD=[
  ["on","Pools de Solana en una lista","Orca y Raydium con búsqueda, categorías y filtros."],
- ["on","Vaults de Kamino y Earn de Jupiter","Rendimientos listados junto a los pools."],
+ ["on","Rendimientos de Aave, Jupiter Earn y Kamino","USDC y USDT en Aave (Ethereum) y vaults de Solana, con enlace para depositar."],
  ["on","Pools de Ethereum y BNB Chain","Uniswap, Curve y PancakeSwap con datos reales."],
  ["on","Movimientos exportables","Historial de cualquier dirección en CSV y PDF."],
  ["test","Swap con comparación de rutas","Vía Jupiter. Por ahora necesita tu clave de API."],
@@ -848,7 +848,7 @@ function rLot(){
   '<div class="row"><div><b style="font-size:14px">80 % del interés para ti</b><small>El 20 % restante compra el token en el mercado y lo quema.</small></div></div>'+
   '<div class="row"><div><b style="font-size:14px">Puntos por depositar</b><small>1 punto por cada 10 $ y día, que contarán para el reparto del token.</small></div></div>'+
   '<div class="row"><div><b style="font-size:14px">Con contrato auditado</b><small>El vault guarda fondos en un contrato, así que no se abrirá sin auditoría previa.</small></div></div>'+
-  (E.length?'<div class="k" style="margin-top:16px">Dónde depositar hoy <small>directo en cada protocolo</small></div><div class="plist">'+E.slice(0,3).map(prow).join("")+'</div><button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-v="pools">Ver todos en Pools</button>':"");
+  (E.length?'<div class="k" style="margin-top:16px">Dónde depositar hoy <small>Aave, Jupiter y Kamino</small></div><div class="plist">'+E.slice(0,6).map(prow).join("")+'</div>'+(S.aaveSt?'<div class="stat">'+esc(S.aaveSt)+"</div>":"")+'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-v="pools">Ver todos en Pools</button>':"");
  lotCalc();
 }
 function dlPdf(){
@@ -876,8 +876,18 @@ async function loadNet(net,q){
   st.st=q?c+" resultados para “"+q+"”":"Top por volumen 24 h · datos de GeckoTerminal"}catch(e){st.st="error: "+(e.message||"red")}
  rNet(net);if(S.view==="home")rHome();
 }
+/* Aave v3 en Ethereum: rendimiento de depositar USDC y USDT (API oficial de Aave). */
+async function loadAave(){
+ try{var r=await fetch("https://api.v3.aave.com/graphql",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:"query{markets(request:{chainIds:[1]}){name reserves{underlyingToken{symbol address decimals imageUrl}supplyInfo{apy{value}}size{usd}isFrozen isPaused}}}"})});
+  if(!r.ok)throw new Error("HTTP "+r.status);var j=await r.json(),n=0;
+  ((j.data&&j.data.markets)||[]).forEach(function(m){if(m.name!=="AaveV3Ethereum")return;(m.reserves||[]).forEach(function(v){var t=v.underlyingToken||{};if(v.isFrozen||v.isPaused||["USDC","USDT"].indexOf(t.symbol)<0)return;
+   var o=mk("Aave",t.address,{m:t.address,s:t.symbol,d:t.decimals,i:t.imageUrl||""},{m:"-",s:"",d:0,i:""},0,+v.size.usd,0,+v.supplyInfo.apy.value*100,null,"https://app.aave.com/reserve-overview/?underlyingAsset="+String(t.address).toLowerCase()+"&marketName=proto_mainnet_v3");
+   o.k="aave:"+t.address;o.net="eth";o.kind="Depósito · Ethereum";S.pools[o.k]=o;n++})});
+  S.aaveSt=n?"":"Aave: sin datos"}catch(e){S.aaveSt="Aave: error: "+(e.message||"red")}
+ if(S.view==="lottery")rLot();if(S.view==="home")rHome();
+}
 function rNet(net){
- var N=NET[net],st=NS[net],q=st.q.toLowerCase().trim(),L=Object.keys(S.pools).map(function(k){return S.pools[k]}).filter(function(p){return p.net===net&&(st.f==="all"||p.pr===st.f)&&(p.A.s+"/"+p.B.s+" "+p.id).toLowerCase().indexOf(q)>=0}).sort(function(a,b){return b.tvl-a.tvl});
+ var N=NET[net],st=NS[net],q=st.q.toLowerCase().trim(),L=Object.keys(S.pools).map(function(k){return S.pools[k]}).filter(function(p){return p.net===net&&!p.kind&&(st.f==="all"||p.pr===st.f)&&(p.A.s+"/"+p.B.s+" "+p.id).toLowerCase().indexOf(q)>=0}).sort(function(a,b){return b.tvl-a.tvl});
  var fl=["all"].concat(N.dx).map(function(x){return '<button class="btn chip'+(st.f===x?" on":"")+'" data-nf="'+net+":"+x+'">'+(x==="all"?"Todas":x)+"</button>"}).join("");
  $(N.el).innerHTML='<div class="k">'+N.n+' · pools de liquidez <small>'+L.length+' pools</small></div><input data-nq="'+net+'" placeholder="Buscar tokens" value="'+esc(st.q)+'" autocomplete="off"><div class="chips">'+fl+'</div><div class="stat">'+esc(st.st||"cargando…")+'</div><div class="plist">'+(L.slice(0,st.lim).map(prow).join("")||'<div class="dim" style="margin-top:10px">Sin pools todavía.</div>')+"</div>"+(L.length>st.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-nm="'+net+'">Ver más</button>':"");
  if(st.foc){var i=$(N.el).querySelector("input");i.focus();i.setSelectionRange(i.value.length,i.value.length)}
@@ -909,7 +919,7 @@ window.addEventListener("kzsdk",function(){loadPos();if(S.sel&&!$("ps").hidden)r
 try{var kzM=document.createElement("script");kzM.type="module";kzM.src="./sdk/kz-sdk.js";document.head.appendChild(kzM)}catch(e){}
 
 window.kzP=400;
-rRoad();rHome();rPf();rWallet();rLot();rNet("eth");rNet("bsc");loadNet("eth").then(function(){loadNet("bsc")});
+rRoad();rHome();rPf();rWallet();rLot();rNet("eth");rNet("bsc");loadNet("eth").then(function(){loadNet("bsc")});loadAave();
 window.kzOK=true;
 }catch(e){window.onerror("Principal: "+(e&&e.message)+" (paso "+window.kzP+")","",0,0)}</script>
 </body>
