@@ -1,0 +1,44 @@
+name: Kosmara probe (temporal)
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/kosmara-probe.yml"
+permissions:
+  contents: write
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Probar la API de Aave desde un origen de navegador
+        run: |
+          mkdir -p sdk
+          O="Origin: https://cristiancgrd13-cpu.github.io"
+          U="https://api.v3.aave.com/graphql"
+          q() { curl -s -m 25 -o /tmp/b.json -D /tmp/h.txt -H "$O" -H "Content-Type: application/json" -d "$1" "$U" || true; echo "$(head -n 1 /tmp/h.txt | tr -d '\r') | acao=$(grep -i '^access-control-allow-origin' /tmp/h.txt | tr -d '\r' | cut -d' ' -f2) | bytes=$(wc -c < /tmp/b.json)"; head -c "$2" /tmp/b.json; echo; }
+          {
+            echo "== A: markets candidata"
+            q '{"query":"query { markets(request:{chainIds:[1]}) { name address reserves { underlyingToken { symbol address decimals imageUrl } supplyInfo { apy { value } total { value } } size { usd } isFrozen isPaused } } }"}' 1800
+            echo "== B: tipos"
+            for t in Query Market Reserve ReserveSupplyInfo MarketsRequest PercentValue TokenAmount Currency DecimalValue; do
+              echo "-- $t"
+              q "{\"query\":\"{ __type(name:\\\"$t\\\"){ kind fields{ name type{ name kind ofType{ name kind ofType{ name kind } } } } inputFields{ name type{ name kind ofType{ name kind ofType{ name } } } } } }\"}" 6000 | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>{const l=s.split('\n');console.log(l[0]);try{const t=JSON.parse(l.slice(1).join('\n')).data.__type;const f=(t.fields||t.inputFields||[]).map(x=>{let y=x.type,n=[];while(y){n.push(y.name||y.kind);y=y.ofType}return x.name+':'+n.join('>')});console.log(t.kind,f.join('  '))}catch(e){console.log(l.slice(1).join(' ').slice(0,400))}})"
+            done
+            echo "== C: preflight"
+            curl -s -m 15 -o /dev/null -D /tmp/h.txt -X OPTIONS -H "$O" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: content-type" "$U" || true
+            head -n 1 /tmp/h.txt; grep -i '^access-control' /tmp/h.txt || true
+            echo "== D: llama"
+            for id in aa70268e-4b52-42bf-a116-608b370f9501 f981a304-bb6c-45b8-b0c5-fd2f515ad23a; do
+              curl -s -m 25 -o /tmp/b.json -D /tmp/h.txt -H "$O" "https://yields.llama.fi/chart/$id" || true
+              echo "$id | $(head -n 1 /tmp/h.txt | tr -d '\r') | acao=$(grep -i '^access-control-allow-origin' /tmp/h.txt | tr -d '\r' | cut -d' ' -f2) | bytes=$(wc -c < /tmp/b.json) | $(tail -c 220 /tmp/b.json)"
+            done
+          } > sdk/probe.txt 2>&1
+      - name: Guardar
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sdk/probe.txt
+          git commit -m "Sonda de API (temporal)" || exit 0
+          git pull --rebase origin main
+          git push
