@@ -654,7 +654,7 @@ document.addEventListener("click",function(e){
  if(a){var m=a.getAttribute("data-act");
   if(m==="open"){setIcons();$("lPh").href="https://phantom.app/ul/browse/"+encodeURIComponent(location.href)+"?ref="+encodeURIComponent(location.origin);$("lMm").href="https://metamask.app.link/dapp/"+location.host+location.pathname;$("sheet").hidden=false}
   else if(m==="close")$("sheet").hidden=true;else if(m==="closeps"){S.sel="";rPs()}
-  else if(m==="quote")quoteAll();else if(m==="doswap")doSwap();else if(m==="autoswap")autoswap();else if(m==="mkpos")mkPos();
+  else if(m==="quote")quoteAll();else if(m==="doswap")doSwap();else if(m==="vmore"){S.vlim+=10;rLot()}else if(m==="autoswap")autoswap();else if(m==="mkpos")mkPos();
   else if(m==="more"){S.lim+=10;rPools()}else if(m==="load")loadHist();else if(m==="dl")dlCsv();else if(m==="pdf")dlPdf();else if(m==="copy")copyCsv();
   else if(m==="flip"){var z=SW.from;SW.from=SW.to;SW.to=z;SW.amt="";SW.res=[];rSwap()}}
 });
@@ -713,7 +713,7 @@ document.addEventListener("click",function(e){
 window.kzP=334;
 var VIEWS=["home","pools","portfolio","swap","lottery","wallet"];
 window.kzP=335;
-S.positions=[];S.pfTab="liq";S.lotN="1000";S.lotP="6";S.view="home";
+S.positions=[];S.pfTab="liq";S.lotN="1000";S.lotP="6";S.vf="usd";S.vlim=6;S.view="home";
 window.kzP=336;
 window.kzAfter=function(v){S.view=v;if(v==="home"){rHome();if(window.kzDoor)window.kzDoor()}else if(v==="portfolio")rPf();else if(v==="wallet")rWallet();else if(v==="lottery")rLot()};
 
@@ -725,7 +725,7 @@ function poolRow(p){
    "on" = en marcha (verde) · "test" = en pruebas (amarillo) · "soon" = próximamente · "idea" = en estudio */
 var ROAD=[
  ["on","Pools de Solana en una lista","Orca y Raydium con búsqueda, categorías y filtros."],
- ["on","Rendimientos de Aave, Jupiter Earn y Kamino","USDC y USDT en Aave (Ethereum) y vaults de Solana, con enlace para depositar."],
+ ["on","Rendimientos de Aave, Jupiter Earn y Kamino","Dólares, ETH, BTC y SOL: dónde rinde más cada token, con enlace para depositar."],
  ["on","Pools de Ethereum y BNB Chain","Uniswap, Curve y PancakeSwap con datos reales."],
  ["on","Movimientos exportables","Historial de cualquier dirección en CSV y PDF."],
  ["test","Swap con comparación de rutas","Vía Jupiter. Por ahora necesita tu clave de API."],
@@ -831,6 +831,7 @@ function rWallet(){
  }
  $("wlMain").innerHTML=h;
 }
+var VF=[["usd","Dólares",/USD|DAI|GHO/i],["eth","ETH",/ETH/i],["btc","BTC",/BTC/i],["sol","SOL",/SOL/i],["all","Todos",null]];
 function lotCalc(){
  var d=Math.max(0,+S.lotN||0),a=Math.max(0,+S.lotP||0),y=d*a/100,e=$("lotRes");if(!e)return;
  var r=function(k,v){return '<div class="row"><span class="dim" style="font-size:13px">'+k+'</span><span class="v"><b>'+v+"</b></span></div>"};
@@ -839,6 +840,7 @@ function lotCalc(){
 function rLot(){
  var E=Object.keys(S.pools).map(function(k){return S.pools[k]}).filter(function(p){return p.kind&&p.apr>0}).sort(function(a,b){return b.tvl-a.tvl}),u=E.filter(function(p){return p.pr==="Jupiter"&&p.A.s==="USDC"})[0];
  if(u&&!S.lotT){S.lotP=String(Math.round(u.apr*10)/10)}
+ var cat=VF.filter(function(c){return c[0]===S.vf})[0],L=E.filter(function(p){return !cat[2]||cat[2].test(p.A.s+" "+p.B.s)}).sort(function(a,b){return b.apr-a.apr});
  $("lotMain").innerHTML='<div class="k">Vault Kosmara <small>en estudio</small></div>'+
   '<div class="dim" style="font-size:14px;line-height:1.6;color:#c9cadb;margin-bottom:10px">Depositas, tu dinero trabaja en protocolos de rendimiento y lo retiras cuando quieras. La mayor parte del interés es para ti; el resto recompra y quema el token de Kosmara.</div>'+
   '<div class="two" style="margin-top:0"><div><label for="lotN" style="margin-top:0">Depósito (USDC)</label><input id="lotN" type="number" inputmode="decimal" min="0" step="any" value="'+esc(S.lotN)+'"></div><div><label for="lotP" style="margin-top:0">Rendimiento anual (%)</label><input id="lotP" type="number" inputmode="decimal" min="0" step="any" value="'+esc(S.lotP)+'"></div></div>'+
@@ -848,7 +850,10 @@ function rLot(){
   '<div class="row"><div><b style="font-size:14px">80 % del interés para ti</b><small>El 20 % restante compra el token en el mercado y lo quema.</small></div></div>'+
   '<div class="row"><div><b style="font-size:14px">Puntos por depositar</b><small>1 punto por cada 10 $ y día, que contarán para el reparto del token.</small></div></div>'+
   '<div class="row"><div><b style="font-size:14px">Con contrato auditado</b><small>El vault guarda fondos en un contrato, así que no se abrirá sin auditoría previa.</small></div></div>'+
-  (E.length?'<div class="k" style="margin-top:16px">Dónde depositar hoy <small>Aave, Jupiter y Kamino</small></div><div class="plist">'+E.slice(0,6).map(prow).join("")+'</div>'+(S.aaveSt?'<div class="stat">'+esc(S.aaveSt)+"</div>":"")+'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-v="pools">Ver todos en Pools</button>':"");
+  '<div class="k" style="margin-top:16px">Dónde depositar hoy <small>Aave, Jupiter y Kamino</small></div><div class="chips" style="margin-top:0">'+VF.map(function(c){return '<button class="btn chip'+(S.vf===c[0]?" on":"")+'" data-vf="'+c[0]+'">'+c[1]+"</button>"}).join("")+"</div>"+
+  (L.length?'<div class="plist">'+L.slice(0,S.vlim).map(prow).join("")+"</div>":'<div class="dim" style="margin-top:10px">'+(E.length?"Nada en esta categoría ahora mismo.":"Cargando rendimientos…")+"</div>")+
+  (S.aaveSt?'<div class="stat">'+esc(S.aaveSt)+"</div>":"")+
+  (L.length>S.vlim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="vmore">Ver más</button>':"");
  lotCalc();
 }
 function dlPdf(){
@@ -876,11 +881,11 @@ async function loadNet(net,q){
   st.st=q?c+" resultados para “"+q+"”":"Top por volumen 24 h · datos de GeckoTerminal"}catch(e){st.st="error: "+(e.message||"red")}
  rNet(net);if(S.view==="home")rHome();
 }
-/* Aave v3 en Ethereum: rendimiento de depositar USDC y USDT (API oficial de Aave). */
+/* Aave v3 en Ethereum: rendimiento de depositar cada token con más de 5 M$ (API oficial de Aave). */
 async function loadAave(){
  try{var r=await fetch("https://api.v3.aave.com/graphql",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({query:"query{markets(request:{chainIds:[1]}){name reserves{underlyingToken{symbol address decimals imageUrl}supplyInfo{apy{value}}size{usd}isFrozen isPaused}}}"})});
   if(!r.ok)throw new Error("HTTP "+r.status);var j=await r.json(),n=0;
-  ((j.data&&j.data.markets)||[]).forEach(function(m){if(m.name!=="AaveV3Ethereum")return;(m.reserves||[]).forEach(function(v){var t=v.underlyingToken||{};if(v.isFrozen||v.isPaused||["USDC","USDT"].indexOf(t.symbol)<0)return;
+  ((j.data&&j.data.markets)||[]).forEach(function(m){if(m.name!=="AaveV3Ethereum")return;(m.reserves||[]).forEach(function(v){var t=v.underlyingToken||{};if(v.isFrozen||v.isPaused||!(+v.size.usd>=5e6)||!(+v.supplyInfo.apy.value>0))return;
    var o=mk("Aave",t.address,{m:t.address,s:t.symbol,d:t.decimals,i:t.imageUrl||""},{m:"-",s:"",d:0,i:""},0,+v.size.usd,0,+v.supplyInfo.apy.value*100,null,"https://app.aave.com/reserve-overview/?underlyingAsset="+String(t.address).toLowerCase()+"&marketName=proto_mainnet_v3");
    o.k="aave:"+t.address;o.net="eth";o.kind="Depósito · Ethereum";S.pools[o.k]=o;n++})});
   S.aaveSt=n?"":"Aave: sin datos"}catch(e){S.aaveSt="Aave: error: "+(e.message||"red")}
@@ -892,7 +897,7 @@ function rNet(net){
  $(N.el).innerHTML='<div class="k">'+N.n+' · pools de liquidez <small>'+L.length+' pools</small></div><input data-nq="'+net+'" placeholder="Buscar tokens" value="'+esc(st.q)+'" autocomplete="off"><div class="chips">'+fl+'</div><div class="stat">'+esc(st.st||"cargando…")+'</div><div class="plist">'+(L.slice(0,st.lim).map(prow).join("")||'<div class="dim" style="margin-top:10px">Sin pools todavía.</div>')+"</div>"+(L.length>st.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-nm="'+net+'">Ver más</button>':"");
  if(st.foc){var i=$(N.el).querySelector("input");i.focus();i.setSelectionRange(i.value.length,i.value.length)}
 }
-document.addEventListener("click",function(e){var a=e.target.closest("[data-nf]"),m=e.target.closest("[data-nm]");
+document.addEventListener("click",function(e){var vf=e.target.closest("[data-vf]");if(vf){S.vf=vf.getAttribute("data-vf");S.vlim=6;rLot();return}var a=e.target.closest("[data-nf]"),m=e.target.closest("[data-nm]");
  if(a){var v=a.getAttribute("data-nf").split(":");NS[v[0]].f=v[1];NS[v[0]].foc=false;rNet(v[0])}
  else if(m){var n=m.getAttribute("data-nm");NS[n].lim+=10;NS[n].foc=false;rNet(n)}});
 document.addEventListener("input",function(e){var t=e.target,n=t.getAttribute&&t.getAttribute("data-nq");if(!n)return;var st=NS[n];st.q=t.value;st.lim=3;st.foc=true;rNet(n);clearTimeout(nT);if(t.value.trim().length>=2)nT=setTimeout(function(){loadNet(n,t.value.trim())},700)});
