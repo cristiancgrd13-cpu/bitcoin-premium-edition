@@ -615,44 +615,62 @@ async function loadBal(){
 var MOB=/Android|iPhone|iPad|iPod/i.test(navigator.userAgent),EIP={},SVGI={ph:"<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"108\" height=\"108\" viewBox=\"0 0 108 108\" fill=\"none\"><rect width=\"108\" height=\"108\" rx=\"26\" fill=\"#AB9FF2\"/><path fill-rule=\"evenodd\" clip-rule=\"evenodd\" d=\"M46.5267 69.9229C42.0054 76.8509 34.4292 85.6182 24.348 85.6182C19.5824 85.6182 15 83.6563 15 75.1342C15 53.4305 44.6326 19.8327 72.1268 19.8327C87.768 19.8327 94 30.6846 94 43.0079C94 58.8258 83.7355 76.9122 73.5321 76.9122C70.2939 76.9122 68.7053 75.1342 68.7053 72.314C68.7053 71.5783 68.8275 70.7812 69.0719 69.9229C65.5893 75.8699 58.8685 81.3878 52.5754 81.3878C47.993 81.3878 45.6713 78.5063 45.6713 74.4598C45.6713 72.9884 45.9768 71.4556 46.5267 69.9229ZM83.6761 42.5794C83.6761 46.1704 81.5575 47.9658 79.1875 47.9658C76.7816 47.9658 74.6989 46.1704 74.6989 42.5794C74.6989 38.9885 76.7816 37.1931 79.1875 37.1931C81.5575 37.1931 83.6761 38.9885 83.6761 42.5794ZM70.2103 42.5795C70.2103 46.1704 68.0916 47.9658 65.7216 47.9658C63.3157 47.9658 61.233 46.1704 61.233 42.5795C61.233 38.9885 63.3157 37.1931 65.7216 37.1931C68.0916 37.1931 70.2103 38.9885 70.2103 42.5795Z\" fill=\"#FFFDF8\"/></svg>",mm:"<svg width=\"35\" height=\"34\" viewBox=\"0 0 35 34\" fill=\"none\" xmlns=\"http://www.w3.org/2000/svg\"><path d=\"M32.7077 32.7522L25.1688 30.5174L19.4833 33.9008L15.5167 33.8991L9.82793 30.5174L2.29225 32.7522L0 25.0489L2.29225 16.4993L0 9.27094L2.29225 0.312256L14.0674 7.31554H20.9326L32.7077 0.312256L35 9.27094L32.7077 16.4993L35 25.0489L32.7077 32.7522Z\" fill=\"#FF5C16\"/><path d=\"M2.29395 0.312256L14.0691 7.32047L13.6008 12.1301L2.29395 0.312256Z\" fill=\"#FF5C16\"/><path d=\"M9.82959 25.0522L15.0106 28.9811L9.82959 30.5175V25.0522Z\" fill=\"#FF5C16\"/><path d=\"M14.5966 18.5565L13.6009 12.1333L7.22692 16.5009L7.22363 16.4993V16.5025L7.24335 20.9983L9.82809 18.5565H9.82974H14.5966Z\" fill=\"#FF5C16\"/><path d=\"M32.7077 0.312256L20.9326 7.32047L21.3993 12.1301L32.7077 0.312256Z\" fill=\"#FF5C16\"/><path d=\"M25.1722 25.0522L19.9912 28.9811L25.1722 30.5175V25.0522Z\" fill=\"#FF5C16\"/><path d=\"M27.7766 16.5025H27.7783H27.7766V16.4993L27.775 16.5009L21.401 12.1333L20.4053 18.5565H25.1722L27.7586 20.9983L27.7766 16.5025Z\" fill=\"#FF5C16\"/><path d=\"M9.82793 30.5175L2.29225 32.7522L0 25.0522H9.82793V30.5175Z\" fill=\"#E34807\"/><path d=\"M14.5947 18.5549L16.0341 27.8406L14.0393 22.6777L7.23975 20.9984L9.82613 18.5549H14.593H14.5947Z\" fill=\"#E34807\"/><path d=\"M25.1721 30.5175L32.7078 32.7522L35.0001 25.0522H25.1721V30.5175Z\" fill=\"#E34807\"/><path d=\"M20.4053 18.5549L18.9658 27.8406L20.9607 22.6777L27.7602 20.9984L25.1722 18.5549H20.4053Z\" fill=\"#E34807\"/><path d=\"M0 25.0488L2.29225 16.4993H7.22183L7.23991 20.9967L14.0394 22.676L16.0343 27.8389L15.0089 28.976L9.82793 25.0472H0V25.0488Z\" fill=\"#FF8D5D\"/><path d=\"M35.0001 25.0488L32.7078 16.4993H27.7783L27.7602 20.9967L20.9607 22.676L18.9658 27.8389L19.9912 28.976L25.1722 25.0472H35.0001V25.0488Z\" fill=\"#FF8D5D\"/><path d=\"M20.9325 7.31543H17.4999H14.0673L13.6006 12.1251L16.0342 27.834H18.9656L21.4008 12.1251L20.9325 7.31543Z\" fill=\"#FF8D5D\"/><path d=\"M2.29225 0.312256L0 9.27094L2.29225 16.4993H7.22183L13.5991 12.1301L2.29225 0.312256Z\" fill=\"#661800\"/><path d=\"M13.17 20.4199H10.9369L9.72095 21.6062L14.0409 22.6727L13.17 20.4182V20.4199Z\" fill=\"#661800\"/><path d=\"M32.7077 0.312256L34.9999 9.27094L32.7077 16.4993H27.7781L21.4009 12.1301L32.7077 0.312256Z\" fill=\"#661800\"/><path d=\"M21.833 20.4199H24.0694L25.2853 21.6079L20.9604 22.676L21.833 20.4182V20.4199Z\" fill=\"#661800\"/><path d=\"M19.4817 30.8362L19.9911 28.9794L18.9658 27.8423H16.0327L15.0073 28.9794L15.5167 30.8362\" fill=\"#661800\"/><path d=\"M19.4816 30.8359V33.9021H15.5166V30.8359H19.4816Z\" fill=\"#C0C4CD\"/><path d=\"M9.82959 30.5142L15.52 33.9008V30.8346L15.0106 28.9778L9.82959 30.5142Z\" fill=\"#E7EBF6\"/><path d=\"M25.1721 30.5142L19.4817 33.9008V30.8346L19.9911 28.9778L25.1721 30.5142Z\" fill=\"#E7EBF6\"/></svg>"};
 function here(){return location.href.split("#")[0]}
 var WL=[
- {id:"ph",n:"Phantom",net:"sol",c:"#AB9FF2",ws:/phantom/i,get:function(){return window.phantom&&window.phantom.solana},
+ {id:"ph",n:"Phantom",c:"#AB9FF2",ws:/phantom/i,sol:function(){return window.phantom&&window.phantom.solana},rd:/phantom/i,lg:function(e){return !!e.isPhantom},
   dl:function(u){return "https://phantom.app/ul/browse/"+encodeURIComponent(u)+"?ref="+encodeURIComponent(location.origin)},site:"https://phantom.com"},
- {id:"sf",n:"Solflare",net:"sol",c:"#FC7227",ws:/solflare/i,get:function(){var p=window.solflare;return p&&p.isSolflare?p:null},
+ {id:"sf",n:"Solflare",c:"#FC7227",ws:/solflare/i,sol:function(){var p=window.solflare;return p&&p.isSolflare?p:null},
   dl:function(u){return "https://solflare.com/ul/v1/browse/"+encodeURIComponent(u)+"?ref="+encodeURIComponent(location.origin)},site:"https://solflare.com"},
- {id:"tws",n:"Trust Wallet",net:"sol",c:"#3375BB",ws:/trust/i,get:function(){return window.trustwallet&&window.trustwallet.solana},
+ {id:"tw",n:"Trust Wallet",sn:"Trust",c:"#0500FF",ws:/trust/i,sol:function(){return window.trustwallet&&window.trustwallet.solana},
+  ev:function(){return window.trustwallet&&window.trustwallet.ethereum},rd:/trust/i,lg:function(e){return !!(e.isTrust||e.isTrustWallet)},
   dl:function(u){return "https://link.trustwallet.com/open_url?coin_id=501&url="+encodeURIComponent(u)},site:"https://trustwallet.com"},
- {id:"bp",n:"Backpack",net:"sol",c:"#E33E3F",ws:/backpack/i,get:function(){var b=window.backpack;return b&&(b.solana||(b.connect?b:null))},site:"https://backpack.app"},
- {id:"mm",n:"MetaMask",net:"evm",c:"#F6851B",rd:/metamask/i,lg:function(e){return e.isMetaMask&&!e.isRabby&&!e.isTrust&&!e.isTrustWallet&&!e.isPhantom&&!e.isBraveWallet},
-  dl:function(){return "https://metamask.app.link/dapp/"+location.host+location.pathname},site:"https://metamask.io"},
- {id:"rb",n:"Rabby",net:"evm",c:"#7084FF",rd:/rabby/i,lg:function(e){return !!e.isRabby},site:"https://rabby.io",tip:"En el móvil, abre Kosmara desde el navegador de la app de Rabby."},
- {id:"cb",n:"Coinbase Wallet",sn:"Coinbase",net:"evm",c:"#0052FF",rd:/coinbase/i,lg:function(e){return !!e.isCoinbaseWallet},
+ {id:"bp",n:"Backpack",c:"#E33E3F",ws:/backpack/i,sol:function(){var b=window.backpack;return b&&(b.solana||(b.connect?b:null))},rd:/backpack/i,lg:function(e){return !!e.isBackpack},site:"https://backpack.app"},
+ {id:"okx",n:"OKX Wallet",sn:"OKX",c:"#000000",ws:/okx/i,sol:function(){return window.okxwallet&&window.okxwallet.solana},
+  ev:function(){return window.okxwallet&&window.okxwallet.request?window.okxwallet:null},rd:/okx/i,lg:function(e){return !!e.isOkxWallet},
+  dl:function(u){return "https://web3.okx.com/download?deeplink="+encodeURIComponent("okx://wallet/dapp/url?dappUrl="+encodeURIComponent(u))},site:"https://web3.okx.com"},
+ {id:"bg",n:"Bitget Wallet",sn:"Bitget",c:"#00F0FF",fc:"#0b0b10",ws:/bitget|bitkeep/i,sol:function(){return window.bitkeep&&window.bitkeep.solana},
+  ev:function(){return window.bitkeep&&window.bitkeep.ethereum},rd:/bitget|bitkeep/i,lg:function(e){return !!(e.isBitKeep||e.isBitgetWallet)},
+  dl:function(u){return "https://bkcode.vip?action=dapp&url="+u},site:"https://web3.bitget.com/en/wallet-download"},
+ {id:"cb",n:"Coinbase Wallet",sn:"Coinbase",c:"#0052FF",ws:/coinbase/i,sol:function(){return window.coinbaseSolana},rd:/coinbase/i,lg:function(e){return !!e.isCoinbaseWallet},
   dl:function(u){return "https://go.cb-w.com/dapp?cb_url="+encodeURIComponent(u)},site:"https://www.coinbase.com/wallet"},
- {id:"twe",n:"Trust Wallet",net:"evm",c:"#3375BB",rd:/trust/i,lg:function(e){return !!(e.isTrust||e.isTrustWallet)},
-  dl:function(u){return "https://link.trustwallet.com/open_url?coin_id=60&url="+encodeURIComponent(u)},site:"https://trustwallet.com"}
+ {id:"ex",n:"Exodus",c:"#8C66FF",ws:/exodus/i,sol:function(){return window.exodus&&window.exodus.solana},
+  ev:function(){return window.exodus&&window.exodus.ethereum},rd:/exodus/i,lg:function(e){return !!e.isExodus},site:"https://www.exodus.com"},
+ {id:"mm",n:"MetaMask",c:"#F6851B",rd:/metamask/i,lg:function(e){return e.isMetaMask&&!e.isRabby&&!e.isTrust&&!e.isTrustWallet&&!e.isPhantom&&!e.isBraveWallet&&!e.isOkxWallet&&!e.isBitKeep&&!e.isCoinbaseWallet&&!e.isExodus&&!e.isRainbow&&!e.isZerion&&!e.isSafePal&&!e.isBinance},
+  dl:function(){return "https://metamask.app.link/dapp/"+location.host+location.pathname},site:"https://metamask.io"},
+ {id:"rb",n:"Rabby",c:"#7084FF",rd:/rabby/i,lg:function(e){return !!e.isRabby},site:"https://rabby.io",tip:"En el móvil, abre Kosmara desde el navegador de la app de Rabby."},
+ {id:"rw",n:"Rainbow",c:"#174299",rd:/rainbow/i,lg:function(e){return !!e.isRainbow},site:"https://rainbow.me"},
+ {id:"zr",n:"Zerion",c:"#2962EF",rd:/zerion/i,lg:function(e){return !!e.isZerion},site:"https://zerion.io"},
+ {id:"uni",n:"Uniswap Wallet",sn:"Uniswap",c:"#FF37C7",rd:/uniswap/i,lg:function(e){return !!e.isUniswapWallet},site:"https://wallet.uniswap.org"},
+ {id:"bn",n:"Binance Wallet",sn:"Binance",c:"#F0B90B",fc:"#0b0b10",rd:/binance/i,lg:function(e){return !!e.isBinance},site:"https://www.binance.com/en/web3wallet"},
+ {id:"sp",n:"SafePal",c:"#4A21EF",rd:/safepal/i,lg:function(e){return !!e.isSafePal},site:"https://www.safepal.com"}
 ];
+/* Logos oficiales subidos a /wallets (id: extensión). Se añaden cuando tengamos el archivo del kit de prensa de cada marca. */
+var LOGOS={};
 var HWL=[{id:"ledger",n:"Ledger",hw:1,c:"#26272e"},{id:"trezor",n:"Trezor",hw:1,c:"#26272e"}];
 function eipTag(d){return (d.info.rdns||"")+" "+(d.info.name||"")}
 function evmGet(w){
+ if(w.eip)return w.eip();
+ if(!w.rd)return null;
  for(var k in EIP)if(w.rd.test(eipTag(EIP[k])))return EIP[k].provider;
- if(w.id==="twe"&&window.trustwallet&&window.trustwallet.ethereum)return window.trustwallet.ethereum;
- var e=window.ethereum;if(!e)return null;var L=e.providers&&e.providers.length?e.providers:[e];
+ if(w.ev){var d=w.ev();if(d)return d}
+ var e=window.ethereum;if(!e||!w.lg)return null;var L=e.providers&&e.providers.length?e.providers:[e];
  for(var i=0;i<L.length;i++)if(w.lg(L[i]))return L[i];return null;
 }
-WL.forEach(function(w){if(w.net==="evm")w.get=function(){return evmGet(w)}});
-function eipExtra(){return Object.keys(EIP).map(function(k){var d=EIP[k];return d}).filter(function(d){return !WL.some(function(w){return w.rd&&w.rd.test(eipTag(d))})}).map(function(d){return{id:"eip:"+(d.info.uuid||d.info.rdns),n:d.info.name||"Wallet",net:"evm",c:"#4a4b58",icon:d.info.icon,get:function(){return d.provider}}})}
-function WID(id){return WL.concat(eipExtra()).filter(function(w){return w.id===id})[0]}
+function solGet(w){try{return (w.sol&&w.sol())||null}catch(e){return null}}
+function eipExtra(){return Object.keys(EIP).map(function(k){return EIP[k]}).filter(function(d){return !WL.some(function(w){return w.rd&&w.rd.test(eipTag(d))})}).map(function(d){return{id:"eip:"+(d.info.uuid||d.info.rdns),n:d.info.name||"Wallet",c:"#4a4b58",icon:d.info.icon,eip:function(){return d.provider}}})}
+var WALIAS={tws:"tw",twe:"tw"};
+function WID(id){id=WALIAS[id]||id;return WL.concat(eipExtra()).filter(function(w){return w.id===id})[0]}
 try{window.addEventListener("eip6963:announceProvider",function(e){var d=e.detail;if(d&&d.info&&d.provider){EIP[d.info.uuid||d.info.rdns||d.info.name]=d;if(S.sheetOpen)rSheet()}});window.dispatchEvent(new Event("eip6963:requestProvider"))}catch(x){}
 
 function wIcon(w){
  var src=w.icon||"";
- if(!src&&w.net==="evm"&&w.rd)for(var k in EIP)if(w.rd.test(eipTag(EIP[k]))&&EIP[k].info.icon){src=EIP[k].info.icon;break}
+ if(!src&&LOGOS[w.id])src="./wallets/"+w.id+"."+LOGOS[w.id];
  if(!src&&w.ws)try{var x=WSW.filter(function(v){return w.ws.test(v.name)})[0];if(x&&x.icon)src=x.icon}catch(e){}
+ if(!src&&w.rd)for(var k in EIP)if(w.rd.test(eipTag(EIP[k]))&&EIP[k].info.icon){src=EIP[k].info.icon;break}
  if(src)return '<span class="wl"><img alt="" src="'+esc(src)+'"></span>';
  if(SVGI[w.id])return '<span class="wl'+(w.id==="mm"?" wl-w":"")+'">'+SVGI[w.id]+"</span>";
- return '<span class="wl wl-l" style="background:'+w.c+'" aria-hidden="true">'+esc(w.n.charAt(0))+"</span>";
+ return '<span class="wl wl-l" style="background:'+w.c+(w.fc?";color:"+w.fc:"")+'" aria-hidden="true">'+esc(w.n.charAt(0))+"</span>";
 }
-function wGet(w){var p=w.get&&w.get();if(!p&&w.id==="tws")p=WID("twe").get();return p}
-function wOn(w){return (w.net==="sol"&&S.wid===w.id)||(w.net==="evm"&&S.eid===w.id)||(w.id==="tws"&&S.eid==="twe")}
+function wGet(w){return solGet(w)||evmGet(w)}
+function wOn(w){return S.wid===w.id||S.eid===w.id}
 function wTile(w,sub){
  if(w.hw)return '<button class="wt" data-wv="'+w.id+'"><span class="wt-i">'+wIcon(w)+"</span><span>"+w.n+"</span></button>";
  var p=wGet(w),on=wOn(w),inner='<span class="wt-i'+(on?" on":p?" det":"")+'">'+wIcon(w)+"</span><span>"+esc(w.sn||w.n)+(sub?"<small>"+sub+"</small>":"")+"</span>";
@@ -666,7 +684,7 @@ var HW={
 function rSheet(){
  var v=S.wv||"main",h,X='<button class="x" data-act="close" aria-label="Cerrar">×</button>',B=function(t){return '<button class="wbk" data-wv="'+t+'" aria-label="Volver">‹</button>'};
  if(v==="main"){
-  var ot=["sf","tws","rb","bp"].map(WID);
+  var ot=["sf","okx","tw","rb"].map(WID);
   h='<div class="wvh"><b>Conectar wallet</b>'+X+'</div><p class="wsub">Kosmara nunca ve tus claves: cada operación la firmas tú.</p>'+
    '<div class="wgrid g3">'+wTile(WID("ph"),"Solana")+wTile(WID("mm"),"Ethereum y BNB")+
    '<button class="wt" data-wv="all" aria-label="Ver otras wallets"><span class="wt-i"><span class="wl wmini">'+ot.map(wIcon).join("")+"</span></span><span>Otras<small>Ledger y más</small></span></button></div>";
@@ -675,9 +693,9 @@ function rSheet(){
    '<button class="wbtn cn" data-act="wout" style="margin-top:12px">Desconectar</button></div>';
   else if(MOB)h+='<p class="dim" style="margin:20px 0 0;font-size:12.5px;text-align:center">En el móvil, tocar una wallet abre Kosmara dentro de su app.</p>';
  }else if(v==="all"){
-  var L=WL.filter(function(w){return w.id!=="twe"}).concat(HWL,eipExtra()).sort(function(a,b){return (a.sn||a.n).localeCompare(b.sn||b.n)});
+  var L=WL.filter(function(w){return w.id!=="ph"&&w.id!=="mm"}).concat(HWL,eipExtra()).sort(function(a,b){return (a.sn||a.n).localeCompare(b.sn||b.n)});
   h='<div class="wvh">'+B("main")+"<b>Elige wallet</b>"+X+'</div><div class="wgrid">'+L.map(function(w){return wTile(w)}).join("")+"</div>"+
-   '<p class="dim" style="margin:22px 0 0;font-size:12.5px;line-height:1.5">El punto verde indica que la wallet está en este navegador. Solana: Phantom, Solflare, Trust Wallet y Backpack. El resto, por ahora, solo cargan tu dirección.'+(MOB?" Rabby no abre webs desde fuera: entra en Kosmara desde su navegador.":"")+"</p>";
+   '<p class="dim" style="margin:22px 0 0;font-size:12.5px;line-height:1.5">El punto verde indica que la wallet está en este navegador. Firman en Solana: Phantom, Solflare, Trust, Backpack, OKX, Bitget, Coinbase y Exodus. Las demás, por ahora, solo cargan tu dirección de Ethereum o BNB.'+(MOB?" Rabby no abre webs desde fuera: entra en Kosmara desde su navegador.":"")+"</p>";
  }else{
   h='<div class="wvh">'+B("all")+"<b>"+(v==="ledger"?"Ledger":"Trezor")+"</b>"+X+'</div><div class="whw">'+HW[v]+"</div>"+
    '<div class="wgrid">'+(v==="ledger"?["ph","sf","mm","rb"]:["mm","rb"]).map(function(id){return wTile(WID(id))}).join("")+"</div>";
@@ -693,11 +711,11 @@ function solWrap(p){return{p:p,
  signAndSendTransaction:async function(t){
   if(p.signAndSendTransaction){var r=await p.signAndSendTransaction(t);return{signature:typeof r==="string"?r:r&&r.signature}}
   var sg=await p.signTransaction(t);return{signature:await rc("sendTransaction",[u8b(sg.serialize()),{encoding:"base64",maxRetries:3}])}}}}
-function solOn(w,pk){S.sw=solWrap(w.get());S.pk=pk;S.wid=w.id;S.wname=w.n;LS("kz_w",w.id);$("addr").value=S.pk;rConn();loadBal().then(function(){rSwap();sumPsSafe();rWallet();rPf();loadPos()})}
+function solOn(w,pk){S.sw=solWrap(solGet(w));S.pk=pk;S.wid=w.id;S.wname=w.n;LS("kz_w",w.id);$("addr").value=S.pk;rConn();loadBal().then(function(){rSwap();sumPsSafe();rWallet();rPf();loadPos()})}
 async function wallet(id){
- try{if(id==="tws"&&!WID("tws").get()&&WID("twe").get())id="twe";var w=WID(id);if(!w)throw new Error("Wallet no disponible.");var p=w.get&&w.get();
+ try{var w=WID(id);if(!w)throw new Error("Wallet no disponible.");var sp=solGet(w),p=sp||evmGet(w);
   if(!p)throw new Error(w.n+" no está en este navegador."+(MOB?" Ábrela desde «Abrir en la app».":""));
-  if(w.net==="sol")solOn(w,await solConnect(p,false));
+  if(sp)solOn(w,await solConnect(sp,false));
   else{var a=(await p.request({method:"eth_requestAccounts"}))[0];if(!a)throw new Error("La wallet no devolvió ninguna dirección.");
    S.ev=p;S.eaddr=a;S.eid=w.id;S.ename=w.n;LS("kz_we",w.id);$("addr").value=a;rConn();
    toast("Dirección de "+w.n+" cargada en Movimientos. Swaps y pools de Ethereum y BNB llegarán después.")}
@@ -712,7 +730,7 @@ function wOut(){
 /* Pide wallet de Solana: reconecta la última usada o abre el selector. */
 async function needSol(){
  if(S.pk&&S.sw)return true;var id=LS("kz_w"),w=id&&WID(id);
- if(w&&w.net==="sol"&&w.get()){await wallet(id);if(S.pk)return true}
+ if(w&&solGet(w)){await wallet(id);if(S.pk)return true}
  openSheet();return false;
 }
 function sumPsSafe(){if(S.sel&&!$("ps").hidden)sumPs()}
@@ -854,7 +872,7 @@ var ROAD=[
  ["test","Swap con comparación de rutas","Vía Jupiter. Por ahora necesita tu clave de API."],
  ["test","Crear posiciones en Orca sin salir de Kosmara","El NFT llega directo a tu wallet."],
  ["test","Portafolio de posiciones","Lee tus posiciones de Orca. Necesita un RPC propio."],
- ["test","Más wallets y cold wallets","Phantom, Solflare, Trust Wallet, Backpack, MetaMask, Rabby y Coinbase; Ledger y Trezor a través de ellas."],
+ ["test","Más wallets y cold wallets","Phantom, Solflare, Trust, Backpack, OKX, Bitget, Coinbase, Exodus, MetaMask, Rabby, Rainbow, Zerion, Uniswap, Binance y SafePal; Ledger y Trezor a través de ellas."],
  ["soon","Cerrar posiciones y cobrar comisiones","Gestión completa sin ir a Orca."],
  ["soon","Crear posiciones en Raydium",""],
  ["soon","Crear posiciones en Uniswap y PancakeSwap","Ethereum y BNB Chain con MetaMask."],
@@ -1041,7 +1059,7 @@ async function mkPos(){
  catch(e){r("No se pudo completar: "+esc((e&&e.message)||e))}
 }
 async function loadPos(){if(!S.pk||!(window.kzSdk&&kzSdk.ready))return;try{S.positions=await kzSdk.positions({rpc:rpcUrl(),owner:S.pk});S.posOk=true;S.posErr=""}catch(e){S.posErr=S.rpc?e.message:"el RPC público no permite listar posiciones; pon un RPC propio en Wallet → Conexiones"}rPf()}
-(function(){var id=LS("kz_w");if(id==="-")return;id=id||"ph";var w=WID(id);if(!w||w.net!=="sol")return;var p=w.get();if(!p)return;
+(function(){var id=LS("kz_w");if(id==="-")return;id=id||"ph";var w=WID(id);if(!w)return;var p=solGet(w);if(!p)return;
  var go=function(k){if(k)solOn(w,k.toString())};
  if(id==="ph")solConnect(p,true).then(go).catch(function(){});else if(p.isConnected&&p.publicKey)go(p.publicKey);
  try{if(p.on)p.on("accountChanged",function(k){if(k&&S.wid===w.id)go(k)})}catch(e){}
