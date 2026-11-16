@@ -223,6 +223,32 @@ button:active,button:focus{outline:0;box-shadow:none}
 .whw{margin:8px 0 0;padding:12px 14px;border-radius:14px;background:rgba(255,214,10,.06);border:1px solid rgba(255,214,10,.25);font-size:13.5px;line-height:1.55;color:#c9cadb}
 .whw b{color:#eeeef5}.whw ul{margin:6px 0 0;padding-left:18px}.whw li{margin-bottom:4px}
 .wtip{margin:4px 2px 0;font-size:12.5px;color:var(--dim)}
+.wvh{position:relative;display:flex;align-items:center;justify-content:center;min-height:34px;margin:0 0 4px}
+.wvh b{font-size:18px}
+.wbk{position:absolute;left:-6px;top:50%;transform:translateY(-50%);background:none;border:0;color:#eeeef5;font-size:30px;line-height:1;padding:2px 10px;cursor:pointer}
+.wvh .x{top:50%;transform:translateY(-50%);right:-4px}
+.wsub{margin:2px 0 0;text-align:center;font-size:13px;color:var(--dim)}
+.wgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:20px 8px;margin-top:22px}
+.wgrid.g3{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:26px}
+.wt{display:flex;flex-direction:column;align-items:center;gap:8px;background:none;border:0;padding:0;color:#d6d7e3;font:inherit;font-size:13px;font-weight:600;line-height:1.2;text-align:center;text-decoration:none;cursor:pointer;min-width:0}
+.wt>span:last-child{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wt small{display:block;font-weight:500;font-size:11.5px;color:var(--dim);margin-top:2px}
+.wt-i{position:relative;display:block;padding:3px;border-radius:21px;border:2px solid transparent}
+.wt-i.on{border-color:var(--up)}
+.wt-i.det:after,.wt-i.on:after{content:"";position:absolute;right:-1px;bottom:-1px;width:13px;height:13px;border-radius:50%;background:var(--up);border:2.5px solid #0d0d12}
+.wt .wl{width:58px;height:58px;border-radius:16px;overflow:hidden}
+.wgrid.g3 .wt .wl,.wgrid.g3 .wmini{width:74px;height:74px;border-radius:21px}
+.wt .wl svg,.wt .wl img{border-radius:0}
+.wt .wl-l{font-size:24px}.wgrid.g3 .wt .wl-l{font-size:30px}
+.wt .wl-w{padding:10px}.wgrid.g3 .wt .wl-w{padding:13px}
+.wt.off{color:#9fa0b2}
+.wmini{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:9px;box-sizing:border-box;background:rgba(255,255,255,.07)}
+.wgrid .wt .wmini .wl{width:auto;height:auto;aspect-ratio:1;border-radius:8px;overflow:hidden;padding:0}
+.wgrid .wt .wmini .wl-l{font-size:13px}.wgrid .wt .wmini .wl-w{padding:3px}
+.wcon{margin-top:22px;border-top:1px solid var(--line);padding-top:6px}
+.wcon .row{margin-top:8px}
+.wcon .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
+.whw{margin-top:14px}
 </style>
 </head>
 <body>
@@ -599,9 +625,12 @@ var WL=[
  {id:"mm",n:"MetaMask",net:"evm",c:"#F6851B",rd:/metamask/i,lg:function(e){return e.isMetaMask&&!e.isRabby&&!e.isTrust&&!e.isTrustWallet&&!e.isPhantom&&!e.isBraveWallet},
   dl:function(){return "https://metamask.app.link/dapp/"+location.host+location.pathname},site:"https://metamask.io"},
  {id:"rb",n:"Rabby",net:"evm",c:"#7084FF",rd:/rabby/i,lg:function(e){return !!e.isRabby},site:"https://rabby.io",tip:"En el móvil, abre Kosmara desde el navegador de la app de Rabby."},
+ {id:"cb",n:"Coinbase Wallet",sn:"Coinbase",net:"evm",c:"#0052FF",rd:/coinbase/i,lg:function(e){return !!e.isCoinbaseWallet},
+  dl:function(u){return "https://go.cb-w.com/dapp?cb_url="+encodeURIComponent(u)},site:"https://www.coinbase.com/wallet"},
  {id:"twe",n:"Trust Wallet",net:"evm",c:"#3375BB",rd:/trust/i,lg:function(e){return !!(e.isTrust||e.isTrustWallet)},
   dl:function(u){return "https://link.trustwallet.com/open_url?coin_id=60&url="+encodeURIComponent(u)},site:"https://trustwallet.com"}
 ];
+var HWL=[{id:"ledger",n:"Ledger",hw:1,c:"#26272e"},{id:"trezor",n:"Trezor",hw:1,c:"#26272e"}];
 function eipTag(d){return (d.info.rdns||"")+" "+(d.info.name||"")}
 function evmGet(w){
  for(var k in EIP)if(w.rd.test(eipTag(EIP[k])))return EIP[k].provider;
@@ -622,29 +651,40 @@ function wIcon(w){
  if(SVGI[w.id])return '<span class="wl'+(w.id==="mm"?" wl-w":"")+'">'+SVGI[w.id]+"</span>";
  return '<span class="wl wl-l" style="background:'+w.c+'" aria-hidden="true">'+esc(w.n.charAt(0))+"</span>";
 }
-function wRow(w){
- var p=w.get&&w.get(),on=(w.net==="sol"&&S.wid===w.id)||(w.net==="evm"&&S.eid===w.id),inner,st;
- st=on?'<span class="wst ok">Conectada</span>':p?'<span class="wst ok">Detectada</span>':MOB&&w.dl?'<span class="wst">Abrir en la app</span>':'<span class="wst">Instalar</span>';
- inner=wIcon(w)+'<span class="wn">'+esc(w.n)+(on?"<small>"+short(w.net==="sol"?S.pk:S.eaddr)+"</small>":"")+"</span>"+st;
- if(p||on)return '<button class="wrow'+(on?" on":"")+'" data-w="'+esc(w.id)+'">'+inner+"</button>";
- return '<a class="wrow off" href="'+esc(MOB&&w.dl?w.dl(here()):w.site)+'" target="_blank" rel="noopener">'+inner+"</a>"+(w.tip&&MOB?'<p class="wtip">'+esc(w.tip)+"</p>":"");
+function wGet(w){var p=w.get&&w.get();if(!p&&w.id==="tws")p=WID("twe").get();return p}
+function wOn(w){return (w.net==="sol"&&S.wid===w.id)||(w.net==="evm"&&S.eid===w.id)||(w.id==="tws"&&S.eid==="twe")}
+function wTile(w,sub){
+ if(w.hw)return '<button class="wt" data-wv="'+w.id+'"><span class="wt-i">'+wIcon(w)+"</span><span>"+w.n+"</span></button>";
+ var p=wGet(w),on=wOn(w),inner='<span class="wt-i'+(on?" on":p?" det":"")+'">'+wIcon(w)+"</span><span>"+esc(w.sn||w.n)+(sub?"<small>"+sub+"</small>":"")+"</span>";
+ if(p||on)return '<button class="wt" data-w="'+esc(w.id)+'" aria-label="'+esc(w.n)+(on?", conectada":p?", detectada":"")+'">'+inner+"</button>";
+ return '<a class="wt off" href="'+esc(MOB&&w.dl?w.dl(here()):w.site)+'" target="_blank" rel="noopener" aria-label="'+esc(w.n)+(MOB&&w.dl?", abrir en la app":", instalar")+'">'+inner+"</a>";
 }
 var HW={
- ledger:'<b>Ledger</b> se usa a través de una wallet: la añades dentro de ella una vez y, a partir de ahí, cada operación de Kosmara la confirmas en el dispositivo.<ul><li><b>Solana:</b> Phantom o Solflare, en el ordenador.</li><li><b>Ethereum, BNB y otras:</b> MetaMask o Rabby. En el móvil, Rabby la conecta por Bluetooth.</li></ul>',
- trezor:'<b>Trezor</b> se usa a través de una wallet: la añades dentro de ella una vez y cada operación la confirmas en el dispositivo.<ul><li><b>Ethereum, BNB y otras:</b> MetaMask o Rabby. En el móvil, Rabby la conecta por Bluetooth.</li><li><b>Solana:</b> todavía no hemos comprobado un camino fiable con Trezor.</li></ul>'
+ ledger:'Kosmara no se conecta al dispositivo: añades tu <b>Ledger</b> una vez dentro de una de estas wallets y cada operación la confirmas en la Ledger.<ul><li><b>Solana:</b> Phantom o Solflare, en el ordenador.</li><li><b>Ethereum, BNB y otras:</b> MetaMask o Rabby. En el móvil, Rabby la conecta por Bluetooth.</li></ul>',
+ trezor:'Kosmara no se conecta al dispositivo: añades tu <b>Trezor</b> una vez dentro de una de estas wallets y cada operación la confirmas en la Trezor.<ul><li><b>Ethereum, BNB y otras:</b> MetaMask o Rabby. En el móvil, Rabby la conecta por Bluetooth.</li><li><b>Solana:</b> todavía no hemos comprobado un camino fiable con Trezor.</li></ul>'
 };
 function rSheet(){
- var sol=WL.filter(function(w){return w.net==="sol"}),evm=WL.filter(function(w){return w.net==="evm"}).concat(eipExtra());
- var hw=function(k,n){return '<button class="wrow" data-hw="'+k+'" aria-expanded="'+(S.hw===k)+'"><span class="wl wl-l" style="background:#2a2b33" aria-hidden="true">'+n.charAt(0)+'</span><span class="wn">'+n+'<small>A través de tu wallet</small></span><span class="wst">'+(S.hw===k?"Ocultar":"Cómo conectar")+"</span></button>"+(S.hw===k?'<div class="whw">'+HW[k]+"</div>":"")};
- $("wsheet").innerHTML='<button class="x" data-act="close" aria-label="Cerrar">×</button><b style="font-size:18px">Conectar wallet</b>'+
-  '<p class="dim" style="margin:6px 0 0;font-size:13px">Kosmara nunca ve tus claves: cada operación la firmas tú.</p>'+
-  '<h4 class="wg">Solana <small>pools, swap y portafolio</small></h4>'+sol.map(wRow).join("")+
-  '<h4 class="wg">Ethereum, BNB y otras <small>de momento, solo tu dirección</small></h4>'+evm.map(wRow).join("")+
-  '<h4 class="wg">Cold wallet</h4>'+hw("ledger","Ledger")+hw("trezor","Trezor")+
-  (MOB?'<p class="dim" style="margin:14px 0 0;font-size:12.5px">En el móvil, una wallet solo se ve si abres Kosmara dentro de su app. «Abrir en la app» lo hace por ti.</p>':"")+
-  (S.pk||S.eaddr?'<button class="wbtn cn" data-act="wout" style="margin-top:14px">Desconectar</button>':"");
+ var v=S.wv||"main",h,X='<button class="x" data-act="close" aria-label="Cerrar">×</button>',B=function(t){return '<button class="wbk" data-wv="'+t+'" aria-label="Volver">‹</button>'};
+ if(v==="main"){
+  var ot=["sf","tws","rb","bp"].map(WID);
+  h='<div class="wvh"><b>Conectar wallet</b>'+X+'</div><p class="wsub">Kosmara nunca ve tus claves: cada operación la firmas tú.</p>'+
+   '<div class="wgrid g3">'+wTile(WID("ph"),"Solana")+wTile(WID("mm"),"Ethereum y BNB")+
+   '<button class="wt" data-wv="all" aria-label="Ver otras wallets"><span class="wt-i"><span class="wl wmini">'+ot.map(wIcon).join("")+"</span></span><span>Otras<small>Ledger y más</small></span></button></div>";
+  if(S.pk||S.eaddr)h+='<div class="wcon">'+(S.pk?'<div class="row"><span><span class="dot" style="background:var(--up)"></span>'+esc(S.wname)+' <small class="dim">Solana</small></span><span class="v num">'+short(S.pk)+"</span></div>":"")+
+   (S.eaddr?'<div class="row"><span><span class="dot" style="background:var(--up)"></span>'+esc(S.ename)+' <small class="dim">EVM</small></span><span class="v num">'+short(S.eaddr)+"</span></div>":"")+
+   '<button class="wbtn cn" data-act="wout" style="margin-top:12px">Desconectar</button></div>';
+  else if(MOB)h+='<p class="dim" style="margin:20px 0 0;font-size:12.5px;text-align:center">En el móvil, tocar una wallet abre Kosmara dentro de su app.</p>';
+ }else if(v==="all"){
+  var L=WL.filter(function(w){return w.id!=="twe"}).concat(HWL,eipExtra()).sort(function(a,b){return (a.sn||a.n).localeCompare(b.sn||b.n)});
+  h='<div class="wvh">'+B("main")+"<b>Elige wallet</b>"+X+'</div><div class="wgrid">'+L.map(function(w){return wTile(w)}).join("")+"</div>"+
+   '<p class="dim" style="margin:22px 0 0;font-size:12.5px;line-height:1.5">El punto verde indica que la wallet está en este navegador. Solana: Phantom, Solflare, Trust Wallet y Backpack. El resto, por ahora, solo cargan tu dirección.'+(MOB?" Rabby no abre webs desde fuera: entra en Kosmara desde su navegador.":"")+"</p>";
+ }else{
+  h='<div class="wvh">'+B("all")+"<b>"+(v==="ledger"?"Ledger":"Trezor")+"</b>"+X+'</div><div class="whw">'+HW[v]+"</div>"+
+   '<div class="wgrid">'+(v==="ledger"?["ph","sf","mm","rb"]:["mm","rb"]).map(function(id){return wTile(WID(id))}).join("")+"</div>";
+ }
+ $("wsheet").innerHTML=h;
 }
-function openSheet(){S.sheetOpen=true;try{window.dispatchEvent(new Event("eip6963:requestProvider"))}catch(e){}rSheet();$("sheet").hidden=false}
+function openSheet(){S.sheetOpen=true;S.wv="main";try{window.dispatchEvent(new Event("eip6963:requestProvider"))}catch(e){}rSheet();$("sheet").hidden=false}
 function rConn(){$("bConn").textContent=S.pk?S.wname+" "+short(S.pk):S.eaddr?S.ename+" "+short(S.eaddr):"Conectar wallet"}
 async function solConnect(p,silent){var r=await p.connect(silent?{onlyIfTrusted:true}:undefined),k=(r&&r.publicKey)||p.publicKey;if(!k)throw new Error("La wallet no devolvió ninguna dirección.");return k.toString()}
 /* Misma interfaz para todas las wallets de Solana: si no firman y envían a la vez, firmamos y enviamos por RPC. */
@@ -655,7 +695,7 @@ function solWrap(p){return{p:p,
   var sg=await p.signTransaction(t);return{signature:await rc("sendTransaction",[u8b(sg.serialize()),{encoding:"base64",maxRetries:3}])}}}}
 function solOn(w,pk){S.sw=solWrap(w.get());S.pk=pk;S.wid=w.id;S.wname=w.n;LS("kz_w",w.id);$("addr").value=S.pk;rConn();loadBal().then(function(){rSwap();sumPsSafe();rWallet();rPf();loadPos()})}
 async function wallet(id){
- try{var w=WID(id);if(!w)throw new Error("Wallet no disponible.");var p=w.get&&w.get();
+ try{if(id==="tws"&&!WID("tws").get()&&WID("twe").get())id="twe";var w=WID(id);if(!w)throw new Error("Wallet no disponible.");var p=w.get&&w.get();
   if(!p)throw new Error(w.n+" no está en este navegador."+(MOB?" Ábrela desde «Abrir en la app».":""));
   if(w.net==="sol")solOn(w,await solConnect(p,false));
   else{var a=(await p.request({method:"eth_requestAccounts"}))[0];if(!a)throw new Error("La wallet no devolvió ninguna dirección.");
@@ -814,7 +854,7 @@ var ROAD=[
  ["test","Swap con comparación de rutas","Vía Jupiter. Por ahora necesita tu clave de API."],
  ["test","Crear posiciones en Orca sin salir de Kosmara","El NFT llega directo a tu wallet."],
  ["test","Portafolio de posiciones","Lee tus posiciones de Orca. Necesita un RPC propio."],
- ["test","Más wallets y cold wallets","Phantom, Solflare, Trust Wallet, Backpack, MetaMask y Rabby; Ledger y Trezor a través de ellas."],
+ ["test","Más wallets y cold wallets","Phantom, Solflare, Trust Wallet, Backpack, MetaMask, Rabby y Coinbase; Ledger y Trezor a través de ellas."],
  ["soon","Cerrar posiciones y cobrar comisiones","Gestión completa sin ir a Orca."],
  ["soon","Crear posiciones en Raydium",""],
  ["soon","Crear posiciones en Uniswap y PancakeSwap","Ethereum y BNB Chain con MetaMask."],
@@ -983,7 +1023,7 @@ function rNet(net){
  $(N.el).innerHTML='<div class="k">'+N.n+' · pools de liquidez <small>'+L.length+' pools</small></div><input data-nq="'+net+'" placeholder="Buscar tokens" value="'+esc(st.q)+'" autocomplete="off"><div class="chips">'+fl+'</div><div class="stat">'+esc(st.st||"cargando…")+'</div><div class="plist">'+(L.slice(0,st.lim).map(prow).join("")||'<div class="dim" style="margin-top:10px">Sin pools todavía.</div>')+"</div>"+(L.length>st.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-nm="'+net+'">Ver más</button>':"");
  if(st.foc){var i=$(N.el).querySelector("input");i.focus();i.setSelectionRange(i.value.length,i.value.length)}
 }
-document.addEventListener("click",function(e){var hw=e.target.closest("[data-hw]");if(hw){var k=hw.getAttribute("data-hw");S.hw=S.hw===k?"":k;rSheet();return}var vf=e.target.closest("[data-vf]");if(vf){S.vf=vf.getAttribute("data-vf");S.vlim=6;rLot();return}var a=e.target.closest("[data-nf]"),m=e.target.closest("[data-nm]");
+document.addEventListener("click",function(e){var wv=e.target.closest("[data-wv]");if(wv){S.wv=wv.getAttribute("data-wv");rSheet();var mb=$("wsheet");if(mb)mb.scrollTop=0;return}var vf=e.target.closest("[data-vf]");if(vf){S.vf=vf.getAttribute("data-vf");S.vlim=6;rLot();return}var a=e.target.closest("[data-nf]"),m=e.target.closest("[data-nm]");
  if(a){var v=a.getAttribute("data-nf").split(":");NS[v[0]].f=v[1];NS[v[0]].foc=false;rNet(v[0])}
  else if(m){var n=m.getAttribute("data-nm");NS[n].lim+=10;NS[n].foc=false;rNet(n)}});
 document.addEventListener("input",function(e){var t=e.target,n=t.getAttribute&&t.getAttribute("data-nq");if(!n)return;var st=NS[n];st.q=t.value;st.lim=3;st.foc=true;rNet(n);clearTimeout(nT);if(t.value.trim().length>=2)nT=setTimeout(function(){loadNet(n,t.value.trim())},700)});
