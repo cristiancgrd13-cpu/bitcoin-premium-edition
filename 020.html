@@ -750,7 +750,7 @@ var WL=[
  {id:"rb",n:"Rabby",c:"#7084FF",rd:/rabby/i,lg:function(e){return !!e.isRabby},site:"https://rabby.io",tip:"En el móvil, abre Kosmara desde el navegador de la app de Rabby."}
 ];
 /* Logos oficiales subidos a /wallets (id: extensión). Se añaden cuando tengamos el archivo del kit de prensa de cada marca. */
-var LOGOS={tw:"svg",okx:"svg",cb:"svg",rb:"svg",ledger:"svg",trezor:"svg"};
+var LOGOS={tw:"svg",okx:"svg",cb:"svg",rb:"svg",ledger:"svg",trezor:"png"};
 var HWL=[{id:"ledger",n:"Ledger",hw:1,c:"#26272e"},{id:"trezor",n:"Trezor",hw:1,c:"#26272e"}];
 function eipTag(d){return (d.info.rdns||"")+" "+(d.info.name||"")}
 function evmGet(w){
@@ -772,7 +772,7 @@ function wIcon(w){
  if(!src&&LOGOS[w.id])src="./wallets/"+w.id+"."+LOGOS[w.id];
  if(!src&&w.ws)try{var x=WSW.filter(function(v){return w.ws.test(v.name)})[0];if(x&&x.icon)src=x.icon}catch(e){}
  if(!src&&w.rd)for(var k in EIP)if(w.rd.test(eipTag(EIP[k]))&&EIP[k].info.icon){src=EIP[k].info.icon;break}
- if(src)return '<span class="wl'+(w.id==="trezor"?" wl-w":"")+'"><img alt="" src="'+esc(src)+'"></span>';
+ if(src)return '<span class="wl"><img alt="" src="'+esc(src)+'"></span>';
  if(SVGI[w.id])return '<span class="wl'+(w.id==="mm"?" wl-w":"")+'">'+SVGI[w.id]+"</span>";
  return '<span class="wl wl-l" style="background:'+w.c+(w.fc?";color:"+w.fc:"")+'" aria-hidden="true">'+esc(w.n.charAt(0))+"</span>";
 }
