@@ -4,12 +4,13 @@ jobs:
   p:
     runs-on: ubuntu-latest
     steps:
-      - run: |
+      - shell: bash {0}
+        run: |
           O="Origin: https://cristiancgrd13-cpu.github.io"
-          for B in https://gateway.liquify.com/chain/thorchain_api https://thornode.ninerealms.com https://thornode.thorchain.liquify.com; do
+          for B in https://gateway.liquify.com/chain/thorchain_api https://thornode.thorchain.liquify.com; do
             echo "##### $B"
             curl -sS -m 20 -D - -H "$O" "$B/thorchain/inbound_addresses" -o ib.json | grep -i "^HTTP\|access-control-allow-origin"
-            head -c 1500 ib.json; echo
+            python3 -c "import json;[print(c['chain'],c['halted'],c['chain_trading_paused'],c.get('router')) for c in json.load(open('ib.json'))]"
           done
           B=https://gateway.liquify.com/chain/thorchain_api
           curl -sS -m 20 -H "$O" "$B/thorchain/pools" -o pools.json; python3 -c "
