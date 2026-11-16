@@ -1,0 +1,19 @@
+name: probe
+on: {push: {paths: [".github/workflows/probe.yml"]}}
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          O="Origin: https://cristiancgrd13-cpu.github.io"
+          for B in https://gateway.liquify.com/chain/thorchain_api https://thornode.ninerealms.com https://thornode.thorchain.liquify.com; do
+            echo "##### $B"
+            curl -sS -m 20 -D - -H "$O" "$B/thorchain/inbound_addresses" -o ib.json | grep -i "^HTTP\|access-control-allow-origin"
+            head -c 1500 ib.json; echo
+          done
+          B=https://gateway.liquify.com/chain/thorchain_api
+          curl -sS -m 20 -H "$O" "$B/thorchain/pools" -o pools.json; python3 -c "
+          import json;p=json.load(open('pools.json'));print(len(p));print([ (x['asset'],x['status'],x.get('decimals')) for x in p])"
+          curl -sS -m 20 -H "$O" "$B/thorchain/quote/swap?from_asset=ETH.ETH&to_asset=BTC.BTC&amount=10000000&destination=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh&streaming_interval=1&streaming_quantity=0"; echo
+          curl -sS -m 20 -H "$O" "$B/thorchain/quote/swap?from_asset=ETH.USDC-0XA0B86991C6218B36C1D19D4A2E9EB0CE3606EB48&to_asset=AVAX.AVAX&amount=10000000000&destination=0x3021c479f7f8c9f1d5c7d8523ba5e22c0bcb5430&streaming_interval=1&streaming_quantity=0&affiliate=t&affiliate_bps=30"; echo
+          curl -sS -m 20 -X OPTIONS -D - -H "$O" -H "Access-Control-Request-Method: GET" "$B/thorchain/quote/swap" -o /dev/null | head -20
