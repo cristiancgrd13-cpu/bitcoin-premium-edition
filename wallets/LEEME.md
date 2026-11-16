@@ -1,9 +1,9 @@
 # Logos de wallets
 
-Aquí van los logos oficiales de cada wallet, sacados de su kit de prensa.
-Nombre del archivo = id de la wallet en `020.html` (por ejemplo `okx.png`, `bg.svg`).
-Después se añade el id a `LOGOS` en `020.html` (por ejemplo `LOGOS={okx:"png"}`).
+Iconos oficiales de cada wallet, en `id.svg`:
 
-Mientras no haya archivo, la web usa el icono que la propia wallet instalada entrega al navegador y, si no hay ninguno, una inicial con el color de la marca.
+- okx, tw (Trust Wallet), cb (Coinbase Wallet), rb (Rabby), ledger: iconos de app de cada wallet, del repositorio de RainbowKit (rainbow-me/rainbowkit, licencia MIT).
+- trezor: logo de trezor/trezor-suite.
+- Phantom y MetaMask van dentro de `020.html`.
 
-ids: ph, sf, tw, bp, okx, bg, cb, ex, mm, rb, rw, zr, uni, bn, sp
+Para cambiar uno, sustituye el archivo y deja el id en `LOGOS` de `020.html`.
