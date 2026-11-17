@@ -492,50 +492,66 @@ function evBal(id,a){var h=(HD.evm||[]).filter(function(x){return String(x.c)===
 function rE(){
  var id=SW.net,el=$("swap");if(EV.ld[id]!==2){el.innerHTML=swTabs()+netHead("LI.FI")+'<div class="stat">'+(EV.ld[id]?"Cargando tokens de "+esc(chN(id))+"…":esc(EV.err||"")+' <button class="btn" data-act="evload">Reintentar</button>')+"</div>";if(!EV.ld[id])loadTk(id);return}
  var L=EV.tk[id],fr=evT(id,EV.from[id])||L[0],to=evT(id,EV.to[id])||L[1],b=evBal(id,fr.address),op=function(sel){return L.map(function(t){return '<option value="'+esc(t.address)+'"'+(t.address===sel?" selected":"")+">"+esc(t.symbol)+"</option>"}).join("")};
- el.innerHTML=swTabs()+netHead("LI.FI")+
+ el.innerHTML=swTabs()+netHead(KSC[id]?"LI.FI y KyberSwap":"LI.FI")+
  '<div class="box"><label for="eamt">Das · saldo '+(S.eaddr?(b==null?"0":f(b,6))+" "+esc(fr.symbol):"conecta tu wallet")+'</label><div class="srow"><select id="ef">'+op(fr.address)+'</select><input id="eamt" class="num" type="text" inputmode="decimal" value="'+esc(EV.amt)+'" placeholder="0.0"></div>'+
  '<div class="chips"><button class="btn" data-epct="25">25%</button><button class="btn" data-epct="50">50%</button><button class="btn" data-epct="100">Máx</button><button class="btn" data-act="eflip">⇅</button></div></div>'+
  '<div class="box" style="margin-top:8px"><label for="et">Recibes</label><div class="srow"><select id="et">'+op(to.address)+'</select><span class="dim" id="eout">'+(EV.q?"≈ "+f(EV.q.out,6):"")+"</span></div></div>"+
  '<div class="hrow"><span class="dim">Deslizamiento máx. <select id="xslip">'+[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===SW.slip?" selected":"")+">"+v+"%</option>"}).join("")+"</select></span></div>"+
  '<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="equote">Ver precio</button><div id="eq">'+eqHtml()+'</div><button class="btn p" data-act="eswap">Cambiar (real)</button><div class="stat" id="eres"></div>'+
- '<div class="dim" style="margin-top:6px">LI.FI busca el mejor precio entre los DEX de '+esc(chN(id))+' (Uniswap, Sushi, 1inch y otros). Firmas con tu wallet de Ethereum; Kosmara no toca tus fondos.</div>'}
-function eqHtml(){var q=EV.q;if(!q)return "";var to=evT(SW.net,EV.to[SW.net])||{},g=q.gas||0,fe=q.fee||0;
- return '<div class="row"><div><b>Recibes unos '+f(q.out,6)+" "+esc(to.symbol||"")+'</b><small>mínimo '+f(q.min,6)+" con tu deslizamiento"+(q.usd?" · ≈ $"+f(q.usd,2):"")+'</small></div><div class="v"><b>'+esc(q.via)+'</b><small>mejor ruta</small></div></div>'+
- '<div class="dim" style="font-size:12px;margin-top:6px">Comisión de LI.FI: $'+f(fe,fe<.01?4:2)+" (0,25 %)"+(q.kz?" · comisión Kosmara incluida":"")+" · gas estimado: $"+f(g,g<.01?4:2)+"</div>"}
+ '<div class="dim" style="margin-top:6px">Kosmara compara LI.FI y KyberSwap, que a su vez buscan el mejor precio entre los DEX de '+esc(chN(id))+'. Firmas con tu wallet de Ethereum; Kosmara no toca tus fondos.</div>'}
+/* KyberSwap: segunda ruta en redes EVM. No se queda comisión propia; la tuya llega directa a KS_RCV en cada swap. */
+var KS="https://aggregator-api.kyberswap.com",KS_RCV="",KS_FEE_BPS=0,KSE="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+var KSC={1:"ethereum",56:"bsc",8453:"base",42161:"arbitrum",43114:"avalanche",999:"hyperevm",4663:"robinhood",137:"polygon",10:"optimism",130:"unichain",143:"monad"};
+function eqRow(q,best){return '<div class="row pick'+(q.p===EV.sel?" sel":"")+'" data-er="'+esc(q.p)+'"><div><b>'+esc(q.p)+"</b>"+(best?'<span class="tag">MEJOR</span>':"")+"<small>"+esc(q.via)+" · "+(q.p==="LI.FI"?"comisión LI.FI 0,25 %":"sin comisión de KyberSwap")+" · gas $"+f(q.gas,q.gas<.01?4:2)+'</small></div><div class="v"><b>'+f(q.out,6)+'</b><small class="'+(best?"up":"dn")+'">'+(best?"mejor precio":f(q.diff,2)+"%")+"</small></div></div>"}
+function eqHtml(){var R=EV.res||[];if(!R.length)return "";var to=evT(SW.net,EV.to[SW.net])||{},q=R.filter(function(x){return x.p===EV.sel})[0]||R[0];
+ return R.map(function(x,i){return x.err?'<div class="row"><div><b>'+esc(x.p)+'</b><small class="dn">'+esc(x.err)+"</small></div></div>":eqRow(x,i===0)}).join("")+
+ (q&&!q.err?'<div class="dim" style="font-size:12px;margin-top:6px">Con '+esc(q.p)+": recibes unos "+f(q.out,6)+" "+esc(to.symbol||"")+", mínimo "+f(q.min,6)+" con tu deslizamiento"+(q.usd?" (≈ $"+f(q.usd,2)+")":"")+(q.kz?" · comisión Kosmara incluida":"")+".</div>":"")}
 function eres(h){var e=$("eres");if(e)e.innerHTML=h}
-async function evQuote(addr){
- var id=SW.net,fr=evT(id,EV.from[id]),to=evT(id,EV.to[id]),a=toU(EV.amt,fr?fr.decimals:18);
- if(!fr||!to||fr.address===to.address)throw new Error("Elige dos tokens distintos.");if(!(a>0n))throw new Error("Introduce una cantidad.");
- var u=LIFI+"/quote?fromChain="+id+"&toChain="+id+"&fromToken="+fr.address+"&toToken="+to.address+"&fromAmount="+a.toString()+"&fromAddress="+(addr||S.eaddr||"0x0000000000000000000000000000000000000001")+"&slippage="+SW.slip/100+(LIFI_INT?"&integrator="+encodeURIComponent(LIFI_INT)+(LIFI_FEE>0?"&fee="+LIFI_FEE:""):"");
+function evPick(){var id=SW.net,fr=evT(id,EV.from[id]),to=evT(id,EV.to[id]);
+ if(!fr||!to||fr.address===to.address)throw new Error("Elige dos tokens distintos.");var a=toU(EV.amt,fr.decimals);if(!(a>0n))throw new Error("Introduce una cantidad.");return{id:id,fr:fr,to:to,a:a}}
+async function qLifi(addr){var x=evPick(),id=x.id,fr=x.fr,to=x.to;
+ var u=LIFI+"/quote?fromChain="+id+"&toChain="+id+"&fromToken="+fr.address+"&toToken="+to.address+"&fromAmount="+x.a.toString()+"&fromAddress="+(addr||S.eaddr||"0x0000000000000000000000000000000000000001")+"&slippage="+SW.slip/100+(LIFI_INT?"&integrator="+encodeURIComponent(LIFI_INT)+(LIFI_FEE>0?"&fee="+LIFI_FEE:""):"");
  var r=await fetch(u),j=null;try{j=await r.json()}catch(e){}
- if(!r.ok||!j||!j.estimate)throw new Error(j&&j.message?String(j.message).replace(/\s*\(.*?\)\s*$/,""):"LI.FI no encontró ruta ("+r.status+").");
- var e=j.estimate,sum=function(L){return (L||[]).reduce(function(s,x){return s+(+x.amountUSD||0)},0)};
- return{raw:j,out:+e.toAmount/Math.pow(10,to.decimals),min:+e.toAmountMin/Math.pow(10,to.decimals),usd:+e.toAmountUSD||0,via:(j.toolDetails&&j.toolDetails.name)||j.tool||"LI.FI",
-  gas:sum(e.gasCosts),fee:sum((e.feeCosts||[]).filter(function(x){return /lifi/i.test(x.name)})),kz:(e.feeCosts||[]).some(function(x){return /integrator/i.test(x.name)}),appr:e.approvalAddress,fr:fr,amt:a}}
-async function eQuote(){eres("Consultando LI.FI…");try{EV.q=await evQuote();var d=$("eq");if(d)d.innerHTML=eqHtml();var o=$("eout");if(o)o.textContent="≈ "+f(EV.q.out,6);eres("Revisa el precio y pulsa Cambiar.")}
- catch(e){EV.q=null;var d=$("eq");if(d)d.innerHTML="";eres('<span class="dn">'+esc(e.message)+"</span>")}}
+ if(!r.ok||!j||!j.estimate)throw new Error(j&&j.message?String(j.message).replace(/\s*\(.*?\)\s*$/,""):"sin ruta ("+r.status+")");
+ var e=j.estimate,sum=function(L){return (L||[]).reduce(function(s,y){return s+(+y.amountUSD||0)},0)};
+ return{p:"LI.FI",raw:j,out:+e.toAmount/Math.pow(10,to.decimals),min:+e.toAmountMin/Math.pow(10,to.decimals),usd:+e.toAmountUSD||0,via:(j.toolDetails&&j.toolDetails.name)||j.tool||"LI.FI",
+  gas:sum(e.gasCosts),kz:(e.feeCosts||[]).some(function(y){return /integrator/i.test(y.name)}),appr:e.approvalAddress,fr:fr,amt:x.a}}
+async function qKyber(){var x=evPick(),c=KSC[x.id];if(!c)throw new Error("no disponible en esta red");var k=function(t){return t.address===NAT?KSE:t.address};
+ var u=KS+"/"+c+"/api/v1/routes?tokenIn="+k(x.fr)+"&tokenOut="+k(x.to)+"&amountIn="+x.a.toString()+(KS_RCV&&KS_FEE_BPS>0?"&feeAmount="+KS_FEE_BPS+"&isInBps=true&chargeFeeBy=currency_in&feeReceiver="+KS_RCV:"");
+ var r=await fetch(u,{headers:{"x-client-id":"kosmara"}}),j=null;try{j=await r.json()}catch(e){}
+ if(!r.ok||!j||j.code!==0||!j.data)throw new Error(j&&j.message?(/route not found/i.test(j.message)?"sin ruta para este par":j.message):"sin ruta ("+r.status+")");
+ var s=j.data.routeSummary,out=+s.amountOut/Math.pow(10,x.to.decimals);
+ return{p:"KyberSwap",rs:s,chain:c,out:out,min:out*(1-SW.slip/100),usd:+s.amountOutUsd||0,via:"KyberSwap",gas:+s.gasUsd||0,kz:!!(KS_RCV&&KS_FEE_BPS>0),appr:j.data.routerAddress,fr:x.fr,amt:x.a}}
+async function evQuoteAll(addr){var R=await Promise.all([qLifi(addr).catch(function(e){return{p:"LI.FI",err:e.message}}),qKyber().catch(function(e){return{p:"KyberSwap",err:e.message,skip:/no disponible/.test(e.message)}})]);
+ R=R.filter(function(q){return !q.skip});var ok=R.filter(function(q){return !q.err}).sort(function(a,b){return b.out-a.out});if(!ok.length)throw new Error(R.map(function(q){return q.p+": "+q.err}).join(" · "));
+ ok.forEach(function(q){q.diff=(q.out/ok[0].out-1)*100});return ok.concat(R.filter(function(q){return q.err}))}
+async function eQuote(){eres("Comparando precios…");try{evPick();EV.res=await evQuoteAll();EV.sel=EV.res[0].p;EV.q=EV.res[0];var d=$("eq");if(d)d.innerHTML=eqHtml();var o=$("eout");if(o)o.textContent="≈ "+f(EV.q.out,6);eres("Elige ruta y pulsa Cambiar.")}
+ catch(e){EV.q=null;EV.res=[];EV.res=[];var d=$("eq");if(d)d.innerHTML="";eres('<span class="dn">'+esc(e.message)+"</span>")}}
 async function evSwitch(id){var c=CH[id],hx="0x"+Number(id).toString(16),cur=await S.ev.request({method:"eth_chainId"});if(String(cur).toLowerCase()===hx)return;
  try{await S.ev.request({method:"wallet_switchEthereumChain",params:[{chainId:hx}]})}
  catch(e){if((e.code===4902||/unrecognized|not added|unknown chain/i.test(e.message||""))&&c&&c.metamask){var m=c.metamask;await S.ev.request({method:"wallet_addEthereumChain",params:[{chainId:hx,chainName:m.chainName||c.name,nativeCurrency:m.nativeCurrency,rpcUrls:m.rpcUrls,blockExplorerUrls:m.blockExplorerUrls}]})}else throw e}}
 async function eSwap(){
- var id=SW.net;try{if(!(await needEvm()))return;eres("Calculando precio actual…");var q=await evQuote(S.eaddr);EV.q=q;var d=$("eq");if(d)d.innerHTML=eqHtml();
-  var to=evT(id,EV.to[id]);if(!confirm("Vas a firmar un swap REAL en "+chN(id)+":\n"+EV.amt+" "+q.fr.symbol+" por unos "+f(q.out,6)+" "+to.symbol+" (mínimo "+f(q.min,6)+").\nRuta: "+q.via+". Revisa los detalles en tu wallet antes de aprobar."))return eres("");
+ var id=SW.net;try{if(!(await needEvm()))return;eres("Calculando precio actual…");var pv=EV.sel||"LI.FI",q;try{q=pv==="KyberSwap"?await qKyber():await qLifi(S.eaddr)}catch(z){EV.res=await evQuoteAll(S.eaddr);q=EV.res[0];pv=q.p}EV.sel=pv;EV.q=q;
+  var to=evT(id,EV.to[id]);if(!confirm("Vas a firmar un swap REAL en "+chN(id)+":\n"+EV.amt+" "+q.fr.symbol+" por unos "+f(q.out,6)+" "+to.symbol+" (mínimo "+f(q.min,6)+").\nRuta: "+q.p+(q.via!==q.p?" ("+q.via+")":"")+". Revisa los detalles en tu wallet antes de aprobar."))return eres("");
   eres("Cambiando tu wallet a "+esc(chN(id))+"…");await evSwitch(id);
   if(q.fr.address!==NAT&&q.appr){var al=BigInt(await ecall(q.fr.address,"0xdd62ed3e"+h32(S.eaddr)+h32(q.appr))||"0x0");
    if(al<q.amt){if(al>0n){eres("Reiniciando el permiso del token…");await waitRc(await esend({to:q.fr.address,data:"0x095ea7b3"+h32(q.appr)+h32(0n)}))}
     eres("Aprueba el uso de "+esc(q.fr.symbol)+"…");await waitRc(await esend({to:q.fr.address,data:"0x095ea7b3"+h32(q.appr)+h32(q.amt)}))}}
-  var t=q.raw.transactionRequest,tx={to:t.to,data:t.data,value:t.value||"0x0"};if(t.gasLimit)tx.gas=t.gasLimit;eres("Firma el swap en tu wallet…");var h=await esend(tx);
+  var tx;if(q.p==="KyberSwap"){var bd=await fetch(KS+"/"+q.chain+"/api/v1/route/build",{method:"POST",headers:{"Content-Type":"application/json","x-client-id":"kosmara"},body:JSON.stringify({routeSummary:q.rs,sender:S.eaddr,recipient:S.eaddr,slippageTolerance:Math.round(SW.slip*100)})}),bj=await bd.json();
+   if(!bd.ok||bj.code!==0||!bj.data)throw new Error("KyberSwap: "+(bj.message||"no se pudo preparar el swap"));tx={to:bj.data.routerAddress,data:bj.data.data,value:"0x"+BigInt(bj.data.transactionValue||"0").toString(16)};if(bj.data.gas)tx.gas="0x"+Math.ceil(+bj.data.gas*1.25).toString(16)}
+  else{var t=q.raw.transactionRequest;tx={to:t.to,data:t.data,value:t.value||"0x0"};if(t.gasLimit)tx.gas=t.gasLimit}eres("Firma el swap en tu wallet…");var h=await esend(tx);
   var x=CH[id]&&CH[id].metamask&&CH[id].metamask.blockExplorerUrls&&CH[id].metamask.blockExplorerUrls[0];
   eres("Swap enviado."+(x?' <a class="lk" href="'+esc(x.replace(/\/$/,""))+"/tx/"+esc(h)+'" target="_blank" rel="noopener">Ver transacción ↗</a>':""));toast("Swap enviado en "+chN(id)+".");setTimeout(function(){loadHold(true)},8000)}
  catch(e){eres('<span class="dn">'+esc(e&&e.code===4001?"Has rechazado la firma.":(e&&e.message)||"No se pudo completar.")+"</span>")}}
-document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-net],[data-epct],[data-act='netpick'],[data-act^='e']");if(!b)return;
- if(b.hasAttribute("data-net")){var n=b.getAttribute("data-net");SW.net=n==="sol"?"sol":+n;SW.np=false;SW.mode="sol";EV.q=null;EV.amt="";rSwap();return}
- if(b.hasAttribute("data-epct")){var id=SW.net,t=evT(id,EV.from[id]),bl=evBal(id,EV.from[id])||0;if(t&&t.address===NAT)bl=Math.max(0,bl-(id===1?.003:.0005));EV.amt=String(Math.floor(bl*b.getAttribute("data-epct")/100*1e6)/1e6);EV.q=null;return rSwap()}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-net],[data-epct],[data-er],[data-act='netpick'],[data-act^='e']");if(!b)return;
+ if(b.hasAttribute("data-er")){EV.sel=b.getAttribute("data-er");EV.q=(EV.res||[]).filter(function(x){return x.p===EV.sel})[0]||EV.q;var d=$("eq");if(d)d.innerHTML=eqHtml();return}
+ if(b.hasAttribute("data-net")){var n=b.getAttribute("data-net");SW.net=n==="sol"?"sol":+n;SW.np=false;SW.mode="sol";EV.q=null;EV.res=[];EV.amt="";rSwap();return}
+ if(b.hasAttribute("data-epct")){var id=SW.net,t=evT(id,EV.from[id]),bl=evBal(id,EV.from[id])||0;if(t&&t.address===NAT)bl=Math.max(0,bl-(id===1?.003:.0005));EV.amt=String(Math.floor(bl*b.getAttribute("data-epct")/100*1e6)/1e6);EV.q=null;EV.res=[];return rSwap()}
  var a=b.getAttribute("data-act");if(a==="netpick"){SW.np=!SW.np;loadCH();return rSwap()}
  if(a==="equote")eQuote();else if(a==="eswap")eSwap();else if(a==="evload"){EV.ld[SW.net]=0;rSwap()}
- else if(a==="eflip"){var z=EV.from[SW.net];EV.from[SW.net]=EV.to[SW.net];EV.to[SW.net]=z;EV.q=null;rSwap()}});
-document.addEventListener("input",function(e){if(e.target.id==="eamt"){EV.amt=e.target.value;EV.q=null;var d=$("eq");if(d)d.innerHTML="";var o=$("eout");if(o)o.textContent=""}});
-document.addEventListener("change",function(e){var t=e.target;var n=SW.net;if(t.id==="ef"){if(t.value===EV.to[n])EV.to[n]=EV.from[n];EV.from[n]=t.value;EV.q=null;rSwap()}else if(t.id==="et"){if(t.value===EV.from[n])EV.from[n]=EV.to[n];EV.to[n]=t.value;EV.q=null;rSwap()}});
+ else if(a==="eflip"){var z=EV.from[SW.net];EV.from[SW.net]=EV.to[SW.net];EV.to[SW.net]=z;EV.q=null;EV.res=[];rSwap()}});
+document.addEventListener("input",function(e){if(e.target.id==="eamt"){EV.amt=e.target.value;EV.q=null;EV.res=[];var d=$("eq");if(d)d.innerHTML="";var o=$("eout");if(o)o.textContent=""}});
+document.addEventListener("change",function(e){var t=e.target;var n=SW.net;if(t.id==="ef"){if(t.value===EV.to[n])EV.to[n]=EV.from[n];EV.from[n]=t.value;EV.q=null;EV.res=[];rSwap()}else if(t.id==="et"){if(t.value===EV.from[n])EV.from[n]=EV.to[n];EV.to[n]=t.value;EV.q=null;EV.res=[];rSwap()}});
 
 /* ---------- Tokens reales de la wallet: Solana vía Jupiter, EVM vía LI.FI (en todas sus redes) ---------- */
 var HD={sol:null,evm:null,ld:0,at:0,key:"",err:"",more:false},JL="https://lite-api.jup.ag";
@@ -680,7 +696,7 @@ document.addEventListener("click",function(e){var b=e.target.closest&&e.target.c
  if(a==="xquote")xQuote();else if(a==="xswap")xSwap();else if(a==="xload"){XS.ld=0;rSwap()}
  else if(a==="xflip"){var z=XS.from;XS.from=XS.to;XS.to=z;XS.q=null;XS.auto=true;rSwap()}});
 document.addEventListener("input",function(e){var t=e.target;if(t.id==="xamt"){XS.amt=t.value;XS.q=null;var d=$("xq");if(d)d.innerHTML="";var o=$("xout");if(o)o.textContent=""}else if(t.id==="xdest"){XS.dest=t.value;XS.auto=!t.value;XS.q=null}});
-document.addEventListener("change",function(e){var t=e.target;if(t.id==="xf"){XS.from=t.value;XS.q=null;rSwap()}else if(t.id==="xt"){XS.to=t.value;XS.q=null;XS.auto=true;rSwap()}else if(t.id==="xslip"){SW.slip=+t.value;XS.q=null;EV.q=null;rSwap()}});
+document.addEventListener("change",function(e){var t=e.target;if(t.id==="xf"){XS.from=t.value;XS.q=null;rSwap()}else if(t.id==="xt"){XS.to=t.value;XS.q=null;XS.auto=true;rSwap()}else if(t.id==="xslip"){SW.slip=+t.value;XS.q=null;EV.q=null;EV.res=[];rSwap()}});
 
 function sres(h){var e=$("sres");if(e)e.innerHTML=h}
 function sopts(v){return TKS.map(function(t){return "<option"+(t.s===v?" selected":"")+">"+t.s+"</option>"}).join("")}
@@ -1211,7 +1227,7 @@ var ROAD=[
  ["on","Pools de Ethereum y BNB Chain","Uniswap, Curve y PancakeSwap con datos reales."],
  ["on","Movimientos exportables","Historial de cualquier dirección en CSV y PDF."],
  ["test","Swap con comparación de rutas","Vía Jupiter. Por ahora necesita tu clave de API."],
- ["test","Swap en 14 redes","Solana con Jupiter; Ethereum, BNB Chain, Base, Arbitrum, Avalanche, HyperEVM, Robinhood Chain, Polygon, Optimism, Unichain, Monad, Sonic y Linea con LI.FI."],
+ ["test","Swap en 14 redes","Solana con Jupiter; Ethereum, BNB Chain, Base, Arbitrum, Avalanche, HyperEVM, Robinhood Chain, Polygon, Optimism, Unichain, Monad, Sonic y Linea con LI.FI y KyberSwap, eligiendo el mejor precio."],
  ["test","Tokens de tu wallet en el portafolio","Todo lo que tienes en Solana y en las redes EVM, con su valor en dólares."],
  ["test","Swap entre redes con THORChain","BTC, ETH, SOL, BNB, AVAX y más, nativos y sin puentes. Firmas desde tu wallet de Ethereum, BNB Chain, Base o Avalanche."],
  ["test","Crear posiciones en Orca sin salir de Kosmara","Rango con la liquidez del pool, asas para ajustarlo y gráfico de velas. El NFT llega directo a tu wallet."],
