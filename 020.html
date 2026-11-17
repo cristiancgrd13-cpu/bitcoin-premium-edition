@@ -1298,10 +1298,11 @@ function tickRun(){if(tkOn||!window.requestAnimationFrame)return;tkOn=true;var b
  for(var m=0;m<14;m++)M.push({x:Math.random(),y:Math.random(),v:.08+Math.random()*.14,r:.6+Math.random()*1.4,c:SR[m%SR.length][1]});
  function size(){D=Math.min(2,window.devicePixelRatio||1);W=cv.clientWidth;H=cv.clientHeight;cv.width=W*D;cv.height=H*D;x.setTransform(D,0,0,D,0,0)}
  function geo(){var dh=H*.74,dw=Math.min(dh*.46,W*.3),dx=W-Math.max(dw/2+10,H*.31+4),dy=H/2;return{dh:dh,dw:dw,dx:dx,dy:dy,l:dx-dw/2,top:dy-dh/2}}
- function arch(g,pad){var l=g.l-pad,r=g.l+g.dw+pad,t=g.top-pad,b=g.top+g.dh+pad,rd=(r-l)/2;x.beginPath();x.moveTo(l,b);x.lineTo(l,t+rd);x.arc(l+rd,t+rd,rd,Math.PI,0);x.lineTo(r,b);x.closePath()}
+ function arch(g,pad){var l=g.l-pad,r=g.l+g.dw+pad,t=g.top-pad,b=g.top+g.dh+pad,rd=Math.max(0,(r-l)/2);x.beginPath();x.moveTo(l,b);x.lineTo(l,t+rd);x.arc(l+rd,t+rd,rd,Math.PI,0);x.lineTo(r,b);x.closePath()}
  function pt(g,i,t){var n=SR.length,y0=H*.09+(H*.82)*(i/(n-1)),x0=Math.min(96,W*.29),x3=g.l+g.dw*.5,y3=g.dy+(i-(n-1)/2)*(g.dh*.07),c=x0+(x3-x0)*.55,u=1-t;
   return[u*u*u*x0+3*u*u*t*c+3*u*t*t*(x0+(x3-x0)*.62)+t*t*t*x3,u*u*u*y0+3*u*u*t*y0+3*u*t*t*y3+t*t*t*y3]}
  function draw(ts){
+  if(W<40||H<40){if(cv.clientWidth>=40)size();if(W<40||H<40){raf=0;return}}
   var dt=t0?Math.min(.05,(ts-t0)/1000):0;t0=ts;x.clearRect(0,0,W,H);var g=geo(),n=SR.length;
   // resplandor y hueco de la puerta
   x.save();x.translate(g.dx,g.dy);x.scale(.62,1);var rg=x.createRadialGradient(0,0,4,0,0,H/2);rg.addColorStop(0,"rgba(124,92,255,.42)");rg.addColorStop(.55,"rgba(45,212,191,.12)");rg.addColorStop(1,"rgba(0,0,0,0)");x.fillStyle=rg;x.beginPath();x.arc(0,0,H/2,0,6.3);x.fill();x.restore();
