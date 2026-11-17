@@ -170,12 +170,12 @@ button:active,button:focus{outline:0;box-shadow:none}
 
 .tick{overflow:hidden;border-block:1px solid var(--line);padding:11px 0;-webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent)}
 .tick[hidden]{display:none}
-.tick-in{display:flex;gap:26px;width:max-content;animation:hzTick 46s linear infinite}
+.tick-in{display:flex;gap:26px;width:max-content;will-change:transform}
 .tick:hover .tick-in,.tick:active .tick-in{animation-play-state:paused}
 @keyframes hzTick{to{transform:translateX(-50%)}}
 .tick button{display:flex;align-items:baseline;gap:8px;background:none;border:0;color:#eeeef5;font-size:14px;padding:0;white-space:nowrap}
 .tick button small{color:var(--dim);font-weight:500;font-size:12px}
-.tick button .num{color:var(--up)}
+.tick button .num{color:var(--up);font-weight:700}.tick .tsep{color:#f3ba2f;font-style:normal;font-size:10px;align-self:center}
 
 .hd{font-family:"Unbounded","Space Grotesk",sans-serif;font-weight:700;font-size:clamp(20px,5.4vw,28px);letter-spacing:-.02em;line-height:1.15;margin:26px 2px 4px}
 .hd+.sub{margin:0 2px 6px;color:var(--dim);font-size:14px;max-width:60ch}
@@ -222,7 +222,7 @@ button:active,button:focus{outline:0;box-shadow:none}
 .pts .note{font-size:12.5px;color:var(--dim);margin:0}
 .badge{display:inline-block;font-size:11px;font-weight:700;border:1px solid #5d5e6c;color:#b4b5c6;border-radius:99px;padding:2px 9px;margin-left:8px;vertical-align:middle}
 #hTop .prow{cursor:pointer}
-@media(prefers-reduced-motion:reduce){.hz h1 span i{animation:none;transform:none}.tick-in{animation:none}.hz-live .dot{animation:none}}
+@media(prefers-reduced-motion:reduce){.hz h1 span i{animation:none;transform:none}.hz-live .dot{animation:none}}
 
 /* ---------- selector de wallets ---------- */
 .wg{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin:18px 0 2px;font-size:14px;font-weight:700}
@@ -1122,10 +1122,16 @@ function rHome(){
  if(!A.length)return;
  var tvl=0,pr={},nets={sol:1};A.forEach(function(p){if(!p.kind)tvl+=p.tvl||0;pr[p.pr]=1;if(p.net)nets[p.net]=1});
  $("hLive").innerHTML='<span class="dot"></span><b>'+f(A.length,0)+"</b> pools en vivo, <b>$"+(tvl>=1e9?f(tvl/1e9,2)+" mil M":f(tvl/1e6,0)+" M")+"</b> de liquidez, <b>"+Object.keys(pr).length+"</b> protocolos, <b>"+Object.keys(nets).length+"</b> redes";
- var T=A.filter(function(p){return p.apr>0&&p.apr<400&&p.tvl>=1e6}).sort(function(a,b){return b.apr-a.apr}).slice(0,14),sig=T.map(function(p){return p.k}).join();
- if(T.length>3&&sig!==tickSig){tickSig=sig;var h=T.map(function(p){return '<button data-pool="'+esc(p.k)+'"><b>'+esc(p.A.s)+(p.B.s?"/"+esc(p.B.s):"")+"</b><small>"+p.pr+'</small><span class="num">'+f(p.apr,1)+"%</span></button>"}).join("");
-  $("hTick").innerHTML='<div class="tick-in">'+h+h+"</div>";$("hTick").hidden=false}
+ var T=A.filter(function(p){return p.apr>0&&p.apr<400&&p.tvl>=1e6}).sort(function(a,b){return b.apr-a.apr}).slice(0,5),sig=T.map(function(p){return p.k}).join();
+ if(T.length>=3&&sig!==tickSig){tickSig=sig;var h=T.map(function(p){return '<button data-pool="'+esc(p.k)+'"><b>'+esc(p.A.s)+(p.B.s?"/"+esc(p.B.s):"")+"</b><small>"+p.pr+'</small><span class="num">'+f(p.apr,1)+"%</span><small>APR</small></button>"}).join('<i class="tsep" aria-hidden="true">◆</i>')+'<i class="tsep" aria-hidden="true">◆</i>';
+  $("hTick").innerHTML='<div class="tick-in">'+h+h+h+h+"</div>";tickRun();$("hTick").hidden=false}
 }
+/* Cinta de pools: se mueve con JS para que siga en marcha aunque el móvil tenga reducidas las animaciones; se para al tocarla. */
+var tkX=0,tkLast=0,tkOn=false,tkHold=false;
+function tickRun(){if(tkOn)return;tkOn=true;var box=$("hTick");
+ box.addEventListener("pointerenter",function(){tkHold=true});box.addEventListener("pointerleave",function(){tkHold=false});
+ box.addEventListener("touchstart",function(){tkHold=true},{passive:true});box.addEventListener("touchend",function(){setTimeout(function(){tkHold=false},1200)});
+ (function loop(n){var tt=box.querySelector(".tick-in");if(tt&&!box.hidden&&!document.hidden){if(!tkLast)tkLast=n;var dt=Math.min(64,n-tkLast);if(!tkHold)tkX+=dt*.04;var q=tt.scrollWidth/4;if(q>0&&tkX>=q)tkX%=q;tt.style.transform="translateX("+(-tkX).toFixed(1)+"px)"}tkLast=n;requestAnimationFrame(loop)})(performance.now())}
 /* La puerta: los protocolos integrados confluyen en un solo punto. */
 (function(){
  var cv=$("door");if(!cv||!cv.getContext)return;var x=cv.getContext("2d"),W=0,H=0,D=1,raf=0,t0=0,still=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches;
