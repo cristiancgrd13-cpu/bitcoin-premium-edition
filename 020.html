@@ -165,6 +165,7 @@ button:active,button:focus{outline:0;box-shadow:none}
 /* Bloques vivos: luz que orbita el borde, entrada al aparecer y foco que sigue al dedo */
 @property --kang{syntax:"<angle>";inherits:false;initial-value:0deg}
 .kb{position:relative;isolation:isolate}.step.kb{--tc:45,212,191}.wp.kb{--tc:124,92,255}.road.kb{--tc:20,241,149}.pts.kb{--tc:160,130,255}
+.b,.kb{will-change:transform,opacity}
 .b::before,.kb::after{content:"";position:absolute;inset:0;border-radius:inherit;padding:1.2px;pointer-events:none;z-index:3;
  background:conic-gradient(from var(--kang),transparent 0 66%,rgba(var(--tc),.15) 72%,rgba(var(--tc),.95) 80%,rgba(255,255,255,.95) 81.5%,rgba(var(--tc),.85) 83%,transparent 92%);
  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);
@@ -173,8 +174,6 @@ button:active,button:focus{outline:0;box-shadow:none}
 .b::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:-1;opacity:0;transition:opacity .45s;
  background:radial-gradient(240px circle at var(--mx,50%) var(--my,0%),rgba(var(--tc),.2),transparent 65%)}
 .b.lit::after{opacity:1}
-.kz-in{opacity:0;transform:translateY(28px) scale(.965);filter:blur(7px)}
-.kz-on{opacity:1;transform:none;filter:none;transition:opacity .7s ease,transform .9s cubic-bezier(.2,.8,.2,1),filter .7s ease}
 .kz-fresh .row,.kz-fresh .prow,.kz-fresh .step,.kz-fresh details{animation:krow .6s cubic-bezier(.2,.8,.2,1) both}
 .kz-fresh :is(.row,.prow,.step,details):nth-child(1){animation-delay:0.19s}.kz-fresh :is(.row,.prow,.step,details):nth-child(2){animation-delay:0.26s}.kz-fresh :is(.row,.prow,.step,details):nth-child(3){animation-delay:0.33s}.kz-fresh :is(.row,.prow,.step,details):nth-child(4){animation-delay:0.40s}.kz-fresh :is(.row,.prow,.step,details):nth-child(5){animation-delay:0.47s}.kz-fresh :is(.row,.prow,.step,details):nth-child(6){animation-delay:0.54s}.kz-fresh :is(.row,.prow,.step,details):nth-child(7){animation-delay:0.61s}.kz-fresh :is(.row,.prow,.step,details):nth-child(8){animation-delay:0.68s}
 @keyframes krow{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
@@ -1337,11 +1336,20 @@ function tickRun(){if(tkOn||!window.requestAnimationFrame)return;tkOn=true;var b
  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(function(){if(still){raf=0;requestAnimationFrame(draw)}});
 })();
 
-/* Bloques vivos: cada bloque aparece al entrar en pantalla, su luz orbita desfasada y se ilumina bajo el dedo. */
+/* Bloques vivos: cada bloque aparece y se esfuma con el scroll, su luz orbita desfasada y se ilumina bajo el dedo. */
 (function(){var B=[].slice.call(document.querySelectorAll(".b,.step,.wp,.road,.pts"));if(!B.length)return;B.forEach(function(b){if(!b.classList.contains("b"))b.classList.add("kb")});
  B.forEach(function(b,i){b.style.setProperty("--kd",(-(i*3.7)%10).toFixed(1)+"s")});
- if("IntersectionObserver" in window){B.forEach(function(b){b.classList.add("kz-in")});
-  var io=new IntersectionObserver(function(E){E.forEach(function(e){var b=e.target;if(e.isIntersecting&&!b.classList.contains("kz-on")){b.classList.add("kz-on","kz-fresh");b.classList.remove("kz-in");setTimeout(function(){b.classList.remove("kz-fresh")},1500)}})},{threshold:.08,rootMargin:"0px 0px -6% 0px"});
+ /* Cada bloque se materializa al entrar por abajo y se esfuma, borroso, al salir por arriba (ligado al scroll). */
+ function fx(){var H=innerHeight,top=58,bot=H-72;
+  for(var i=0;i<B.length;i++){var b=B[i];if(!b.offsetParent)continue;var r=b.getBoundingClientRect();if(r.bottom<-80||r.top>H+80)continue;
+   var en=Math.max(0,Math.min(1,(bot-r.top)/(H*.24))),ex=Math.max(0,Math.min(1,(r.bottom-top)/(H*.3))),k=Math.min(en,ex);
+   if(k>=1){if(b._k!==1){b.style.opacity="";b.style.transform="";b.style.filter="";b._k=1}continue}
+   var e=k*k*(3-2*k),up=ex<en,dy=up?-(1-e)*30:(1-e)*36,sc=up?1-(1-e)*.06:.94+.06*e;
+   b.style.opacity=(.02+.98*e).toFixed(3);b.style.transform="translateY("+dy.toFixed(1)+"px) scale("+sc.toFixed(3)+")";b.style.filter="blur("+((1-e)*(up?10:8)).toFixed(1)+"px)"+(up?" saturate("+(.6+.4*e).toFixed(2)+")":"");b._k=k}}
+ window.kzBlocks=fx;var pend=0;function req(){if(!pend){pend=1;requestAnimationFrame(function(){pend=0;fx()})}}
+ window.addEventListener("scroll",req,{passive:true});window.addEventListener("resize",req);document.addEventListener("click",function(){setTimeout(req,30);setTimeout(req,400)});req();
+ if("IntersectionObserver" in window){
+  var io=new IntersectionObserver(function(E){E.forEach(function(e){var b=e.target;if(e.isIntersecting&&!b._seen){b._seen=1;b.classList.add("kz-fresh");setTimeout(function(){b.classList.remove("kz-fresh")},1500)}})},{threshold:.08,rootMargin:"0px 0px -6% 0px"});
   B.forEach(function(b){io.observe(b)})}
  function mv(e){var b=e.currentTarget,r=b.getBoundingClientRect();b.style.setProperty("--mx",(e.clientX-r.left)+"px");b.style.setProperty("--my",(e.clientY-r.top)+"px");b.classList.add("lit")}
  B.filter(function(b){return b.classList.contains("b")}).forEach(function(b){b.addEventListener("pointermove",mv);b.addEventListener("pointerdown",mv);b.addEventListener("pointerleave",function(){b.classList.remove("lit")});b.addEventListener("pointerup",function(e){if(e.pointerType!=="mouse")setTimeout(function(){b.classList.remove("lit")},700)})});
