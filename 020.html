@@ -60,6 +60,16 @@ option{color:#000}
 .rvt{display:flex;gap:6px;margin:4px 0 6px}.rvt .btn{flex:0 0 auto;padding:5px 12px}.rvt .btn.on{background:rgba(20,241,149,.18);color:#14f195}
 #rcsvg{display:block;width:100%;height:auto}
 @media (prefers-reduced-motion:reduce){.rvar{transition:none}}
+.nhd{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px}.nhd small{margin-left:auto}
+.netb{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:999px;color:#fff;padding:5px 10px 5px 6px;font:inherit;font-size:14px;cursor:pointer}
+.netb[aria-expanded=true] .rvar{transform:rotate(180deg)}.netb .rvar{font-size:14px}
+.chi{width:22px;height:22px;border-radius:50%;flex:none;object-fit:cover}.chl{display:inline-grid;place-items:center;background:#3a3b4a;color:#fff;font-size:11px;font-weight:700}
+.netl{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px;margin:0 0 12px;padding:8px;background:rgba(0,0,0,.35);border-radius:14px}
+.netl button{display:flex;align-items:center;gap:7px;background:none;border:1px solid transparent;border-radius:10px;color:#ddd;font:inherit;font-size:12.5px;padding:7px 6px;cursor:pointer;text-align:left}
+.netl button.on{border-color:rgba(124,92,255,.8);background:rgba(124,92,255,.15);color:#fff}.netl button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hrw{gap:10px}.hti{position:relative;width:34px;height:34px;flex:none}.hti>img,.hlt{width:34px;height:34px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:#2c2d3a;font-weight:700}
+.hcb{position:absolute;right:-3px;bottom:-3px;width:15px;height:15px;border-radius:50%;border:2px solid #111;background:#2c2d3a;font-size:8px;display:grid;place-items:center}
+.hnm{flex:1;min-width:0}.hnm b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .chips{display:flex;gap:8px;margin:10px 0 2px;flex-wrap:wrap}.chips .btn{flex:1;padding:7px 6px;white-space:nowrap}
 .chip.on{background:rgb(var(--tc));color:#000;border-color:rgb(var(--tc))}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(0,0,0,.32);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:8px}
@@ -335,7 +345,7 @@ button.logo:focus-visible{outline:2px solid #7c5cff;outline-offset:4px}
 </div>
 
 <div class="view" data-view="portfolio">
-<div class="all" style="padding:6px 2px"><h2 class="vt">Portafolio</h2><div class="dim">Visualiza y gestiona tus activos depositados en pools de liquidez y vaults.</div></div>
+<div class="all" style="padding:6px 2px"><h2 class="vt">Portafolio</h2><div class="dim">Tus tokens en todas las redes, tus posiciones de liquidez y tus vaults.</div></div>
 <section class="b ctr" id="pfTot" style="--tc:150,160,185"></section>
 <section class="b ctr" id="pfList" style="--tc:20,241,149"></section>
 </div>
@@ -449,7 +459,111 @@ var TKS=[["SOL",SOLM,9],["USDC","EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",6
 window.kzP=43;
 TKS.forEach(function(t){TM[t.s]=t});
 window.kzP=44;
-var SW={from:"SOL",to:"USDC",amt:"",slip:1,res:[],sel:""};
+var SW={from:"SOL",to:"USDC",amt:"",slip:1,res:[],sel:"",net:"sol",mode:"sol",np:false};
+/* ---------- Redes (LI.FI): lista de cadenas con logo y datos para la wallet ---------- */
+window.kzP=44;
+var LIFI="https://li.quest/v1",LIFI_INT="",LIFI_FEE=0; /* afiliado LI.FI: nombre de integrador del portal y comisión en fracción (0.003 = 0,3 %). Vacío = sin comisión. */
+var NETL=["sol",1,56,8453,42161,43114,999,4663,137,10,130,143,146,59144],CH={},CHL=0;
+var CHF={sol:"Solana",1:"Ethereum",56:"BNB Chain",8453:"Base",42161:"Arbitrum",43114:"Avalanche",999:"HyperEVM",4663:"Robinhood Chain",137:"Polygon",10:"Optimism",130:"Unichain",143:"Monad",146:"Sonic",59144:"Linea"};
+var NAT="0x0000000000000000000000000000000000000000";
+async function loadCH(){if(CHL)return;CHL=1;try{var r=await fetch(LIFI+"/chains?chainTypes=EVM,SVM");if(!r.ok)throw 0;(await r.json()).chains.forEach(function(c){CH[c.chainType==="SVM"?"sol":c.id]=c});CHL=2}catch(e){CHL=0}
+ if(S.view==="swap")rSwap();if(S.view==="portfolio")rPf();if(S.view==="wallet")rWallet()}
+function chN(id){return CHF[id]||(CH[id]&&CH[id].name)||String(id)}
+function chIco(id,cls){var c=CH[id];return c&&c.logoURI?'<img class="'+(cls||"chi")+'" alt="" src="'+esc(c.logoURI)+'" onerror="this.remove()">':'<span class="'+(cls||"chi")+' chl">'+esc(chN(id).charAt(0))+"</span>"}
+function netHead(via){
+ return '<div class="nhd"><span class="k" style="margin:0">Swap en</span><button class="netb" data-act="netpick" aria-expanded="'+!!SW.np+'" aria-controls="netl">'+chIco(SW.net)+"<b>"+esc(chN(SW.net))+'</b><span class="rvar">⌄</span></button><small class="dim">vía '+via+"</small></div>"+
+ (SW.np?'<div class="netl" id="netl" role="listbox" aria-label="Redes">'+NETL.map(function(id){return '<button role="option" aria-selected="'+(String(id)===String(SW.net))+'" class="'+(String(id)===String(SW.net)?"on":"")+'" data-net="'+id+'">'+chIco(id)+"<span>"+esc(chN(id))+"</span></button>"}).join("")+"</div>":"")}
+/* ---------- Swap en una red EVM (LI.FI) ---------- */
+var EV={tk:{},ld:{},from:{},to:{},amt:"",q:null};
+var EVP=["USDC","USDT","USDT0","WETH","ETH","WBTC","cbBTC","DAI","USDe","wstETH","WHYPE","HYPE","UBTC","UETH","AVAX","WAVAX","BNB","WBNB","BTCB","ARB","OP","POL","WPOL","S","MON","UNI","LINK","AAVE"];
+async function loadTk(id){if(EV.ld[id])return;EV.ld[id]=1;try{var r=await fetch(LIFI+"/tokens?chains="+id);if(!r.ok)throw new Error("LI.FI HTTP "+r.status);
+  var L=(await r.json()).tokens[id]||[],rk=function(t){var i=EVP.indexOf(t.symbol);return t.address===NAT?-1:i<0?99:i};
+  L=L.filter(function(t){return t.address===NAT||t.coinKey||EVP.indexOf(t.symbol)>=0}).sort(function(a,b){return rk(a)-rk(b)||a.symbol.localeCompare(b.symbol)}).slice(0,70);
+  (HD.evm||[]).forEach(function(h){if(h.ok&&h.v>=.01&&String(h.c)===String(id)&&!L.some(function(t){return t.address.toLowerCase()===h.m.toLowerCase()}))L.push({address:h.m,symbol:h.s,decimals:h.d,logoURI:h.ic,priceUSD:h.px})});
+  EV.tk[id]=L;if(!EV.from[id])EV.from[id]=L[0]&&L[0].address;if(!EV.to[id]){var u=L.filter(function(t){return /^USDC/.test(t.symbol)&&t.address!==EV.from[id]})[0]||L[1];EV.to[id]=u&&u.address}EV.ld[id]=2}
+ catch(e){EV.ld[id]=0;EV.err=e.message}if(String(SW.net)===String(id)&&S.view==="swap")rSwap()}
+function evT(id,a){return (EV.tk[id]||[]).filter(function(t){return t.address===a})[0]}
+function evBal(id,a){var h=(HD.evm||[]).filter(function(x){return String(x.c)===String(id)&&x.m.toLowerCase()===String(a).toLowerCase()})[0];return h?h.a:null}
+function rE(){
+ var id=SW.net,el=$("swap");if(EV.ld[id]!==2){el.innerHTML=swTabs()+netHead("LI.FI")+'<div class="stat">'+(EV.ld[id]?"Cargando tokens de "+esc(chN(id))+"…":esc(EV.err||"")+' <button class="btn" data-act="evload">Reintentar</button>')+"</div>";if(!EV.ld[id])loadTk(id);return}
+ var L=EV.tk[id],fr=evT(id,EV.from[id])||L[0],to=evT(id,EV.to[id])||L[1],b=evBal(id,fr.address),op=function(sel){return L.map(function(t){return '<option value="'+esc(t.address)+'"'+(t.address===sel?" selected":"")+">"+esc(t.symbol)+"</option>"}).join("")};
+ el.innerHTML=swTabs()+netHead("LI.FI")+
+ '<div class="box"><label for="eamt">Das · saldo '+(S.eaddr?(b==null?"0":f(b,6))+" "+esc(fr.symbol):"conecta tu wallet")+'</label><div class="srow"><select id="ef">'+op(fr.address)+'</select><input id="eamt" class="num" type="text" inputmode="decimal" value="'+esc(EV.amt)+'" placeholder="0.0"></div>'+
+ '<div class="chips"><button class="btn" data-epct="25">25%</button><button class="btn" data-epct="50">50%</button><button class="btn" data-epct="100">Máx</button><button class="btn" data-act="eflip">⇅</button></div></div>'+
+ '<div class="box" style="margin-top:8px"><label for="et">Recibes</label><div class="srow"><select id="et">'+op(to.address)+'</select><span class="dim" id="eout">'+(EV.q?"≈ "+f(EV.q.out,6):"")+"</span></div></div>"+
+ '<div class="hrow"><span class="dim">Deslizamiento máx. <select id="xslip">'+[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===SW.slip?" selected":"")+">"+v+"%</option>"}).join("")+"</select></span></div>"+
+ '<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="equote">Ver precio</button><div id="eq">'+eqHtml()+'</div><button class="btn p" data-act="eswap">Cambiar (real)</button><div class="stat" id="eres"></div>'+
+ '<div class="dim" style="margin-top:6px">LI.FI busca el mejor precio entre los DEX de '+esc(chN(id))+' (Uniswap, Sushi, 1inch y otros). Firmas con tu wallet de Ethereum; Kosmara no toca tus fondos.</div>'}
+function eqHtml(){var q=EV.q;if(!q)return "";var to=evT(SW.net,EV.to[SW.net])||{},g=q.gas||0,fe=q.fee||0;
+ return '<div class="row"><div><b>Recibes unos '+f(q.out,6)+" "+esc(to.symbol||"")+'</b><small>mínimo '+f(q.min,6)+" con tu deslizamiento"+(q.usd?" · ≈ $"+f(q.usd,2):"")+'</small></div><div class="v"><b>'+esc(q.via)+'</b><small>mejor ruta</small></div></div>'+
+ '<div class="dim" style="font-size:12px;margin-top:6px">Comisión de LI.FI: $'+f(fe,fe<.01?4:2)+" (0,25 %)"+(q.kz?" · comisión Kosmara incluida":"")+" · gas estimado: $"+f(g,g<.01?4:2)+"</div>"}
+function eres(h){var e=$("eres");if(e)e.innerHTML=h}
+async function evQuote(addr){
+ var id=SW.net,fr=evT(id,EV.from[id]),to=evT(id,EV.to[id]),a=toU(EV.amt,fr?fr.decimals:18);
+ if(!fr||!to||fr.address===to.address)throw new Error("Elige dos tokens distintos.");if(!(a>0n))throw new Error("Introduce una cantidad.");
+ var u=LIFI+"/quote?fromChain="+id+"&toChain="+id+"&fromToken="+fr.address+"&toToken="+to.address+"&fromAmount="+a.toString()+"&fromAddress="+(addr||S.eaddr||"0x0000000000000000000000000000000000000001")+"&slippage="+SW.slip/100+(LIFI_INT?"&integrator="+encodeURIComponent(LIFI_INT)+(LIFI_FEE>0?"&fee="+LIFI_FEE:""):"");
+ var r=await fetch(u),j=null;try{j=await r.json()}catch(e){}
+ if(!r.ok||!j||!j.estimate)throw new Error(j&&j.message?String(j.message).replace(/\s*\(.*?\)\s*$/,""):"LI.FI no encontró ruta ("+r.status+").");
+ var e=j.estimate,sum=function(L){return (L||[]).reduce(function(s,x){return s+(+x.amountUSD||0)},0)};
+ return{raw:j,out:+e.toAmount/Math.pow(10,to.decimals),min:+e.toAmountMin/Math.pow(10,to.decimals),usd:+e.toAmountUSD||0,via:(j.toolDetails&&j.toolDetails.name)||j.tool||"LI.FI",
+  gas:sum(e.gasCosts),fee:sum((e.feeCosts||[]).filter(function(x){return /lifi/i.test(x.name)})),kz:(e.feeCosts||[]).some(function(x){return /integrator/i.test(x.name)}),appr:e.approvalAddress,fr:fr,amt:a}}
+async function eQuote(){eres("Consultando LI.FI…");try{EV.q=await evQuote();var d=$("eq");if(d)d.innerHTML=eqHtml();var o=$("eout");if(o)o.textContent="≈ "+f(EV.q.out,6);eres("Revisa el precio y pulsa Cambiar.")}
+ catch(e){EV.q=null;var d=$("eq");if(d)d.innerHTML="";eres('<span class="dn">'+esc(e.message)+"</span>")}}
+async function evSwitch(id){var c=CH[id],hx="0x"+Number(id).toString(16),cur=await S.ev.request({method:"eth_chainId"});if(String(cur).toLowerCase()===hx)return;
+ try{await S.ev.request({method:"wallet_switchEthereumChain",params:[{chainId:hx}]})}
+ catch(e){if((e.code===4902||/unrecognized|not added|unknown chain/i.test(e.message||""))&&c&&c.metamask){var m=c.metamask;await S.ev.request({method:"wallet_addEthereumChain",params:[{chainId:hx,chainName:m.chainName||c.name,nativeCurrency:m.nativeCurrency,rpcUrls:m.rpcUrls,blockExplorerUrls:m.blockExplorerUrls}]})}else throw e}}
+async function eSwap(){
+ var id=SW.net;try{if(!(await needEvm()))return;eres("Calculando precio actual…");var q=await evQuote(S.eaddr);EV.q=q;var d=$("eq");if(d)d.innerHTML=eqHtml();
+  var to=evT(id,EV.to[id]);if(!confirm("Vas a firmar un swap REAL en "+chN(id)+":\n"+EV.amt+" "+q.fr.symbol+" por unos "+f(q.out,6)+" "+to.symbol+" (mínimo "+f(q.min,6)+").\nRuta: "+q.via+". Revisa los detalles en tu wallet antes de aprobar."))return eres("");
+  eres("Cambiando tu wallet a "+esc(chN(id))+"…");await evSwitch(id);
+  if(q.fr.address!==NAT&&q.appr){var al=BigInt(await ecall(q.fr.address,"0xdd62ed3e"+h32(S.eaddr)+h32(q.appr))||"0x0");
+   if(al<q.amt){if(al>0n){eres("Reiniciando el permiso del token…");await waitRc(await esend({to:q.fr.address,data:"0x095ea7b3"+h32(q.appr)+h32(0n)}))}
+    eres("Aprueba el uso de "+esc(q.fr.symbol)+"…");await waitRc(await esend({to:q.fr.address,data:"0x095ea7b3"+h32(q.appr)+h32(q.amt)}))}}
+  var t=q.raw.transactionRequest,tx={to:t.to,data:t.data,value:t.value||"0x0"};if(t.gasLimit)tx.gas=t.gasLimit;eres("Firma el swap en tu wallet…");var h=await esend(tx);
+  var x=CH[id]&&CH[id].metamask&&CH[id].metamask.blockExplorerUrls&&CH[id].metamask.blockExplorerUrls[0];
+  eres("Swap enviado."+(x?' <a class="lk" href="'+esc(x.replace(/\/$/,""))+"/tx/"+esc(h)+'" target="_blank" rel="noopener">Ver transacción ↗</a>':""));toast("Swap enviado en "+chN(id)+".");setTimeout(function(){loadHold(true)},8000)}
+ catch(e){eres('<span class="dn">'+esc(e&&e.code===4001?"Has rechazado la firma.":(e&&e.message)||"No se pudo completar.")+"</span>")}}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-net],[data-epct],[data-act='netpick'],[data-act^='e']");if(!b)return;
+ if(b.hasAttribute("data-net")){var n=b.getAttribute("data-net");SW.net=n==="sol"?"sol":+n;SW.np=false;SW.mode="sol";EV.q=null;EV.amt="";rSwap();return}
+ if(b.hasAttribute("data-epct")){var id=SW.net,t=evT(id,EV.from[id]),bl=evBal(id,EV.from[id])||0;if(t&&t.address===NAT)bl=Math.max(0,bl-(id===1?.003:.0005));EV.amt=String(Math.floor(bl*b.getAttribute("data-epct")/100*1e6)/1e6);EV.q=null;return rSwap()}
+ var a=b.getAttribute("data-act");if(a==="netpick"){SW.np=!SW.np;loadCH();return rSwap()}
+ if(a==="equote")eQuote();else if(a==="eswap")eSwap();else if(a==="evload"){EV.ld[SW.net]=0;rSwap()}
+ else if(a==="eflip"){var z=EV.from[SW.net];EV.from[SW.net]=EV.to[SW.net];EV.to[SW.net]=z;EV.q=null;rSwap()}});
+document.addEventListener("input",function(e){if(e.target.id==="eamt"){EV.amt=e.target.value;EV.q=null;var d=$("eq");if(d)d.innerHTML="";var o=$("eout");if(o)o.textContent=""}});
+document.addEventListener("change",function(e){var t=e.target;var n=SW.net;if(t.id==="ef"){if(t.value===EV.to[n])EV.to[n]=EV.from[n];EV.from[n]=t.value;EV.q=null;rSwap()}else if(t.id==="et"){if(t.value===EV.from[n])EV.from[n]=EV.to[n];EV.to[n]=t.value;EV.q=null;rSwap()}});
+
+/* ---------- Tokens reales de la wallet: Solana vía Jupiter, EVM vía LI.FI (en todas sus redes) ---------- */
+var HD={sol:null,evm:null,ld:0,at:0,key:"",err:"",more:false},JL="https://lite-api.jup.ag";
+async function loadHold(force){
+ var key=S.pk+"|"+S.eaddr;if(!S.pk&&!S.eaddr){HD.sol=HD.evm=null;HD.key="";return}
+ if(HD.ld===1||(!force&&HD.key===key&&Date.now()-HD.at<60000))return;HD.ld=1;HD.err="";var er=[];rHold();
+ await Promise.all([
+  (async function(){if(!S.pk){HD.sol=null;return}try{
+   var r=await fetch(JL+"/ultra/v1/balances/"+S.pk);if(!r.ok)throw new Error("HTTP "+r.status);var b=await r.json(),L=[],meta={};
+   Object.keys(b).forEach(function(m){var v=b[m];if(v&&v.uiAmount>0)L.push({c:"sol",m:m==="SOL"?SOLM:m,a:v.uiAmount})});
+   for(var i=0;i<L.length;i+=80){try{var q=await fetch(JL+"/tokens/v2/search?query="+L.slice(i,i+80).map(function(x){return x.m}).join(","));if(q.ok)(await q.json()).forEach(function(t){meta[t.id]=t})}catch(z){}}
+   L.forEach(function(x){var t=meta[x.m]||{};x.s=t.symbol||short(x.m);x.n=t.name||"";x.ic=t.icon||"";x.px=+t.usdPrice||0;x.v=x.a*x.px;x.ok=!!t.isVerified||(x.px>0&&(+t.liquidity||0)>5e4)});
+   var o={};L.forEach(function(x){o[x.m]=x.a});S.bal=Object.assign({},S.bal,o);HD.sol=L}catch(e){er.push("Solana ("+e.message+")")}})(),
+  (async function(){if(!S.eaddr){HD.evm=null;return}try{
+   var r=await fetch(LIFI+"/wallets/"+S.eaddr+"/balances?extended=true");if(!r.ok)throw new Error("HTTP "+r.status);var b=(await r.json()).balances||{},L=[];
+   Object.keys(b).forEach(function(c){(b[c]||[]).forEach(function(t){var a=Number(t.amount)/Math.pow(10,t.decimals);if(!(a>0))return;var px=+t.priceUSD||0;
+    L.push({c:+c,m:t.address,s:t.symbol,n:t.name,d:t.decimals,ic:t.logoURI||"",a:a,px:px,v:a*px,ok:t.verificationStatus==="verified"})})});HD.evm=L}catch(e){er.push("Ethereum y otras redes ("+e.message+")")}})()]);
+ HD.ld=2;HD.at=Date.now();HD.key=key;HD.err=er.length?"No se pudo leer: "+er.join(", ")+".":"";loadCH();rHold();
+}
+function rHold(){if(S.view==="portfolio")rPf();else if(S.view==="wallet")rWallet()}
+function hAll(){return (HD.sol||[]).concat(HD.evm||[]).filter(function(x){return x.a>0}).sort(function(a,b){return b.v-a.v})}
+function hSplit(){var A=hAll();return{show:A.filter(function(x){return x.v>=.01&&(x.ok||x.v>=1)}),rest:A.filter(function(x){return !(x.v>=.01&&(x.ok||x.v>=1))})}}
+function hTot(){return hSplit().show.reduce(function(s,x){return s+x.v},0)}
+function hRow(x){return '<div class="row hrw"><div class="hti">'+(x.ic?'<img alt="" src="'+esc(x.ic)+'" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'hlt\',textContent:\''+esc(String(x.s).charAt(0))+'\'}))">':'<span class="hlt">'+esc(String(x.s).charAt(0))+"</span>")+chIco(x.c,"hcb")+'</div><div class="hnm"><b>'+esc(x.s)+"</b><small>"+esc(chN(x.c))+'</small></div><div class="v"><b>'+(x.px?usd(x.v):"—")+'</b><small class="num">'+f(x.a,x.a>=1000?2:6)+"</small></div></div>"}
+function hList(){
+ if(!S.pk&&!S.eaddr)return '<div class="dim" style="margin-top:12px">Conecta tu wallet para ver los tokens que tienes.</div><button class="btn p" data-act="open">Conectar wallet</button>';
+ if(HD.ld!==2&&!HD.sol&&!HD.evm)return '<div class="dim" style="margin-top:12px">Leyendo los tokens de tu wallet…</div>';
+ var sp=hSplit(),h=sp.show.length?sp.show.map(hRow).join(""):'<div class="dim" style="margin-top:12px">'+(HD.err?"":"No hay tokens con saldo en tu wallet.")+"</div>";
+ if(sp.rest.length)h+='<button class="btn" style="margin-top:10px;width:100%" data-act="hmore" aria-expanded="'+HD.more+'">'+(HD.more?"Ocultar":"Ver")+" "+sp.rest.length+" tokens sin precio o sin verificar</button>"+(HD.more?'<div class="dim" style="font-size:12px;margin-top:8px">Pueden ser airdrops de spam: no firmes nada que venga de ellos.</div>'+sp.rest.map(hRow).join(""):"");
+ if(HD.err)h+='<div class="stat dn" style="margin-top:8px">'+esc(HD.err)+"</div>";
+ return h+'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="refbal">'+(HD.ld===1?"Actualizando…":"Actualizar saldos")+"</button>"}
+document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest('[data-act="hmore"]');if(t){HD.more=!HD.more;rHold()}});
+
 /* ---------- Swap entre redes (THORChain) ---------- */
 window.kzP=46;
 var TCB="https://gateway.liquify.com/chain/thorchain_api/thorchain";
@@ -554,21 +668,22 @@ async function xSwap(){
   toast("Swap entre redes enviado.");
  }catch(e){xres('<span class="dn">'+esc(e&&e.code===4001?"Has rechazado la firma.":(e&&e.message)||"No se pudo completar.")+"</span>")}
 }
-function swTabs(){return '<div class="smode" role="tablist"><button role="tab" data-sm="sol" class="'+(SW.mode!=="x"?"on":"")+'">En Solana</button><button role="tab" data-sm="x" class="'+(SW.mode==="x"?"on":"")+'">Entre redes</button></div>'}
+function swTabs(){return '<div class="smode" role="tablist"><button role="tab" data-sm="sol" class="'+(SW.mode!=="x"?"on":"")+'">En una red</button><button role="tab" data-sm="x" class="'+(SW.mode==="x"?"on":"")+'">Entre redes</button></div>'}
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-sm],[data-act^='x']");if(!b)return;
  var m=b.getAttribute("data-sm");if(m){SW.mode=m;rSwap();if(m==="x")loadTC();return}
  var a=b.getAttribute("data-act");
  if(a==="xquote")xQuote();else if(a==="xswap")xSwap();else if(a==="xload"){XS.ld=0;rSwap()}
  else if(a==="xflip"){var z=XS.from;XS.from=XS.to;XS.to=z;XS.q=null;XS.auto=true;rSwap()}});
 document.addEventListener("input",function(e){var t=e.target;if(t.id==="xamt"){XS.amt=t.value;XS.q=null;var d=$("xq");if(d)d.innerHTML="";var o=$("xout");if(o)o.textContent=""}else if(t.id==="xdest"){XS.dest=t.value;XS.auto=!t.value;XS.q=null}});
-document.addEventListener("change",function(e){var t=e.target;if(t.id==="xf"){XS.from=t.value;XS.q=null;rSwap()}else if(t.id==="xt"){XS.to=t.value;XS.q=null;XS.auto=true;rSwap()}else if(t.id==="xslip"){SW.slip=+t.value;XS.q=null;rSwap()}});
+document.addEventListener("change",function(e){var t=e.target;if(t.id==="xf"){XS.from=t.value;XS.q=null;rSwap()}else if(t.id==="xt"){XS.to=t.value;XS.q=null;XS.auto=true;rSwap()}else if(t.id==="xslip"){SW.slip=+t.value;XS.q=null;EV.q=null;rSwap()}});
 
 function sres(h){var e=$("sres");if(e)e.innerHTML=h}
 function sopts(v){return TKS.map(function(t){return "<option"+(t.s===v?" selected":"")+">"+t.s+"</option>"}).join("")}
 function rSwap(){
  if(SW.mode==="x")return rX();
+ if(SW.net!=="sol")return rE();
  var fr=TM[SW.from],bal=S.bal[fr.m];
- $("swap").innerHTML=swTabs()+'<div class="k">Swap en Solana <small>rutas reales vía Jupiter</small></div>'+
+ $("swap").innerHTML=swTabs()+netHead("Jupiter")+
  '<div class="box"><label for="amt">Das · saldo '+(S.pk?f(bal||0,6)+" "+fr.s:"conecta tu wallet")+'</label><div class="srow"><select id="sf">'+sopts(SW.from)+'</select><input id="amt" class="num" type="number" inputmode="decimal" min="0" step="any" value="'+esc(SW.amt)+'" placeholder="0.0"></div>'+
  '<div class="chips"><button class="btn" data-pct="25">25%</button><button class="btn" data-pct="50">50%</button><button class="btn" data-pct="100">Máx</button><button class="btn" data-act="flip">⇅</button></div></div>'+
  '<div class="box" style="margin-top:8px"><label for="st">Recibes</label><div class="srow"><select id="st">'+sopts(SW.to)+'</select><span class="dim">estimado en las rutas</span></div></div>'+
@@ -938,14 +1053,14 @@ async function wallet(id){
   if(!p)throw new Error(w.n+" no está en este navegador."+(MOB?" Ábrela desde «Abrir en la app».":""));
   if(sp)solOn(w,await solConnect(sp,false));
   else{var a=(await p.request({method:"eth_requestAccounts"}))[0];if(!a)throw new Error("La wallet no devolvió ninguna dirección.");
-   S.ev=p;S.eaddr=a;S.eid=w.id;S.ename=w.n;LS("kz_we",w.id);$("addr").value=a;rConn();
-   toast("Dirección de "+w.n+" cargada. Ya puedes usarla en Swap, entre redes.")}
+   S.ev=p;S.eaddr=a;S.eid=w.id;S.ename=w.n;LS("kz_we",w.id);$("addr").value=a;rConn();loadHold(true);
+   toast(w.n+" conectada: tus tokens salen en Portafolio y ya puedes hacer swaps en sus redes.")}
   S.sheetOpen=false;$("sheet").hidden=true;
  }catch(x){toast((x&&x.message)||"No se pudo conectar.")}
 }
 function wOut(){
  try{if(S.sw&&S.sw.p&&S.sw.p.disconnect)S.sw.p.disconnect()}catch(e){}
- S.sw=null;S.pk="";S.wid="";S.wname="";S.ev=null;S.eaddr="";S.eid="";S.ename="";S.bal={};S.positions=[];S.posOk=false;
+ HD.sol=HD.evm=null;HD.key="";S.sw=null;S.pk="";S.wid="";S.wname="";S.ev=null;S.eaddr="";S.eid="";S.ename="";S.bal={};S.positions=[];S.posOk=false;
  LS("kz_w","-");LS("kz_we","");rConn();rSwap();rWallet();rPf();rSheet();toast("Wallet desconectada.");
 }
 /* Pide wallet de Solana: reconecta la última usada o abre el selector. */
@@ -1075,7 +1190,7 @@ document.addEventListener("click",function(e){
 window.kzP=334;
 var VIEWS=["home","pools","portfolio","swap","lottery","wallet"];
 window.kzP=335;
-S.positions=[];S.pfTab="liq";S.lotN="1000";S.lotP="6";S.vf="usd";S.vlim=6;S.view="home";
+S.positions=[];S.pfTab="tok";S.lotN="1000";S.lotP="6";S.vf="usd";S.vlim=6;S.view="home";
 window.kzP=336;
 window.kzAfter=function(v){S.view=v;if(v==="home"){rHome();if(window.kzDoor)window.kzDoor()}else if(v==="portfolio")rPf();else if(v==="wallet")rWallet();else if(v==="lottery")rLot()};
 
@@ -1091,6 +1206,8 @@ var ROAD=[
  ["on","Pools de Ethereum y BNB Chain","Uniswap, Curve y PancakeSwap con datos reales."],
  ["on","Movimientos exportables","Historial de cualquier dirección en CSV y PDF."],
  ["test","Swap con comparación de rutas","Vía Jupiter. Por ahora necesita tu clave de API."],
+ ["test","Swap en 14 redes","Solana con Jupiter; Ethereum, BNB Chain, Base, Arbitrum, Avalanche, HyperEVM, Robinhood Chain, Polygon, Optimism, Unichain, Monad, Sonic y Linea con LI.FI."],
+ ["test","Tokens de tu wallet en el portafolio","Todo lo que tienes en Solana y en las redes EVM, con su valor en dólares."],
  ["test","Swap entre redes con THORChain","BTC, ETH, SOL, BNB, AVAX y más, nativos y sin puentes. Firmas desde tu wallet de Ethereum, BNB Chain, Base o Avalanche."],
  ["test","Crear posiciones en Orca sin salir de Kosmara","Rango con la liquidez del pool, asas para ajustarlo y gráfico de velas. El NFT llega directo a tu wallet."],
  ["test","Portafolio de posiciones","Lee tus posiciones de Orca. Necesita un RPC propio."],
@@ -1131,7 +1248,7 @@ var tkX=0,tkLast=0,tkOn=false,tkHold=false;
 function tickRun(){if(tkOn)return;tkOn=true;var box=$("hTick");
  box.addEventListener("pointerenter",function(){tkHold=true});box.addEventListener("pointerleave",function(){tkHold=false});
  box.addEventListener("touchstart",function(){tkHold=true},{passive:true});box.addEventListener("touchend",function(){setTimeout(function(){tkHold=false},1200)});
- (function loop(n){var tt=box.querySelector(".tick-in");if(tt&&!box.hidden&&!document.hidden){if(!tkLast)tkLast=n;var dt=Math.min(64,n-tkLast);if(!tkHold)tkX+=dt*.04;var q=tt.scrollWidth/4;if(q>0&&tkX>=q)tkX%=q;tt.style.transform="translateX("+(-tkX).toFixed(1)+"px)"}tkLast=n;requestAnimationFrame(loop)})(performance.now())}
+ (function loop(n){var tt=box.querySelector(".tick-in");if(tt&&tt.style&&!box.hidden&&!document.hidden){if(!tkLast)tkLast=n;var dt=Math.min(64,n-tkLast);if(!tkHold)tkX+=dt*.04;var q=tt.scrollWidth/4;if(q>0&&tkX>=q)tkX%=q;tt.style.transform="translateX("+(-tkX).toFixed(1)+"px)"}tkLast=n;requestAnimationFrame(loop)})(performance.now())}
 /* La puerta: los protocolos integrados confluyen en un solo punto. */
 (function(){
  var cv=$("door");if(!cv||!cv.getContext)return;var x=cv.getContext("2d"),W=0,H=0,D=1,raf=0,t0=0,still=window.matchMedia&&matchMedia("(prefers-reduced-motion:reduce)").matches;
@@ -1178,14 +1295,15 @@ function posCard(p){
   (p.symA?r("Tokens",f(p.amtA,4)+" "+esc(p.symA)+" + "+f(p.amtB,4)+" "+esc(p.symB)):"")+r("Saldo",usd(p.usd))+r("PNL total",usd(p.pnl))+r("Rendimiento cosechado",usd(p.harv))+r("Rendimiento pendiente",usd(p.pend))+r("Duración",esc(p.dur||"—"))+(p.mint?'<a class="lk" style="display:block;margin-top:8px" href="https://www.orca.so/portfolio" target="_blank" rel="noopener">Gestionar en Orca ↗</a>':"")+"</div>";
 }
 function rPf(){
- var n=S.positions.length,tot=S.positions.reduce(function(a,p){return a+p.usd},0);
- $("pfTot").innerHTML='<div class="row" style="margin-top:0"><span class="dim" style="font-size:14px">Valor total del portafolio</span><span class="v"><b>'+(n?usd(tot):"—")+"</b></span></div>";
+ var n=S.positions.length,ht=hTot(),tot=S.positions.reduce(function(a,p){return a+p.usd},0)+ht,nt=hSplit().show.length;loadHold();
+ $("pfTot").innerHTML='<div class="row" style="margin-top:0"><span class="dim" style="font-size:14px">Valor total del portafolio</span><span class="v"><b>'+(n||nt?usd(tot):"—")+"</b>"+(nt&&n?'<small>'+usd(ht)+" en tokens · "+usd(tot-ht)+" en pools</small>":"")+"</span></div>";
  var body;
- if(S.pfTab==="vault")body='<div class="dim" style="margin-top:12px">Los vaults de Kosmara llegarán más adelante.</div>';
+ if(S.pfTab==="tok")body=hList();
+ else if(S.pfTab==="vault")body='<div class="dim" style="margin-top:12px">Los vaults de Kosmara llegarán más adelante.</div>';
  else if(n)body=S.positions.map(posCard).join("");
  else if(!S.pk)body='<div class="dim" style="margin-top:12px">Conecta tu wallet para ver tus posiciones.</div><button class="btn p" data-act="open">Conectar wallet</button>';
  else body='<div class="dim" style="margin-top:12px;line-height:1.6">'+(S.posOk?"No tienes posiciones abiertas en Orca.":S.posErr?"No se pudieron leer tus posiciones: "+esc(S.posErr)+".":"Tu wallet está conectada, pero la lectura de posiciones (NFT) aún no está activa.")+' También puedes verlas en <a class="lk" href="https://www.orca.so/portfolio" target="_blank" rel="noopener">orca.so ↗</a>.</div>';
- $("pfList").innerHTML='<div class="chips"><button class="btn chip'+(S.pfTab==="liq"?" on":"")+'" data-pft="liq">Posiciones de liquidez <span class="tag">'+n+'</span></button><button class="btn chip'+(S.pfTab==="vault"?" on":"")+'" data-pft="vault">Vaults</button></div>'+body;
+ $("pfList").innerHTML='<div class="chips"><button class="btn chip'+(S.pfTab==="tok"?" on":"")+'" data-pft="tok">Tokens <span class="tag">'+nt+'</span></button><button class="btn chip'+(S.pfTab==="liq"?" on":"")+'" data-pft="liq">Posiciones <span class="tag">'+n+'</span></button><button class="btn chip'+(S.pfTab==="vault"?" on":"")+'" data-pft="vault">Vaults</button></div>'+body;
 }
 window.kzP=366;
 document.addEventListener("click",function(e){var t=e.target.closest("[data-pft]");if(t){S.pfTab=t.getAttribute("data-pft");rPf()}});
@@ -1193,12 +1311,12 @@ document.addEventListener("click",function(e){var t=e.target.closest("[data-pft]
 /* ---------- wallet, lotería, PDF ---------- */
 function usd(n){return n==null?"—":"$"+f(+n||0,2)}
 function rWallet(){
- var h='<div class="k">Wallet <small>'+(S.pk?esc(S.wname):"sin conectar")+"</small></div>";
- if(!S.pk)h+='<div class="dim">Conecta tu wallet para ver tu dirección y tus saldos. Kosmara nunca guarda tus claves.</div><button class="btn p" data-act="open">Conectar wallet</button>';
+ var h='<div class="k">Wallet <small>'+(S.pk?esc(S.wname):S.eaddr?esc(S.ename):"sin conectar")+"</small></div>";loadHold();
+ if(!S.pk&&!S.eaddr)h+='<div class="dim">Conecta tu wallet para ver tu dirección y tus saldos. Kosmara nunca guarda tus claves.</div><button class="btn p" data-act="open">Conectar wallet</button>';
  else{
-  h+='<div class="row" style="margin-top:0"><div><b style="font-size:14px">Dirección</b><small>'+esc(S.pk)+"</small></div></div>";
-  h+=TKS.map(function(t){return '<div class="row"><b>'+t.s+'</b><span class="v"><b>'+f(S.bal[t.m]||0,6)+"</b></span></div>"}).join("");
-  h+='<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="refbal">Actualizar saldos</button>';
+  if(S.pk)h+='<div class="row" style="margin-top:0"><div><b style="font-size:14px">Solana</b><small>'+esc(S.pk)+"</small></div></div>";
+  if(S.eaddr)h+='<div class="row"'+(S.pk?"":' style="margin-top:0"')+'><div><b style="font-size:14px">Ethereum y otras redes</b><small>'+esc(S.eaddr)+"</small></div></div>";
+  h+='<div class="wg" style="margin-top:16px">Tus tokens <small>'+(HD.ld===2?usd(hTot()):"")+"</small></div>"+hList();
  }
  $("wlMain").innerHTML=h;
 }
@@ -1235,7 +1353,7 @@ function dlPdf(){
  w.document.close();setTimeout(function(){try{w.focus();w.print()}catch(e){}},400);
  toast("En el cuadro de impresión elige Guardar como PDF.");
 }
-document.addEventListener("click",function(e){var t=e.target.closest('[data-act="refbal"]');if(t)loadBal().then(function(){rWallet();rSwap()})});
+document.addEventListener("click",function(e){var t=e.target.closest('[data-act="refbal"]');if(t){loadHold(true);if(S.pk)loadBal().then(function(){rWallet();rSwap()})}});
 document.addEventListener("input",function(e){var id=e.target.id;if(id==="lotN"||id==="lotP"){S[id]=e.target.value;if(id==="lotP")S.lotT=1;lotCalc()}});
 
 
