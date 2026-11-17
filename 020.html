@@ -1245,7 +1245,7 @@ function rHome(){
 }
 /* Cinta de pools: se mueve con JS para que siga en marcha aunque el móvil tenga reducidas las animaciones; se para al tocarla. */
 var tkX=0,tkLast=0,tkOn=false,tkHold=false;
-function tickRun(){if(tkOn)return;tkOn=true;var box=$("hTick");
+function tickRun(){if(tkOn||!window.requestAnimationFrame)return;tkOn=true;var box=$("hTick");
  box.addEventListener("pointerenter",function(){tkHold=true});box.addEventListener("pointerleave",function(){tkHold=false});
  box.addEventListener("touchstart",function(){tkHold=true},{passive:true});box.addEventListener("touchend",function(){setTimeout(function(){tkHold=false},1200)});
  (function loop(n){var tt=box.querySelector(".tick-in");if(tt&&tt.style&&!box.hidden&&!document.hidden){if(!tkLast)tkLast=n;var dt=Math.min(64,n-tkLast);if(!tkHold)tkX+=dt*.04;var q=tt.scrollWidth/4;if(q>0&&tkX>=q)tkX%=q;tt.style.transform="translateX("+(-tkX).toFixed(1)+"px)"}tkLast=n;requestAnimationFrame(loop)})(performance.now())}
