@@ -1482,7 +1482,11 @@ if(window.MutationObserver&&document.body&&document.createTreeWalker)new Mutatio
  B.forEach(function(b,i){b.style.setProperty("--kd",(-(i*3.7)%10).toFixed(1)+"s")});
  /* Cada bloque se materializa al entrar por abajo y se esfuma, borroso, al salir por arriba (ligado al scroll). */
  function fx(){var H=innerHeight,top=58,bot=H-72,mov=false;
-  for(var i=0;i<B.length;i++){var b=B[i];if(!b.offsetParent)continue;var r=b.getBoundingClientRect();if(r.bottom<-120||r.top>H+120){b._s=null;continue}
+  for(var i=0;i<B.length;i++){var b=B[i];if(!b.offsetParent)continue;
+   /* Portafolio y Wallet se quedan fijos, sin efecto de aparición */
+   if(b._fix===undefined){var vw=b.closest(".view");b._fix=!!(vw&&/^(portfolio|wallet)$/.test(vw.getAttribute("data-view")))}
+   if(b._fix){if(b._k!==1){b.style.opacity="";b.style.transform="";b.style.filter="";b._k=1;b._s=1}continue}
+   var r=b.getBoundingClientRect();if(r.bottom<-120||r.top>H+120){b._s=null;continue}
    /* zonas amplias: entra a lo largo de algo más de media pantalla y se esfuma en el 40 % superior */
    var en=Math.max(0,Math.min(1,(bot-r.top)/(H*.58))),ex=Math.max(0,Math.min(1,(r.bottom-top)/(H*.42))),k=Math.min(en,ex);
    /* suavizado: el bloque persigue su objetivo poco a poco, así nunca salta aunque el scroll sea rápido */
