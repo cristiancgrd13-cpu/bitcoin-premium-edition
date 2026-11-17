@@ -1439,7 +1439,7 @@ async function i18load(c){try{var r=await fetch("./i18n/"+c+".json",{cache:"no-c
 async function setLang(c){
  if(!LANGS.some(function(l){return l[0]===c}))c="es";
  if(c!=="es"){if(!I18.en)I18.en=await i18load("en");I18.d=c==="en"?I18.en:await i18load(c)}else I18.d=null;
- I18.lang=c;LS("kz_lang",c);document.documentElement.lang=c;i18all();
+ I18.lang=c;LS("kz_lang",c);try{document.documentElement.lang=c;i18all()}catch(e){}
 }
 function i18t(k){var d=I18.d,e=I18.en;if(I18.lang==="es")return null;var t=(d&&d.t&&d.t[k])||(e&&e.t&&e.t[k]);if(t)return t;
  var P=[].concat((d&&d.p)||[],(e&&e.p)||[]);for(var i=0;i<P.length;i++)if(k.indexOf(P[i][0])===0)return P[i][1]+k.slice(P[i][0].length);return null}
@@ -1452,7 +1452,7 @@ function i18walk(root){if(!root)return;if(root.nodeType===3){var p=root.parentEl
  var w=document.createTreeWalker(root,NodeFilter.SHOW_TEXT|NodeFilter.SHOW_ELEMENT,null),n;
  while(n=w.nextNode()){if(n.nodeType===3){var pp=n.parentElement;if(pp&&!/^(SCRIPT|STYLE|TEXTAREA)$/.test(pp.tagName))i18node(n)}else i18el(n)}}
 function i18all(){i18walk(document.body);document.title=I18.lang==="es"?"Kosmara":(i18t("Kosmara")||"Kosmara")}
-if(window.MutationObserver)new MutationObserver(function(L){if(I18.lang==="es"&&!I18.was)return;I18.was=I18.lang!=="es";
+if(window.MutationObserver&&document.body&&document.createTreeWalker)new MutationObserver(function(L){if(I18.lang==="es"&&!I18.was)return;I18.was=I18.lang!=="es";
  for(var i=0;i<L.length;i++){var r=L[i];if(r.type==="characterData")i18walk(r.target);else if(r.type==="attributes")i18el(r.target);else for(var j=0;j<r.addedNodes.length;j++)i18walk(r.addedNodes[j])}})
  .observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:I18A});
 (function(){var c=LS("kz_lang");if(!c){var nl=(navigator.language||"es").slice(0,2).toLowerCase();c=LANGS.some(function(l){return l[0]===nl})?nl:"es"}if(c!=="es")setLang(c)})();
