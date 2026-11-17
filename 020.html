@@ -1481,19 +1481,19 @@ if(window.MutationObserver&&document.body&&document.createTreeWalker)new Mutatio
 (function(){var B=[].slice.call(document.querySelectorAll(".b,.step,.wp,.road,.pts"));if(!B.length)return;B.forEach(function(b){if(!b.classList.contains("b"))b.classList.add("kb")});
  B.forEach(function(b,i){b.style.setProperty("--kd",(-(i*3.7)%10).toFixed(1)+"s")});
  /* Cada bloque se materializa al entrar por abajo y se esfuma, borroso, al salir por arriba (ligado al scroll). */
- function fx(){var H=innerHeight,top=58,bot=H-72,mov=false;
+ function fx(){var H=innerHeight,top=40,bot=H-96,mov=false;
   for(var i=0;i<B.length;i++){var b=B[i];if(!b.offsetParent)continue;
    /* Portafolio y Wallet se quedan fijos, sin efecto de aparición */
    if(b._fix===undefined){var vw=b.closest(".view");b._fix=!!(vw&&/^(portfolio|wallet)$/.test(vw.getAttribute("data-view")))}
    if(b._fix){if(b._k!==1){b.style.opacity="";b.style.transform="";b.style.filter="";b._k=1;b._s=1}continue}
    var r=b.getBoundingClientRect();if(r.bottom<-120||r.top>H+120){b._s=null;continue}
-   /* zonas amplias: entra a lo largo de algo más de media pantalla y se esfuma en el 40 % superior */
-   var en=Math.max(0,Math.min(1,(bot-r.top)/(H*.58))),ex=Math.max(0,Math.min(1,(r.bottom-top)/(H*.42))),k=Math.min(en,ex);
+   /* zonas estrechas en los bordes: casi toda la pantalla queda nítida para leer; entra en el 20 % inferior y se esfuma en el 16 % superior */
+   var en=Math.max(0,Math.min(1,(bot-r.top)/(H*.2))),ex=Math.max(0,Math.min(1,(r.bottom-top)/(H*.16))),k=Math.min(en,ex);
    /* suavizado: el bloque persigue su objetivo poco a poco, así nunca salta aunque el scroll sea rápido */
-   var s0=b._s==null?(k>=1?1:0):b._s,sv=s0+(k-s0)*.075;if(Math.abs(k-sv)<.003)sv=k;else mov=true;b._s=sv;
+   var s0=b._s==null?(k>=1?1:0):b._s,sv=s0+(k-s0)*.11;if(Math.abs(k-sv)<.003)sv=k;else mov=true;b._s=sv;
    if(sv>=1){if(b._k!==1){b.style.opacity="";b.style.transform="";b.style.filter="";b._k=1}continue}
    var e=sv*sv*(3-2*sv),up=ex<en,dy=up?-(1-e)*34:(1-e)*44,sc=up?1-(1-e)*.07:.93+.07*e;
-   b.style.opacity=(.02+.98*e).toFixed(3);b.style.transform="translateY("+dy.toFixed(1)+"px) scale("+sc.toFixed(3)+")";b.style.filter="blur("+((1-e)*(up?11:9)).toFixed(1)+"px)"+(up?" saturate("+(.6+.4*e).toFixed(2)+")":"");b._k=sv}
+   b.style.opacity=(.08+.92*e).toFixed(3);b.style.transform="translateY("+dy.toFixed(1)+"px) scale("+sc.toFixed(3)+")";b.style.filter="blur("+((1-e)*(up?7:6)).toFixed(1)+"px)"+(up?" saturate("+(.6+.4*e).toFixed(2)+")":"");b._k=sv}
   if(mov)req()}
  window.kzBlocks=fx;var pend=0;function req(){if(!pend){pend=1;requestAnimationFrame(function(){pend=0;fx()})}}
  window.addEventListener("scroll",req,{passive:true});window.addEventListener("resize",req);document.addEventListener("click",function(){setTimeout(req,30);setTimeout(req,400)});req();
