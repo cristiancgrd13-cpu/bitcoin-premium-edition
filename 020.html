@@ -67,9 +67,10 @@ option{color:#000}
 .netl{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:6px;margin:0 0 12px;padding:8px;background:rgba(0,0,0,.35);border-radius:14px}
 .netl button{display:flex;align-items:center;gap:7px;background:none;border:1px solid transparent;border-radius:10px;color:#ddd;font:inherit;font-size:12.5px;padding:7px 6px;cursor:pointer;text-align:left}
 .netl button.on{border-color:rgba(124,92,255,.8);background:rgba(124,92,255,.15);color:#fff}.netl button span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.hrw{gap:10px}.hti{position:relative;width:34px;height:34px;flex:none}.hti>img,.hlt{width:34px;height:34px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:#2c2d3a;font-weight:700}
-.hcb{position:absolute;right:-3px;bottom:-3px;width:15px;height:15px;border-radius:50%;border:2px solid #111;background:#2c2d3a;font-size:8px;display:grid;place-items:center}
+.hrw{gap:10px}.hti{position:relative;width:34px;height:34px;flex:none}.hti>img:not(.hcb),.hlt{width:34px;height:34px;border-radius:50%;object-fit:cover;display:grid;place-items:center;background:#2c2d3a;font-weight:700}
+.hcb{position:absolute;right:-3px;bottom:-3px;width:16px;height:16px;object-fit:cover;border-radius:50%;border:2px solid #111;background:#2c2d3a;font-size:8px;display:grid;place-items:center}
 .hnm{flex:1;min-width:0}.hnm b{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.lbi{display:flex!important;align-items:center;gap:7px}.lbi .chi{width:18px;height:18px}
 .chips{display:flex;gap:8px;margin:10px 0 2px;flex-wrap:wrap}.chips .btn{flex:1;padding:7px 6px;white-space:nowrap}
 .chip.on{background:rgb(var(--tc));color:#000;border-color:rgb(var(--tc))}
 .row{display:flex;justify-content:space-between;align-items:center;gap:10px;background:rgba(0,0,0,.32);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:8px}
@@ -469,7 +470,11 @@ var NAT="0x0000000000000000000000000000000000000000";
 async function loadCH(){if(CHL)return;CHL=1;try{var r=await fetch(LIFI+"/chains?chainTypes=EVM,SVM");if(!r.ok)throw 0;(await r.json()).chains.forEach(function(c){CH[c.chainType==="SVM"?"sol":c.id]=c});CHL=2}catch(e){CHL=0}
  if(S.view==="swap")rSwap();if(S.view==="portfolio")rPf();if(S.view==="wallet")rWallet()}
 function chN(id){return CHF[id]||(CH[id]&&CH[id].name)||String(id)}
-function chIco(id,cls){var c=CH[id];return c&&c.logoURI?'<img class="'+(cls||"chi")+'" alt="" src="'+esc(c.logoURI)+'" onerror="this.remove()">':'<span class="'+(cls||"chi")+' chl">'+esc(chN(id).charAt(0))+"</span>"}
+/* Logos oficiales de cada red, guardados en /chains (del repositorio lifinance/types); si faltan, el de la API de LI.FI. */
+var CHI={sol:"solana",1:"ethereum",56:"bsc",8453:"base",42161:"arbitrum",43114:"avalanche",999:"hyperevm",4663:"robinhood",137:"polygon",10:"optimism",130:"unichain",143:"monad",146:"sonic",59144:"linea",BTC:"bitcoin",ETH:"ethereum",BSC:"bsc",AVAX:"avalanche",BASE:"base",SOL:"solana",LTC:"litecoin",DOGE:"dogecoin",BCH:"bitcoincash",TRON:"tron",ZEC:"zcash"};
+function chIco(id,cls){var c=CH[id],k=CHI[id],alt=c&&c.logoURI?c.logoURI:"",src=k?"./chains/"+k+".svg":alt;
+ if(src)return '<img class="'+(cls||"chi")+'" alt="" src="'+esc(src)+'"'+(k&&alt?' data-alt="'+esc(alt)+'" onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt=\'\'}else this.remove()"':' onerror="this.remove()"')+">";
+ return '<span class="'+(cls||"chi")+' chl">'+esc((CHF[id]||TCN[id]||String(id)).charAt(0))+"</span>"}
 function netHead(via){
  return '<div class="nhd"><span class="k" style="margin:0">Swap en</span><button class="netb" data-act="netpick" aria-expanded="'+!!SW.np+'" aria-controls="netl">'+chIco(SW.net)+"<b>"+esc(chN(SW.net))+'</b><span class="rvar">⌄</span></button><small class="dim">vía '+via+"</small></div>"+
  (SW.np?'<div class="netl" id="netl" role="listbox" aria-label="Redes">'+NETL.map(function(id){return '<button role="option" aria-selected="'+(String(id)===String(SW.net))+'" class="'+(String(id)===String(SW.net)?"on":"")+'" data-net="'+id+'">'+chIco(id)+"<span>"+esc(chN(id))+"</span></button>"}).join("")+"</div>":"")}
@@ -607,9 +612,9 @@ function rX(){
  var el=$("swap");if(XS.ld!==2){el.innerHTML=swTabs()+'<div class="k">Swap entre redes <small>vía THORChain</small></div><div class="stat">'+(XS.err?esc(XS.err)+' <button class="btn" data-act="xload">Reintentar</button>':"Cargando redes y activos…")+"</div>";if(!XS.ld)loadTC();return}
  tcAutoDest();var fr=XS.AM[XS.from],to=XS.AM[XS.to],hz=XS.halt[fr.c]||XS.halt[to.c];
  el.innerHTML=swTabs()+'<div class="k">Swap entre redes <small>vía THORChain</small></div>'+
- '<div class="box"><label for="xf">Das, desde tu wallet de '+TCN[fr.c]+'</label><div class="srow"><select id="xf">'+tcOpts(XS.from,1)+'</select><input id="xamt" class="num" type="text" inputmode="decimal" value="'+esc(XS.amt)+'" placeholder="0.0"></div>'+
+ '<div class="box"><label for="xf" class="lbi">'+chIco(fr.c)+"Das, desde tu wallet de "+TCN[fr.c]+'</label><div class="srow"><select id="xf">'+tcOpts(XS.from,1)+'</select><input id="xamt" class="num" type="text" inputmode="decimal" value="'+esc(XS.amt)+'" placeholder="0.0"></div>'+
  '<div class="chips"><button class="btn" data-act="xflip" '+(TCE[to.c]?"":"disabled ")+'title="Invertir">⇅ Invertir</button></div></div>'+
- '<div class="box" style="margin-top:8px"><label for="xt">Recibes en '+TCN[to.c]+'</label><div class="srow"><select id="xt">'+tcOpts(XS.to,0)+'</select><span class="dim" id="xout">'+(XS.q?"≈ "+f(XS.q.out,6):"")+'</span></div>'+
+ '<div class="box" style="margin-top:8px"><label for="xt" class="lbi">'+chIco(to.c)+"Recibes en "+TCN[to.c]+'</label><div class="srow"><select id="xt">'+tcOpts(XS.to,0)+'</select><span class="dim" id="xout">'+(XS.q?"≈ "+f(XS.q.out,6):"")+'</span></div>'+
  '<label for="xdest" style="margin-top:10px;display:block">Tu dirección en '+TCN[to.c]+'</label><input id="xdest" class="xdest" type="text" autocomplete="off" spellcheck="false" value="'+esc(XS.dest)+'" placeholder="Pega tu dirección de '+TCN[to.c]+'">'+
  '<div class="dim" style="margin-top:6px;font-size:12px">Usa una dirección de una wallet tuya, no la de un exchange ni la de un contrato.</div></div>'+
  '<div class="hrow"><span class="dim">Deslizamiento máx. <select id="xslip">'+[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===SW.slip?" selected":"")+">"+v+"%</option>"}).join("")+'</select></span></div>'+
