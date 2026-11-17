@@ -315,6 +315,19 @@ button:active,button:focus{outline:0;box-shadow:none}
 .wcon .row{margin-top:8px}
 .wcon .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:8px}
 .whw{margin-top:14px}
+/* Logo vivo: respiración de color, destello que lo recorre, chispa en órbita y giro al tocarlo */
+button.logo{position:relative;isolation:isolate}
+button.logo img{animation:lgBreath 6s ease-in-out infinite}
+@keyframes lgBreath{0%,100%{filter:drop-shadow(0 0 3px rgba(45,212,191,.55)) drop-shadow(0 0 10px rgba(45,212,191,.18))}50%{filter:drop-shadow(0 0 5px rgba(168,85,247,.85)) drop-shadow(0 0 16px rgba(124,92,255,.45))}}
+.lgl{position:absolute;inset:0;pointer-events:none;z-index:2;-webkit-mask:var(--lgm) center/contain no-repeat;mask:var(--lgm) center/contain no-repeat;
+ background:linear-gradient(105deg,transparent 38%,rgba(255,255,255,.95) 50%,transparent 62%) no-repeat;background-size:260% 100%;background-position:160% 0;animation:lgGlint 7s ease-in-out 1.2s infinite}
+@keyframes lgGlint{0%,72%{background-position:160% 0}88%,100%{background-position:-70% 0}}
+.lgo{position:absolute;left:50%;top:50%;width:0;height:0;pointer-events:none;z-index:3;transform:rotate(-22deg)}
+.lgo i{position:absolute;left:0;top:0;width:5px;height:5px;margin:-2.5px 0 0 -2.5px;border-radius:50%;background:#fff;
+ box-shadow:0 0 6px 2px rgba(45,212,191,.9),0 0 14px 4px rgba(124,92,255,.6);offset-path:path("M -30 0 A 30 11 0 1 1 30 0 A 30 11 0 1 1 -30 0");offset-rotate:0deg;animation:lgOrb 4.8s linear infinite}
+@keyframes lgOrb{0%{offset-distance:0%;opacity:.35;transform:scale(.7)}25%{opacity:1;transform:scale(1.15)}50%{offset-distance:50%;opacity:.35;transform:scale(.7)}75%{opacity:.15;transform:scale(.55)}100%{offset-distance:100%;opacity:.35;transform:scale(.7)}}
+button.logo.spin img{animation:lgSpin .9s cubic-bezier(.3,1.4,.5,1)}
+@keyframes lgSpin{0%{transform:rotateY(0) scale(1)}40%{transform:rotateY(200deg) scale(.86)}100%{transform:rotateY(360deg) scale(1)}}
 button.logo{pointer-events:auto;cursor:pointer;background:none;border:0;padding:0;color:inherit;border-radius:12px}
 button.logo:focus-visible{outline:2px solid #7c5cff;outline-offset:4px}
 .wl.wl-w img{padding:14%;box-sizing:border-box}
@@ -1456,6 +1469,13 @@ if(window.MutationObserver&&document.body&&document.createTreeWalker)new Mutatio
  for(var i=0;i<L.length;i++){var r=L[i];if(r.type==="characterData")i18walk(r.target);else if(r.type==="attributes")i18el(r.target);else for(var j=0;j<r.addedNodes.length;j++)i18walk(r.addedNodes[j])}})
  .observe(document.body,{childList:true,subtree:true,characterData:true,attributes:true,attributeFilter:I18A});
 (function(){var c=LS("kz_lang");if(!c){var nl=(navigator.language||"es").slice(0,2).toLowerCase();c=LANGS.some(function(l){return l[0]===nl})?nl:"es"}if(c!=="es")setLang(c)})();
+
+/* Logo vivo: capas del destello y la chispa en órbita; gira al tocarlo. */
+(function(){var b=document.querySelector("button.logo"),im=b&&b.querySelector("img");if(!b||!im)return;
+ b.style.setProperty("--lgm","url("+im.src+")");
+ var g=document.createElement("span");g.className="lgl";g.setAttribute("aria-hidden","true");b.appendChild(g);
+ var o=document.createElement("span");o.className="lgo";o.setAttribute("aria-hidden","true");o.innerHTML="<i></i>";b.appendChild(o);
+ b.addEventListener("click",function(){b.classList.remove("spin");void b.offsetWidth;b.classList.add("spin");setTimeout(function(){b.classList.remove("spin")},950)})})();
 
 /* Bloques vivos: cada bloque aparece y se esfuma con el scroll, su luz orbita desfasada y se ilumina bajo el dedo. */
 (function(){var B=[].slice.call(document.querySelectorAll(".b,.step,.wp,.road,.pts"));if(!B.length)return;B.forEach(function(b){if(!b.classList.contains("b"))b.classList.add("kb")});
