@@ -1,0 +1,26 @@
+name: probe
+on: {push: {paths: [".github/workflows/probe.yml"]}}
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash {0}
+        run: |
+          O="Origin: https://cristiancgrd13-cpu.github.io";V=0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045;SA=5Q544fKrFoe6tsEbD7S8EmxGTJYAKtTVhAW5Q5pge4j1
+          echo CHAINS; curl -sS -D h.txt -H "$O" "https://li.quest/v1/chains?chainTypes=EVM" -o c.json; grep -i "access-control-allow-origin\|ratelimit" h.txt
+          python3 -c "
+          import json;c=json.load(open('c.json'))['chains'];print(len(c))
+          for x in c: print(x['id'],x['key'],x['name'],x['nativeToken']['symbol'],(x.get('metamask') or {}).get('rpcUrls',[''])[0][:50],bool(x.get('logoURI')))
+          print(sorted(c[0].keys()))"
+          echo QUOTE; curl -sS -D h2.txt -H "$O" "https://li.quest/v1/quote?fromChain=8453&toChain=8453&fromToken=0x0000000000000000000000000000000000000000&toToken=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&fromAmount=1000000000000000&fromAddress=$V&slippage=0.01" -o q.json; grep -i "access-control-allow-origin" h2.txt
+          python3 -c "
+          import json;q=json.load(open('q.json'));print(sorted(q.keys()));e=q.get('estimate',{});print({k:e.get(k) for k in ['toAmount','toAmountMin','approvalAddress','executionDuration']});print([ (f['name'],f.get('percentage'),f.get('amountUSD')) for f in e.get('feeCosts',[])]);t=q.get('transactionRequest',{});print(sorted(t.keys()),t.get('to'),t.get('value'),t.get('chainId'));print(q.get('toolDetails'),q.get('message'))"
+          echo QUOTE_INT; curl -sS "https://li.quest/v1/quote?fromChain=8453&toChain=8453&fromToken=ETH&toToken=USDC&fromAmount=1000000000000000&fromAddress=$V&integrator=kosmara" | head -c 250; echo
+          echo TOKENS; curl -sS "https://li.quest/v1/tokens?chains=8453" | python3 -c "import json,sys;t=json.load(sys.stdin)['tokens']['8453'];print(len(t),t[0])"
+          echo LIBAL; curl -sS -o /dev/null -w "%{http_code}\n" "https://li.quest/v1/wallets/$V/balances"
+          echo BS; curl -sS -D h3.txt -H "$O" "https://base.blockscout.com/api/v2/addresses/$V/token-balances" -o b.json; grep -i "access-control-allow-origin" h3.txt; python3 -c "import json;b=json.load(open('b.json'));print(len(b),b[0] if b else '')" | head -c 700; echo
+          for d in eth.blockscout.com arbitrum.blockscout.com optimism.blockscout.com polygon.blockscout.com bsc.blockscout.com avalanche.blockscout.com explorer.hyperliquid.xyz robinhood.blockscout.com explorer.robinhood.com; do echo "$d $(curl -sS -m 10 -o /dev/null -w '%{http_code}' https://$d/api/v2/addresses/$V/token-balances)"; done
+          echo JUP; for u in "https://lite-api.jup.ag/ultra/v1/balances/$SA" "https://api.jup.ag/ultra/v1/balances/$SA" "https://lite-api.jup.ag/ultra/v1/holdings/$SA" "https://api.jup.ag/ultra/v1/holdings/$SA"; do curl -sS -m 15 -D h4.txt -H "$O" "$u" -o j.json; echo "$u $(head -1 h4.txt) $(grep -i access-control-allow-origin h4.txt)"; head -c 400 j.json; echo; done
+          echo JUPTOK; curl -sS "https://lite-api.jup.ag/tokens/v2/search?query=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v,DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263" | head -c 700; echo
+          echo RPCGTA; curl -sS -H "$O" -H "Content-Type: application/json" -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"getTokenAccountsByOwner\",\"params\":[\"$SA\",{\"programId\":\"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA\"},{\"encoding\":\"jsonParsed\"}]}" https://solana-rpc.publicnode.com | head -c 300; echo
+          curl -sS -H "Content-Type: application/json" -d "{\"jsonrpc\":\"2.0\",\"id\":1,\"method\":\"getTokenAccountsByOwner\",\"params\":[\"$SA\",{\"programId\":\"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA\"},{\"encoding\":\"jsonParsed\"}]}" https://public.rpc.solanavibestation.com | head -c 300; echo
