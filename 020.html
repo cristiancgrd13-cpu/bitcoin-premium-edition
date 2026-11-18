@@ -887,7 +887,7 @@ function rX(){
 }
 function xqHtml(){var q=XS.q;if(!q)return "";var to=XS.AM[XS.to],fr=XS.AM[XS.from],fe=q.fees||{},ff=(+fe.total||0)/1e8,af=(+fe.affiliate||0)/1e8,sec=+q.total_swap_seconds||0;
  return '<div class="row"><div><b>Recibes unos '+f(q.out,6)+" "+esc(to.s)+'</b><small>'+(to.usd?"≈ "+cur(q.out*to.usd,2)+" · ":"")+"en "+TCN[to.c]+'</small></div><div class="v"><b>'+(sec<90?"≈ "+Math.max(1,Math.round(sec))+" s":"≈ "+Math.round(sec/60)+" min")+'</b><small>tiempo estimado</small></div></div>'+
- '<div class="dim" style="font-size:12px;margin-top:6px">Comisiones de red y liquidez: '+f(ff,6)+" "+esc(to.s)+" ("+f((+fe.total_bps||0)/100,2)+" %)"+(af>0?" · comisión Kosmara incluida: "+f(af,6)+" "+esc(to.s):"")+
+ '<div class="dim" style="font-size:12px;margin-top:6px">Comisiones de red y liquidez: '+f(ff,6)+" "+esc(to.s)+" ("+f((+fe.total_bps||0)/100,2)+" %)"+(af>0?" · incluye comisión de Kosmara ("+f(TC_BPS/100,2)+" %): "+f(af,6)+" "+esc(to.s):"")+
  (q.min?" · mínimo recomendado: "+f(q.min,6)+" "+esc(fr.s):"")+"</div>"}
 function xres(h){var e=$("xres");if(e)e.innerHTML=h}
 async function tcQuote(){

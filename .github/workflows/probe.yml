@@ -1,9 +1,0 @@
-name: probe
-on: push
-jobs:
-  p:
-    runs-on: ubuntu-latest
-    steps:
-      - run: |
-          B="https://gateway.liquify.com/chain/thorchain_api/thorchain/quote/swap"
-          curl -s "$B?from_asset=ETH.ETH&to_asset=BTC.BTC&amount=10000000&destination=bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq&streaming_interval=1&streaming_quantity=0&affiliate=thor15te48306vf9l354lpd2me70tezeep7aee6zg25&affiliate_bps=30" -H "Origin: https://cristiancgrd13-cpu.github.io" | python3 -c "import sys,json;d=json.load(sys.stdin);print(d.get('memo'),d.get('fees'),d.get('error'))"
