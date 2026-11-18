@@ -375,6 +375,27 @@ button.logo:focus-visible{outline:2px solid #7c5cff;outline-offset:4px}
 @keyframes spBr{50%{transform:scale(1.06);filter:drop-shadow(0 0 18px rgba(124,92,255,.7))}}
 @keyframes spT{from{opacity:0;letter-spacing:.7em}to{opacity:1}}
 @media(prefers-reduced-motion:reduce){.view.v-in,.road-l.in li,#splash img,#splash b,.btn.spin,.hz-live .dot:after{animation:none}}
+
+/* ---- Selector de tokens ---- */
+.tkb{flex:none;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border:1px solid var(--line);border-radius:999px;padding:5px 12px 5px 5px;color:#fff;font:700 15px "Space Grotesk",system-ui,sans-serif;cursor:pointer;max-width:58%}
+.tkb b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tkb i{font-style:normal;color:var(--dim);font-size:12px}
+.tkb .ico{width:26px;height:26px}
+#tkp{position:fixed;inset:0;z-index:120}
+#tkp .tkp-bg{position:absolute;inset:0;background:rgba(0,0,0,.6);opacity:0;transition:opacity .22s}
+#tkp .tkp-p{position:absolute;left:0;right:0;bottom:0;max-height:82vh;display:flex;flex-direction:column;background:#101016;border:1px solid var(--line);border-bottom:0;border-radius:22px 22px 0 0;padding:14px 14px calc(12px + env(safe-area-inset-bottom,0px));transform:translateY(100%);transition:transform .26s cubic-bezier(.2,.8,.2,1)}
+@media(min-width:620px){#tkp .tkp-p{left:50%;right:auto;width:440px;margin-left:-220px;bottom:auto;top:12vh;border-radius:22px;border-bottom:1px solid var(--line);transform:translateY(20px);opacity:0;transition:transform .26s,opacity .2s}}
+#tkp.on .tkp-bg{opacity:1}#tkp.on .tkp-p{transform:none;opacity:1}
+.tkp-h{display:flex;align-items:center;gap:10px;margin-bottom:10px}.tkp-h b{font-size:17px}.tkp-h .dim{flex:1;font-size:13px}
+.tkp-x{background:none;border:0;color:#fff;font-size:24px;line-height:1;padding:2px 6px;cursor:pointer}
+#tkpq{width:100%;margin-bottom:8px}
+.tkp-l{overflow-y:auto;margin:0 -6px;padding:0 6px;-webkit-overflow-scrolling:touch}
+.tkp-r{display:flex;align-items:center;gap:12px;width:100%;background:none;border:0;border-radius:14px;padding:9px 8px;color:#eeeef5;text-align:left;cursor:pointer;font:inherit}
+.tkp-r:hover,.tkp-r:focus-visible{background:rgba(255,255,255,.06)}
+.tkp-r .ico{width:34px;height:34px}
+.tkp-n{flex:1;min-width:0}.tkp-n b{display:block;font-size:15px}.tkp-n small{display:block;color:var(--dim);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tkp-w{font-style:normal;font-size:10.5px;font-weight:600;color:#ffb35c;border:1px solid rgba(255,179,92,.45);border-radius:6px;padding:0 5px;margin-left:4px;vertical-align:2px}
+.tkp-b{color:#c9cadb;font-size:13px}
 </style>
 </head>
 <body>
@@ -588,7 +609,7 @@ async function execSwap(v,im,om,amt,slip){
 window.kzP=41;
 var SOLM="So11111111111111111111111111111111111111112",VEN=["Jupiter","Orca","Raydium"];
 window.kzP=42;
-var TKS=[["SOL",SOLM,9],["USDC","EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",6],["JUP","JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",6],["ORCA","orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",6],["RAY","4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",6]].map(function(a){return{s:a[0],m:a[1],d:a[2]}}),TM={};
+var TKS=[["SOL",SOLM,9],["USDC","EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",6],["JUP","JUPyiwrYJFskUPiHa7hkeR8VUtAeFoSYbKedZNsDvCN",6],["ORCA","orcaEKTdK7LKz57vaAYr9QeNsVEPfiu6QeMU1kektZE",6],["RAY","4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R",6],["USDT","Es9vMFrzaCERmJfrF4H2FYD4KCoNkY11McCe8BenwNYB",6],["JitoSOL","J1toso1uCk3RLmjorhTtrVwY9HJ7X8V9yYac6Y7kGCPn",9],["mSOL","mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So",9],["JTO","jtojtomepa8beP8AuQc6eXt5FriJwfFMwQx2v2f9mCL",9],["BONK","DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",5],["WIF","EKpQGSJtjMFqKZ9KQanSqYXRcF8fBopzLHYxdM65zcjm",6],["PYTH","HZ1JovNiVvGrGNiiYvEozEVgZ58xaU3RKwX8eACQBCt3",6]].map(function(a){return{s:a[0],m:a[1],d:a[2]}}),TM={};
 window.kzP=43;
 TKS.forEach(function(t){TM[t.s]=t});
 window.kzP=44;
@@ -625,9 +646,9 @@ function rE(){
  var id=SW.net,el=$("swap");if(EV.ld[id]!==2){el.innerHTML=swTabs()+netHead("LI.FI")+'<div class="stat">'+(EV.ld[id]?"Cargando tokens de "+esc(chN(id))+"…":esc(EV.err||"")+' <button class="btn" data-act="evload">Reintentar</button>')+"</div>";if(!EV.ld[id])loadTk(id);return}
  var L=EV.tk[id],fr=evT(id,EV.from[id])||L[0],to=evT(id,EV.to[id])||L[1],b=evBal(id,fr.address),op=function(sel){return L.map(function(t){return '<option value="'+esc(t.address)+'"'+(t.address===sel?" selected":"")+">"+esc(t.symbol)+"</option>"}).join("")};
  el.innerHTML=swTabs()+netHead(KSC[id]?"LI.FI y KyberSwap":"LI.FI")+
- '<div class="box"><label for="eamt">Das · saldo '+(S.eaddr?(b==null?"0":f(b,6))+" "+esc(fr.symbol):"conecta tu wallet")+'</label><div class="srow"><select id="ef">'+op(fr.address)+'</select><input id="eamt" class="num" type="text" inputmode="decimal" value="'+esc(EV.amt)+'" placeholder="0.0"></div>'+
+ '<div class="box"><label for="eamt">Das · saldo '+(S.eaddr?(b==null?"0":f(b,6))+" "+esc(fr.symbol):"conecta tu wallet")+'</label><div class="srow"><button class="tkb" data-tkp="from" aria-label="Elegir token que das">'+ico({s:fr.symbol,m:fr.address,i:fr.logoURI})+'<b>'+esc(fr.symbol)+'</b><i aria-hidden="true">▾</i></button><input id="eamt" class="num" type="text" inputmode="decimal" value="'+esc(EV.amt)+'" placeholder="0.0"></div>'+
  '<div class="chips"><button class="btn" data-epct="25">25%</button><button class="btn" data-epct="50">50%</button><button class="btn" data-epct="100">Máx</button><button class="btn" data-act="eflip">⇅</button></div></div>'+
- '<div class="box" style="margin-top:8px"><label for="et">Recibes</label><div class="srow"><select id="et">'+op(to.address)+'</select><span class="dim" id="eout">'+(EV.q?"≈ "+f(EV.q.out,6):"")+"</span></div></div>"+
+ '<div class="box" style="margin-top:8px"><label for="et">Recibes</label><div class="srow"><button class="tkb" data-tkp="to" aria-label="Elegir token que recibes">'+ico({s:to.symbol,m:to.address,i:to.logoURI})+'<b>'+esc(to.symbol)+'</b><i aria-hidden="true">▾</i></button><span class="dim" id="eout">'+(EV.q?"≈ "+f(EV.q.out,6):"")+"</span></div></div>"+
  '<div class="hrow"><span class="dim">Deslizamiento máx. <select id="xslip">'+[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===SW.slip?" selected":"")+">"+v+"%</option>"}).join("")+"</select></span></div>"+
  '<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="equote">Ver precio</button><div id="eq">'+eqHtml()+'</div><button class="btn p" data-act="eswap">Cambiar (real)</button><div class="stat" id="eres"></div>'+
  '<div class="dim" style="margin-top:6px">Kosmara compara LI.FI y KyberSwap, que a su vez buscan el mejor precio entre los DEX de '+esc(chN(id))+'. Firmas con tu wallet de Ethereum; Kosmara no toca tus fondos.</div>'}
@@ -837,9 +858,9 @@ function rSwap(){
  if(SW.net!=="sol")return rE();
  var fr=TM[SW.from],bal=S.bal[fr.m];
  $("swap").innerHTML=swTabs()+netHead("Jupiter")+
- '<div class="box"><label for="amt">Das · saldo '+(S.pk?f(bal||0,6)+" "+fr.s:"conecta tu wallet")+'</label><div class="srow"><select id="sf">'+sopts(SW.from)+'</select><input id="amt" class="num" type="number" inputmode="decimal" min="0" step="any" value="'+esc(SW.amt)+'" placeholder="0.0"></div>'+
+ '<div class="box"><label for="amt">Das · saldo '+(S.pk?f(bal||0,6)+" "+fr.s:"conecta tu wallet")+'</label><div class="srow"><button class="tkb" data-tkp="from" aria-label="Elegir token que das">'+ico(TM[SW.from])+'<b>'+esc(SW.from.split("·")[0])+'</b><i aria-hidden="true">▾</i></button><input id="amt" class="num" type="number" inputmode="decimal" min="0" step="any" value="'+esc(SW.amt)+'" placeholder="0.0"></div>'+
  '<div class="chips"><button class="btn" data-pct="25">25%</button><button class="btn" data-pct="50">50%</button><button class="btn" data-pct="100">Máx</button><button class="btn" data-act="flip">⇅</button></div></div>'+
- '<div class="box" style="margin-top:8px"><label for="st">Recibes</label><div class="srow"><select id="st">'+sopts(SW.to)+'</select><span class="dim">estimado en las rutas</span></div></div>'+
+ '<div class="box" style="margin-top:8px"><label for="st">Recibes</label><div class="srow"><button class="tkb" data-tkp="to" aria-label="Elegir token que recibes">'+ico(TM[SW.to])+'<b>'+esc(SW.to.split("·")[0])+'</b><i aria-hidden="true">▾</i></button><span class="dim">estimado en las rutas</span></div></div>'+
  '<div class="hrow"><span class="dim">Deslizamiento máx. <select id="sw-slip">'+[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===SW.slip?" selected":"")+">"+v+"%</option>"}).join("")+'</select></span></div>'+
  '<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="quote">Buscar mejores precios</button><div id="qt"></div>'+
  '<button class="btn p" data-act="doswap">Swap (real)</button><div class="stat" id="sres"></div><div class="dim" style="margin-top:6px">DFlow, JupiterZ y otros routers compiten dentro de la opción Jupiter (mejor ruta).</div>';
@@ -917,7 +938,7 @@ var CHIPS={
 };
 window.kzP=126;
 var LSTR=/^(msol|jitosol|bsol|jupsol|hsol|vsol|dsol|stsol|bbsol|picosol|lsol|bnsol|hubsol|inf)$/i,MEMER=/^(bonk|wif|trump|popcat|fartcoin|pengu|mew|bome|goat|pnut|moodeng|useless|wen|myro|giga|ponke|michi|buttcoin|pump)$/i,RWAR=/^[A-Z]{2,8}x$|^(buidl|ousg|usdy|bcspx)$/i,GOVR=/^(jup|orca|ray|jto|pyth|drift|mnde|kmno|tnsr|met)$/i;
-function ico(t){return '<span class="ico">'+esc((t.s||"?").slice(0,1))+(t.i?'<img src="'+esc(t.i)+'" alt="" loading="lazy" onerror="this.remove()">':"")+"</span>"}
+function ico(t){var u=t.i||(typeof lgOf==="function"?lgOf(t):"");return '<span class="ico" data-m="'+esc(t.m||"")+'" data-s="'+esc(t.s||"")+'">'+esc((t.s||"?").slice(0,1))+(u?'<img src="'+esc(u)+'" alt="" loading="lazy" onerror="this.remove()">':"")+"</span>"}
 function pnm(p){return '<span class="icos">'+ico(p.A)+(p.B.s?ico(p.B):"")+'</span><b>'+esc(p.A.s)+(p.B.s?"/"+esc(p.B.s):"")+"</b>"}
 function prow(p){return '<div class="row pick prow" data-pool="'+esc(p.k)+'"><div class="a">'+pnm(p)+'<span class="tag o">'+p.pr+'</span></div><div class="r up"><b>'+(p.apr!=null?f(p.apr,1)+"%":"—")+'</b> <small>'+(p.kind?"APY":"APR")+'</small></div><small>TVL $'+f(p.tvl,0)+(p.fee!=null&&!p.kind?" · comisión "+f(p.fee,2)+"%":"")+'</small><small class="r">'+(p.kind?esc(p.kind):"vol. $"+f(p.vol,0))+"</small></div>"}
 function filt(){
@@ -1783,6 +1804,48 @@ window.kzOK=true;
   var pdu=function(){var w=LI[0]?LI[0].getBoundingClientRect().width+10:1,k=Math.round(pu.scrollLeft/w);if(pu.scrollLeft+pu.clientWidth>=pu.scrollWidth-4)k=LI.length-1;for(var j=0;j<pd.children.length;j++)pd.children[j].classList.toggle("on",j===k)};
   pu.addEventListener("scroll",pdu,{passive:true});pdu()}
 })();
+</script>
+<script>
+/* Logos de tokens (caché por mint/dirección y por símbolo) y selector de tokens con buscador */
+var LG={},LGS={},LGQ={},LGT=0;
+function lgAdd(m,s,u){if(!u)return;if(m&&!LG[m])LG[m]=u;s=String(s||"").toUpperCase();if(s&&!LGS[s])LGS[s]=u}
+function lgOf(t){if(!t)return "";var m=t.m||t.address||"",s=String(t.s||t.symbol||"").toUpperCase();if(t.i||t.logoURI)return t.i||t.logoURI;if(m&&LG[m])return LG[m];
+ if(m&&/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(m)&&!(m in LGQ)){LGQ[m]=0;clearTimeout(LGT);LGT=setTimeout(lgFetch,300)}return LGS[s]||""}
+async function lgFetch(){var M=Object.keys(LGQ).filter(function(m){return LGQ[m]===0});if(!M.length)return;M.forEach(function(m){LGQ[m]=1});
+ for(var i=0;i<M.length;i+=50){try{var r=await fetch(JL+"/tokens/v2/search?query="+M.slice(i,i+50).join(","));if(!r.ok)continue;(await r.json()).forEach(function(t){lgAdd(t.id,t.symbol,t.icon)})}catch(e){}}lgPatch()}
+function lgPatch(){document.querySelectorAll(".ico[data-m]").forEach(function(el){if(el.querySelector("img"))return;var u=LG[el.getAttribute("data-m")]||LGS[String(el.getAttribute("data-s")||"").toUpperCase()];if(!u)return;var im=new Image();im.alt="";im.loading="lazy";im.onerror=function(){im.remove()};im.src=u;el.appendChild(im)})}
+function lgSeed(L){(L||[]).forEach(function(t){lgAdd(t.address||t.m,t.symbol||t.s,t.logoURI||t.ic||t.i)})}
+setInterval(function(){try{if(typeof HD!=="undefined"){(HD.sol||[]).forEach(function(x){lgAdd(x.m,x.s,x.ic)});(HD.evm||[]).forEach(function(x){lgAdd(x.m,x.s,x.ic)})}if(typeof EV!=="undefined")for(var k in EV.tk)if(!EV.tk[k]._lg){EV.tk[k]._lg=1;lgSeed(EV.tk[k])}lgPatch()}catch(e){}},2500);
+
+var TP={o:0,side:"",q:"",R:[],ld:0,t:0};
+function tpItems(){
+ if(SW.net==="sol"){var seen={},L=[];
+  function add(t){if(!t.m||seen[t.m])return;seen[t.m]=1;L.push(t)}
+  (HD.sol||[]).filter(function(x){return x.ok}).sort(function(a,b){return b.v-a.v}).forEach(function(x){add({s:x.s,m:x.m,d:x.d!=null?x.d:9,i:x.ic,n:x.n,b:x.a,v:x.v,ok:1})});
+  TKS.forEach(function(t){add({s:t.s.split("·")[0],m:t.m,d:t.d,i:t.i||lgOf(t),b:S.bal[t.m],ok:1})});
+  TP.R.forEach(function(t){add(t)});
+  var q=TP.q.toLowerCase().trim();return q?L.filter(function(t){return (t.s+" "+(t.n||"")+(q.length>=6?" "+t.m:"")).toLowerCase().indexOf(q)>=0}):L}
+ var id=SW.net,q2=TP.q.toLowerCase().trim(),E=(EV.tk[id]||[]).map(function(t){return{s:t.symbol,m:t.address,d:t.decimals,i:t.logoURI,n:t.name,b:evBal(id,t.address),ok:1}});
+ if(q2)E=E.filter(function(t){return (t.s+" "+(t.n||"")+(q2.length>=6?" "+t.m:"")).toLowerCase().indexOf(q2)>=0});
+ E.sort(function(a,b){return (b.b||0)-(a.b||0)});return E.slice(0,120)}
+function tpRender(){var el=$("tkp");if(!el)return;var L=tpItems();TP.L=L;
+ el.querySelector(".tkp-l").innerHTML=L.length?L.map(function(t,i){return '<button class="tkp-r" data-tpi="'+i+'">'+ico(t)+'<span class="tkp-n"><b>'+esc(t.s)+(t.ok?"":' <em class="tkp-w">sin verificar</em>')+"</b><small>"+esc(t.n||(t.m.slice(0,4)+"…"+t.m.slice(-4)))+'</small></span><span class="tkp-b num">'+(t.b>0?f(t.b,t.b<1?6:4):"")+"</span></button>"}).join(""):
+  '<div class="dim" style="padding:18px 4px">'+(TP.ld?"Buscando…":"No hay tokens con ese nombre.")+"</div>"}
+function tpOpen(side){TP.o=1;TP.side=side;TP.q="";TP.R=[];var el=$("tkp");if(!el){el=document.createElement("div");el.id="tkp";el.setAttribute("role","dialog");el.setAttribute("aria-modal","true");el.setAttribute("aria-label","Elige token");document.body.appendChild(el)}
+ el.innerHTML='<div class="tkp-bg" data-tpx></div><div class="tkp-p"><div class="tkp-h"><b>'+(side==="from"?"Das":"Recibes")+'</b><span class="dim">'+esc(chN(SW.net))+'</span><button class="tkp-x" data-tpx aria-label="Cerrar">×</button></div><input id="tkpq" type="search" autocomplete="off" placeholder="'+(SW.net==="sol"?"Busca por nombre, símbolo o mint":"Busca por nombre, símbolo o dirección")+'"><div class="tkp-l"></div></div>';
+ el.hidden=false;document.body.style.overflow="hidden";requestAnimationFrame(function(){el.classList.add("on")});tpRender();setTimeout(function(){var q=$("tkpq");if(q&&!MOB)q.focus()},60)}
+function tpClose(){TP.o=0;var el=$("tkp");if(!el)return;el.classList.remove("on");document.body.style.overflow="";setTimeout(function(){if(!TP.o)el.hidden=true},250)}
+function tpPick(t){var side=TP.side;tpClose();
+ if(SW.net==="sol"){var k=t.s;if(TM[k]&&TM[k].m!==t.m)k=t.s+"·"+t.m.slice(0,4);if(!TM[k]){var o={s:k,m:t.m,d:t.d,i:t.i};TKS.push(o);TM[k]=o}lgAdd(t.m,t.s,t.i);
+  if(side==="from"){if(k===SW.to)SW.to=SW.from;SW.from=k;SW.amt=""}else{if(k===SW.from)SW.from=SW.to;SW.to=k}SW.res=[];SW.sel="";return rSwap()}
+ var n=SW.net;if(side==="from"){if(t.m===EV.to[n])EV.to[n]=EV.from[n];EV.from[n]=t.m}else{if(t.m===EV.from[n])EV.from[n]=EV.to[n];EV.to[n]=t.m}EV.q=null;EV.res=[];rSwap()}
+document.addEventListener("click",function(e){var c=e.target.closest&&e.target.closest("[data-tkp],[data-tpx],[data-tpi]");if(!c)return;
+ if(c.hasAttribute("data-tkp"))return tpOpen(c.getAttribute("data-tkp"));if(c.hasAttribute("data-tpx"))return tpClose();var t=TP.L&&TP.L[+c.getAttribute("data-tpi")];if(t)tpPick(t)});
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&TP.o)tpClose()});
+document.addEventListener("input",function(e){if(e.target.id!=="tkpq")return;TP.q=e.target.value;tpRender();
+ if(SW.net!=="sol")return;clearTimeout(TP.t);var q=TP.q.trim();if(q.length<2){TP.R=[];return}
+ TP.t=setTimeout(async function(){TP.ld=1;tpRender();try{var r=await fetch(JL+"/tokens/v2/search?query="+encodeURIComponent(q));var A=r.ok?await r.json():[];if(TP.q.trim()!==q)return;
+  TP.R=A.slice(0,25).map(function(t){lgAdd(t.id,t.symbol,t.icon);return{s:t.symbol,m:t.id,d:t.decimals,i:t.icon,n:t.name,b:S.bal[t.id],ok:!!t.isVerified}})}catch(x){TP.R=[]}TP.ld=0;tpRender()},300)});
 </script>
 </body>
 </html>
