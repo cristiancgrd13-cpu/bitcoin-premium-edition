@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Kosmara</title>
+<meta name="theme-color" content="#07070a">
+<meta name="description" content="Pools de liquidez, swaps en 14 redes y todo tu portafolio en un solo sitio. Sin custodia: cada operación la firmas tú.">
+<link rel="manifest" href="./manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32.png">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Kosmara">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Space+Grotesk:wght@500;600;700&family=Unbounded:wght@700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@solana/web3.js@1.98.0/lib/index.iife.min.js"></script>
 <style>
@@ -396,6 +405,31 @@ button.logo:focus-visible{outline:2px solid #7c5cff;outline-offset:4px}
 .tkp-n{flex:1;min-width:0}.tkp-n b{display:block;font-size:15px}.tkp-n small{display:block;color:var(--dim);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .tkp-w{font-style:normal;font-size:10.5px;font-weight:600;color:#ffb35c;border:1px solid rgba(255,179,92,.45);border-radius:6px;padding:0 5px;margin-left:4px;vertical-align:2px}
 .tkp-b{color:#c9cadb;font-size:13px}
+
+/* ---- Pie de página ---- */
+.kfoot{margin-top:18px;border-top:1px solid var(--line);padding:22px 4px 6px;display:grid;gap:18px}
+.kf-top{display:flex;align-items:center;gap:12px}
+.kf-top img{width:40px;height:40px}
+.kf-top b{display:block;font:700 14px Unbounded,"Space Grotesk",sans-serif;letter-spacing:.18em}
+.kf-top small{display:block;color:var(--dim);font-size:13px}
+.kf-cols{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(min-width:820px){.kfoot{grid-template-columns:1.1fr 2fr}.kf-cols{grid-template-columns:repeat(3,1fr)}}
+.kf-cols h4{margin:0 0 6px;font-size:12px;font-weight:700;color:var(--dim)}
+.kf-cols button,.kf-cols a{display:block;background:none;border:0;padding:5px 0;color:#d6d7e3;font:500 14px "Space Grotesk",system-ui,sans-serif;text-align:left;text-decoration:none;cursor:pointer}
+.kf-cols button:hover,.kf-cols a:hover{color:#fff}
+.kf-soc{display:flex;gap:10px;flex-wrap:wrap}
+.kf-soc a{width:38px;height:38px;border-radius:12px;border:1px solid var(--line);display:grid;place-items:center;color:#d6d7e3;background:rgba(255,255,255,.03)}
+.kf-soc a:hover{color:#fff;border-color:#7c5cff}
+.kf-soc svg{width:18px;height:18px}
+.kf-copy{font-size:12px;color:var(--dim);grid-column:1/-1}
+
+/* ---- Portafolio de solo lectura ---- */
+.wbar{display:flex;align-items:center;gap:10px;margin:0 0 12px;padding:10px 12px;border-radius:14px;border:1px solid rgba(124,92,255,.45);background:rgba(124,92,255,.12)}
+.wbar>div{flex:1;min-width:0}.wbar b{display:block;font-size:14px}.wbar small{display:block;color:#c9cadb;font-size:12.5px}
+.wbar-e{font-size:18px}
+.wform{margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+.wform label{display:block;font-size:13px;color:var(--dim);margin-bottom:6px}
+.wform input{flex:1;min-width:0;text-align:left;font-size:13px}
 </style>
 </head>
 <body>
@@ -496,6 +530,7 @@ button.logo:focus-visible{outline:2px solid #7c5cff;outline-offset:4px}
 <section class="b ctr" id="cfg" style="--tc:139,140,153"></section>
 </div>
 
+<footer class="all kfoot" id="kfoot"></footer>
 <p class="all foot">Prototipo sin auditar. Los swaps de este prototipo son reales y mueven fondos de tu wallet: prueba con importes pequeños. Crear la posición (NFT) se hace en el protocolo elegido; el contrato propio de Kosmara llegará más adelante.</p>
 </div>
 
@@ -514,9 +549,13 @@ button.logo:focus-visible{outline:2px solid #7c5cff;outline-offset:4px}
 <script>document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("#bConn,[data-act=open]");if(t){var sh=document.getElementById("sheet");if(sh)sh.hidden=false}});</script>
 <script>
 window.kzLog=[];window.onerror=function(m,u,l,c){if(/ResizeObserver|Script error\.?$/i.test(String(m)))return;window.kzLog.push(m+" (línea "+l+", col "+c+")");var d=document.getElementById("kzerr");if(!d){d=document.createElement("div");d.id="kzerr";d.setAttribute("role","alert");d.style.cssText="position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:10px;right:10px;z-index:99;background:rgba(40,14,30,.96);border:1px solid rgba(255,120,150,.45);color:#fff;font:13px/1.45 system-ui,sans-serif;padding:10px 12px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.45)";d.innerHTML='<div style="display:flex;gap:8px;align-items:center"><span style="flex:1">Una parte de Kosmara no ha cargado bien.</span><button type="button" style="background:#fff;color:#1a0d24;border:0;border-radius:10px;padding:6px 10px;font-weight:600" onclick="location.reload()">Recargar</button><button type="button" aria-label="Cerrar" style="background:none;border:0;color:#fff;font-size:18px;padding:0 4px" onclick="this.closest(\'#kzerr\').remove()">×</button></div><details style="margin-top:6px;opacity:.75"><summary style="cursor:pointer;font-size:12px">Detalles técnicos</summary><pre style="white-space:pre-wrap;font:11px monospace;margin:6px 0 0"></pre></details>';document.body.appendChild(d)}d.querySelector("pre").textContent=window.kzLog.join("\n")};
+/* Moneda de visualización: los datos llegan en dólares y, si eliges euros, se convierten con el cambio del día. */
+var KZC={c:(function(){try{return localStorage.getItem("kz_cur")==="eur"?"eur":"usd"}catch(e){return "usd"}})(),r:(function(){try{var o=JSON.parse(localStorage.getItem("kz_eur")||"null");return o&&o.r>0?o.r:0}catch(e){return 0}})()};
+function curOn(){return KZC.c==="eur"&&KZC.r>0}
+function cur(n,d){if(n==null||!isFinite(+n))return "—";n=+n;d=d==null?2:d;var v=curOn()?n*KZC.r:n,t=(+v).toLocaleString("es-ES",{minimumFractionDigits:d,maximumFractionDigits:d});return curOn()?t+" €":"$"+t}
 /* Contadores que suben hasta el valor real */
 var CU={};
-function cuFmt(k,v){if(k==="tvl")return "$"+(v>=1e9?(v/1e9).toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+" mil M":Math.round(v/1e6).toLocaleString("es-ES")+" M");return Math.round(v).toLocaleString("es-ES")}
+function cuFmt(k,v){if(k==="tvl"){var e=curOn();if(e)v=v*KZC.r;var t=v>=1e9?(v/1e9).toLocaleString("es-ES",{minimumFractionDigits:2,maximumFractionDigits:2})+" mil M":Math.round(v/1e6).toLocaleString("es-ES")+" M";return e?t+" €":"$"+t}return Math.round(v).toLocaleString("es-ES")}
 function cuRun(root){if(!root)return;var R=window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches;
  root.querySelectorAll("[data-cu]").forEach(function(el){var k=el.getAttribute("data-cu"),to=+el.getAttribute("data-v"),fr=CU[k]==null?0:CU[k];CU[k]=to;if(R||fr===to){el.textContent=cuFmt(k,to);return}
   var t0=performance.now(),D=fr?700:1300;el.textContent=cuFmt(k,fr);(function st(t){var x=Math.min(1,Math.max(0,(t-t0)/D)),e=1-Math.pow(1-x,3);el.textContent=cuFmt(k,fr+(to-fr)*e);if(x<1&&el.isConnected)requestAnimationFrame(st)})(t0)})}
@@ -655,10 +694,10 @@ function rE(){
 /* KyberSwap: segunda ruta en redes EVM. No se queda comisión propia; la tuya llega directa a KS_RCV en cada swap. */
 var KS="https://aggregator-api.kyberswap.com",KS_RCV="",KS_FEE_BPS=0,KSE="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 var KSC={1:"ethereum",56:"bsc",8453:"base",42161:"arbitrum",43114:"avalanche",999:"hyperevm",4663:"robinhood",137:"polygon",10:"optimism",130:"unichain",143:"monad"};
-function eqRow(q,best){return '<div class="row pick'+(q.p===EV.sel?" sel":"")+'" data-er="'+esc(q.p)+'"><div><b>'+esc(q.p)+"</b>"+(best?'<span class="tag">MEJOR</span>':"")+"<small>"+esc(q.via)+" · "+(q.p==="LI.FI"?"comisión LI.FI 0,25 %":"sin comisión de KyberSwap")+" · gas $"+f(q.gas,q.gas<.01?4:2)+'</small></div><div class="v"><b>'+f(q.out,6)+'</b><small class="'+(best?"up":"dn")+'">'+(best?"mejor precio":f(q.diff,2)+"%")+"</small></div></div>"}
+function eqRow(q,best){return '<div class="row pick'+(q.p===EV.sel?" sel":"")+'" data-er="'+esc(q.p)+'"><div><b>'+esc(q.p)+"</b>"+(best?'<span class="tag">MEJOR</span>':"")+"<small>"+esc(q.via)+" · "+(q.p==="LI.FI"?"comisión LI.FI 0,25 %":"sin comisión de KyberSwap")+" · gas "+cur(q.gas,q.gas<.01?4:2)+'</small></div><div class="v"><b>'+f(q.out,6)+'</b><small class="'+(best?"up":"dn")+'">'+(best?"mejor precio":f(q.diff,2)+"%")+"</small></div></div>"}
 function eqHtml(){var R=EV.res||[];if(!R.length)return "";var to=evT(SW.net,EV.to[SW.net])||{},q=R.filter(function(x){return x.p===EV.sel})[0]||R[0];
  return R.map(function(x,i){return x.err?'<div class="row"><div><b>'+esc(x.p)+'</b><small class="dn">'+esc(x.err)+"</small></div></div>":eqRow(x,i===0)}).join("")+
- (q&&!q.err?'<div class="dim" style="font-size:12px;margin-top:6px">Con '+esc(q.p)+": recibes unos "+f(q.out,6)+" "+esc(to.symbol||"")+", mínimo "+f(q.min,6)+" con tu deslizamiento"+(q.usd?" (≈ $"+f(q.usd,2)+")":"")+(q.kz?" · comisión Kosmara incluida":"")+".</div>":"")}
+ (q&&!q.err?'<div class="dim" style="font-size:12px;margin-top:6px">Con '+esc(q.p)+": recibes unos "+f(q.out,6)+" "+esc(to.symbol||"")+", mínimo "+f(q.min,6)+" con tu deslizamiento"+(q.usd?" (≈ "+cur(q.usd,2)+")":"")+(q.kz?" · comisión Kosmara incluida":"")+".</div>":"")}
 function eres(h){var e=$("eres");if(e)e.innerHTML=h}
 function evPick(){var id=SW.net,fr=evT(id,EV.from[id]),to=evT(id,EV.to[id]);
  if(!fr||!to||fr.address===to.address)throw new Error("Elige dos tokens distintos.");var a=toU(EV.amt,fr.decimals);if(!(a>0n))throw new Error("Introduce una cantidad.");return{id:id,fr:fr,to:to,a:a}}
@@ -708,18 +747,29 @@ document.addEventListener("change",function(e){var t=e.target;var n=SW.net;if(t.
 
 /* ---------- Tokens reales de la wallet: Solana vía Jupiter, EVM vía LI.FI (en todas sus redes) ---------- */
 var HD={sol:null,evm:null,ld:0,at:0,key:"",err:"",more:false},JL="https://lite-api.jup.ag";
+/* Portafolio de solo lectura: cualquier dirección pegada (no firma nada). */
+S.wch=(function(){try{var o=JSON.parse(LS("kz_watch")||"null");if(o&&o.a&&o.t)return o}catch(e){}return{a:"",t:""}})();
+function hSol(){return S.wch.a?(S.wch.t==="sol"?S.wch.a:""):S.pk}
+function hEvm(){return S.wch.a?(S.wch.t==="evm"?S.wch.a:""):S.eaddr}
+function wDetect(a){a=String(a||"").trim();if(/^0x[0-9a-fA-F]{40}$/.test(a))return "evm";if(/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(a))return "sol";return ""}
+function wSet(a){var t=wDetect(a);if(!t)return toast("Esa dirección no parece de Solana ni de Ethereum.");S.wch={a:a.trim(),t:t};LS("kz_watch",JSON.stringify(S.wch));HD.sol=HD.evm=null;HD.key="";S.positions=[];S.posOk=false;S.posErr="";S.pfTab="tok";loadHold(true);loadPos();rHold()}
+function wClear(){S.wch={a:"",t:""};LS("kz_watch","");HD.sol=HD.evm=null;HD.key="";S.positions=[];S.posOk=false;S.posErr="";loadHold(true);loadPos();rHold()}
+function wBar(){if(!S.wch.a)return "";return '<div class="wbar"><span class="wbar-e" aria-hidden="true">👁</span><div><b>Solo lectura</b><small class="num">'+esc(short(S.wch.a))+" · "+(S.wch.t==="sol"?"Solana":"Ethereum y redes EVM")+'</small></div><button class="btn" data-wclr>Dejar de ver</button></div>'}
+function wForm(){return '<div class="wform"><label for="wadr">'+(S.pk||S.eaddr?"Ver otra dirección (solo lectura)":"O mira cualquier dirección, sin conectar nada")+'</label><div class="srow"><input id="wadr" type="text" autocomplete="off" spellcheck="false" placeholder="Dirección de Solana o 0x…"><button class="btn" data-wgo>Ver</button></div></div>'}
+document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("[data-wgo],[data-wclr]");if(!t)return;if(t.hasAttribute("data-wclr"))return wClear();var i=$("wadr");if(i)wSet(i.value)});
+document.addEventListener("keydown",function(e){if(e.target&&e.target.id==="wadr"&&e.key==="Enter")wSet(e.target.value)});
 async function loadHold(force){
- var key=S.pk+"|"+S.eaddr;if(!S.pk&&!S.eaddr){HD.sol=HD.evm=null;HD.key="";return}
+ var hs=hSol(),he=hEvm(),key=hs+"|"+he;if(!hs&&!he){HD.sol=HD.evm=null;HD.key="";return}
  if(HD.ld===1||(!force&&HD.key===key&&Date.now()-HD.at<60000))return;HD.ld=1;HD.err="";var er=[];rHold();
  await Promise.all([
-  (async function(){if(!S.pk){HD.sol=null;return}try{
-   var r=await fetch(JL+"/ultra/v1/balances/"+S.pk);if(!r.ok)throw new Error("HTTP "+r.status);var b=await r.json(),L=[],meta={};
+  (async function(){if(!hs){HD.sol=null;return}try{
+   var r=await fetch(JL+"/ultra/v1/balances/"+hs);if(!r.ok)throw new Error("HTTP "+r.status);var b=await r.json(),L=[],meta={};
    Object.keys(b).forEach(function(m){var v=b[m];if(v&&v.uiAmount>0)L.push({c:"sol",m:m==="SOL"?SOLM:m,a:v.uiAmount})});
    for(var i=0;i<L.length;i+=80){try{var q=await fetch(JL+"/tokens/v2/search?query="+L.slice(i,i+80).map(function(x){return x.m}).join(","));if(q.ok)(await q.json()).forEach(function(t){meta[t.id]=t})}catch(z){}}
    L.forEach(function(x){var t=meta[x.m]||{};x.s=t.symbol||short(x.m);x.n=t.name||"";x.ic=t.icon||"";x.px=+t.usdPrice||0;x.v=x.a*x.px;x.ok=!!t.isVerified||(x.px>0&&(+t.liquidity||0)>5e4)});
-   var o={};L.forEach(function(x){o[x.m]=x.a});S.bal=Object.assign({},S.bal,o);HD.sol=L}catch(e){er.push("Solana")}})(),
-  (async function(){if(!S.eaddr){HD.evm=null;return}try{
-   var r=await fetch(LIFI+"/wallets/"+S.eaddr+"/balances?extended=true");if(!r.ok)throw new Error("HTTP "+r.status);var b=(await r.json()).balances||{},L=[];
+   if(!S.wch.a){var o={};L.forEach(function(x){o[x.m]=x.a});S.bal=Object.assign({},S.bal,o)}HD.sol=L}catch(e){er.push("Solana")}})(),
+  (async function(){if(!he){HD.evm=null;return}try{
+   var r=await fetch(LIFI+"/wallets/"+he+"/balances?extended=true");if(!r.ok)throw new Error("HTTP "+r.status);var b=(await r.json()).balances||{},L=[];
    Object.keys(b).forEach(function(c){(b[c]||[]).forEach(function(t){var a=Number(t.amount)/Math.pow(10,t.decimals);if(!(a>0))return;var px=+t.priceUSD||0;
     L.push({c:+c,m:t.address,s:t.symbol,n:t.name,d:t.decimals,ic:t.logoURI||"",a:a,px:px,v:a*px,ok:t.verificationStatus==="verified"})})});HD.evm=L}catch(e){er.push("Ethereum y otras redes")}})()]);
  HD.ld=2;HD.at=Date.now();HD.key=key;HD.err=er.length?(er.length>1?"No se pudieron leer tus tokens. Revisa tu conexión y vuelve a intentarlo.":"No se pudieron leer tus tokens de "+er[0]+". Revisa tu conexión y vuelve a intentarlo."):"";loadCH();rHold();
@@ -730,12 +780,12 @@ function hSplit(){var A=hAll();return{show:A.filter(function(x){return x.v>=.01&
 function hTot(){return hSplit().show.reduce(function(s,x){return s+x.v},0)}
 function hRow(x){return '<div class="row hrw"><div class="hti">'+(x.ic?'<img alt="" src="'+esc(x.ic)+'" onerror="this.replaceWith(Object.assign(document.createElement(\'span\'),{className:\'hlt\',textContent:\''+esc(String(x.s).charAt(0))+'\'}))">':'<span class="hlt">'+esc(String(x.s).charAt(0))+"</span>")+chIco(x.c,"hcb")+'</div><div class="hnm"><b>'+esc(x.s)+"</b><small>"+esc(chN(x.c))+'</small></div><div class="v"><b>'+(x.px?usd(x.v):"—")+'</b><small class="num">'+f(x.a,x.a>=1000?2:6)+"</small></div></div>"}
 function hList(){
- if(!S.pk&&!S.eaddr)return '<div class="dim" style="margin-top:12px">Conecta tu wallet para ver los tokens que tienes.</div><button class="btn p" data-act="open">Conectar wallet</button>';
- if(HD.ld!==2&&!HD.sol&&!HD.evm)return '<div class="dim" style="margin-top:12px">Leyendo los tokens de tu wallet…</div>';
- var sp=hSplit(),h=sp.show.length?sp.show.map(hRow).join(""):'<div class="dim" style="margin-top:12px">'+(HD.err?"":"No hay tokens con saldo en tu wallet.")+"</div>";
+ if(!hSol()&&!hEvm())return '<div class="dim" style="margin-top:12px">Conecta tu wallet para ver los tokens que tienes.</div><button class="btn p" data-act="open">Conectar wallet</button>'+wForm();
+ if(HD.ld!==2&&!HD.sol&&!HD.evm)return '<div class="dim" style="margin-top:12px">'+(S.wch.a?"Leyendo los tokens de esta dirección…":"Leyendo los tokens de tu wallet…")+"</div>";
+ var sp=hSplit(),h=sp.show.length?sp.show.map(hRow).join(""):'<div class="dim" style="margin-top:12px">'+(HD.err?"":S.wch.a?"Esta dirección no tiene tokens con saldo.":"No hay tokens con saldo en tu wallet.")+"</div>";
  if(sp.rest.length)h+='<button class="btn" style="margin-top:10px;width:100%" data-act="hmore" aria-expanded="'+HD.more+'">'+(HD.more?"Ocultar":"Ver")+" "+sp.rest.length+" tokens sin precio o sin verificar</button>"+(HD.more?'<div class="dim" style="font-size:12px;margin-top:8px">Pueden ser airdrops de spam: no firmes nada que venga de ellos.</div>'+sp.rest.map(hRow).join(""):"");
  if(HD.err)h+='<div class="stat dn" style="margin-top:8px">'+esc(HD.err)+rbtn("hold")+"</div>";
- return h+'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="refbal">'+(HD.ld===1?"Actualizando…":"Actualizar saldos")+"</button>"}
+ return h+'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="refbal">'+(HD.ld===1?"Actualizando…":"Actualizar saldos")+"</button>"+(S.wch.a?"":wForm())}
 document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest('[data-act="hmore"]');if(t){HD.more=!HD.more;rHold()}});
 
 /* ---------- Swap entre redes (THORChain) ---------- */
@@ -793,7 +843,7 @@ function rX(){
  '<div class="dim" style="margin-top:6px">Firmas con tu wallet de Ethereum, BNB Chain, Base o Avalanche. THORChain te envía el resultado a la dirección que indiques; Kosmara no toca tus fondos.</div>';
 }
 function xqHtml(){var q=XS.q;if(!q)return "";var to=XS.AM[XS.to],fr=XS.AM[XS.from],fe=q.fees||{},ff=(+fe.total||0)/1e8,af=(+fe.affiliate||0)/1e8,sec=+q.total_swap_seconds||0;
- return '<div class="row"><div><b>Recibes unos '+f(q.out,6)+" "+esc(to.s)+'</b><small>'+(to.usd?"≈ $"+f(q.out*to.usd,2)+" · ":"")+"en "+TCN[to.c]+'</small></div><div class="v"><b>'+(sec<90?"≈ "+Math.max(1,Math.round(sec))+" s":"≈ "+Math.round(sec/60)+" min")+'</b><small>tiempo estimado</small></div></div>'+
+ return '<div class="row"><div><b>Recibes unos '+f(q.out,6)+" "+esc(to.s)+'</b><small>'+(to.usd?"≈ "+cur(q.out*to.usd,2)+" · ":"")+"en "+TCN[to.c]+'</small></div><div class="v"><b>'+(sec<90?"≈ "+Math.max(1,Math.round(sec))+" s":"≈ "+Math.round(sec/60)+" min")+'</b><small>tiempo estimado</small></div></div>'+
  '<div class="dim" style="font-size:12px;margin-top:6px">Comisiones de red y liquidez: '+f(ff,6)+" "+esc(to.s)+" ("+f((+fe.total_bps||0)/100,2)+" %)"+(af>0?" · comisión Kosmara incluida: "+f(af,6)+" "+esc(to.s):"")+
  (q.min?" · mínimo recomendado: "+f(q.min,6)+" "+esc(fr.s):"")+"</div>"}
 function xres(h){var e=$("xres");if(e)e.innerHTML=h}
@@ -940,7 +990,7 @@ window.kzP=126;
 var LSTR=/^(msol|jitosol|bsol|jupsol|hsol|vsol|dsol|stsol|bbsol|picosol|lsol|bnsol|hubsol|inf)$/i,MEMER=/^(bonk|wif|trump|popcat|fartcoin|pengu|mew|bome|goat|pnut|moodeng|useless|wen|myro|giga|ponke|michi|buttcoin|pump)$/i,RWAR=/^[A-Z]{2,8}x$|^(buidl|ousg|usdy|bcspx)$/i,GOVR=/^(jup|orca|ray|jto|pyth|drift|mnde|kmno|tnsr|met)$/i;
 function ico(t){var u=t.i||(typeof lgOf==="function"?lgOf(t):"");return '<span class="ico" data-m="'+esc(t.m||"")+'" data-s="'+esc(t.s||"")+'">'+esc((t.s||"?").slice(0,1))+(u?'<img src="'+esc(u)+'" alt="" loading="lazy" onerror="this.remove()">':"")+"</span>"}
 function pnm(p){return '<span class="icos">'+ico(p.A)+(p.B.s?ico(p.B):"")+'</span><b>'+esc(p.A.s)+(p.B.s?"/"+esc(p.B.s):"")+"</b>"}
-function prow(p){return '<div class="row pick prow" data-pool="'+esc(p.k)+'"><div class="a">'+pnm(p)+'<span class="tag o">'+p.pr+'</span></div><div class="r up"><b>'+(p.apr!=null?f(p.apr,1)+"%":"—")+'</b> <small>'+(p.kind?"APY":"APR")+'</small></div><small>TVL $'+f(p.tvl,0)+(p.fee!=null&&!p.kind?" · comisión "+f(p.fee,2)+"%":"")+'</small><small class="r">'+(p.kind?esc(p.kind):"vol. $"+f(p.vol,0))+"</small></div>"}
+function prow(p){return '<div class="row pick prow" data-pool="'+esc(p.k)+'"><div class="a">'+pnm(p)+'<span class="tag o">'+p.pr+'</span></div><div class="r up"><b>'+(p.apr!=null?f(p.apr,1)+"%":"—")+'</b> <small>'+(p.kind?"APY":"APR")+'</small></div><small>TVL '+cur(p.tvl,0)+(p.fee!=null&&!p.kind?" · comisión "+f(p.fee,2)+"%":"")+'</small><small class="r">'+(p.kind?esc(p.kind):"vol. "+cur(p.vol,0))+"</small></div>"}
 function filt(){
  var q=S.q.toLowerCase().trim(),ch=S.chip?CHIPS[S.chip]:null,L=Object.keys(S.pools).map(function(k){return S.pools[k]});
  L=L.filter(function(p){return !p.net&&(S.flt==="all"||p.pr===S.flt)&&(ch?ch.t(p):(p.A.s+"/"+p.B.s+" "+p.A.m+" "+p.B.m+" "+p.id).toLowerCase().indexOf(q)>=0)});
@@ -1082,7 +1132,7 @@ function sumPs(){
 }
 function rPs(){
  var p=S.pools[S.sel],el=$("ps");if(!p){el.hidden=true;return}
- if(p.kind||p.net){el.style.setProperty("--tc","20,241,149");el.innerHTML='<div class="mb"><button class="x" data-act="closeps" aria-label="Cerrar">×</button><b style="font-size:20px">'+esc(p.A.s)+(p.B.s?"/"+esc(p.B.s):"")+'</b><div class="dim">'+p.pr+" · "+esc(p.kind||NET[p.net].n)+" · TVL $"+f(p.tvl,0)+(p.apr!=null?(p.net&&!p.kind?" · APR est. ":" · APY ")+f(p.apr,1)+"%":"")+'</div><div class="dim" style="margin-top:12px;line-height:1.6">'+(p.pr==="Aave"?"Depositas un solo token en Aave, en la red Ethereum, con tu wallet (MetaMask) y lo retiras cuando quieras. El interés lo pagan quienes piden prestado y cambia cada día. Operar en Ethereum tiene coste de gas.":p.net?"La posición se abre en "+p.pr+" con tu wallet (MetaMask). Crear posiciones de "+NET[p.net].n+" sin salir de Kosmara llegará en la siguiente fase.":p.pr==="Kamino"?"Kamino gestiona el rango y reinvierte las comisiones por ti. Recibes un token del vault, no un NFT.":"Depositas un solo token en Jupiter Lend y recibes un token que acumula el interés. No hay rango ni NFT.")+'</div><a class="btn p" href="'+esc(p.url)+'" target="_blank" rel="noopener">'+(p.net&&!p.kind?"Abrir en ":"Depositar en ")+p.pr+" ↗</a></div>";el.hidden=false;return}
+ if(p.kind||p.net){el.style.setProperty("--tc","20,241,149");el.innerHTML='<div class="mb"><button class="x" data-act="closeps" aria-label="Cerrar">×</button><b style="font-size:20px">'+esc(p.A.s)+(p.B.s?"/"+esc(p.B.s):"")+'</b><div class="dim">'+p.pr+" · "+esc(p.kind||NET[p.net].n)+" · TVL "+cur(p.tvl,0)+(p.apr!=null?(p.net&&!p.kind?" · APR est. ":" · APY ")+f(p.apr,1)+"%":"")+'</div><div class="dim" style="margin-top:12px;line-height:1.6">'+(p.pr==="Aave"?"Depositas un solo token en Aave, en la red Ethereum, con tu wallet (MetaMask) y lo retiras cuando quieras. El interés lo pagan quienes piden prestado y cambia cada día. Operar en Ethereum tiene coste de gas.":p.net?"La posición se abre en "+p.pr+" con tu wallet (MetaMask). Crear posiciones de "+NET[p.net].n+" sin salir de Kosmara llegará en la siguiente fase.":p.pr==="Kamino"?"Kamino gestiona el rango y reinvierte las comisiones por ti. Recibes un token del vault, no un NFT.":"Depositas un solo token en Jupiter Lend y recibes un token que acumula el interés. No hay rango ni NFT.")+'</div><a class="btn p" href="'+esc(p.url)+'" target="_blank" rel="noopener">'+(p.net&&!p.kind?"Abrir en ":"Depositar en ")+p.pr+" ↗</a></div>";el.hidden=false;return}
  var z=ST,chips=[1,5,10].map(function(x){return '<button class="btn chip'+(z.r===x?" on":"")+'" data-pr="'+x+'">±'+x+"%</button>"}).join("")+'',
  vo=VEN.map(function(v){return "<option"+(v===z.via?" selected":"")+">"+v+"</option>"}).join(""),
  sl=[.5,1,3].map(function(v){return '<option value="'+v+'"'+(v===z.slip?" selected":"")+">"+v+"%</option>"}).join("");
@@ -1368,7 +1418,7 @@ window.kzAfter=function(v){S.view=v;if(v==="home"){rHome();if(window.kzDoor)wind
 
 /* ---------- inicio ---------- */
 function poolRow(p){
- return '<div class="row prow pick" data-pool="'+esc(p.k)+'"><div class="a">'+pnm(p)+'<span class="tag o">'+p.pr+'</span></div><div class="r up"><b>'+(p.apr!=null?f(p.apr,1)+"%":"—")+'</b> <small>'+(p.kind?"APY":"APR")+'</small></div><small>TVL $'+f(p.tvl,0)+'</small><small class="r">'+(p.kind?esc(p.kind):"vol. $"+f(p.vol,0))+"</small></div>";
+ return '<div class="row prow pick" data-pool="'+esc(p.k)+'"><div class="a">'+pnm(p)+'<span class="tag o">'+p.pr+'</span></div><div class="r up"><b>'+(p.apr!=null?f(p.apr,1)+"%":"—")+'</b> <small>'+(p.kind?"APY":"APR")+'</small></div><small>TVL '+cur(p.tvl,0)+'</small><small class="r">'+(p.kind?esc(p.kind):"vol. "+cur(p.vol,0))+"</small></div>";
 }
 /* Hoja de ruta. Para marcar algo como hecho, cambia su estado:
    "on" = en marcha (verde) · "test" = en pruebas (amarillo) · "soon" = próximamente · "idea" = en estudio */
@@ -1480,7 +1530,7 @@ window.kzP=91;
 var SUPPORT_EMAIL="";/* email de soporte: rellenar cuando esté creado */
 var LANGS=[["es","Español","🇪🇸"],["en","English","🇬🇧"],["fr","Français","🇫🇷"],["de","Deutsch","🇩🇪"],["zh","中文","🇨🇳"],["ko","한국어","🇰🇷"],["ja","日本語","🇯🇵"],["ru","Русский","🇷🇺"],["tr","Türkçe","🇹🇷"],["pt","Português","🇧🇷"]];
 var MN={open:false,v:"main"};
-var ICO={lang:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
+var ICO={cur:'<circle cx="12" cy="12" r="9"/><path d="M15.5 8.5a4.5 4.5 0 1 0 0 7M7 10.5h6M7 13.5h6"/>',dl:'<path d="M12 4v11M7 10l5 5 5-5M5 20h14"/>',lang:'<circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.5 2.7 3.8 5.7 3.8 9s-1.3 6.3-3.8 9c-2.5-2.7-3.8-5.7-3.8-9S9.5 5.7 12 3z"/>',
  slip:'<path d="M4 7h10M4 17h6M18 7h2M14 17h6"/><circle cx="16" cy="7" r="2"/><circle cx="12" cy="17" r="2"/>',
  rpc:'<rect x="4" y="4" width="16" height="6" rx="1.5"/><rect x="4" y="14" width="16" height="6" rx="1.5"/><path d="M8 7h.01M8 17h.01"/>',
  csv:'<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4M9 13h6M9 17h6"/>',
@@ -1505,7 +1555,7 @@ function rMenu(){
   if(S.pk)h+='<div class="mwr"><span class="chw">'+chIco("sol")+'</span><div><b>'+esc(S.wname||"Solana")+'</b><small class="num">'+esc(short(S.pk))+'</small></div><button class="btn" data-copy="'+esc(S.pk)+'">Copiar</button><a class="btn" href="https://solscan.io/account/'+esc(S.pk)+'" target="_blank" rel="noopener">Explorador ↗</a></div>';
   if(S.eaddr)h+='<div class="mwr"><span class="chw">'+chIco(1)+'</span><div><b>'+esc(S.ename||"Ethereum")+'</b><small class="num">'+esc(short(S.eaddr))+'</small></div><button class="btn" data-copy="'+esc(S.eaddr)+'">Copiar</button><a class="btn" href="https://debank.com/profile/'+esc(S.eaddr)+'" target="_blank" rel="noopener">Explorador ↗</a></div>';
   h+="</div>";
-  h+='<div class="mgrp"><small>Preferencias</small>'+mItem("lang","Idioma",L[2]+" "+L[1],"lang")+mItem("slip","Deslizamiento por defecto",String(SW.slip).replace(".",",")+" %","slip")+mItem("rpc","Conexiones (RPC)","","go:cfg")+"</div>";
+  h+='<div class="mgrp"><small>Preferencias</small>'+mItem("lang","Idioma",L[2]+" "+L[1],"lang")+mItem("slip","Deslizamiento por defecto",String(SW.slip).replace(".",",")+" %","slip")+mItem("cur","Moneda",KZC.c==="eur"?"€ Euro":"$ Dólar","cur")+mItem("rpc","Conexiones (RPC)","","go:cfg")+(window.kzCanInstall&&kzCanInstall()?mItem("dl","Instalar app","","install"):"")+"</div>";
   h+='<div class="mgrp"><small>Tu actividad</small>'+mItem("csv","Movimientos y exportar CSV","","go:movimientos")+"</div>";
   h+='<div class="mgrp"><small>Kosmara</small>'+mItem("doc","White paper","","go:wp")+mItem("road","Hoja de ruta","","go:road")+mItem("help","Soporte","","help")+mItem("risk","Riesgos y condiciones de uso","","risk")+mItem("lock","Privacidad","","priv")+"</div>";
   h+='<button class="mout" data-mv="logout">'+ic("out")+"<span>Cerrar sesión</span></button>";
@@ -1516,6 +1566,14 @@ function rMenu(){
  }else if(v==="slip"){
   h=mHead("Deslizamiento por defecto",1)+'<p class="mtx">Diferencia máxima de precio que aceptas en un swap antes de que se cancele. Más bajo protege mejor el precio; más alto ayuda en tokens con poca liquidez.</p><div class="mlist">'+
    [.5,1,3].map(function(x){return '<button class="mlg'+(x===SW.slip?" on":"")+'" data-slip="'+x+'"><span>'+String(x).replace(".",",")+" %</span>"+(x===SW.slip?'<i aria-hidden="true">✓</i>':"")+"</button>"}).join("")+"</div>";
+ }else if(v==="cur"){
+  h=mHead("Moneda",1)+'<p class="mtx">Elige en qué moneda ves los valores. Los datos llegan en dólares y se convierten al euro con el cambio del día.</p><div class="mlist" role="listbox" aria-label="Moneda">'+
+   [["usd","$ Dólar estadounidense"],["eur","€ Euro"]].map(function(x){var on=KZC.c===x[0];return '<button role="option" aria-selected="'+on+'" class="mlg'+(on?" on":"")+'" data-cur="'+x[0]+'"><span>'+x[1]+"</span>"+(on?'<i aria-hidden="true">✓</i>':"")+"</button>"}).join("")+"</div>"+
+   (KZC.c==="eur"&&KZC.r?'<p class="mtx dim">Cambio usado: 1 $ = '+KZC.r.toLocaleString("es-ES",{maximumFractionDigits:4})+" €</p>":"");
+ }else if(v==="install"){
+  h=mHead("Instalar app",1)+'<p class="mtx">Añade Kosmara a tu pantalla de inicio: se abre a pantalla completa, como una app, y sin pasar por el navegador.</p>'+
+   (window.kzPWA&&kzPWA.ev?'<button class="btn p" data-pwa>Instalar Kosmara</button>':kzPWA&&kzPWA.ios?'<div class="mtx"><p>En iPhone o iPad, desde Safari:</p><ol><li>Pulsa el botón <b>Compartir</b> (el cuadrado con la flecha).</li><li>Elige <b>Añadir a pantalla de inicio</b>.</li><li>Pulsa <b>Añadir</b>.</li></ol></div>':'<p class="mtx">Abre el menú de tu navegador y elige <b>Instalar app</b> o <b>Añadir a pantalla de inicio</b>.</p>')+
+   '<p class="mtx dim">Las wallets de móvil (Phantom, MetaMask…) tienen su propio navegador: para firmar desde el móvil, sigue entrando en Kosmara desde ellas.</p>';
  }else if(v==="help"){
   h=mHead("Soporte",1)+'<p class="mtx">¿Tienes una duda, un problema con una operación o una idea? Escríbenos y te respondemos lo antes posible.</p>'+
    (SUPPORT_EMAIL?'<a class="btn p mmail" href="mailto:'+esc(SUPPORT_EMAIL)+'?subject=Soporte%20Kosmara">Escribir a '+esc(SUPPORT_EMAIL)+"</a>":'<div class="stat">El email de soporte estará disponible muy pronto.</div>')+
@@ -1660,20 +1718,20 @@ function posCard(p){
 }
 function rPf(){
  var n=S.positions.length,ht=hTot(),tot=S.positions.reduce(function(a,p){return a+p.usd},0)+ht,nt=hSplit().show.length;loadHold();
- $("pfTot").innerHTML='<div class="row" style="margin-top:0"><span class="dim" style="font-size:14px">Valor total del portafolio</span><span class="v"><b>'+(n||nt?usd(tot):"—")+"</b>"+(nt&&n?'<small>'+usd(ht)+" en tokens · "+usd(tot-ht)+" en pools</small>":"")+"</span></div>";
+ $("pfTot").innerHTML=wBar()+'<div class="row" style="margin-top:0"><span class="dim" style="font-size:14px">Valor total del portafolio</span><span class="v"><b>'+(n||nt?usd(tot):"—")+"</b>"+(nt&&n?'<small>'+usd(ht)+" en tokens · "+usd(tot-ht)+" en pools</small>":"")+"</span></div>";
  var body;
  if(S.pfTab==="tok")body=hList();
  else if(S.pfTab==="vault")body='<div class="dim" style="margin-top:12px">Los vaults de Kosmara llegarán más adelante.</div>';
  else if(n)body=S.positions.map(posCard).join("");
- else if(!S.pk)body='<div class="dim" style="margin-top:12px">Conecta tu wallet para ver tus posiciones.</div><button class="btn p" data-act="open">Conectar wallet</button>';
- else body='<div class="dim" style="margin-top:12px;line-height:1.6">'+(S.posOk?"No tienes posiciones abiertas en Orca.":S.posErr?"<span>No se pudieron leer tus posiciones.</span> <span>"+esc(S.posErr)+"</span>"+rbtn("pos"):"Tu wallet está conectada, pero la lectura de posiciones (NFT) aún no está activa.")+' También puedes verlas en <a class="lk" href="https://www.orca.so/portfolio" target="_blank" rel="noopener">orca.so ↗</a>.</div>';
+ else if(!hSol())body='<div class="dim" style="margin-top:12px">'+(S.wch.a?"Las posiciones de liquidez solo se leen en direcciones de Solana.":"Conecta tu wallet para ver tus posiciones.")+"</div>"+(S.wch.a?"":'<button class="btn p" data-act="open">Conectar wallet</button>'+wForm());
+ else body='<div class="dim" style="margin-top:12px;line-height:1.6">'+(S.posOk?(S.wch.a?"Esta dirección no tiene posiciones abiertas en Orca.":"No tienes posiciones abiertas en Orca."):S.posErr?"<span>No se pudieron leer tus posiciones.</span> <span>"+esc(S.posErr)+"</span>"+rbtn("pos"):"Tu wallet está conectada, pero la lectura de posiciones (NFT) aún no está activa.")+' También puedes verlas en <a class="lk" href="https://www.orca.so/portfolio" target="_blank" rel="noopener">orca.so ↗</a>.</div>';
  $("pfList").innerHTML='<div class="chips"><button class="btn chip'+(S.pfTab==="tok"?" on":"")+'" data-pft="tok">Tokens <span class="tag">'+nt+'</span></button><button class="btn chip'+(S.pfTab==="liq"?" on":"")+'" data-pft="liq">Posiciones <span class="tag">'+n+'</span></button><button class="btn chip'+(S.pfTab==="vault"?" on":"")+'" data-pft="vault">Vaults</button></div>'+body;
 }
 window.kzP=366;
 document.addEventListener("click",function(e){var t=e.target.closest("[data-pft]");if(t){S.pfTab=t.getAttribute("data-pft");rPf()}});
 
 /* ---------- wallet, lotería, PDF ---------- */
-function usd(n){return n==null?"—":"$"+f(+n||0,2)}
+function usd(n){return n==null?"—":cur(+n||0,2)}
 function rWallet(){
  var h='<div class="k">Wallet <small>'+(S.pk?esc(S.wname):S.eaddr?esc(S.ename):"sin conectar")+"</small></div>";loadHold();
  if(!S.pk&&!S.eaddr)h+='<div class="dim">Conecta tu wallet para ver tu dirección y tus saldos. Kosmara nunca guarda tus claves.</div><button class="btn p" data-act="open">Conectar wallet</button>';
@@ -1688,7 +1746,7 @@ var VF=[["usd","Dólares",/USD|DAI|GHO/i],["eth","ETH",/ETH/i],["btc","BTC",/BTC
 function lotCalc(){
  var d=Math.max(0,+S.lotN||0),a=Math.max(0,+S.lotP||0),y=d*a/100,e=$("lotRes");if(!e)return;
  var r=function(k,v){return '<div class="row"><span class="dim" style="font-size:13px">'+k+'</span><span class="v"><b>'+v+"</b></span></div>"};
- e.innerHTML=r("Interés estimado al año","$"+f(y,2))+r("Para ti (80 %)","$"+f(y*.8,2))+r("Recompra y quema del token (20 %)","$"+f(y*.2,2))+r("Puntos Kosmara al día",f(Math.floor(d/10),0));
+ e.innerHTML=r("Interés estimado al año",cur(y,2))+r("Para ti (80 %)",cur(y*.8,2))+r("Recompra y quema del token (20 %)",cur(y*.2,2))+r("Puntos Kosmara al día",f(Math.floor(d/10),0));
 }
 function rLot(){
  var E=Object.keys(S.pools).map(function(k){return S.pools[k]}).filter(function(p){return p.kind&&p.apr>0}).sort(function(a,b){return b.tvl-a.tvl}),u=E.filter(function(p){return p.pr==="Jupiter"&&p.A.s==="USDC"})[0];
@@ -1767,7 +1825,7 @@ async function mkPos(){
   r((o.confirmed?"Posición creada.":"Transacción enviada; aún sin confirmar.")+' <a class="lk" href="https://solscan.io/tx/'+esc(o.signature)+'" target="_blank" rel="noopener">Ver transacción ↗</a> · <a class="lk" href="https://solscan.io/token/'+esc(o.positionMint)+'" target="_blank" rel="noopener">Ver NFT ↗</a>');kzCelebrate(2);loadBal();loadPos()}
  catch(e){r('<span class="dn">'+esc(fe(e))+"</span>")}
 }
-async function loadPos(){if(!S.pk||!(window.kzSdk&&kzSdk.ready))return;try{S.positions=await kzSdk.positions({rpc:rpcUrl(),owner:S.pk});S.posOk=true;S.posErr=""}catch(e){S.posErr=fe(e)}rPf()}
+async function loadPos(){var ow=hSol();if(!ow||!(window.kzSdk&&kzSdk.ready))return;try{var P=await kzSdk.positions({rpc:rpcUrl(),owner:ow});if(ow!==hSol())return;S.positions=P;S.posOk=true;S.posErr=""}catch(e){S.posErr=fe(e)}rPf()}
 (function(){var id=LS("kz_w");if(id==="-")return;id=id||"ph";var w=WID(id);if(!w)return;var p=solGet(w);if(!p)return;
  var go=function(k){if(k)solOn(w,k.toString())};
  if(id==="ph")solConnect(p,true).then(go).catch(function(){});else if(p.isConnected&&p.publicKey)go(p.publicKey);
@@ -1846,6 +1904,48 @@ document.addEventListener("input",function(e){if(e.target.id!=="tkpq")return;TP.
  if(SW.net!=="sol")return;clearTimeout(TP.t);var q=TP.q.trim();if(q.length<2){TP.R=[];return}
  TP.t=setTimeout(async function(){TP.ld=1;tpRender();try{var r=await fetch(JL+"/tokens/v2/search?query="+encodeURIComponent(q));var A=r.ok?await r.json():[];if(TP.q.trim()!==q)return;
   TP.R=A.slice(0,25).map(function(t){lgAdd(t.id,t.symbol,t.icon);return{s:t.symbol,m:t.id,d:t.decimals,i:t.icon,n:t.name,b:S.bal[t.id],ok:!!t.isVerified}})}catch(x){TP.R=[]}TP.ld=0;tpRender()},300)});
+</script>
+<script>
+/* App instalable (PWA) */
+window.kzPWA={ev:null,ios:/iphone|ipad|ipod/i.test(navigator.userAgent)&&!/crios|fxios|edgios/i.test(navigator.userAgent),on:false};
+kzPWA.on=(window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true;
+window.kzCanInstall=function(){return !kzPWA.on&&(!!kzPWA.ev||kzPWA.ios)};
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();kzPWA.ev=e;try{if(MN.open)rMenu()}catch(x){}if(window.rFoot)rFoot()});
+window.addEventListener("appinstalled",function(){kzPWA.on=true;kzPWA.ev=null;toast("Kosmara instalada en tu pantalla de inicio.");if(window.rFoot)rFoot()});
+document.addEventListener("click",async function(e){var b=e.target.closest&&e.target.closest("[data-pwa]");if(!b)return;
+ if(!kzPWA.ev){try{mOpen("install")}catch(x){}return}kzPWA.ev.prompt();try{var c=await kzPWA.ev.userChoice;if(c&&c.outcome==="accepted"){kzPWA.ev=null;try{mClose()}catch(x){}}}catch(x){}});
+if("serviceWorker" in navigator&&location.protocol==="https:")window.addEventListener("load",function(){navigator.serviceWorker.register("./sw.js").catch(function(){})});
+</script>
+<script>
+/* Pie de página: enlaces útiles, soporte y redes. Rellena SOCIAL con tus perfiles; los vacíos no se muestran. */
+var SOCIAL={x:"",telegram:"",discord:"",github:"https://github.com/cristiancgrd13-cpu/bitcoin-premium-edition"};
+var SOCI={x:'<path fill="currentColor" stroke="none" d="M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.3l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z"/>',
+ telegram:'<path fill="currentColor" stroke="none" d="M21.4 4.2 2.9 11.3c-1.3.5-1.2 1.2-.2 1.5l4.7 1.5 1.8 5.6c.2.6.4.8.9.8.4 0 .6-.2.8-.4l2.3-2.2 4.7 3.5c.9.5 1.5.2 1.7-.8l3.1-14.6c.3-1.3-.5-1.9-1.3-1.5zM9.6 14.2l8.9-5.6c.4-.3.8-.1.5.2l-7.2 6.5-.3 3.2-1.9-4.3z"/>',
+ discord:'<path fill="currentColor" stroke="none" d="M19.3 5.3A16.7 16.7 0 0 0 15.2 4l-.5 1a15.4 15.4 0 0 0-5.4 0l-.5-1a16.6 16.6 0 0 0-4.1 1.3C2.1 9.2 1.4 13 1.7 16.7a16.8 16.8 0 0 0 5 2.5l1.1-1.7c-.6-.2-1.2-.5-1.7-.9l.4-.3a11.9 11.9 0 0 0 10.2 0l.4.3c-.5.4-1.1.7-1.7.9l1.1 1.7a16.7 16.7 0 0 0 5-2.5c.4-4.3-.7-8-2.2-11.4zM8.7 14.4c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2zm6.6 0c-1 0-1.8-.9-1.8-2s.8-2 1.8-2 1.8.9 1.8 2-.8 2-1.8 2z"/>',
+ github:'<path fill="currentColor" stroke="none" d="M12 2a10 10 0 0 0-3.2 19.5c.5.1.7-.2.7-.5v-1.7c-2.8.6-3.4-1.3-3.4-1.3-.5-1.2-1.1-1.5-1.1-1.5-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.6.3-1.1.6-1.3-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.4-1.3.1-2.7 0 0 .8-.3 2.8 1a9.6 9.6 0 0 1 5 0c1.9-1.3 2.8-1 2.8-1 .5 1.4.2 2.4.1 2.7.6.7 1 1.6 1 2.7 0 3.9-2.3 4.7-4.6 5 .4.3.7.9.7 1.9V21c0 .3.2.6.7.5A10 10 0 0 0 12 2z"/>'};
+var SOCN={x:"X",telegram:"Telegram",discord:"Discord",github:"GitHub"};
+function rFoot(){var el=document.getElementById("kfoot");if(!el)return;var lg=document.querySelector(".logo img"),L=typeof curLang==="function"?curLang():["es","Español","🇪🇸"];
+ var soc=Object.keys(SOCIAL).filter(function(k){return SOCIAL[k]}).map(function(k){return '<a href="'+esc(SOCIAL[k])+'" target="_blank" rel="noopener" aria-label="'+SOCN[k]+'" title="'+SOCN[k]+'"><svg viewBox="0 0 24 24" aria-hidden="true">'+SOCI[k]+"</svg></a>"}).join("");
+ el.innerHTML='<div><div class="kf-top">'+(lg?'<img alt="" src="'+lg.src+'">':"")+'<div><b>KOSMARA</b><small>La sencillez de un único universo</small></div></div>'+(soc?'<div class="kf-soc" style="margin-top:14px">'+soc+"</div>":"")+"</div>"+
+  '<div class="kf-cols"><div><h4>Producto</h4><button data-fgo="pools">Pools</button><button data-fgo="swap">Swap</button><button data-fgo="portfolio">Portafolio</button>'+(window.kzCanInstall&&kzCanInstall()?'<button data-pwa>Instalar app</button>':"")+'</div>'+
+  '<div><h4>Kosmara</h4><button data-fgo="wp">White paper</button><button data-fgo="road">Hoja de ruta</button><button data-fgo="m:lang">'+L[2]+" "+esc(L[1])+'</button><button data-fgo="m:cur">'+(KZC.c==="eur"?"€ Euro":"$ Dólar")+'</button></div>'+
+  '<div><h4>Ayuda</h4><button data-fgo="m:help">Soporte</button>'+(typeof SUPPORT_EMAIL!=="undefined"&&SUPPORT_EMAIL?'<a href="mailto:'+esc(SUPPORT_EMAIL)+'">'+esc(SUPPORT_EMAIL)+"</a>":"")+'<button data-fgo="m:risk">Riesgos y condiciones</button><button data-fgo="m:priv">Privacidad</button></div></div>'+
+  '<div class="kf-copy"><span>© '+new Date().getFullYear()+" Kosmara</span> · <span>Interfaz sin custodia: tus fondos no salen de tu wallet.</span></div>"}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-fgo]");if(!b)return;var g=b.getAttribute("data-fgo");
+ if(g.indexOf("m:")===0)return mOpen(g.slice(2));if(g==="wp"||g==="road"){kzShow("home");setTimeout(function(){var el=document.querySelector(g==="wp"?".wp":".road");if(el)el.scrollIntoView({behavior:"smooth",block:"start"})},120);return}kzShow(g)});
+rFoot();setTimeout(rFoot,1500);
+</script>
+<script>
+/* Cambio USD→EUR: EURC en Jupiter y, si falla, el BCE vía Frankfurter. Se guarda 6 h. */
+async function curRate(force){try{var o=JSON.parse(localStorage.getItem("kz_eur")||"null");if(!force&&o&&o.r>0&&Date.now()-o.t<216e5){KZC.r=o.r;return true}}catch(e){}
+ var r=0;try{var q=await fetch(JL+"/tokens/v2/search?query=HzwqbKZw8HxMN6bF2yFZNrht3c2iXXzpKcFu7uBEDKtr");if(q.ok){var t=(await q.json())[0];if(t&&t.usdPrice>.5&&t.usdPrice<2)r=1/t.usdPrice}}catch(e){}
+ if(!r)try{var q2=await fetch("https://api.frankfurter.app/latest?from=USD&to=EUR");if(q2.ok){var j=await q2.json();if(j&&j.rates&&j.rates.EUR)r=+j.rates.EUR}}catch(e){}
+ if(r){KZC.r=r;try{localStorage.setItem("kz_eur",JSON.stringify({r:r,t:Date.now()}))}catch(e){}return true}return KZC.r>0}
+function kzRedraw(){["rPools","rHome","rPf","rWallet","rSwap","rLot","rFoot"].forEach(function(n){try{if(typeof window[n]==="function")window[n]()}catch(e){}});try{rNet("eth");rNet("bsc")}catch(e){}try{if(MN.open)rMenu()}catch(e){}}
+async function setCur(c){if(c==="eur"&&!(await curRate())){toast("No se pudo obtener el cambio del euro. Vuelve a intentarlo.");return}KZC.c=c;try{localStorage.setItem("kz_cur",c)}catch(e){}CU={};kzRedraw();toast(c==="eur"?"Valores en euros.":"Valores en dólares.")}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-cur]");if(!b)return;setCur(b.getAttribute("data-cur"))});
+if(KZC.c==="eur")curRate().then(function(ok){if(ok)kzRedraw()});
+(function(){if(typeof setLang!=="function")return;var o=setLang;setLang=function(c){return o(c).then(function(x){try{rFoot()}catch(e){}return x})}})();
 </script>
 </body>
 </html>
