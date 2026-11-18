@@ -1,0 +1,13 @@
+name: probe
+on: {push: {paths: [".github/workflows/probe.yml"]}}
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - shell: bash {0}
+        run: |
+          K=jup_pub_fc0db5fe4cd24284045be587a267338b6e067d0f97e76712fbf9692bd3830f69;O="Origin: https://cristiancgrd13-cpu.github.io"
+          S=So11111111111111111111111111111111111111112;U=EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+          for u in "swap/v2/order?inputMint=$S&outputMint=$U&amount=10000000" "swap/v1/quote?inputMint=$S&outputMint=$U&amount=10000000" "lend/v1/earn/tokens"; do
+            curl -sS -D h.txt -H "$O" -H "x-api-key: $K" "https://api.jup.ag/$u" -o r.json; echo "$u $(head -1 h.txt) $(grep -i 'access-control-allow-origin\|ratelimit' h.txt | tr '\n' ' ')"; head -c 200 r.json; echo; done
+          curl -sS -X OPTIONS -D - -o /dev/null -H "$O" -H "Access-Control-Request-Method: GET" -H "Access-Control-Request-Headers: x-api-key" "https://api.jup.ag/swap/v2/order" | grep -i "HTTP/\|access-control"
