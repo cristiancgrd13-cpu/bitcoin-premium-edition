@@ -349,7 +349,7 @@ button.logo:focus-visible{outline:2px solid #7c5cff;outline-offset:4px}
 
 <h2 class="all hd">Abre una posición en tres pasos</h2>
 <div class="all steps">
-<div class="step"><b>Conecta tu wallet</b><span>Phantom, MetaMask, Trust Wallet, OKX, Coinbase o Rabby, y tu Ledger a través de ellas. Sin registro ni cuenta.</span></div>
+<div class="step"><b>Conecta tu wallet</b><span>Phantom, MetaMask, Trust Wallet, OKX, Coinbase o Rabby, y tu Ledger o Trezor a través de ellas. Sin registro ni cuenta.</span></div>
 <div class="step"><b>Elige pool y rango</b><span>Kosmara calcula cuánto necesitas de cada token y lo reparte por ti con un autoswap.</span></div>
 <div class="step"><b>Firma en tu wallet</b><span>Orca crea el NFT de tu posición y te lo envía directamente. Nunca pasa por Kosmara.</span></div>
 </div>
@@ -359,13 +359,13 @@ button.logo:focus-visible{outline:2px solid #7c5cff;outline-offset:4px}
 <h2 class="all hd">El papel de Kosmara</h2>
 <p class="all sub">Qué es, cómo funciona y hacia dónde va, explicado sin tecnicismos.</p>
 <div class="all wp">
-<details open><summary>Qué es Kosmara</summary><div class="tx"><p>Kosmara es una puerta única a las finanzas descentralizadas. En lugar de saltar entre Orca, Raydium, Jupiter, Kamino, Uniswap o PancakeSwap, ves sus pools en una sola lista, los comparas y operas desde aquí.</p><p>Empieza en Solana y suma Ethereum y BNB Chain, con la misma forma de trabajar en las tres redes.</p></div></details>
+<details open><summary>Qué es Kosmara</summary><div class="tx"><p>Kosmara reúne las finanzas descentralizadas en un único universo. En lugar de saltar entre Orca, Raydium, Jupiter, Kamino, Uniswap o PancakeSwap, ves sus pools en una sola lista, los comparas y operas desde aquí.</p><p>Nació en Solana y ya trabaja en 14 redes: pools en Solana, Ethereum y BNB Chain; swaps también en Base, Arbitrum, Avalanche, HyperEVM y más; y cambios entre redes, incluido Bitcoin, con THORChain. Todo se usa de la misma forma.</p></div></details>
 <details><summary>Qué problema resuelve</summary><div class="tx"><p>DeFi está repartido en decenas de webs, cada una con su interfaz, su red y su wallet. Comparar rendimientos, mover liquidez y llevar la cuenta de lo que has hecho obliga a abrir muchas pestañas y a fiarse de la memoria.</p><p>Kosmara junta los cuatro pasos en un sitio: <b>buscar</b> dónde rinde tu dinero, <b>comparar</b> entre protocolos, <b>operar</b> sin salir y <b>exportar</b> tus movimientos cuando toque hacer cuentas.</p></div></details>
 <details><summary>Cómo funciona por dentro</summary><div class="tx"><p>Kosmara no es un banco ni un exchange: es una interfaz. Prepara cada transacción con las herramientas oficiales del protocolo de destino y te la entrega para que la firmes en tu wallet.</p><p>Quien ejecuta la operación es ese protocolo. Si abres una posición en Orca, es Orca quien crea el NFT y lo deposita en tu wallet.</p><ul><li><b>Sin custodia.</b> Kosmara no guarda fondos, claves ni NFT.</li><li><b>Sin registro.</b> No hay cuentas ni datos personales.</li><li><b>Código abierto.</b> El código de la web es público y cualquiera puede revisarlo.</li></ul></div></details>
 <details><summary>Cómo se sostiene</summary><div class="tx"><p>Ver, comparar y abrir pools será siempre gratis.</p><p>Los ingresos previstos vienen de una pequeña comisión en los swaps y, más adelante, de servicios opcionales como alertas o informes. A día de hoy Kosmara no cobra ninguna comisión propia: solo pagas las del protocolo que uses y las de la red.</p><p>El Vault Kosmara, aún en estudio, añadirá otra vía: el 80 % del interés de cada depósito será para quien deposita y el 20 % recomprará y quemará el token.</p></div></details>
 <details><summary>Puntos y token MARA</summary><div class="tx"><p>Kosmara premiará el uso real del protocolo con puntos: cambiar tokens, abrir posiciones, mantenerlas en rango. El plan es que esos puntos sean la base del reparto de MARA, el token del protocolo, cuando se lance.</p><p>MARA está pensado para dar ventajas dentro de Kosmara, como descuentos en comisiones y acceso a funciones avanzadas. Todavía no existe: no hay fecha, cantidades ni precio, y nadie debería comprar nada con ese nombre.</p></div></details>
 <details><summary>Riesgos que debes conocer</summary><div class="tx"><ul><li><b>Es un prototipo sin auditar.</b> Úsalo con importes pequeños.</li><li><b>Los pools tienen riesgo.</b> El precio puede salir de tu rango y puedes acabar con menos valor que si hubieras guardado los tokens (pérdida impermanente).</li><li><b>Dependes de terceros.</b> Cada protocolo tiene sus propios contratos y sus propios riesgos.</li><li><b>Las operaciones son irreversibles.</b> Revisa siempre lo que firmas en tu wallet.</li></ul><p>Nada de lo que ves aquí es asesoramiento financiero.</p></div></details>
-<div class="wp-foot">Documento vivo, versión 0.1, noviembre de 2026</div>
+<div class="wp-foot">Documento vivo, versión 0.2, noviembre de 2026</div>
 </div>
 
 <h2 class="all hd">Hoja de ruta</h2>
@@ -1093,7 +1093,7 @@ function rSheet(){
  if(v==="main"){
   var ot=["tw","okx","cb","rb"].map(WID);
   h='<div class="wvh"><b>Conectar wallet</b>'+X+'</div><p class="wsub">Kosmara nunca ve tus claves: cada operación la firmas tú.</p>'+
-   '<div class="wgrid g3">'+wTile(WID("ph"),"Solana")+wTile(WID("mm"),"Ethereum y BNB")+
+   '<div class="wgrid g3">'+wTile(WID("ph"),"Solana")+wTile(WID("mm"),"Ethereum y redes EVM")+
    '<button class="wt" data-wv="all" aria-label="Ver otras wallets"><span class="wt-i"><span class="wl wmini">'+ot.map(wIcon).join("")+"</span></span><span>Otras<small>Ledger y más</small></span></button></div>";
   if(S.pk||S.eaddr)h+='<div class="wcon">'+(S.pk?'<div class="row"><span><span class="dot" style="background:var(--up)"></span>'+esc(S.wname)+' <small class="dim">Solana</small></span><span class="v num">'+short(S.pk)+"</span></div>":"")+
    (S.eaddr?'<div class="row"><span><span class="dot" style="background:var(--up)"></span>'+esc(S.ename)+' <small class="dim">EVM</small></span><span class="v num">'+short(S.eaddr)+"</span></div>":"")+
@@ -1102,7 +1102,7 @@ function rSheet(){
  }else if(v==="all"){
   var L=WL.filter(function(w){return w.id!=="ph"&&w.id!=="mm"}).concat(HWL).sort(function(a,b){return (a.sn||a.n).localeCompare(b.sn||b.n)});
   h='<div class="wvh">'+B("main")+"<b>Elige wallet</b>"+X+'</div><div class="wgrid">'+L.map(function(w){return wTile(w)}).join("")+"</div>"+
-   '<p class="dim" style="margin:22px 0 0;font-size:12.5px;line-height:1.5">El punto verde indica que la wallet está en este navegador. Firman en Solana: Phantom, Trust, OKX y Coinbase. MetaMask y Rabby, por ahora, solo cargan tu dirección de Ethereum o BNB.'+(MOB?" Rabby no abre webs desde fuera: entra en Kosmara desde su navegador.":"")+"</p>";
+   '<p class="dim" style="margin:22px 0 0;font-size:12.5px;line-height:1.5">El punto verde indica que la wallet está en este navegador. Firman en Solana: Phantom, Trust, OKX y Coinbase. MetaMask y Rabby firman en Ethereum y en el resto de redes EVM.'+(MOB?" Rabby no abre webs desde fuera: entra en Kosmara desde su navegador.":"")+"</p>";
  }else{
   h='<div class="wvh">'+B("all")+"<b>"+(v==="ledger"?"Ledger":"Trezor")+"</b>"+X+'</div><div class="whw">'+HW[v]+"</div>"+
    '<div class="wgrid">'+(v==="ledger"?["ph","mm","rb"]:["mm","rb"]).map(function(id){return wTile(WID(id))}).join("")+"</div>";
@@ -1311,7 +1311,7 @@ function rHome(){
  $("hTop").innerHTML='<div class="k">Pools destacados <small>por liquidez, datos reales</small></div>'+(L.length?'<div class="plist">'+L.map(poolRow).join("")+"</div>":'<div class="dim">Cargando pools…</div>');
  if(!A.length)return;
  var tvl=0,pr={},nets={sol:1};A.forEach(function(p){if(!p.kind)tvl+=p.tvl||0;pr[p.pr]=1;if(p.net)nets[p.net]=1});
- $("hLive").innerHTML='<span class="dot"></span><b>'+f(A.length,0)+"</b> pools en vivo, <b>$"+(tvl>=1e9?f(tvl/1e9,2)+" mil M":f(tvl/1e6,0)+" M")+"</b> de liquidez, <b>"+Object.keys(pr).length+"</b> protocolos, <b>"+Object.keys(nets).length+"</b> redes";
+ $("hLive").innerHTML='<span class="dot"></span><b>'+f(A.length,0)+"</b> pools en vivo, <b>$"+(tvl>=1e9?f(tvl/1e9,2)+" mil M":f(tvl/1e6,0)+" M")+"</b> de liquidez, <b>"+Object.keys(pr).length+"</b> protocolos, <b>"+Math.max(Object.keys(nets).length,typeof NETL!=="undefined"?NETL.length:0)+"</b> redes";
  var T=A.filter(function(p){return p.apr>0&&p.apr<400&&p.tvl>=1e6}).sort(function(a,b){return b.apr-a.apr}).slice(0,5),sig=T.map(function(p){return p.k}).join();
  if(T.length>=3&&sig!==tickSig){tickSig=sig;var h=T.map(function(p){return '<button data-pool="'+esc(p.k)+'"><b>'+esc(p.A.s)+(p.B.s?"/"+esc(p.B.s):"")+"</b><small>"+p.pr+'</small><span class="num">'+f(p.apr,1)+"%</span><small>APR</small></button>"}).join('<i class="tsep" aria-hidden="true">◆</i>')+'<i class="tsep" aria-hidden="true">◆</i>';
   $("hTick").innerHTML='<div class="tick-in">'+h+h+h+h+"</div>";tickRun();$("hTick").hidden=false}
