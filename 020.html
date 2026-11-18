@@ -468,7 +468,8 @@ window.kzP=9;
 /* Clave publicable de Kosmara en Jupiter (segura en la web: solo atribución). Un usuario avanzado puede usar la suya. */
 var KZJ="jup_pub_fc0db5fe4cd24284045be587a267338b6e067d0f97e76712fbf9692bd3830f69";
 var S={key:LS("kz_jup")||KZJ,rpc:LS("kz_rpc"),pk:"",wname:"",bal:{},pools:{},stat:{},flt:"all",chip:"",q:"",sort:"tvl",lim:3,sel:"",rows:[],net:"",addr:""},CSV="";
-var RPCS=["https://solana-rpc.publicnode.com","https://public.rpc.solanavibestation.com"];
+var KZRPC="https://mainnet.helius-rpc.com/?api-key=d69a3929-b7b3-4523-8dea-9d82a0bcfd36";
+var RPCS=[KZRPC,"https://solana-rpc.publicnode.com","https://public.rpc.solanavibestation.com"];
 function rpcUrl(){return S.rpc||S.rpcOk||RPCS[0]}
 async function rc(m,p){
  var c=rpcUrl(),us=S.rpc?[S.rpc]:[c].concat(RPCS.filter(function(u){return u!==c})),er="";
@@ -789,7 +790,7 @@ async function doSwap(){
 /* ---------- Conexiones ---------- */
 function rCfg(){
  $("cfg").innerHTML='<div class="k">Conexiones <small>se guardan solo en este navegador</small></div>'+
- '<label for="rp">RPC de Solana (opcional; el público sirve para saldos y crear posiciones, pero para ver el Portafolio hace falta uno propio, p. ej. Helius)</label><input id="rp" type="url" autocomplete="off" value="'+esc(S.rpc)+'" placeholder="https://mainnet.helius-rpc.com/?api-key=…">';
+ '<label for="rp">RPC de Solana (opcional: Kosmara ya usa Helius; pon aquí el tuyo solo si quieres cambiarlo)</label><input id="rp" type="url" autocomplete="off" value="'+esc(S.rpc)+'" placeholder="Vacío = RPC de Kosmara (Helius)">';
 }
 
 /* ---------- Pools reales ---------- */
@@ -1020,12 +1021,12 @@ async function balAta(o){
 async function loadBal(){
  if(!S.pk)return;
  try{var o={};o[SOLM]=(await rc("getBalance",[S.pk])).value/1e9;
-  try{if(!S.rpc)throw 0;await Promise.all(TPG.map(async function(pg){
+  try{await Promise.all(TPG.map(async function(pg){
    var t=await rc("getTokenAccountsByOwner",[S.pk,{programId:pg},{encoding:"jsonParsed"}]);
    t.value.forEach(function(a){var i=a.account.data.parsed.info;o[i.mint]=(o[i.mint]||0)+(i.tokenAmount.uiAmount||0)})}))}
   catch(e1){await balAta(o)}
   S.bal=o}
- catch(e){toast("No se pudo leer tu saldo: "+e.message+(S.rpc?"":". Prueba con un RPC propio en Wallet → Conexiones."))}
+ catch(e){toast("No se pudo leer tu saldo: "+e.message+". Vuelve a intentarlo en unos segundos.")}
 }
 /* ---------- wallets ----------
    Solana: Phantom, Trust Wallet, OKX y Coinbase (firman pools, swap y portafolio).
@@ -1208,7 +1209,7 @@ document.addEventListener("click",function(e){
  if(e.target===$("sheet"))$("sheet").hidden=true;
  if(e.target===$("ps")){S.sel="";rPs()}
  if(w)return wallet(w.getAttribute("data-w"));
- if(pl){S.sel=pl.getAttribute("data-pool");var p=S.pools[S.sel];ST.r=5;ST.cmin="";ST.cmax="";RV.zoom=1;ST.pay=p&&p.B.s&&/USD/.test(p.B.s)?"B":"B";ST.amt="";rPs();if(S.pk&&!S.rpc)loadBal().then(sumPsSafe);return}
+ if(pl){S.sel=pl.getAttribute("data-pool");var p=S.pools[S.sel];ST.r=5;ST.cmin="";ST.cmax="";RV.zoom=1;ST.pay=p&&p.B.s&&/USD/.test(p.B.s)?"B":"B";ST.amt="";rPs();if(S.pk)loadBal().then(sumPsSafe);return}
  if(fl){S.flt=fl.getAttribute("data-flt");S.focusQ=false;return rPools()}
  if(pr){var v=pr.getAttribute("data-pr");ST.r=v==="c"?"c":+v;return rPs()}
  if(rt){SW.sel=rt.getAttribute("data-rt");return rQt()}
@@ -1280,7 +1281,7 @@ var ROAD=[
  ["test","Tokens de tu wallet en el portafolio","Todo lo que tienes en Solana y en las redes EVM, con su valor en dólares."],
  ["test","Swap entre redes con THORChain","BTC, ETH, SOL, BNB, AVAX y más, nativos y sin puentes. Firmas desde tu wallet de Ethereum, BNB Chain, Base o Avalanche."],
  ["test","Crear posiciones en Orca sin salir de Kosmara","Rango con la liquidez del pool, asas para ajustarlo y gráfico de velas. El NFT llega directo a tu wallet."],
- ["test","Portafolio de posiciones","Lee tus posiciones de Orca. Necesita un RPC propio."],
+ ["test","Portafolio de posiciones","Lee tus posiciones de Orca directamente de la cadena."],
  ["test","Más wallets y cold wallets","Phantom, Trust Wallet, OKX, Coinbase, MetaMask y Rabby; Ledger y Trezor a través de ellas."],
  ["soon","Cerrar posiciones y cobrar comisiones","Gestión completa sin ir a Orca."],
  ["soon","Crear posiciones en Raydium",""],
@@ -1660,7 +1661,7 @@ async function mkPos(){
   r((o.confirmed?"Posición creada.":"Transacción enviada; aún sin confirmar.")+' <a class="lk" href="https://solscan.io/tx/'+esc(o.signature)+'" target="_blank" rel="noopener">Ver transacción ↗</a> · <a class="lk" href="https://solscan.io/token/'+esc(o.positionMint)+'" target="_blank" rel="noopener">Ver NFT ↗</a>');loadBal();loadPos()}
  catch(e){r("No se pudo completar: "+esc((e&&e.message)||e))}
 }
-async function loadPos(){if(!S.pk||!(window.kzSdk&&kzSdk.ready))return;try{S.positions=await kzSdk.positions({rpc:rpcUrl(),owner:S.pk});S.posOk=true;S.posErr=""}catch(e){S.posErr=S.rpc?e.message:"el RPC público no permite listar posiciones; pon un RPC propio en Wallet → Conexiones"}rPf()}
+async function loadPos(){if(!S.pk||!(window.kzSdk&&kzSdk.ready))return;try{S.positions=await kzSdk.positions({rpc:rpcUrl(),owner:S.pk});S.posOk=true;S.posErr=""}catch(e){S.posErr="no se pudieron leer tus posiciones ahora mismo ("+e.message+"). Vuelve a intentarlo en unos segundos."}rPf()}
 (function(){var id=LS("kz_w");if(id==="-")return;id=id||"ph";var w=WID(id);if(!w)return;var p=solGet(w);if(!p)return;
  var go=function(k){if(k)solOn(w,k.toString())};
  if(id==="ph")solConnect(p,true).then(go).catch(function(){});else if(p.isConnected&&p.publicKey)go(p.publicKey);

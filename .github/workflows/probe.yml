@@ -1,0 +1,12 @@
+name: probe
+on: push
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          U="https://mainnet.helius-rpc.com/?api-key=d69a3929-b7b3-4523-8dea-9d82a0bcfd36"
+          O="Origin: https://cristiancgrd13-cpu.github.io"
+          curl -s -i -X POST "$U" -H "$O" -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"getBalance","params":["9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"]}' | grep -i -E 'HTTP/|access-control|result|error' | head
+          curl -s -X POST "$U" -H "$O" -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"getTokenAccountsByOwner","params":["9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM",{"programId":"TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA"},{"encoding":"jsonParsed"}]}' | head -c 300; echo
+          curl -s -X POST "$U" -H "$O" -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"getProgramAccounts","params":["whirLbMiicVdio4qvUfM5KAg6Ct8VwpYzGff3uctyCc",{"encoding":"base64","dataSlice":{"offset":0,"length":0},"filters":[{"dataSize":216},{"memcmp":{"offset":8,"bytes":"9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM"}}]}]}' | head -c 300; echo
