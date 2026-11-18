@@ -439,7 +439,7 @@ button.logo:focus-visible{outline:2px solid #7c5cff;outline-offset:4px}
 <script>try{var kzI=document.createElement("link");kzI.rel="icon";kzI.href=document.querySelector(".logo img").src;document.head.appendChild(kzI)}catch(e){}</script>
 <script>document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest("#bConn,[data-act=open]");if(t){var sh=document.getElementById("sheet");if(sh)sh.hidden=false}});</script>
 <script>
-window.kzLog=[];window.onerror=function(m,u,l,c){window.kzLog.push(m+" (línea "+l+", col "+c+")");var d=document.getElementById("kzerr");if(!d){d=document.createElement("div");d.id="kzerr";d.style.cssText="position:fixed;top:0;left:0;right:0;z-index:99;background:#7a1020;color:#fff;font:12px monospace;padding:6px 10px;white-space:pre-wrap";document.body.appendChild(d)}d.textContent=window.kzLog.join("\n")};
+window.kzLog=[];window.onerror=function(m,u,l,c){if(/ResizeObserver|Script error\.?$/i.test(String(m)))return;window.kzLog.push(m+" (línea "+l+", col "+c+")");var d=document.getElementById("kzerr");if(!d){d=document.createElement("div");d.id="kzerr";d.setAttribute("role","alert");d.style.cssText="position:fixed;top:calc(8px + env(safe-area-inset-top,0px));left:10px;right:10px;z-index:99;background:rgba(40,14,30,.96);border:1px solid rgba(255,120,150,.45);color:#fff;font:13px/1.45 system-ui,sans-serif;padding:10px 12px;border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.45)";d.innerHTML='<div style="display:flex;gap:8px;align-items:center"><span style="flex:1">Una parte de Kosmara no ha cargado bien.</span><button type="button" style="background:#fff;color:#1a0d24;border:0;border-radius:10px;padding:6px 10px;font-weight:600" onclick="location.reload()">Recargar</button><button type="button" aria-label="Cerrar" style="background:none;border:0;color:#fff;font-size:18px;padding:0 4px" onclick="this.closest(\'#kzerr\').remove()">×</button></div><details style="margin-top:6px;opacity:.75"><summary style="cursor:pointer;font-size:12px">Detalles técnicos</summary><pre style="white-space:pre-wrap;font:11px monospace;margin:6px 0 0"></pre></details>';document.body.appendChild(d)}d.querySelector("pre").textContent=window.kzLog.join("\n")};
 var KZV=["home","pools","portfolio","swap","lottery","wallet"];
 function kzShow(v,push){
  if(KZV.indexOf(v)<0)v="home";
@@ -476,6 +476,25 @@ async function rc(m,p){
  for(var i=0;i<us.length;i++){try{var r=await fetch(us[i],{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({jsonrpc:"2.0",id:1,method:m,params:p})});if(!r.ok)throw new Error("RPC HTTP "+r.status);var j=await r.json();if(j.error)throw new Error(j.error.message);if(!S.rpc)S.rpcOk=us[i];return j.result}catch(e){er=e.message}}
  throw new Error(er);
 }
+
+/* Errores en lenguaje claro: traduce el mensaje técnico a algo que se entiende y se puede resolver. */
+function fe(e){var m=String((e&&(e.message||e.reason))||e||""),c=e&&e.code;
+ if(c===4001||c==="ACTION_REJECTED"||/user rejected|user denied|rejected the request|request rejected|cancell?ed by user/i.test(m))return "Has rechazado la firma en tu wallet.";
+ if(/failed to fetch|networkerror|load failed|network request failed|err_internet|timed? ?out|aborted|sin respuesta/i.test(m))return "No hay respuesta del servidor. Revisa tu conexión y vuelve a intentarlo.";
+ if(/\b429\b|rate.?limit|too many/i.test(m))return "El servicio está saturado. Espera unos segundos y vuelve a intentarlo.";
+ if(/HTTP 5\d\d|\b50[0-4]\b|bad gateway|service unavailable|internal server/i.test(m))return "El servicio tiene problemas ahora mismo. Vuelve a intentarlo en un momento.";
+ if(/HTTP 40[13]|unauthori[sz]ed|forbidden|api.?key/i.test(m))return "El servicio ha rechazado la conexión. Vuelve a intentarlo más tarde.";
+ if(/insufficient (funds|lamports|balance)|not enough (funds|balance)|exceeds balance|transfer amount exceeds/i.test(m))return "No tienes saldo suficiente, contando la comisión de red.";
+ if(/slippage|price impact too|0x1771|tolerance|exceeds desired|return amount is not enough/i.test(m))return "El precio se ha movido demasiado. Pide un precio nuevo o sube el deslizamiento.";
+ if(/no route|no routes|route not found|could not find any route|no quote|not tradable|no_possible_route|could_not_find/i.test(m))return "No hay ruta para este par con este importe. Prueba con otro importe u otro token.";
+ if(/blockhash|block height exceeded|expired/i.test(m))return "La operación caducó antes de enviarse. Pide un precio nuevo y vuelve a firmar.";
+ if(/HTTP 404|not found/i.test(m))return "No hay datos para esto ahora mismo.";
+ m=m.trim();if(m&&m.length<=140&&!/[{}<>]|0x[0-9a-f]{6}|undefined|null|TypeError|ReferenceError|Unexpected token|JSON|HTTP \d/i.test(m))return m.charAt(0).toUpperCase()+m.slice(1).replace(/\.?$/,".");
+ return "Algo ha fallado. Vuelve a intentarlo.";}
+function tt(k){try{return (typeof i18t==="function"&&i18t(k))||k}catch(e){return k}}
+function rbtn(k){return ' <button class="btn" data-retry="'+k+'">Reintentar</button>'}
+document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-retry]");if(!b)return;var k=b.getAttribute("data-retry");b.disabled=true;b.textContent="Cargando…";
+ if(k==="pools")loadPools();else if(k==="aave")loadAave();else if(k==="hold")loadHold(true);else if(k==="pos")loadPos();else if(k.indexOf("net:")===0)loadNet(k.slice(4),NS[k.slice(4)].q)});
 function b64u(s){var b=atob(s),u=new Uint8Array(b.length);for(var i=0;i<b.length;i++)u[i]=b.charCodeAt(i);return u}
 function u8b(u){var s="";for(var i=0;i<u.length;i++)s+=String.fromCharCode(u[i]);return btoa(s)}
 
@@ -538,7 +557,7 @@ async function loadTk(id){if(EV.ld[id])return;EV.ld[id]=1;try{var r=await fetch(
   L=L.filter(function(t){return t.address===NAT||t.coinKey||EVP.indexOf(t.symbol)>=0}).sort(function(a,b){return rk(a)-rk(b)||a.symbol.localeCompare(b.symbol)}).slice(0,70);
   (HD.evm||[]).forEach(function(h){if(h.ok&&h.v>=.01&&String(h.c)===String(id)&&!L.some(function(t){return t.address.toLowerCase()===h.m.toLowerCase()}))L.push({address:h.m,symbol:h.s,decimals:h.d,logoURI:h.ic,priceUSD:h.px})});
   EV.tk[id]=L;if(!EV.from[id])EV.from[id]=L[0]&&L[0].address;if(!EV.to[id]){var u=L.filter(function(t){return /^USDC/.test(t.symbol)&&t.address!==EV.from[id]})[0]||L[1];EV.to[id]=u&&u.address}EV.ld[id]=2}
- catch(e){EV.ld[id]=0;EV.err=e.message}if(String(SW.net)===String(id)&&S.view==="swap")rSwap()}
+ catch(e){EV.ld[id]=0;EV.err=fe(e)}if(String(SW.net)===String(id)&&S.view==="swap")rSwap()}
 function evT(id,a){return (EV.tk[id]||[]).filter(function(t){return t.address===a})[0]}
 function evBal(id,a){var h=(HD.evm||[]).filter(function(x){return String(x.c)===String(id)&&x.m.toLowerCase()===String(a).toLowerCase()})[0];return h?h.a:null}
 function rE(){
@@ -574,11 +593,11 @@ async function qKyber(){var x=evPick(),c=KSC[x.id];if(!c)throw new Error("no dis
  if(!r.ok||!j||j.code!==0||!j.data)throw new Error(j&&j.message?(/route not found/i.test(j.message)?"sin ruta para este par":j.message):"sin ruta ("+r.status+")");
  var s=j.data.routeSummary,out=+s.amountOut/Math.pow(10,x.to.decimals);
  return{p:"KyberSwap",rs:s,chain:c,out:out,min:out*(1-SW.slip/100),usd:+s.amountOutUsd||0,via:"KyberSwap",gas:+s.gasUsd||0,kz:!!(KS_RCV&&KS_FEE_BPS>0),appr:j.data.routerAddress,fr:x.fr,amt:x.a}}
-async function evQuoteAll(addr){var R=await Promise.all([qLifi(addr).catch(function(e){return{p:"LI.FI",err:e.message}}),qKyber().catch(function(e){return{p:"KyberSwap",err:e.message,skip:/no disponible/.test(e.message)}})]);
- R=R.filter(function(q){return !q.skip});var ok=R.filter(function(q){return !q.err}).sort(function(a,b){return b.out-a.out});if(!ok.length)throw new Error(R.map(function(q){return q.p+": "+q.err}).join(" · "));
+async function evQuoteAll(addr){var R=await Promise.all([qLifi(addr).catch(function(e){return{p:"LI.FI",err:fe(e)}}),qKyber().catch(function(e){return{p:"KyberSwap",err:fe(e),skip:/no disponible/.test(e.message)}})]);
+ R=R.filter(function(q){return !q.skip});var ok=R.filter(function(q){return !q.err}).sort(function(a,b){return b.out-a.out});if(!ok.length)throw new Error(R.length?R[0].err:"No hay ruta para este par con este importe.");
  ok.forEach(function(q){q.diff=(q.out/ok[0].out-1)*100});return ok.concat(R.filter(function(q){return q.err}))}
 async function eQuote(){eres("Comparando precios…");try{evPick();EV.res=await evQuoteAll();EV.sel=EV.res[0].p;EV.q=EV.res[0];var d=$("eq");if(d)d.innerHTML=eqHtml();var o=$("eout");if(o)o.textContent="≈ "+f(EV.q.out,6);eres("Elige ruta y pulsa Cambiar.")}
- catch(e){EV.q=null;EV.res=[];EV.res=[];var d=$("eq");if(d)d.innerHTML="";eres('<span class="dn">'+esc(e.message)+"</span>")}}
+ catch(e){EV.q=null;EV.res=[];EV.res=[];var d=$("eq");if(d)d.innerHTML="";eres('<span class="dn">'+esc(fe(e))+"</span>")}}
 async function evSwitch(id){var c=CH[id],hx="0x"+Number(id).toString(16),cur=await S.ev.request({method:"eth_chainId"});if(String(cur).toLowerCase()===hx)return;
  try{await S.ev.request({method:"wallet_switchEthereumChain",params:[{chainId:hx}]})}
  catch(e){if((e.code===4902||/unrecognized|not added|unknown chain/i.test(e.message||""))&&c&&c.metamask){var m=c.metamask;await S.ev.request({method:"wallet_addEthereumChain",params:[{chainId:hx,chainName:m.chainName||c.name,nativeCurrency:m.nativeCurrency,rpcUrls:m.rpcUrls,blockExplorerUrls:m.blockExplorerUrls}]})}else throw e}}
@@ -594,7 +613,7 @@ async function eSwap(){
   else{var t=q.raw.transactionRequest;tx={to:t.to,data:t.data,value:t.value||"0x0"};if(t.gasLimit)tx.gas=t.gasLimit}eres("Firma el swap en tu wallet…");var h=await esend(tx);
   var x=CH[id]&&CH[id].metamask&&CH[id].metamask.blockExplorerUrls&&CH[id].metamask.blockExplorerUrls[0];
   eres("Swap enviado."+(x?' <a class="lk" href="'+esc(x.replace(/\/$/,""))+"/tx/"+esc(h)+'" target="_blank" rel="noopener">Ver transacción ↗</a>':""));toast("Swap enviado en "+chN(id)+".");setTimeout(function(){loadHold(true)},8000)}
- catch(e){eres('<span class="dn">'+esc(e&&e.code===4001?"Has rechazado la firma.":(e&&e.message)||"No se pudo completar.")+"</span>")}}
+ catch(e){eres('<span class="dn">'+esc(fe(e))+"</span>")}}
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-net],[data-epct],[data-er],[data-act='netpick'],[data-act^='e']");if(!b)return;
  if(b.hasAttribute("data-er")){EV.sel=b.getAttribute("data-er");EV.q=(EV.res||[]).filter(function(x){return x.p===EV.sel})[0]||EV.q;var d=$("eq");if(d)d.innerHTML=eqHtml();return}
  if(b.hasAttribute("data-net")){var n=b.getAttribute("data-net");SW.net=n==="sol"?"sol":+n;SW.np=false;SW.mode="sol";EV.q=null;EV.res=[];EV.amt="";rSwap();return}
@@ -616,12 +635,12 @@ async function loadHold(force){
    Object.keys(b).forEach(function(m){var v=b[m];if(v&&v.uiAmount>0)L.push({c:"sol",m:m==="SOL"?SOLM:m,a:v.uiAmount})});
    for(var i=0;i<L.length;i+=80){try{var q=await fetch(JL+"/tokens/v2/search?query="+L.slice(i,i+80).map(function(x){return x.m}).join(","));if(q.ok)(await q.json()).forEach(function(t){meta[t.id]=t})}catch(z){}}
    L.forEach(function(x){var t=meta[x.m]||{};x.s=t.symbol||short(x.m);x.n=t.name||"";x.ic=t.icon||"";x.px=+t.usdPrice||0;x.v=x.a*x.px;x.ok=!!t.isVerified||(x.px>0&&(+t.liquidity||0)>5e4)});
-   var o={};L.forEach(function(x){o[x.m]=x.a});S.bal=Object.assign({},S.bal,o);HD.sol=L}catch(e){er.push("Solana ("+e.message+")")}})(),
+   var o={};L.forEach(function(x){o[x.m]=x.a});S.bal=Object.assign({},S.bal,o);HD.sol=L}catch(e){er.push("Solana")}})(),
   (async function(){if(!S.eaddr){HD.evm=null;return}try{
    var r=await fetch(LIFI+"/wallets/"+S.eaddr+"/balances?extended=true");if(!r.ok)throw new Error("HTTP "+r.status);var b=(await r.json()).balances||{},L=[];
    Object.keys(b).forEach(function(c){(b[c]||[]).forEach(function(t){var a=Number(t.amount)/Math.pow(10,t.decimals);if(!(a>0))return;var px=+t.priceUSD||0;
-    L.push({c:+c,m:t.address,s:t.symbol,n:t.name,d:t.decimals,ic:t.logoURI||"",a:a,px:px,v:a*px,ok:t.verificationStatus==="verified"})})});HD.evm=L}catch(e){er.push("Ethereum y otras redes ("+e.message+")")}})()]);
- HD.ld=2;HD.at=Date.now();HD.key=key;HD.err=er.length?"No se pudo leer: "+er.join(", ")+".":"";loadCH();rHold();
+    L.push({c:+c,m:t.address,s:t.symbol,n:t.name,d:t.decimals,ic:t.logoURI||"",a:a,px:px,v:a*px,ok:t.verificationStatus==="verified"})})});HD.evm=L}catch(e){er.push("Ethereum y otras redes")}})()]);
+ HD.ld=2;HD.at=Date.now();HD.key=key;HD.err=er.length?(er.length>1?"No se pudieron leer tus tokens. Revisa tu conexión y vuelve a intentarlo.":"No se pudieron leer tus tokens de "+er[0]+". Revisa tu conexión y vuelve a intentarlo."):"";loadCH();rHold();
 }
 function rHold(){if(S.view==="portfolio")rPf();else if(S.view==="wallet")rWallet()}
 function hAll(){return (HD.sol||[]).concat(HD.evm||[]).filter(function(x){return x.a>0}).sort(function(a,b){return b.v-a.v})}
@@ -633,7 +652,7 @@ function hList(){
  if(HD.ld!==2&&!HD.sol&&!HD.evm)return '<div class="dim" style="margin-top:12px">Leyendo los tokens de tu wallet…</div>';
  var sp=hSplit(),h=sp.show.length?sp.show.map(hRow).join(""):'<div class="dim" style="margin-top:12px">'+(HD.err?"":"No hay tokens con saldo en tu wallet.")+"</div>";
  if(sp.rest.length)h+='<button class="btn" style="margin-top:10px;width:100%" data-act="hmore" aria-expanded="'+HD.more+'">'+(HD.more?"Ocultar":"Ver")+" "+sp.rest.length+" tokens sin precio o sin verificar</button>"+(HD.more?'<div class="dim" style="font-size:12px;margin-top:8px">Pueden ser airdrops de spam: no firmes nada que venga de ellos.</div>'+sp.rest.map(hRow).join(""):"");
- if(HD.err)h+='<div class="stat dn" style="margin-top:8px">'+esc(HD.err)+"</div>";
+ if(HD.err)h+='<div class="stat dn" style="margin-top:8px">'+esc(HD.err)+rbtn("hold")+"</div>";
  return h+'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="refbal">'+(HD.ld===1?"Actualizando…":"Actualizar saldos")+"</button>"}
 document.addEventListener("click",function(e){var t=e.target.closest&&e.target.closest('[data-act="hmore"]');if(t){HD.more=!HD.more;rHold()}});
 
@@ -666,7 +685,7 @@ async function loadTC(){
    return{a:p.asset,c:c,s:i<0?r:r.slice(0,i),tok:i<0?"":r.slice(i+1).toLowerCase(),usd:(+p.asset_tor_price||0)/1e8,dep:+p.balance_rune||0}});
   XS.AM={};XS.A.forEach(function(x){XS.AM[x.a]=x});
   if(!XS.AM[XS.from])XS.from="ETH.ETH";if(!XS.AM[XS.to])XS.to="BTC.BTC";XS.ld=2;
- }catch(e){XS.ld=0;XS.err=e.message||"No se pudo cargar THORChain."}
+ }catch(e){XS.ld=0;XS.err=fe(e)}
  if(SW.mode==="x")rSwap();
 }
 function tcName(x){return x?x.s+" · "+TCN[x.c]:""}
@@ -706,7 +725,7 @@ async function tcQuote(){
  q.out=(+q.expected_amount_out||0)/1e8;q.min=(+q.recommended_min_amount_in||0)/1e8;return q}
 async function xQuote(){xres("Consultando THORChain…");try{XS.q=await tcQuote();var e=$("xq");if(e)e.innerHTML=xqHtml();var o=$("xout");if(o)o.textContent="≈ "+f(XS.q.out,6);
   xres(XS.q.min&&parseFloat(XS.amt)<XS.q.min?'<span class="dn">Por debajo del mínimo recomendado: las comisiones pesan mucho.</span>':"Revisa el precio y pulsa Cambiar.")}
- catch(e){XS.q=null;var d=$("xq");if(d)d.innerHTML="";xres('<span class="dn">'+esc(e.message)+"</span>")}}
+ catch(e){XS.q=null;var d=$("xq");if(d)d.innerHTML="";xres('<span class="dn">'+esc(fe(e))+"</span>")}}
 /* wallet de Ethereum: la conectada, o la parte EVM de la wallet de Solana (p. ej. Phantom) */
 async function needEvm(){
  if(S.ev&&S.eaddr)return true;var w=S.wid&&WID(S.wid),p=w&&evmGet(w);
@@ -739,7 +758,7 @@ async function xSwap(){
    xres("Firma el envío en tu wallet…");h=await esend({to:q.router,data:data})}
   xres('Enviado. <a href="'+TCE[fr.c].x+esc(h)+'" target="_blank" rel="noopener">Ver transacción</a>. THORChain te enviará unos '+f(q.out,6)+" "+esc(to.s)+" a tu dirección de "+TCN[to.c]+" en "+(q.total_swap_seconds>90?"≈ "+Math.round(q.total_swap_seconds/60)+" min":"unos segundos")+".");
   toast("Swap entre redes enviado.");
- }catch(e){xres('<span class="dn">'+esc(e&&e.code===4001?"Has rechazado la firma.":(e&&e.message)||"No se pudo completar.")+"</span>")}
+ }catch(e){xres('<span class="dn">'+esc(fe(e))+"</span>")}
 }
 function swTabs(){return '<div class="smode" role="tablist"><button role="tab" data-sm="sol" class="'+(SW.mode!=="x"?"on":"")+'">En una red</button><button role="tab" data-sm="x" class="'+(SW.mode==="x"?"on":"")+'">Entre redes</button></div>'}
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest("[data-sm],[data-act^='x']");if(!b)return;
@@ -773,7 +792,7 @@ async function quoteAll(){
  var a=parseFloat(SW.amt),fr=TM[SW.from],to=TM[SW.to];
  if(!(a>0)||fr===to)return sres("Elige dos activos distintos e introduce una cantidad.");
  var amt=Math.floor(a*Math.pow(10,fr.d));sres("Consultando rutas…");
- var R=await Promise.all(VEN.map(function(v){return quoteV(v,fr.m,to.m,amt,SW.slip).then(function(q){return{v:v,out:q.out/Math.pow(10,to.d)}},function(e){return{v:v,err:e.message}})}));
+ var R=await Promise.all(VEN.map(function(v){return quoteV(v,fr.m,to.m,amt,SW.slip).then(function(q){return{v:v,out:q.out/Math.pow(10,to.d)}},function(e){return{v:v,err:fe(e)}})}));
  var ok=R.filter(function(r){return !r.err}).sort(function(x,y){return y.out-x.out}),bad=R.filter(function(r){return r.err});
  ok.forEach(function(r,i){r.best=i===0;r.diff=ok[0].out?(r.out/ok[0].out-1)*100:0});
  SW.res=ok.concat(bad);SW.sel=ok.length?ok[0].v:"";rQt();sres(ok.length?"Elige una ruta y pulsa Swap.":"Ninguna ruta disponible.");
@@ -784,7 +803,7 @@ async function doSwap(){
  if(!confirm("Vas a firmar un swap REAL:\n"+f(a,6)+" "+fr.s+" por unos "+f(r.out,6)+" "+to.s+" vía "+r.v+".\nRevisa los detalles en tu wallet antes de aprobar."))return;
  try{sres("Esperando tu firma en la wallet…");var sg=await execSwap(r.v,fr.m,to.m,Math.floor(a*Math.pow(10,fr.d)),SW.slip);
   sres('Swap enviado. <a class="lk" href="https://solscan.io/tx/'+esc(sg)+'" target="_blank" rel="noopener">Ver en Solscan ↗</a>');SW.amt="";SW.res=[];loadBal().then(rSwap)}
- catch(e){sres("No se pudo completar: "+esc(e.message))}
+ catch(e){sres('<span class="dn">'+esc(fe(e))+"</span>")}
 }
 
 /* ---------- Conexiones ---------- */
@@ -819,7 +838,7 @@ async function loadPools(q){
   var s=SRC[n],u=s.u(q);if(!u)return;if(s.need&&!s.need()){S.stat[n]=s.msg;return}
   try{var r=null,er="";for(var ui=0,us=[].concat(u);ui<us.length;ui++){try{r=await fetch(us[ui],s.h?{headers:s.h()}:undefined);if(r.ok)break;er="HTTP "+r.status}catch(e2){er=e2.message}r=null}if(!r||!r.ok)throw new Error(er||"sin respuesta");var L=s.r(await r.json()),c=0;
    L.forEach(function(p){try{var o=s.n(p);if(o.id&&o.A.m&&o.B.m){S.pools[o.k]=o;c++}}catch(e){}});S.stat[n]=c+" pools"}
-  catch(e){S.stat[n]="error: "+(e.message||"red")}}));
+  catch(e){S.stat[n]="sin conexión"}}));
  rPools();if(S.view==="home")rHome();
 }
 window.kzP=115;
@@ -849,10 +868,10 @@ function rPools(){
  var act=true,L=filt();
  var cb=Object.keys(CHIPS).map(function(k){return '<button class="btn chip'+(S.chip===k?" on":"")+'" data-chip="'+k+'">'+CHIPS[k].n+"</button>"}).join("");
  var fl=["all","Orca","Raydium","Jupiter","Kamino"].map(function(x){return '<button class="btn chip'+(S.flt===x?" on":"")+'" data-flt="'+x+'">'+(x==="all"?"Todas":x)+"</button>"}).join("");
- var st=Object.keys(SRC).map(function(n){var s=S.stat[n];return n+": "+(s?esc(s):"cargando…")}).join(" · ");
+ var st=Object.keys(SRC).map(function(n){var s=S.stat[n];return n+": <span>"+(s?esc(s):"cargando…")+"</span>"}).join(" · ")+(Object.keys(SRC).some(function(n){return S.stat[n]==="sin conexión"})?rbtn("pools"):"");
  var rows=L.slice(0,S.lim).map(prow).join("");
  var srt='<select id="psort" style="flex:none;width:auto"><option value="tvl"'+(S.sort==="tvl"?" selected":"")+'>Ordenar: TVL</option><option value="vol"'+(S.sort==="vol"?" selected":"")+'>Ordenar: volumen</option><option value="apr"'+(S.sort==="apr"?" selected":"")+">Ordenar: APR</option></select>";
- var res=act?'<div class="chips">'+fl+srt+'</div><div class="stat">'+st+'</div><div class="plist" id="plist">'+(rows||'<div class="dim" style="margin-top:10px">Cargando pools… Si no aparecen en unos segundos, revisa tu conexión.</div>')+"</div>"+(L.length>S.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="more">Ver más</button>':""):'<div class="dim" style="margin-top:12px">Elige una categoría o escribe un token para ver sus pools. Datos reales de Orca, Raydium, Jupiter y Kamino.</div>';
+ var res=act?'<div class="chips">'+fl+srt+'</div><div class="stat">'+st+'</div><div class="plist" id="plist">'+(rows||'<div class="dim" style="margin-top:10px">'+(Object.keys(SRC).every(function(n){return S.stat[n]==="sin conexión"})?"No se han podido cargar los pools. Pulsa Reintentar.":"Cargando pools… Si no aparecen en unos segundos, revisa tu conexión.")+'</div>')+"</div>"+(L.length>S.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="more">Ver más</button>':""):'<div class="dim" style="margin-top:12px">Elige una categoría o escribe un token para ver sus pools. Datos reales de Orca, Raydium, Jupiter y Kamino.</div>';
  $("pools").innerHTML='<div class="k">Solana · pools de liquidez <small>'+(act?L.length+" pools":"busca un token")+"</small></div>"+
   '<input id="pq" placeholder="Buscar tokens o dirección de mint" value="'+esc(S.q)+'" autocomplete="off"><div class="chips tabsrow">'+cb+"</div>"+res;
  var pq=$("pq");if(S.focusQ){pq.focus();pq.setSelectionRange(pq.value.length,pq.value.length)}
@@ -1005,7 +1024,7 @@ async function autoswap(){
   if(!confirm("Vas a firmar un swap REAL para el autoswap:\n"+f(c.swapIn,6)+" "+pay.s+" por unos "+f(out,6)+" "+oth.s+" vía "+ST.via+".\nRevisa los detalles en tu wallet antes de aprobar."))return r("Cancelado.");
   r("Esperando tu firma en la wallet…");var sg=await execSwap(ST.via,pay.m,oth.m,amt,ST.slip);
   r('Autoswap enviado. <a class="lk" href="https://solscan.io/tx/'+esc(sg)+'" target="_blank" rel="noopener">Ver en Solscan ↗</a> Ahora crea la posición en '+p.pr+".");loadBal().then(sumPs)}
- catch(e){r("No se pudo completar: "+esc(e.message))}
+ catch(e){r('<span class="dn">'+esc(fe(e))+"</span>")}
 }
 
 /* ---------- Wallets ---------- */
@@ -1026,7 +1045,7 @@ async function loadBal(){
    t.value.forEach(function(a){var i=a.account.data.parsed.info;o[i.mint]=(o[i.mint]||0)+(i.tokenAmount.uiAmount||0)})}))}
   catch(e1){await balAta(o)}
   S.bal=o}
- catch(e){toast("No se pudo leer tu saldo: "+e.message+". Vuelve a intentarlo en unos segundos.")}
+ catch(e){toast(tt("No se pudo leer tu saldo.")+" "+tt(fe(e)))}
 }
 /* ---------- wallets ----------
    Solana: Phantom, Trust Wallet, OKX y Coinbase (firman pools, swap y portafolio).
@@ -1197,7 +1216,7 @@ async function loadHist(){
  try{S.rows=net==="sol"?await histSol(a):await histEth(a);showHist();
   var blank=net==="sol"&&S.rows.length&&S.rows.every(function(r){return r.imp===""});
   stt(S.rows.length+" filas cargadas de "+(net==="sol"?"Solana (últimas 40 transacciones)":"Ethereum (página más reciente)")+(blank?". El nodo no devolvió los importes; prueba con un RPC propio en Conexiones.":"."))}
- catch(e){stt("No se pudo leer: "+(e&&e.message)+". Los nodos públicos tienen límites; prueba un RPC propio en Conexiones.")}
+ catch(e){stt(tt("No se pudo leer el historial.")+" "+tt(fe(e)))}
 }
 function dlCsv(){if(!CSV)return;var b=new Blob(["\ufeff"+CSV],{type:"text/csv;charset=utf-8"}),u=URL.createObjectURL(b),l=document.createElement("a");l.href=u;l.download="movimientos-"+S.addr.slice(0,6)+".csv";document.body.appendChild(l);l.click();l.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000);toast("Descarga iniciada. Si no aparece, usa Copiar CSV.")}
 function copyCsv(){var ta=$("csv"),ok=false;try{navigator.clipboard.writeText(CSV);ok=true}catch(e){}if(!ok){try{ta.select();ok=document.execCommand("copy")}catch(e){}}toast(ok?"CSV copiado.":"No se pudo copiar solo: mantén pulsado el texto y copia.")}
@@ -1560,7 +1579,7 @@ function rPf(){
  else if(S.pfTab==="vault")body='<div class="dim" style="margin-top:12px">Los vaults de Kosmara llegarán más adelante.</div>';
  else if(n)body=S.positions.map(posCard).join("");
  else if(!S.pk)body='<div class="dim" style="margin-top:12px">Conecta tu wallet para ver tus posiciones.</div><button class="btn p" data-act="open">Conectar wallet</button>';
- else body='<div class="dim" style="margin-top:12px;line-height:1.6">'+(S.posOk?"No tienes posiciones abiertas en Orca.":S.posErr?"No se pudieron leer tus posiciones: "+esc(S.posErr)+".":"Tu wallet está conectada, pero la lectura de posiciones (NFT) aún no está activa.")+' También puedes verlas en <a class="lk" href="https://www.orca.so/portfolio" target="_blank" rel="noopener">orca.so ↗</a>.</div>';
+ else body='<div class="dim" style="margin-top:12px;line-height:1.6">'+(S.posOk?"No tienes posiciones abiertas en Orca.":S.posErr?"<span>No se pudieron leer tus posiciones.</span> <span>"+esc(S.posErr)+"</span>"+rbtn("pos"):"Tu wallet está conectada, pero la lectura de posiciones (NFT) aún no está activa.")+' También puedes verlas en <a class="lk" href="https://www.orca.so/portfolio" target="_blank" rel="noopener">orca.so ↗</a>.</div>';
  $("pfList").innerHTML='<div class="chips"><button class="btn chip'+(S.pfTab==="tok"?" on":"")+'" data-pft="tok">Tokens <span class="tag">'+nt+'</span></button><button class="btn chip'+(S.pfTab==="liq"?" on":"")+'" data-pft="liq">Posiciones <span class="tag">'+n+'</span></button><button class="btn chip'+(S.pfTab==="vault"?" on":"")+'" data-pft="vault">Vaults</button></div>'+body;
 }
 window.kzP=366;
@@ -1599,7 +1618,7 @@ function rLot(){
   '<div class="row"><div><b style="font-size:14px">Con contrato auditado</b><small>El vault guarda fondos en un contrato, así que no se abrirá sin auditoría previa.</small></div></div>'+
   '<div class="k" style="margin-top:16px">Dónde depositar hoy <small>Aave, Jupiter y Kamino</small></div><div class="chips" style="margin-top:0">'+VF.map(function(c){return '<button class="btn chip'+(S.vf===c[0]?" on":"")+'" data-vf="'+c[0]+'">'+c[1]+"</button>"}).join("")+"</div>"+
   (L.length?'<div class="plist">'+L.slice(0,S.vlim).map(prow).join("")+"</div>":'<div class="dim" style="margin-top:10px">'+(E.length?"Nada en esta categoría ahora mismo.":"Cargando rendimientos…")+"</div>")+
-  (S.aaveSt?'<div class="stat">'+esc(S.aaveSt)+"</div>":"")+
+  (S.aaveSt?'<div class="stat">'+esc(S.aaveSt)+(S.aaveErr?rbtn("aave"):"")+"</div>":"")+
   (L.length>S.vlim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="vmore">Ver más</button>':"");
  lotCalc();
 }
@@ -1625,7 +1644,7 @@ async function loadNet(net,q){
    (j.included||[]).forEach(function(x){T[x.id]=x.attributes||{}});
    (j.data||[]).forEach(function(d){var a=d.attributes||{},rl=d.relationships||{},id=function(k){return (rl[k]&&rl[k].data&&rl[k].data.id)||""},pr=dxn(id("dex"),net),A=T[id("base_token")],B=T[id("quote_token")];if(!pr||!A||!B||!a.address)return;
     var fee=(/([\d.]+)%/.exec(a.name||"")||[])[1]||(/_v2$/.test(id("dex"))?(pr==="Uniswap"?.3:.25):0),tvl=+a.reserve_in_usd||0;if(tvl<50000)return;var vol=+(a.volume_usd&&a.volume_usd.h24)||0,o=mk(pr,a.address,tk(A),tk(B),a.base_token_price_quote_token,tvl,vol,fee&&tvl?vol*fee*365/tvl:null,fee?+fee:null,dxu(pr,net,a.address));o.k=net+":"+a.address;o.net=net;S.pools[o.k]=o;c++})}
-  st.st=q?c+" resultados para “"+q+"”":"Top por volumen 24 h · datos de GeckoTerminal"}catch(e){st.st="error: "+(e.message||"red")}
+  st.err=0;st.st=q?c+" resultados para “"+q+"”":"Top por volumen 24 h · datos de GeckoTerminal"}catch(e){st.st=fe(e);st.err=1}
  rNet(net);if(S.view==="home")rHome();
 }
 /* Aave v3 en Ethereum: rendimiento de depositar cada token con más de 5 M$ (API oficial de Aave). */
@@ -1635,13 +1654,13 @@ async function loadAave(){
   ((j.data&&j.data.markets)||[]).forEach(function(m){if(m.name!=="AaveV3Ethereum")return;(m.reserves||[]).forEach(function(v){var t=v.underlyingToken||{};if(v.isFrozen||v.isPaused||!(+v.size.usd>=5e6)||!(+v.supplyInfo.apy.value>0))return;
    var o=mk("Aave",t.address,{m:t.address,s:t.symbol,d:t.decimals,i:t.imageUrl||""},{m:"-",s:"",d:0,i:""},0,+v.size.usd,0,+v.supplyInfo.apy.value*100,null,"https://app.aave.com/reserve-overview/?underlyingAsset="+String(t.address).toLowerCase()+"&marketName=proto_mainnet_v3");
    o.k="aave:"+t.address;o.net="eth";o.kind="Depósito · Ethereum";S.pools[o.k]=o;n++})});
-  S.aaveSt=n?"":"Aave: sin datos"}catch(e){S.aaveSt="Aave: error: "+(e.message||"red")}
+  S.aaveErr=0;S.aaveSt=n?"":"Aave: sin datos"}catch(e){S.aaveSt="Aave: "+fe(e);S.aaveErr=1}
  if(S.view==="lottery")rLot();if(S.view==="home")rHome();
 }
 function rNet(net){
  var N=NET[net],st=NS[net],q=st.q.toLowerCase().trim(),L=Object.keys(S.pools).map(function(k){return S.pools[k]}).filter(function(p){return p.net===net&&!p.kind&&(st.f==="all"||p.pr===st.f)&&(p.A.s+"/"+p.B.s+" "+p.id).toLowerCase().indexOf(q)>=0}).sort(function(a,b){return b.tvl-a.tvl});
  var fl=["all"].concat(N.dx).map(function(x){return '<button class="btn chip'+(st.f===x?" on":"")+'" data-nf="'+net+":"+x+'">'+(x==="all"?"Todas":x)+"</button>"}).join("");
- $(N.el).innerHTML='<div class="k">'+N.n+' · pools de liquidez <small>'+L.length+' pools</small></div><input data-nq="'+net+'" placeholder="Buscar tokens" value="'+esc(st.q)+'" autocomplete="off"><div class="chips">'+fl+'</div><div class="stat">'+esc(st.st||"cargando…")+'</div><div class="plist">'+(L.slice(0,st.lim).map(prow).join("")||'<div class="dim" style="margin-top:10px">Sin pools todavía.</div>')+"</div>"+(L.length>st.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-nm="'+net+'">Ver más</button>':"");
+ $(N.el).innerHTML='<div class="k">'+N.n+' · pools de liquidez <small>'+L.length+' pools</small></div><input data-nq="'+net+'" placeholder="Buscar tokens" value="'+esc(st.q)+'" autocomplete="off"><div class="chips">'+fl+'</div><div class="stat">'+esc(st.st||"cargando…")+(st.err?rbtn("net:"+net):"")+'</div><div class="plist">'+(L.slice(0,st.lim).map(prow).join("")||(st.err?"":'<div class="dim" style="margin-top:10px">Sin pools todavía.</div>'))+"</div>"+(L.length>st.lim?'<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-nm="'+net+'">Ver más</button>':"");
  if(st.foc){var i=$(N.el).querySelector("input");i.focus();i.setSelectionRange(i.value.length,i.value.length)}
 }
 document.addEventListener("click",function(e){var wv=e.target.closest("[data-wv]");if(wv){S.wv=wv.getAttribute("data-wv");rSheet();var mb=$("wsheet");if(mb)mb.scrollTop=0;return}var vf=e.target.closest("[data-vf]");if(vf){S.vf=vf.getAttribute("data-vf");S.vlim=6;rLot();return}var a=e.target.closest("[data-nf]"),m=e.target.closest("[data-nm]");
@@ -1659,9 +1678,9 @@ async function mkPos(){
  if(!confirm("Vas a abrir una posición REAL en Orca ("+p.A.s+"/"+p.B.s+").\nHasta "+f(aA,6)+" "+p.A.s+" + "+f(aB,6)+" "+p.B.s+".\nEl NFT llegará a tu wallet. Revisa la transacción en tu wallet antes de aprobar."))return;
  try{r("Preparando la posición…");var o=await kzSdk.openPosition({rpc:rpcUrl(),pool:p.id,owner:S.pk,amountA:aA,amountB:aB,decA:p.A.d,decB:p.B.d,lower:c.pa,upper:c.pb,slipBps:Math.round(ST.slip*100),provider:S.sw});
   r((o.confirmed?"Posición creada.":"Transacción enviada; aún sin confirmar.")+' <a class="lk" href="https://solscan.io/tx/'+esc(o.signature)+'" target="_blank" rel="noopener">Ver transacción ↗</a> · <a class="lk" href="https://solscan.io/token/'+esc(o.positionMint)+'" target="_blank" rel="noopener">Ver NFT ↗</a>');loadBal();loadPos()}
- catch(e){r("No se pudo completar: "+esc((e&&e.message)||e))}
+ catch(e){r('<span class="dn">'+esc(fe(e))+"</span>")}
 }
-async function loadPos(){if(!S.pk||!(window.kzSdk&&kzSdk.ready))return;try{S.positions=await kzSdk.positions({rpc:rpcUrl(),owner:S.pk});S.posOk=true;S.posErr=""}catch(e){S.posErr="no se pudieron leer tus posiciones ahora mismo ("+e.message+"). Vuelve a intentarlo en unos segundos."}rPf()}
+async function loadPos(){if(!S.pk||!(window.kzSdk&&kzSdk.ready))return;try{S.positions=await kzSdk.positions({rpc:rpcUrl(),owner:S.pk});S.posOk=true;S.posErr=""}catch(e){S.posErr=fe(e)}rPf()}
 (function(){var id=LS("kz_w");if(id==="-")return;id=id||"ph";var w=WID(id);if(!w)return;var p=solGet(w);if(!p)return;
  var go=function(k){if(k)solOn(w,k.toString())};
  if(id==="ph")solConnect(p,true).then(go).catch(function(){});else if(p.isConnected&&p.publicKey)go(p.publicKey);
