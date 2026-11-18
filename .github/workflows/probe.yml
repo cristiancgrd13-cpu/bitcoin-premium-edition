@@ -1,0 +1,11 @@
+name: probe
+on: push
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: |
+          cd .github/probe && npm init -y >/dev/null && npm i @solana/web3.js@1.98.0 >/dev/null 2>&1
+          node t.mjs 9WzDXwBbmkg8ZTbNMqUxvQRAyrZzDsGYdLVL9zYtAWWM || true
+          node -e "fetch('https://lite-api.jup.ag/price/v3?ids=So11111111111111111111111111111111111111112',{headers:{Origin:'https://cristiancgrd13-cpu.github.io'}}).then(r=>r.text()).then(t=>console.log('PRICE',t.slice(0,200)))"

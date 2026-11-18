@@ -675,15 +675,40 @@ async function quoteV(v,im,om,amt,slip){
  if(v==="Jupiter"){var o=await jj("v2/order?inputMint="+im+"&outputMint="+om+"&amount="+amt);return{out:+o.outAmount}}
  var q=await jj("v1/quote?inputMint="+im+"&outputMint="+om+"&amount="+amt+"&slippageBps="+Math.round(slip*100)+"&dexes="+encodeURIComponent(await dexFor(v)));return{out:+q.outAmount}
 }
+/* Comisión de Kosmara en swaps de Solana: siempre en SOL, como una transferencia más dentro de la misma transacción (cualquier par, una sola firma). */
+var JFEE_TO="7ZeR8DKhdDDXsYHk5oBWPvf9edAzF6cvaJBmuJsry9Uw",JFEE_BPS=20,JFEE_OK={t:0,ok:false};
+async function jfeeReady(){if(Date.now()-JFEE_OK.t<6e5)return JFEE_OK.ok;try{var b=await rc("getBalance",[JFEE_TO]);JFEE_OK={t:Date.now(),ok:(b&&b.value!=null?b.value:b)>=890880}}catch(e){JFEE_OK={t:Date.now(),ok:false}}return JFEE_OK.ok}
+async function solPx(ids){try{var r=await fetch(JL+"/price/v3?ids="+ids.join(","));return r.ok?await r.json():{}}catch(e){return {}}}
+/* Lamports de comisión para este swap (0 si no procede: sin destino listo, importe mínimo o SOL justo del usuario) */
+async function jfeeLamports(im,om,amt,q){
+ if(!JFEE_TO||!(JFEE_BPS>0))return 0;var L=0;
+ if(im===SOLM)L=amt*JFEE_BPS/1e4;else if(om===SOLM)L=(+q.outAmount||0)*JFEE_BPS/1e4;
+ else{var P=await solPx([SOLM,im]),ps=P[SOLM]&&+P[SOLM].usdPrice,usd=+q.swapUsdValue||0;
+  if(!usd&&P[im]&&P[im].usdPrice){var tm=TKS.filter(function(t){return t.m===im})[0],d=tm?tm.d:(P[im].decimals||6);usd=amt/Math.pow(10,d)*P[im].usdPrice}
+  if(ps&&usd)L=usd*JFEE_BPS/1e4/ps*1e9}
+ L=Math.floor(L);if(L<5000)return 0;if(!(await jfeeReady()))return 0;
+ try{var ub=await rc("getBalance",[S.pk]),u=ub&&ub.value!=null?ub.value:ub;if(u<(im===SOLM?amt:0)+L+3e6)return 0}catch(e){}
+ return L}
+function jIx(ix){var W=solanaWeb3;return new W.TransactionInstruction({programId:new W.PublicKey(ix.programId),keys:ix.accounts.map(function(a){return{pubkey:new W.PublicKey(a.pubkey),isSigner:a.isSigner,isWritable:a.isWritable}}),data:b64u(ix.data)})}
+/* Arma la transacción del swap con las instrucciones de Jupiter + la transferencia de la comisión */
+async function jupBuild(q,feeL){
+ var W=solanaWeb3,si=await jj("v1/swap-instructions",{quoteResponse:q,userPublicKey:S.pk,dynamicComputeUnitLimit:true,dynamicSlippage:false});
+ var ixs=[].concat((si.computeBudgetInstructions||[]).map(jIx),(si.setupInstructions||[]).map(jIx),[jIx(si.swapInstruction)],si.cleanupInstruction?[jIx(si.cleanupInstruction)]:[],(si.otherInstructions||[]).map(jIx));
+ if(feeL>0)ixs.push(W.SystemProgram.transfer({fromPubkey:new W.PublicKey(S.pk),toPubkey:new W.PublicKey(JFEE_TO),lamports:feeL}));
+ var alts=[];for(var i=0;i<(si.addressLookupTableAddresses||[]).length;i++){var a=si.addressLookupTableAddresses[i],ai=await rc("getAccountInfo",[a,{encoding:"base64"}]);var v=ai&&ai.value;if(v)alts.push(new W.AddressLookupTableAccount({key:new W.PublicKey(a),state:W.AddressLookupTableAccount.deserialize(b64u(v.data[0]))}))}
+ var bh=await rc("getLatestBlockhash",[{commitment:"confirmed"}]);
+ return new W.VersionedTransaction(new W.TransactionMessage({payerKey:new W.PublicKey(S.pk),recentBlockhash:(bh.value||bh).blockhash,instructions:ixs}).compileToV0Message(alts))}
 async function execSwap(v,im,om,amt,slip){
  var pv=S.sw;if(!pv||!S.pk)throw new Error("Conecta una wallet de Solana primero");
  if(!window.solanaWeb3)throw new Error("No se cargó la librería de Solana");
- var V=solanaWeb3.VersionedTransaction;
+ var V=solanaWeb3.VersionedTransaction;window.kzLastFee=0;
+ var q=await jj("v1/quote?inputMint="+im+"&outputMint="+om+"&amount="+amt+"&slippageBps="+Math.round(slip*100)+(v==="Jupiter"?"":"&dexes="+encodeURIComponent(await dexFor(v))));
+ var fee=0;try{fee=await jfeeLamports(im,om,amt,q)}catch(e){fee=0}
+ if(fee>0){var tx=await jupBuild(q,fee),r0=await pv.signAndSendTransaction(tx);window.kzLastFee=fee;return r0.signature}
  if(v==="Jupiter"){
   var o=await jj("v2/order?inputMint="+im+"&outputMint="+om+"&amount="+amt+"&taker="+S.pk);if(!o.transaction)throw new Error("Jupiter no devolvió transacción");
   var sg=await pv.signTransaction(V.deserialize(b64u(o.transaction))),ex=await jj("v2/execute",{signedTransaction:u8b(sg.serialize()),requestId:o.requestId});
   if(ex.status&&ex.status!=="Success")throw new Error(ex.error||ex.status);return ex.signature||""}
- var q=await jj("v1/quote?inputMint="+im+"&outputMint="+om+"&amount="+amt+"&slippageBps="+Math.round(slip*100)+"&dexes="+encodeURIComponent(await dexFor(v)));
  var s=await jj("v1/swap",{quoteResponse:q,userPublicKey:S.pk,dynamicComputeUnitLimit:true}),r=await pv.signAndSendTransaction(V.deserialize(b64u(s.swapTransaction)));return r.signature
 }
 
@@ -735,7 +760,7 @@ function rE(){
  '<button class="btn p" style="background:rgba(255,255,255,.1);color:#fff" data-act="equote">Ver precio</button><div id="eq">'+eqHtml()+'</div><button class="btn p" data-act="eswap">Cambiar (real)</button><div class="stat" id="eres"></div>'+
  '<div class="dim" style="margin-top:6px">Kosmara compara LI.FI y KyberSwap, que a su vez buscan el mejor precio entre los DEX de '+esc(chN(id))+'. Firmas con tu wallet de Ethereum; Kosmara no toca tus fondos.</div>'}
 /* KyberSwap: segunda ruta en redes EVM. No se queda comisión propia; la tuya llega directa a KS_RCV en cada swap. */
-var KS="https://aggregator-api.kyberswap.com",KS_RCV="",KS_FEE_BPS=0,KSE="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
+var KS="https://aggregator-api.kyberswap.com",KS_RCV="0xFB6db00f8Dc3909C11aE836e7D8d249869d4a154",KS_FEE_BPS=20,KSE="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE";
 var KSC={1:"ethereum",56:"bsc",8453:"base",42161:"arbitrum",43114:"avalanche",999:"hyperevm",4663:"robinhood",137:"polygon",10:"optimism",130:"unichain",143:"monad"};
 function eqRow(q,best){return '<div class="row pick'+(q.p===EV.sel?" sel":"")+'" data-er="'+esc(q.p)+'"><div><b>'+esc(q.p)+"</b>"+(best?'<span class="tag">MEJOR</span>':"")+"<small>"+esc(q.via)+" · "+(q.p==="LI.FI"?"comisión LI.FI 0,25 %":"sin comisión de KyberSwap")+" · gas "+cur(q.gas,q.gas<.01?4:2)+'</small></div><div class="v"><b>'+f(q.out,6)+'</b><small class="'+(best?"up":"dn")+'">'+(best?"mejor precio":f(q.diff,2)+"%")+"</small></div></div>"}
 function eqHtml(){var R=EV.res||[];if(!R.length)return "";var to=evT(SW.net,EV.to[SW.net])||{},q=R.filter(function(x){return x.p===EV.sel})[0]||R[0];
@@ -975,9 +1000,9 @@ async function quoteAll(){
 async function doSwap(){
  var a=parseFloat(SW.amt),fr=TM[SW.from],to=TM[SW.to],r=SW.res.filter(function(x){return x.v===SW.sel&&!x.err})[0];
  if(!(await needSol()))return toast("Elige una wallet de Solana para continuar.");if(!r)return sres("Primero busca las mejores rutas.");
- if(!confirm("Vas a firmar un swap REAL:\n"+f(a,6)+" "+fr.s+" por unos "+f(r.out,6)+" "+to.s+" vía "+r.v+".\nRevisa los detalles en tu wallet antes de aprobar."))return;
+ if(!confirm("Vas a firmar un swap REAL:\n"+f(a,6)+" "+fr.s+" por unos "+f(r.out,6)+" "+to.s+" vía "+r.v+"."+(JFEE_BPS>0?"\nIncluye la comisión de Kosmara ("+f(JFEE_BPS/100,2)+" %), que se paga en SOL.":"")+"\nRevisa los detalles en tu wallet antes de aprobar."))return;
  try{sres("Esperando tu firma en la wallet…");var sg=await execSwap(r.v,fr.m,to.m,Math.floor(a*Math.pow(10,fr.d)),SW.slip);
-  kzCelebrate();sres('Swap enviado. <a class="lk" href="https://solscan.io/tx/'+esc(sg)+'" target="_blank" rel="noopener">Ver en Solscan ↗</a>');SW.amt="";SW.res=[];loadBal().then(rSwap)}
+  kzCelebrate();sres('Swap enviado'+(window.kzLastFee?" · comisión de Kosmara: "+f(kzLastFee/1e9,6)+" SOL":"")+'. <a class="lk" href="https://solscan.io/tx/'+esc(sg)+'" target="_blank" rel="noopener">Ver en Solscan ↗</a>');SW.amt="";SW.res=[];loadBal().then(rSwap)}
  catch(e){sres('<span class="dn">'+esc(fe(e))+"</span>")}
 }
 
