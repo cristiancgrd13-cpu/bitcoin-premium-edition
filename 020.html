@@ -465,7 +465,9 @@ function LS(k,v){try{if(v===undefined)return localStorage.getItem(k)||"";localSt
 function fp(n){return !isFinite(n)?"—":n>=1?f(n,n>=100?2:4):f(n,6)}
 function short(a){return a&&a.length>12?a.slice(0,5)+"…"+a.slice(-4):a||""}
 window.kzP=9;
-var S={key:LS("kz_jup"),rpc:LS("kz_rpc"),pk:"",wname:"",bal:{},pools:{},stat:{},flt:"all",chip:"",q:"",sort:"tvl",lim:3,sel:"",rows:[],net:"",addr:""},CSV="";
+/* Clave publicable de Kosmara en Jupiter (segura en la web: solo atribución). Un usuario avanzado puede usar la suya. */
+var KZJ="jup_pub_fc0db5fe4cd24284045be587a267338b6e067d0f97e76712fbf9692bd3830f69";
+var S={key:LS("kz_jup")||KZJ,rpc:LS("kz_rpc"),pk:"",wname:"",bal:{},pools:{},stat:{},flt:"all",chip:"",q:"",sort:"tvl",lim:3,sel:"",rows:[],net:"",addr:""},CSV="";
 var RPCS=["https://solana-rpc.publicnode.com","https://public.rpc.solanavibestation.com"];
 function rpcUrl(){return S.rpc||S.rpcOk||RPCS[0]}
 async function rc(m,p){
@@ -486,7 +488,6 @@ async function jj(u,body){
 async function labels(){if(LBL)return LBL;var m=await jj("v1/program-id-to-label"),a=[];for(var k in m)if(a.indexOf(m[k])<0)a.push(m[k]);LBL=a;return a}
 async function dexFor(v){var re={Orca:/orca|whirlpool/i,Raydium:/raydium/i}[v],d=(await labels()).filter(function(l){return re.test(l)}).join(",");if(!d)throw new Error("Jupiter no lista "+v);return d}
 async function quoteV(v,im,om,amt,slip){
- if(!S.key)throw new Error("Falta la clave de Jupiter");
  if(v==="Jupiter"){var o=await jj("v2/order?inputMint="+im+"&outputMint="+om+"&amount="+amt);return{out:+o.outAmount}}
  var q=await jj("v1/quote?inputMint="+im+"&outputMint="+om+"&amount="+amt+"&slippageBps="+Math.round(slip*100)+"&dexes="+encodeURIComponent(await dexFor(v)));return{out:+q.outAmount}
 }
@@ -770,7 +771,6 @@ function rQt(){
 async function quoteAll(){
  var a=parseFloat(SW.amt),fr=TM[SW.from],to=TM[SW.to];
  if(!(a>0)||fr===to)return sres("Elige dos activos distintos e introduce una cantidad.");
- if(!S.key)return sres("Falta la clave de Jupiter: pégala en el pestaña Wallet, bloque Conexiones.");
  var amt=Math.floor(a*Math.pow(10,fr.d));sres("Consultando rutas…");
  var R=await Promise.all(VEN.map(function(v){return quoteV(v,fr.m,to.m,amt,SW.slip).then(function(q){return{v:v,out:q.out/Math.pow(10,to.d)}},function(e){return{v:v,err:e.message}})}));
  var ok=R.filter(function(r){return !r.err}).sort(function(x,y){return y.out-x.out}),bad=R.filter(function(r){return r.err});
@@ -789,7 +789,6 @@ async function doSwap(){
 /* ---------- Conexiones ---------- */
 function rCfg(){
  $("cfg").innerHTML='<div class="k">Conexiones <small>se guardan solo en este navegador</small></div>'+
- '<label for="jk">Clave de API de Jupiter (gratis en <a class="lk" href="https://developers.jup.ag/portal" target="_blank" rel="noopener">developers.jup.ag/portal</a>)</label><input id="jk" type="password" autocomplete="off" value="'+esc(S.key)+'" placeholder="Pega tu clave">'+
  '<label for="rp">RPC de Solana (opcional; el público sirve para saldos y crear posiciones, pero para ver el Portafolio hace falta uno propio, p. ej. Helius)</label><input id="rp" type="url" autocomplete="off" value="'+esc(S.rpc)+'" placeholder="https://mainnet.helius-rpc.com/?api-key=…">';
 }
 
@@ -1000,7 +999,7 @@ function rPs(){
 async function autoswap(){
  var p=S.pools[S.sel],c=pcalc(),pay=c.payB?p.B:p.A,oth=c.payB?p.A:p.B,amt=Math.floor(c.swapIn*Math.pow(10,pay.d));
  var r=function(h){$("pres").innerHTML=h};
- if(!(await needSol()))return r("Elige una wallet de Solana para continuar.");if(!(amt>0))return r("Introduce una cantidad.");if(!S.key)return r("Falta la clave de Jupiter (pestaña Wallet, bloque Conexiones).");
+ if(!(await needSol()))return r("Elige una wallet de Solana para continuar.");if(!(amt>0))return r("Introduce una cantidad.");
  try{r("Consultando ruta…");var q=await quoteV(ST.via,pay.m,oth.m,amt,ST.slip),out=q.out/Math.pow(10,oth.d);
   if(!confirm("Vas a firmar un swap REAL para el autoswap:\n"+f(c.swapIn,6)+" "+pay.s+" por unos "+f(out,6)+" "+oth.s+" vía "+ST.via+".\nRevisa los detalles en tu wallet antes de aprobar."))return r("Cancelado.");
   r("Esperando tu firma en la wallet…");var sg=await execSwap(ST.via,pay.m,oth.m,amt,ST.slip);
@@ -1234,7 +1233,7 @@ document.addEventListener("change",function(e){
  if(id==="sf"){SW.from=t.value;SW.amt="";SW.res=[];rSwap()}else if(id==="st"){SW.to=t.value;SW.res=[];rSwap()}else if(id==="sw-slip"){SW.slip=+t.value;SW.res=[];rQt()}
  else if(id==="psort"){S.sort=t.value;S.focusQ=false;rPools()}
  else if(id==="ppay"){ST.pay=t.value;sumPs()}else if(id==="pau"){ST.auto=t.checked;sumPs()}else if(id==="pvia"){ST.via=t.value;sumPs()}else if(id==="pslp"){ST.slip=+t.value;sumPs()}
- else if(id==="jk"){S.key=t.value.trim();LS("kz_jup",S.key);toast("Clave de Jupiter guardada en este navegador.");loadPools()}
+ else if(id==="jk"){S.key=t.value.trim()||KZJ;LS("kz_jup",t.value.trim());loadPools()}
  else if(id==="rp"){S.rpc=t.value.trim();LS("kz_rpc",S.rpc);toast("RPC guardado.");if(S.pk)loadBal().then(rSwap)}
 });
 window.kzP=304;
@@ -1276,7 +1275,7 @@ var ROAD=[
  ["on","Rendimientos de Aave, Jupiter Earn y Kamino","Dólares, ETH, BTC y SOL: dónde rinde más cada token, con enlace para depositar."],
  ["on","Pools de Ethereum y BNB Chain","Uniswap, Curve y PancakeSwap con datos reales."],
  ["on","Movimientos exportables","Historial de cualquier dirección en CSV y PDF."],
- ["test","Swap con comparación de rutas","Vía Jupiter. Por ahora necesita tu clave de API."],
+ ["on","Swap en Solana con Jupiter","Sin claves ni registro: compara rutas y firmas en tu wallet."],
  ["test","Swap en 14 redes","Solana con Jupiter; Ethereum, BNB Chain, Base, Arbitrum, Avalanche, HyperEVM, Robinhood Chain, Polygon, Optimism, Unichain, Monad, Sonic y Linea con LI.FI y KyberSwap, eligiendo el mejor precio."],
  ["test","Tokens de tu wallet en el portafolio","Todo lo que tienes en Solana y en las redes EVM, con su valor en dólares."],
  ["test","Swap entre redes con THORChain","BTC, ETH, SOL, BNB, AVAX y más, nativos y sin puentes. Firmas desde tu wallet de Ethereum, BNB Chain, Base o Avalanche."],
