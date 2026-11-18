@@ -2,7 +2,7 @@
    - La página y las traducciones van siempre primero a la red (así ves la última versión) y usan la copia guardada solo sin conexión.
    - Logos e iconos se sirven desde la caché y se refrescan en segundo plano.
    - Nunca guarda llamadas a APIs ni a otros dominios: precios, saldos y firmas son siempre en vivo. */
-var V="kz-v5",SHELL=["./020.html","./manifest.webmanifest","./icons/icon-192.png"];
+var V="kz-v6",SHELL=["./020.html","./manifest.webmanifest","./icons/icon-192.png"];
 self.addEventListener("install",function(e){e.waitUntil(caches.open(V).then(function(c){return c.addAll(SHELL)}).catch(function(){}));self.skipWaiting()});
 self.addEventListener("activate",function(e){e.waitUntil(caches.keys().then(function(K){return Promise.all(K.filter(function(k){return k!==V}).map(function(k){return caches.delete(k)}))}).then(function(){return self.clients.claim()}))});
 self.addEventListener("fetch",function(e){var r=e.request,u=new URL(r.url);
