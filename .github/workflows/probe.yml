@@ -1,0 +1,10 @@
+name: probe
+on: push
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for F in 0.002; do
+          curl -s "https://li.quest/v1/quote?fromChain=8453&toChain=8453&fromToken=0x0000000000000000000000000000000000000000&toToken=0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913&fromAmount=10000000000000000&fromAddress=0x0000000000000000000000000000000000000001&slippage=0.01&integrator=kosmara-defi&fee=$F" -H "Origin: https://cristiancgrd13-cpu.github.io" | python3 -c "import sys,json;d=json.load(sys.stdin);e=d.get('estimate') or {};print('MSG',d.get('message'),'CODE',d.get('code'));print('FEES',[(x.get('name'),x.get('percentage'),x.get('amountUSD')) for x in e.get('feeCosts',[])]);print('TOOL',d.get('tool'),'OUT',e.get('toAmount'))"
+          done
